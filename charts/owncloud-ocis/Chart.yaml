@@ -1,0 +1,5 @@
+---
+apiVersion: v2
+description: ownCloud Infinite Scale is a self-hosted file sync and share server.
+name: owncloud-ocis
+version: 0.0.2
