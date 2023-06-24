@@ -1,0 +1,33 @@
+{{- $root := . }}
+{{- range $persistenceIndex, $persistenceItem := .Values.persistence }}
+  {{- if $persistenceItem.enabled -}}
+    {{- if $persistenceItem.nfs.enabled -}}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "common.fullname" $ }}-{{ $persistenceIndex }}
+spec:
+  accessModes:
+    {{- toYaml $persistenceItem.accessMode | nindent 4 }}
+  capacity:
+    storage: {{ $persistenceItem.size }}
+  nfs:
+    server: {{ $persistenceItem.nfs.server }}
+    path: {{ $persistenceItem.nfs.path }}
+    {{- end }}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "common.fullname" $ }}-{{ $persistenceIndex }}
+spec:
+  accessModes:
+    {{- toYaml $persistenceItem.accessMode | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ $persistenceItem.size }}
+  storageClassName: ""
+  {{- end -}}
+{{- end -}}
