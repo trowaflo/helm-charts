@@ -1,0 +1,11 @@
+prometheus:
+  server:
+    fullnameOverride: test
+
+    persistentVolume:
+      ## If true, Prometheus server will create/use a Persistent Volume Claim
+      ## If false, use emptyDir
+      ##
+      enabled: false
+
+      volumeName: prometheus
