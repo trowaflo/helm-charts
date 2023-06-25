@@ -14,12 +14,9 @@ controller:
   revisionHistoryLimit: 2
   replicas: 1
 
-
-
 command: []
 
 args: []
-
 
 # -- environment variables. See more environment variables in the [owncloud-ocis documentation](https://owncloud.dev/ocis/configuration/#environment-variables).
 # @default -- See below
