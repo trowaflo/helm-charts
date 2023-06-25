@@ -2,7 +2,7 @@ image:
   # -- image repository
   repository: owncloud/ocis
   # -- image tag
-  tag: 1.7.0
+  tag: 1.20.0
   # -- image pull policy
   pullPolicy: IfNotPresent
 
