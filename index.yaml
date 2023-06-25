@@ -1,0 +1,19 @@
+apiVersion: v1
+entries:
+  prometheus:
+  - apiVersion: v2
+    created: "2023-06-26T14:21:43.397041434Z"
+    dependencies:
+    - name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 22.6.7
+    description: Chart to agregate existent helm chart with custom object
+    digest: 1df19ef64f8cb1c7a65ec67cd08adde2e13120d6aa64751240623ff2e8d4902e
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: prometheus
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
+    version: 1.0.1
+generated: "2023-06-26T14:21:43.397053034Z"
