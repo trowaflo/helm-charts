@@ -1,10 +1,10 @@
 apiVersion: v2
 name: prometheus
-version: 0.2.1
+version: 0.2.2
 description: Chart to agregate existent helm chart with custom object
 dependencies:
   - name: prometheus
-    version: 22.6.4
+    version: 22.6.5
     repository: https://prometheus-community.github.io/helm-charts
 maintainers:
   - name: trowaflo
