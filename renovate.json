@@ -5,6 +5,7 @@
   ],
   "packageRules":[
     {
+      "matchManagers": "helmv3",
       "bumpVersion": "patch"
     }
   ]
