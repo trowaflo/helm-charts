@@ -1,10 +1,12 @@
+{{- if .Values.prometheus.server.persistentVolume.nfs.enabled -}}
+{{- if ne "" .Values.prometheus.server.persistentVolume.volumeName  -}}
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ .Values.server.persistentVolume.existingClaim }}
+  name: {{ .Values.prometheus.server.persistentVolume.volumeName }}
   labels:
-    app.kubernetes.io/name: {{ .Values.server.persistentVolume.existingClaim }}
+    app.kubernetes.io/name: {{ .Values.prometheus.server.persistentVolume.volumeName }}
 spec:
   capacity:
     storage: 10Gi
@@ -14,5 +16,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ""
   nfs:
-    server: 192.168.2.3
-    path: /export/k3s_nextcloud
+    server: {{ .Values.prometheus.server.persistentVolume.nfs.server }}
+    path: {{ .Values.prometheus.server.persistentVolume.nfs.path }}
+{{- end -}}
+{{- end -}}

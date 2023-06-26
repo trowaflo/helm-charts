@@ -1,11 +1,18 @@
 prometheus:
   server:
-    fullnameOverride: test
-
     persistentVolume:
       ## If true, Prometheus server will create/use a Persistent Volume Claim
       ## If false, use emptyDir
       ##
       enabled: false
 
-      volumeName: prometheus
+      volumeName: ""
+
+      storageClass: "-"
+
+      size: 10Gi
+
+      nfs:
+        enabled: false
+        server: 10.0.0.1
+        path: /path
