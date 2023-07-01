@@ -1,0 +1,41 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .Release.Name }}-helper
+spec:
+  imagePullSecrets:
+    - name: {{ .Release.Name }}-helper-registry-credentials
+  containers:
+    - name: {{ .Release.Name }}-helper
+      image: {{ .Values.init.image.repository }}:{{ .Values.init.image.tag }}
+      command: ["/bin/sh", "-c", "--"]
+      args: ["while :; do :; done & kill -STOP $! && wait $!"]
+      imagePullPolicy: Always
+      env:
+        - name: MYSQL_PORT
+          value: "3306"
+        - name: MYSQL_HOSTNAME
+          value: "{{ .Release.Name }}-db"
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-db-sec
+              key: database
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-db-sec
+              key: dbuser_login
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-db-sec
+              key: dbuser_password
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "250m"
+        limits:
+          memory: "256Mi"
+          cpu: "750m"

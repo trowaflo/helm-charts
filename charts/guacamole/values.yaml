@@ -1,0 +1,8 @@
+image:
+  repository: guacamole/guacamole
+  tag: 1.4.0
+
+guacd:
+  image:
+    repository: guacamole/guacd
+    tag: 1.4.0
