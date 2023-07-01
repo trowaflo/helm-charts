@@ -3,8 +3,6 @@ apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
   name: {{ .Release.Name }}
-  labels:
-    test: {{ .Values.traefik.host }}
 spec:
   entryPoints:
   - web
