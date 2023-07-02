@@ -73,7 +73,7 @@ spec:
       volumes:
         - name: {{ .Release.Name }}-db-volume
           persistentVolumeClaim:
-            claimName: {{ .Release.Name }}-db-pvc
+            claimName: {{ .Values.persistentVolume.volumeName }}
         - name: hookvolume
           configMap:
             name: {{ .Release.Name }}-poststarthook
