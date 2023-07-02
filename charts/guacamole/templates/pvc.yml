@@ -6,6 +6,8 @@ metadata:
   name: {{ .Values.persistentVolume.volumeName }}
 spec:
   storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
   resources:
     requests:
       storage: "{{ .Values.persistentVolume.size }}"
