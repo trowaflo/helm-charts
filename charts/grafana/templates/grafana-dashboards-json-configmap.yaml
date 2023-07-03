@@ -14,7 +14,7 @@ data:
 {{- $dashboardFound = true }}
   {{- print $key | nindent 2 }}.json:
     {{- if hasKey $value "json" }}
-    |-
+    |
       {{- $value.json | b64dec | nindent 6 }}
     {{- end }}
     {{- if hasKey $value "file" }}
