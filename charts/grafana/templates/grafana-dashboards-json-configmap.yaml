@@ -15,7 +15,7 @@ data:
   {{- print $key | nindent 2 }}.json:
     {{- if hasKey $value "json" }}
     |-
-      {{- $value.json | nindent 6 }}
+      {{- $value.json | b64dec | nindent 6 }}
     {{- end }}
     {{- if hasKey $value "file" }}
     {{- toYaml ( $files.Get $value.file ) | nindent 4}}
