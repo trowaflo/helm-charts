@@ -1,4 +1,4 @@
-{{- if .Values.dashboards }}
+{{- if .Values.dashboards -}}
 {{ $files := .Files }}
 {{- range $provider, $dashboards := .Values.dashboards }}
 apiVersion: v1
@@ -27,5 +27,4 @@ data:
 {{- end }}
 ---
 {{- end }}
-
-{{- end }}
+{{- end -}}
