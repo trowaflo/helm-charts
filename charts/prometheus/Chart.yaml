@@ -1,11 +1,16 @@
 apiVersion: v2
 name: prometheus
-version: 1.1.3
+version: 1.1.4-rc
 description: Chart to agregate existent helm chart with custom object
 dependencies:
   - name: prometheus
     version: 22.7.0
     repository: https://prometheus-community.github.io/helm-charts
+  - name: prometheus-operator-crds
+    version: 5.0.0
+    repository: https://prometheus-community.github.io/helm-charts
+
+
 maintainers:
   - name: trowaflo
     email: trowa.flo@gmail.com
