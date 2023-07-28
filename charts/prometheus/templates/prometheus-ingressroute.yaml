@@ -1,16 +1,15 @@
-{{- if index .Values "kube-prometheus-stack" "prometheus" "ingressroute" "enabled" -}}
-{{- $serviceName := printf "%s-%s" (include "kube-prometheus-stack.fullname" .) "prometheus" -}}
+{{- if .Values.prometheus.server.ingressroute.enabled -}}
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: {{ $serviceName }}
+  name: {{ .Release.Name }}
 spec:
   entryPoints:
   - web
   routes:
   - kind: Rule
-    match: PathPrefix(`{{ index .Values "kube-prometheus-stack" "prometheus" "ingressroute" "path" }}`)
+    match: PathPrefix(`{{ .Values.prometheus.server.ingressroute.path }}`)
     services:
-    - name: {{ $serviceName }}
-      port: 9090
+    - name: {{ template "prometheus.name" . }}-{{ .Values.prometheus.server.name }}
+      port: 80
 {{- end -}}
