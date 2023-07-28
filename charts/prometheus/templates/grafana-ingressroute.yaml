@@ -1,4 +1,4 @@
-{{- if ".Values.kube-prometheus-stack.grafana.ingressroute.enabled" -}}
+{{- if index .Values "kube-prometheus-stack" "grafana" "ingressroute" "enabled" -}}
 {{- $fullName := include "grafana.fullname" . -}}
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
@@ -9,7 +9,7 @@ spec:
   - web
   routes:
   - kind: Rule
-    match: PathPrefix(`{{ ".Values.kube-prometheus-stack.grafana.ingressroute.path" }}`)
+    match: PathPrefix(`{{ index .Values "kube-prometheus-stack" "grafana" "ingressroute" "path" }}`)
     services:
     - name: {{ $fullName }}-grafana
       port: 80
