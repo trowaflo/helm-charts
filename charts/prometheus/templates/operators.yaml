@@ -4,7 +4,7 @@
 # metadata:
 #   name: argocd-metrics
 #   labels:
-#     release: prometheus-stack
+#     release: prometheus
 # spec:
 #   selector:
 #     matchLabels:
@@ -17,7 +17,7 @@
 # metadata:
 #   name: argocd-server-metrics
 #   labels:
-#     release: prometheus-stack
+#     release: prometheus
 # spec:
 #   selector:
 #     matchLabels:
@@ -30,7 +30,7 @@
 # metadata:
 #   name: argocd-repo-server-metrics
 #   labels:
-#     release: prometheus-stack
+#     release: prometheus
 # spec:
 #   selector:
 #     matchLabels:
@@ -43,7 +43,7 @@
 # metadata:
 #   name: argocd-applicationset-controller-metrics
 #   labels:
-#     release: prometheus-stack
+#     release: prometheus
 # spec:
 #   selector:
 #     matchLabels:
@@ -56,7 +56,7 @@
 # metadata:
 #   name: argocd-dex-server-metrics
 #   labels:
-#     release: prometheus-stack
+#     release: prometheus
 # spec:
 #   selector:
 #     matchLabels:
@@ -69,7 +69,7 @@
 # metadata:
 #   name: argocd-notifications-controller-metrics
 #   labels:
-#     release: prometheus-stack
+#     release: prometheus
 # spec:
 #   selector:
 #     matchLabels:
