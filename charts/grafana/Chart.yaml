@@ -1,10 +1,10 @@
 apiVersion: v2
 name: grafana
-version: 0.0.12
+version: 0.0.13
 description: Chart to agregate existent helm chart with custom object
 dependencies:
   - name: grafana
-    version: 6.58.6
+    version: 6.59.0
     repository: https://grafana.github.io/helm-charts
 maintainers:
   - name: trowaflo
