@@ -1,6 +1,65 @@
 apiVersion: v1
 entries:
+  grafana:
+  - apiVersion: v2
+    created: "2023-08-27T22:22:10.954522303Z"
+    dependencies:
+    - name: grafana
+      repository: https://grafana.github.io/helm-charts
+      version: 6.59.0
+    description: Chart to agregate existent helm chart with custom object
+    digest: eaa94935efb600efa9dbb3edb67d191eb11d399b345b88b20246c740bb9f01c0
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: grafana
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/grafana-0.1.0/grafana-0.1.0.tgz
+    version: 0.1.0
+  guacamole:
+  - apiVersion: v2
+    created: "2023-08-27T22:22:11.103099385Z"
+    description: Chart for guacamole
+    digest: 9860ad02801bd5fc3093335088058d327875c2bb58769ceaa005d907d4e0ad82
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: guacamole
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/guacamole-0.1.0/guacamole-0.1.0.tgz
+    version: 0.1.0
+  portainer:
+  - apiVersion: v2
+    created: "2023-08-27T22:22:11.261564618Z"
+    dependencies:
+    - name: portainer
+      repository: https://portainer.github.io/k8s
+      version: 1.0.44
+    description: Chart to agregate existent helm chart with custom object
+    digest: d2fd2d47ebb9b49d439a367b40b5c1635f28ee9affd045859d45789fd3061802
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: portainer
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/portainer-0.0.3/portainer-0.0.3.tgz
+    version: 0.0.3
   prometheus:
+  - apiVersion: v2
+    created: "2023-08-27T22:22:11.427063689Z"
+    dependencies:
+    - name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 23.4.0
+    description: Chart to agregate existent helm chart with custom object
+    digest: 9c2f3c30b0c32687b1c6c661489544344fac40800866eb732813b31aa4c0e152
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: prometheus
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/prometheus-2.1.0/prometheus-2.1.0.tgz
+    version: 2.1.0
   - apiVersion: v2
     created: "2023-06-26T14:21:43.397041434Z"
     dependencies:
@@ -16,4 +75,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2023-06-26T14:21:43.397053034Z"
+generated: "2023-08-27T22:22:11.427075989Z"
