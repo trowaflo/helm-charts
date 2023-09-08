@@ -33,6 +33,17 @@ entries:
     version: 0.1.0
   guacamole:
   - apiVersion: v2
+    created: "2023-09-08T21:14:43.236815383Z"
+    description: Chart for guacamole
+    digest: da1baaa848b5ae470471987abe2a8c2398857fef82c058627d33b8ff7c402e46
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: guacamole
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/guacamole-0.2.1/guacamole-0.2.1.tgz
+    version: 0.2.1
+  - apiVersion: v2
     created: "2023-09-08T20:13:40.127493959Z"
     description: Chart for guacamole
     digest: c7f7180c9aa43de0973a1ef196513bd0567ded3c184c81d1dff9b00d238bf372
@@ -146,4 +157,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2023-09-08T20:35:59.214758708Z"
+generated: "2023-09-08T21:14:43.23684217Z"
