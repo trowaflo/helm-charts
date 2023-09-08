@@ -78,3 +78,7 @@ spec:
           configMap:
             name: {{ .Release.Name }}-poststarthook
             defaultMode: 0755
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
