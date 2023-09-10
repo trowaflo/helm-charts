@@ -32,13 +32,6 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}-db-sec
               key: dbuser_password
-      resources:
-        requests:
-          memory: "64Mi"
-          cpu: "250m"
-        limits:
-          memory: "256Mi"
-          cpu: "750m"
       {{- with .Values.helper.resources }}
       resources:
         {{- toYaml . | nindent 8 }}
