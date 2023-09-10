@@ -39,7 +39,7 @@ spec:
         limits:
           memory: "256Mi"
           cpu: "750m"
-{{- with .Values.affinity }}
-  affinity:
-    {{- toYaml . | nindent 8 }}
-{{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
