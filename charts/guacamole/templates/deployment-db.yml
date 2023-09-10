@@ -57,13 +57,10 @@ spec:
               port: 3306
             initialDelaySeconds: 25
             periodSeconds: 25
+          {{- with .Values.db.resources }}
           resources:
-            requests:
-              memory: "64Mi"
-              cpu: "250m"
-            limits:
-              memory: "256Mi"
-              cpu: "500m"
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: {{ .Release.Name }}-db-volume
               mountPath: "/var/lib/mysql"

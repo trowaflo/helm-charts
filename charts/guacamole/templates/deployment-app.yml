@@ -86,6 +86,10 @@ spec:
               port: 8080
             initialDelaySeconds: 10
             periodSeconds: 20
+          {{- with .Values.app.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
         - name: guacd
           image: {{ .Values.guacd.image.repository }}:{{ .Values.guacd.image.tag }}
           imagePullPolicy: IfNotPresent
@@ -101,6 +105,10 @@ spec:
               port: 4822
             initialDelaySeconds: 15
             periodSeconds: 20
+          {{- with .Values.guacd.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
     {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
