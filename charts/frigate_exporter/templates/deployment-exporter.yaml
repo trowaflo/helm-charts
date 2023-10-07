@@ -21,7 +21,7 @@ spec:
         - name: frigate-exporter
           image: rhysbailey/prometheus-frigate-exporter
           {{- with .Values.imagePullPolicy }}
-          imagePullPolicy: .
+          imagePullPolicy: {{ . }}
           {{- end }}
           env:
             - name: "FRIGATE_STATS_URL"
