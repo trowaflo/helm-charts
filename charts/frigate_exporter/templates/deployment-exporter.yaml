@@ -14,12 +14,12 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-    {{- with .Values.imagePullPolicy }}
-      imagePullPolicy: .
-    {{- end }}
       containers:
         - name: frigate-exporter
           image: rhysbailey/prometheus-frigate-exporter
+          {{- with .Values.imagePullPolicy }}
+          imagePullPolicy: .
+          {{- end }}
           env:
             - name: "FRIGATE_STATS_URL"
               value: "http://frigate.frigate.svc.cluster.local:5000/api/stats"
