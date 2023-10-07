@@ -1,0 +1,16 @@
+apiVersion: v2
+name: frigate
+version: 0.0.1
+description: Chart for agregate frigate and firgate exporter
+maintainers:
+  - name: trowaflo
+    email: trowa.flo@gmail.com
+sources:
+  - https://github.com/bairhys/prometheus-frigate-exporter
+dependencies:
+  - name: frigate
+    version: 7.0.0
+    repository: https://blakeblackshear.github.io/blakeshome-charts/
+  - name: frigate_exporter
+    version: 0.0.1
+    repository: https://trowaflo.github.io/helm-charts
