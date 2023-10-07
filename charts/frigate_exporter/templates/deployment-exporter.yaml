@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-exporter
+  name: {{ .Release.Name }}
 spec:
   replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ .Release.Name }}-exporter
+      app.kubernetes.io/name: {{ .Release.Name }}
   template:
     spec:
     {{- with .Values.imagePullSecrets }}
