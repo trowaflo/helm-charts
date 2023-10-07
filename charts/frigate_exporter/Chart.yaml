@@ -1,0 +1,9 @@
+apiVersion: v2
+name: frigate_exporter
+version: 0.0.1
+description: Chart for prometheus frigate exporter
+maintainers:
+  - name: trowaflo
+    email: trowa.flo@gmail.com
+sources:
+  - https://github.com/bairhys/prometheus-frigate-exporter

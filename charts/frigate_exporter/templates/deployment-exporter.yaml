@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}
+  template:
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.imagePullPolicy }}
+      imagePullPolicy: .
+    {{- end }}
+      containers:
+        - name: frigate-exporter
+          image: rhysbailey/prometheus-frigate-exporter
+          env:
+            - name: "FRIGATE_STATS_URL"
+              value: "http://frigate.frigate.svc.cluster.local:5000/api/stats"
+          ports:
+            - name: exporter
+              containerPort: 9100
+              protocol: TCP
