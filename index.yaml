@@ -23,6 +23,19 @@ entries:
     version: 0.0.1
   frigate_exporter:
   - apiVersion: v2
+    created: "2023-10-07T18:27:07.831402626Z"
+    description: Chart for prometheus frigate exporter
+    digest: db3b20efb84203740d785e4bbbd543652a6eb6390b921e61eaf310e864b28033
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: frigate_exporter
+    sources:
+    - https://github.com/bairhys/prometheus-frigate-exporter
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/frigate_exporter-0.0.4/frigate_exporter-0.0.4.tgz
+    version: 0.0.4
+  - apiVersion: v2
     created: "2023-10-07T18:21:49.244515858Z"
     description: Chart for prometheus frigate exporter
     digest: f202d31cf51bf22bb3487c34a5cb6f2c488e1835f5fc3ca559e4df5fb1e214e0
@@ -292,4 +305,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2023-10-07T18:21:49.244932985Z"
+generated: "2023-10-07T18:27:07.831557727Z"
