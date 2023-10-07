@@ -1,6 +1,6 @@
 apiVersion: v2
 name: frigate_exporter
-version: 0.0.2
+version: 0.0.3
 description: Chart for prometheus frigate exporter
 maintainers:
   - name: trowaflo
