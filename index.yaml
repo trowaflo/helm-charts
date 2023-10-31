@@ -116,6 +116,21 @@ entries:
     version: 0.0.1
   grafana:
   - apiVersion: v2
+    created: "2023-10-31T21:48:02.508954053Z"
+    dependencies:
+    - name: grafana
+      repository: https://grafana.github.io/helm-charts
+      version: 6.61.2
+    description: Chart to agregate existent helm chart with custom object
+    digest: 20e973bae5ddb95c21a56cbce1e784d4b96eb3652c4af844e2b201d01be6e148
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: grafana
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/grafana-0.1.2/grafana-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
     created: "2023-09-08T20:35:33.593389134Z"
     dependencies:
     - name: grafana
@@ -390,4 +405,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2023-10-31T21:46:42.110900648Z"
+generated: "2023-10-31T21:48:02.509158553Z"
