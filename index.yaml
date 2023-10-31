@@ -256,6 +256,21 @@ entries:
     version: 0.0.3
   prometheus:
   - apiVersion: v2
+    created: "2023-10-31T21:46:27.507862583Z"
+    dependencies:
+    - name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 25.4.0
+    description: Chart to agregate existent helm chart with custom object
+    digest: c941b25ec4657ccbca16cca9dbc14b806c8e9373c572c2bbaeb699f35835cf02
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: prometheus
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/prometheus-2.3.3/prometheus-2.3.3.tgz
+    version: 2.3.3
+  - apiVersion: v2
     created: "2023-10-31T21:45:55.008480447Z"
     dependencies:
     - name: prometheus
@@ -360,4 +375,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2023-10-31T21:45:55.008624955Z"
+generated: "2023-10-31T21:46:27.507918283Z"
