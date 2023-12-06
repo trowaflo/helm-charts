@@ -1,10 +1,10 @@
 apiVersion: v2
 name: portainer
-version: 0.0.5
+version: 0.0.6
 description: Chart to agregate existent helm chart with custom object
 dependencies:
   - name: portainer
-    version: 1.0.46
+    version: 1.0.49
     repository: https://portainer.github.io/k8s
 maintainers:
   - name: trowaflo
