@@ -6,7 +6,7 @@
   "packageRules":[
     {
       "groupName": "helm chart",
-      "matchManagers": "helm",
+      "matchManagers": "helmv3",
       "bumpVersion": "patch"
     }
   ]
