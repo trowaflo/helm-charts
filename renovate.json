@@ -5,7 +5,8 @@
   ],
   "packageRules":[
     {
-      "matchManagers": "helmv3",
+      "groupName": "helm chart",
+      "matchManagers": "helm",
       "bumpVersion": "patch"
     }
   ]
