@@ -1,6 +1,6 @@
 image:
   repository: guacamole/guacamole
-  tag: 1.5.3
+  tag: 1.5.4
 
 guacd:
   image:
