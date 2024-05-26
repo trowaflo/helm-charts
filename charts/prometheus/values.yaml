@@ -502,7 +502,7 @@ pveExporter:
     # -- image repository
     repository: prompve/prometheus-pve-exporter
     # -- Overrides the image tag
-    tag: "3.0.2"
+    tag: "3.4.2"
 
   # -- Number of replicas
   replicaCount: 1
