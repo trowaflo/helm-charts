@@ -4,7 +4,7 @@ version: 0.1.5
 description: Chart to agregate existent helm chart with custom object
 dependencies:
   - name: grafana
-    version: 7.3.0
+    version: 7.3.12
     repository: https://grafana.github.io/helm-charts
 maintainers:
   - name: trowaflo
