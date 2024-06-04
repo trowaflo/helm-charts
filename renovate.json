@@ -5,9 +5,14 @@
   ],
   "packageRules":[
     {
-      "groupName": "helm chart",
+      "groupName": "all minor",
       "matchManagers": "helmv3",
-      "bumpVersion": "patch"
+      "matchUpdateTypes": ["minor","patch"]
+    },
+    {
+      "groupName": "all major",
+      "matchManagers": "helmv3",
+      "matchUpdateTypes": ["major"]
     }
   ]
 }
