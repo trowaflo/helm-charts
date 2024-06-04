@@ -5,13 +5,11 @@
   ],
   "packageRules":[
     {
-      "groupName": "all minor",
-      "matchManagers": "helmv3",
+      "groupName": "Helm all minor",
       "matchUpdateTypes": ["minor","patch"]
     },
     {
       "groupName": "all major",
-      "matchManagers": "helmv3",
       "matchUpdateTypes": ["major"]
     }
   ]
