@@ -3,7 +3,6 @@
   "extends": [
     "config:base",
     "github>trowaflo/renovate:renovate.json5"
-
   ],
   "packageRules":[
     {
