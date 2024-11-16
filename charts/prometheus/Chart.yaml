@@ -4,7 +4,7 @@ version: 2.3.5
 description: Chart to agregate existent helm chart with custom object
 dependencies:
   - name: prometheus
-    version: 25.29.0
+    version: 25.30.1
     repository: https://prometheus-community.github.io/helm-charts
 maintainers:
   - name: trowaflo
