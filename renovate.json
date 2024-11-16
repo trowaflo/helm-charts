@@ -2,15 +2,5 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>trowaflo/renovate:renovate.json5"
-  ],
-  "packageRules":[
-    {
-      "groupName": "Helm all minor",
-      "matchUpdateTypes": ["minor","patch"]
-    },
-    {
-      "groupName": "all major",
-      "matchUpdateTypes": ["major"]
-    }
   ]
 }
