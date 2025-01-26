@@ -4,8 +4,8 @@ kind: Pod
 metadata:
   name: {{ .Release.Name }}-helper
 spec:
-  # imagePullSecrets:
-  #   - name: {{ .Release.Name }}-helper-registry-credentials
+  imagePullSecrets:
+    - name: {{ .Release.Name }}-helper-registry-credentials
   containers:
     - name: {{ .Release.Name }}-helper
       image: {{ .Values.init.image.repository }}:{{ .Values.init.image.tag }}
