@@ -7,7 +7,7 @@ frigateApiStatsEndpoint: "http://frigate.frigate.svc.cluster.local:5000/api/stat
 image:
   pullPolicy: IfNotPresent
   repository: rhysbailey/prometheus-frigate-exporter
-  tag: 0.1.1
+  # tag: 0.1.1
 imagePullSecrets: []
 probes:
   liveness:
