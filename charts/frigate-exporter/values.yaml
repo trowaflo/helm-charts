@@ -55,6 +55,7 @@ podSecurityContext:
     type: RuntimeDefault
   capabilities:
     drop: ["ALL"]
+  readOnlyRootFilesystem: true
 service:
   annotations: {}
   labels: {}
