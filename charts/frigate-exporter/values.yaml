@@ -42,11 +42,15 @@ probes:
     successThreshold: 1
     timeoutSeconds: 5
 resources:
+  limits:
+    cpu: 100m
+    memory: 64Mi
   requests:
     cpu: 1m
     memory: 32Mi
 securityContext:
   privilegeEscalation: false
+  runAsNonRoot: true
 service:
   annotations: {}
   labels: {}
