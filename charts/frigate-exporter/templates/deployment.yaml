@@ -88,7 +88,7 @@ spec:
             {{- include "frigateExporter.resources" . | nindent 12 }}
         {{- if .Values.podSecurityContext }}
           securityContext:
-            {{- toYaml .Values.podSecurityContext | nindent 8 }}
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
