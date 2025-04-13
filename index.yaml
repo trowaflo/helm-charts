@@ -344,6 +344,21 @@ entries:
     version: 0.1.0
   portainer:
   - apiVersion: v2
+    created: "2025-04-13T07:02:23.435084861Z"
+    dependencies:
+    - name: portainer
+      repository: https://portainer.github.io/k8s
+      version: 1.0.63
+    description: Chart to agregate existent helm chart with custom object
+    digest: 44facb3e8674b2229c8e8a648785800b5ee9d12588275b5632e913cd8ae384d0
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: portainer
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/portainer-0.0.7/portainer-0.0.7.tgz
+    version: 0.0.7
+  - apiVersion: v2
     created: "2025-01-26T20:10:15.780604614Z"
     dependencies:
     - name: portainer
@@ -554,4 +569,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2025-04-12T16:07:04.826518359Z"
+generated: "2025-04-13T07:02:23.435155944Z"
