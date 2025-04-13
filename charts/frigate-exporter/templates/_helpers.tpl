@@ -22,6 +22,7 @@
 {{- else -}}
 {{- printf "%s-%s" .Release.Name $namespace | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+{{- end -}}
 
 {{- define "frigateExporter.labels" -}}
 app.kubernetes.io/name: {{ include "frigateExporter.name" . }}
