@@ -4,7 +4,7 @@ fullnameOverride: ''
 image:
   pullPolicy: IfNotPresent
   repository: rhysbailey/prometheus-frigate-exporter
-  tag: latest
+  tag: 0.1.1
 imagePullSecrets: []
 nameOverride: ''
 probes:
@@ -51,6 +51,10 @@ resources:
 securityContext:
   privilegeEscalation: false
   runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+  capabilities:
+    drop: ["ALL"]
 service:
   annotations: {}
   labels: {}
