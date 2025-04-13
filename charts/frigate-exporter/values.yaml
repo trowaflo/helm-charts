@@ -48,14 +48,24 @@ resources:
   requests:
     cpu: 1m
     memory: 32Mi
-podSecurityContext:
-  privilegeEscalation: false
-  runAsNonRoot: true
-  seccompProfile:
-    type: RuntimeDefault
-  capabilities:
-    drop: ["ALL"]
-  readOnlyRootFilesystem: true
+# securityContext:
+#   allowPrivilegeEscalation: false
+#   runAsNonRoot: true
+#   runAsUser: 1000
+#   seccompProfile:
+#     type: RuntimeDefault
+#   capabilities:
+#     drop: ["ALL"]
+#   readOnlyRootFilesystem: true
+# podSecurityContext:
+#   allowPrivilegeEscalation: false
+#   runAsNonRoot: true
+#   runAsUser: 1000
+#   seccompProfile:
+#     type: RuntimeDefault
+#   capabilities:
+#     drop: ["ALL"]
+#   readOnlyRootFilesystem: true
 service:
   annotations: {}
   labels: {}
