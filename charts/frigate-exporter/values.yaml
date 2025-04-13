@@ -59,13 +59,13 @@ resources:
 #   readOnlyRootFilesystem: true
 podSecurityContext:
   allowPrivilegeEscalation: false
-  # runAsNonRoot: true
+  runAsNonRoot: true
 #   runAsUser: 1000
-#   seccompProfile:
-#     type: RuntimeDefault
+  seccompProfile:
+    type: RuntimeDefault
   capabilities:
     drop: ["ALL"]
-#   readOnlyRootFilesystem: true
+  readOnlyRootFilesystem: true
 service:
   annotations: {}
   labels: {}
