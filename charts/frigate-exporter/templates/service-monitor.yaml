@@ -4,6 +4,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: {{ include "frigateExporter.fullname" . }}
+  namespace: {{ include "frigateExporter.namespace" . }}
   labels:
     release: {{ .Values.serviceMonitor.labels.release }}
 spec:

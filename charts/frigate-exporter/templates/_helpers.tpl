@@ -15,6 +15,14 @@
 {{- end -}}
 {{- end -}}
 
+{{- define "frigateExporter.namespace" -}}
+{{- $namespace := default .Chart.Name .Values.namespaceOverride -}}
+{{- if contains $namespace .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $namespace | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
 {{- define "frigateExporter.labels" -}}
 app.kubernetes.io/name: {{ include "frigateExporter.name" . }}
 helm.sh/chart: {{ include "frigateExporter.chart" . }}
