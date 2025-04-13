@@ -7,23 +7,42 @@ frigateApiStatsEndpoint: "http://frigate.frigate.svc.cluster.local:5000/api/stat
 image:
   pullPolicy: IfNotPresent
   repository: rhysbailey/prometheus-frigate-exporter
-  # tag: 0.1.1
+  tag: latest
 imagePullSecrets: []
 probes:
   liveness:
-    enabled: false
+    enabled: true
+    httpGet:
+      path: /metrics
+      port: exporter
+      scheme: HTTP
     failureThreshold: 3
     initialDelaySeconds: 30
+    successThreshold: 1
+    periodSeconds: 10
     timeoutSeconds: 5
   readiness:
-    enabled: false
+    enabled: true
+    httpGet:
+      path: /metrics
+      port: exporter
+      scheme: HTTP
     failureThreshold: 3
     initialDelaySeconds: 30
+    successThreshold: 1
+    periodSeconds: 10
     timeoutSeconds: 5
   startup:
-    enabled: false
+    enabled: true
+    httpGet:
+      path: /metrics
+      port: exporter
+      scheme: HTTP
     failureThreshold: 3
+    initialDelaySeconds: 30
+    successThreshold: 1
     periodSeconds: 10
+    timeoutSeconds: 5
 service:
   annotations: {}
   labels: {}
