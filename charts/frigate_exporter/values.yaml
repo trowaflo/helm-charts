@@ -11,17 +11,17 @@ image:
 imagePullSecrets: []
 probes:
   liveness:
-    enabled: true
+    enabled: false
     failureThreshold: 3
     initialDelaySeconds: 30
     timeoutSeconds: 5
   readiness:
-    enabled: true
+    enabled: false
     failureThreshold: 3
     initialDelaySeconds: 30
     timeoutSeconds: 5
   startup:
-    enabled: true
+    enabled: false
     failureThreshold: 3
     periodSeconds: 10
 service:
