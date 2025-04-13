@@ -45,6 +45,8 @@ resources:
   requests:
     cpu: 1m
     memory: 32Mi
+securityContext:
+  privilegeEscalation: false
 service:
   annotations: {}
   labels: {}
