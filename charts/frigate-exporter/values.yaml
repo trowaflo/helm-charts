@@ -1,51 +1,58 @@
-fullnameOverride: ""
-nameOverride: ""
-
-strategyType: Recreate
-
-frigateApiStatsEndpoint: "http://frigate.frigate.svc.cluster.local:5000/api/stats"
+---
+frigateApiStatsEndpoint: http://frigate.frigate.svc.cluster.local:5000/api/stats
+fullnameOverride: ''
 image:
   pullPolicy: IfNotPresent
   repository: rhysbailey/prometheus-frigate-exporter
   tag: latest
 imagePullSecrets: []
+nameOverride: ''
 probes:
   liveness:
     enabled: true
+    failureThreshold: 3
     httpGet:
       path: /metrics
       port: exporter
       scheme: HTTP
-    failureThreshold: 3
     initialDelaySeconds: 30
-    successThreshold: 1
     periodSeconds: 10
+    successThreshold: 1
     timeoutSeconds: 5
   readiness:
     enabled: true
+    failureThreshold: 3
     httpGet:
       path: /metrics
       port: exporter
       scheme: HTTP
-    failureThreshold: 3
     initialDelaySeconds: 30
-    successThreshold: 1
     periodSeconds: 10
+    successThreshold: 1
     timeoutSeconds: 5
   startup:
     enabled: true
+    failureThreshold: 3
     httpGet:
       path: /metrics
       port: exporter
       scheme: HTTP
-    failureThreshold: 3
     initialDelaySeconds: 30
-    successThreshold: 1
     periodSeconds: 10
+    successThreshold: 1
     timeoutSeconds: 5
+resources:
+  requests:
+    cpu: 1m
+    memory: 32Mi
 service:
   annotations: {}
   labels: {}
   port: 9100
-
-# resources: {}
+serviceMonitor:
+  enabled: true
+  labels:
+    release: prometheus
+  endpoints:
+    port: exporter
+strategyType: Recreate
