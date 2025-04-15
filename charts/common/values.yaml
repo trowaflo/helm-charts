@@ -1,0 +1,83 @@
+---
+replicaCount: 1
+revisionHistoryLimit: 3
+fullnameOverride: ''
+containers:
+  - name: main-container
+env:
+  - name: "ENVVAR"
+    value: "TEST"
+image:
+  pullPolicy: Always
+  repository: traefik/whoami
+  tag: v1.10@sha256:0
+imagePullSecrets: []
+nameOverride: ''
+namespaceOverride: ''
+probes:
+  liveness:
+    enabled: true
+    failureThreshold: 3
+    httpGet:
+      path: /health
+      port: exporter
+      scheme: HTTP
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 5
+  readiness:
+    enabled: true
+    failureThreshold: 3
+    httpGet:
+      path: /health
+      port: exporter
+      scheme: HTTP
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 5
+  startup:
+    enabled: true
+    failureThreshold: 3
+    httpGet:
+      path: /health
+      port: exporter
+      scheme: HTTP
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 5
+resources:
+  limits:
+    cpu: 100m
+    memory: 64Mi
+  requests:
+    cpu: 1m
+    memory: 32Mi
+podSecurityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  seccompProfile:
+    type: RuntimeDefault
+  capabilities:
+    drop: ["ALL"]
+  readOnlyRootFilesystem: true
+services:
+  annotations: {}
+  labels: {}
+  ports:
+    http:
+      port: 80
+      protocol: uDp
+    https:
+      port: 443
+      protocol: TCp
+serviceMonitor:
+  enabled: true
+  labels:
+    release: prometheus
+  endpoints:
+    port: https
+strategyType: Recreate
