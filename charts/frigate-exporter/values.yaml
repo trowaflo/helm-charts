@@ -4,7 +4,7 @@ fullnameOverride: ''
 image:
   pullPolicy: IfNotPresent
   repository: rhysbailey/prometheus-frigate-exporter
-  tag: 0.1.1@sha256:0
+  tag: 0.1.1@sha256:6df30ca30c5a69df4f3b21c06a93043a52baf523f808de56f4a40982393b8aff
 imagePullSecrets: []
 nameOverride: ''
 namespaceOverride: ''
