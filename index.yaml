@@ -1,5 +1,19 @@
 apiVersion: v1
 entries:
+  common:
+  - apiVersion: v2
+    created: "2025-04-16T20:01:40.805973154Z"
+    description: A Helm chart for Kubernetes to deploy common resources
+    digest: 9609bdde5177076355595e75a5e2c0b39d10770a78a5258b649fc6076f9d439a
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: common
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/common-0.0.1/common-0.0.1.tgz
+    version: 0.0.1
   frigate:
   - apiVersion: v2
     appVersion: 0.12.0
@@ -44,6 +58,19 @@ entries:
     - https://github.com/trowaflo/helm-charts/releases/download/frigate-0.0.1/frigate-0.0.1.tgz
     version: 0.0.1
   frigate-exporter:
+  - apiVersion: v2
+    created: "2025-04-16T20:01:40.911403331Z"
+    description: Chart for prometheus frigate exporter
+    digest: 9df2dd3957ca08bce7c11f1437ae25c9963acde39b8950b0dd71b576fc09e965
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: frigate-exporter
+    sources:
+    - https://github.com/bairhys/prometheus-frigate-exporter
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/frigate-exporter-0.0.12/frigate-exporter-0.0.12.tgz
+    version: 0.0.12
   - apiVersion: v2
     created: "2025-04-12T16:07:04.8264384Z"
     description: Chart for prometheus frigate exporter
@@ -569,4 +596,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2025-04-13T07:02:23.435155944Z"
+generated: "2025-04-16T20:01:40.91152607Z"
