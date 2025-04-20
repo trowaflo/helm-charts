@@ -2,5 +2,5 @@
 .DS_Store
 .terraform*
 .decrypted~*
-charts/frigate-exporter/Chart.lock
-charts/frigate-exporter/charts/common-0.0.1.tgz
+Chart.lock
+charts/**/charts/**.tgz
