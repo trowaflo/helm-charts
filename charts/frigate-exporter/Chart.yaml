@@ -7,3 +7,8 @@ maintainers:
     email: trowa.flo@gmail.com
 sources:
   - https://github.com/bairhys/prometheus-frigate-exporter
+  - https://github.com/trowaflo/helm-charts/frigate-exporter
+dependencies:
+  - name: common
+    version: 0.1.0
+    repository: https://trowaflo.github.io/helm-charts
