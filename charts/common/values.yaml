@@ -68,10 +68,10 @@ services:
   annotations: {}
   labels: {}
   ports:
-    http:
+    - name: http
       port: 80
       protocol: uDp
-    https:
+    - name: https
       port: 443
       protocol: TCp
 serviceMonitor:

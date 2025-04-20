@@ -1,8 +1,8 @@
 apiVersion: v2
 name: common
-version: 0.0.1
+version: 0.1.0
 description: A Helm chart for Kubernetes to deploy common resources
-# type: library
+type: library
 maintainers:
   - name: trowaflo
     email: trowa.flo@gmail.com

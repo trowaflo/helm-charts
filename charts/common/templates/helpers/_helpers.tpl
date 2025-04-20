@@ -1,8 +1,8 @@
-{{- define "common.name" -}}
+{{- define "common.helpers.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "common.fullname" -}}
+{{- define "common.helpers.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -15,7 +15,7 @@
 {{- end -}}
 {{- end -}}
 
-{{- define "common.namespace" -}}
+{{- define "common.helpers.namespace" -}}
 {{- $namespace := default .Chart.Name .Values.namespaceOverride -}}
 {{- if contains $namespace .Release.Name -}}
 {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
@@ -24,9 +24,9 @@
 {{- end -}}
 {{- end -}}
 
-{{- define "common.labels" -}}
-app.kubernetes.io/name: {{ include "common.name" . }}
-helm.sh/chart: {{ include "common.chart" . }}
+{{- define "common.helpers.labels" -}}
+app.kubernetes.io/name: {{ include "common.helpers.name" . }}
+helm.sh/chart: {{ include "common.helpers.chart" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
@@ -34,11 +34,11 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
-{{- define "common.chart" -}}
+{{- define "common.helpers.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "common.imageTag" -}}
+{{- define "common.helpers.imageTag" -}}
 {{- if .Values.image.tag -}}
 {{ .Values.image.tag }}
 {{- else -}}
@@ -46,12 +46,12 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 {{- end -}}
 
-{{- define "common.resources" -}}
+{{- define "common.helpers.resources" -}}
 {{- $resources := .Values.resources | default dict -}}
 {{ $resources | toYaml }}
 {{- end -}}
 
-{{- define "common.protocol" -}}
+{{- define "common.helpers.protocol" -}}
 {{- $protocol := . | upper -}}
 {{- if not (has $protocol (list "TCP" "UDP" "SCTP")) -}}
 {{- fail (printf "Invalid protocol: %s. Expected: TCP, UDP, or SCTP." $protocol) -}}
