@@ -2,6 +2,20 @@ apiVersion: v1
 entries:
   common:
   - apiVersion: v2
+    created: "2025-04-20T05:39:11.866989393Z"
+    description: A Helm chart for Kubernetes to deploy common resources
+    digest: 0eaa336a115be6f42b57eb87a4845f37ef0df88256b66410c42671ebdbbb6cc8
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: common
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    type: library
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/common-0.1.0/common-0.1.0.tgz
+    version: 0.1.0
+  - apiVersion: v2
     created: "2025-04-16T20:01:40.805973154Z"
     description: A Helm chart for Kubernetes to deploy common resources
     digest: 9609bdde5177076355595e75a5e2c0b39d10770a78a5258b649fc6076f9d439a
@@ -596,4 +610,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2025-04-16T20:01:40.91152607Z"
+generated: "2025-04-20T05:39:11.867053112Z"
