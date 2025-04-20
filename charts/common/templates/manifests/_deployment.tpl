@@ -1,13 +1,12 @@
+{{- define "common.manifests.deployment" -}}
 ---
-{{ $_ := .Values }}
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "common.fullname" . }}
-  namespace: {{ include "common.namespace" . }}
+  name: {{ include "common.helpers.fullname" . }}
+  namespace: {{ include "common.helpers.namespace" . }}
   labels:
-{{ include "common.labels" . | indent 4 }}
+    {{- include "common.helpers.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
@@ -15,12 +14,12 @@ spec:
     type: {{ .Values.strategyType }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "common.name" . }}
+      app.kubernetes.io/name: {{ include "common.helpers.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "common.name" . }}
+        app.kubernetes.io/name: {{ include "common.helpers.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
       annotations:
       {{- if .Values.podAnnotations }}
@@ -40,13 +39,13 @@ spec:
     {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ include "common.imageTag" . }}"
+          image: "{{ .Values.image.repository }}:{{ include "common.helpers.imageTag" . }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-          {{- range $serviceName, $serviceValues := $_.services.ports }}
-            - name: {{ $serviceName }}
-              containerPort: {{ $serviceValues.port }}
-              protocol: {{ include "common.protocol" $serviceValues.protocol }}
+          {{- range .Values.services.ports }}
+            - name: {{ .name }}
+              containerPort: {{ .port }}
+              protocol: {{ include "common.helpers.protocol" .protocol }}
           {{- end }}
           {{- if .Values.probes.liveness.enabled }}
           livenessProbe:
@@ -87,7 +86,7 @@ spec:
           env:
             {{- toYaml .Values.env | nindent 12 }}
           resources:
-            {{- include "common.resources" . | nindent 12 }}
+            {{- include "common.helpers.resources" . | nindent 12 }}
         {{- if .Values.podSecurityContext }}
           securityContext:
             {{- toYaml .Values.podSecurityContext | nindent 12 }}
@@ -105,3 +104,4 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
 ...
+{{- end -}}
