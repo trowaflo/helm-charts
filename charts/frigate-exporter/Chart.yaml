@@ -1,9 +1,14 @@
 apiVersion: v2
 name: frigate-exporter
-version: 0.0.12
+version: 0.0.13
 description: Chart for prometheus frigate exporter
 maintainers:
   - name: trowaflo
     email: trowa.flo@gmail.com
 sources:
   - https://github.com/bairhys/prometheus-frigate-exporter
+  - https://github.com/trowaflo/helm-charts/frigate-exporter
+dependencies:
+  - name: common
+    version: 0.1.0
+    repository: https://trowaflo.github.io/helm-charts

@@ -49,6 +49,9 @@ resources:
   requests:
     cpu: 1m
     memory: 32Mi
+env:
+  - name: "FRIGATE_STATS_URL"
+    value: "http://frigate.frigate.svc.cluster.local:5000/api/stats"
 # securityContext:
 #   allowPrivilegeEscalation: false
 #   runAsNonRoot: true
@@ -67,10 +70,13 @@ podSecurityContext:
   capabilities:
     drop: ["ALL"]
   readOnlyRootFilesystem: true
-service:
+services:
   annotations: {}
   labels: {}
-  port: 9100
+  ports:
+    - name: exporter
+      port: 9100
+      protocol: TCP
 serviceMonitor:
   enabled: true
   labels:

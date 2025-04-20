@@ -2,3 +2,5 @@
 .DS_Store
 .terraform*
 .decrypted~*
+Chart.lock
+charts/**/charts/**.tgz
