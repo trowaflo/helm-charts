@@ -73,6 +73,24 @@ entries:
     version: 0.0.1
   frigate-exporter:
   - apiVersion: v2
+    created: "2025-06-27T15:09:11.219655176Z"
+    dependencies:
+    - name: common
+      repository: https://trowaflo.github.io/helm-charts
+      version: 0.1.0
+    description: Chart for prometheus frigate exporter
+    digest: 84e599f91fe819d3f74ea9595fc176b4a876aaee240bab4311fdc66a3702608b
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: frigate-exporter
+    sources:
+    - https://github.com/bairhys/prometheus-frigate-exporter
+    - https://github.com/trowaflo/helm-charts/frigate-exporter
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/frigate-exporter-0.0.14/frigate-exporter-0.0.14.tgz
+    version: 0.0.14
+  - apiVersion: v2
     created: "2025-04-20T06:13:23.470983306Z"
     dependencies:
     - name: common
@@ -628,4 +646,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2025-04-20T06:13:23.471095175Z"
+generated: "2025-06-27T15:09:11.219749562Z"
