@@ -25,6 +25,8 @@ jobs:
           enable_annotations: true
           enable_comments: true
           enable_jobs_summary: true
+          # 555ab8f9-2001-455e-a077-f2d0f41e2fb9: Unpinned Actions Full Length Commit SHA
+          exclude_queries: "555ab8f9-2001-455e-a077-f2d0f41e2fb9"
           comments_with_queries: true
           output_path: ./results
           output_formats: json
