@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "github>trowaflo/renovate-config:default.json"
+    "github>trowaflo/renovate-config:ci.json5"
   ]
 }
