@@ -1,0 +1,32 @@
+suite: test frigate-exporter service monitor
+templates:
+  - templates/common.yaml
+tests:
+  - it: should create a ServiceMonitor when enabled
+    documentIndex: 2
+    set:
+      serviceMonitor.enabled: true
+    asserts:
+      - isKind:
+          of: ServiceMonitor
+      - equal:
+          path: metadata.labels.release
+          value: prometheus
+
+  - it: should not create ServiceMonitor when disabled
+    set:
+      serviceMonitor.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 2
+
+  - it: should configure correct endpoint port
+    documentIndex: 2
+    set:
+      serviceMonitor.enabled: true
+    asserts:
+      - isKind:
+          of: ServiceMonitor
+      - equal:
+          path: spec.endpoints[0].port
+          value: exporter

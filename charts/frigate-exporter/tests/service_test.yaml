@@ -1,0 +1,27 @@
+suite: test frigate-exporter service
+templates:
+  - templates/common.yaml
+tests:
+  - it: should create a Service with correct name
+    documentIndex: 0
+    set:
+      fullnameOverride: "my-frigate-exporter"
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: my-frigate-exporter
+
+  - it: should configure service port correctly
+    documentIndex: 0
+    asserts:
+      - isKind:
+          of: Service
+      - contains:
+          path: spec.ports
+          content:
+            name: exporter
+            port: 9100
+            protocol: TCP
+            targetPort: exporter
