@@ -5,7 +5,7 @@ tests:
   - it: should create a deployment with correct name
     documentIndex: 1
     set:
-      fullnameOverride: "my-frigate-exporter"
+      fullnameOverride: "my-frigate-exporterrr"
     asserts:
       - isKind:
           of: Deployment
