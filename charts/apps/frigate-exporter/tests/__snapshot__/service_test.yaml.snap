@@ -1,0 +1,21 @@
+should match snapshot with default values:
+  1: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: frigate-exporter
+        helm.sh/chart: frigate-exporter-0.0.14
+      name: RELEASE-NAME-frigate-exporter
+      namespace: RELEASE-NAME-frigate-exporter
+    spec:
+      ports:
+        - name: exporter
+          port: 9100
+          protocol: TCP
+          targetPort: exporter
+      selector:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: frigate-exporter

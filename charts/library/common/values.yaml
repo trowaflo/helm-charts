@@ -15,12 +15,13 @@ imagePullSecrets: []
 nameOverride: ''
 namespaceOverride: ''
 probes:
+  enabled: true
   liveness:
     enabled: true
     failureThreshold: 3
     httpGet:
       path: /health
-      port: exporter
+      port: http
       scheme: HTTP
     initialDelaySeconds: 30
     periodSeconds: 10
@@ -31,7 +32,7 @@ probes:
     failureThreshold: 3
     httpGet:
       path: /health
-      port: exporter
+      port: http
       scheme: HTTP
     initialDelaySeconds: 30
     periodSeconds: 10
@@ -42,23 +43,23 @@ probes:
     failureThreshold: 3
     httpGet:
       path: /health
-      port: exporter
+      port: http
       scheme: HTTP
-    initialDelaySeconds: 30
+    initialDelaySeconds: 60
     periodSeconds: 10
     successThreshold: 1
     timeoutSeconds: 5
 resources:
   limits:
-    cpu: 100m
-    memory: 64Mi
+    cpu: 2
+    memory: 2Gi
   requests:
     cpu: 1m
     memory: 32Mi
 podSecurityContext:
   allowPrivilegeEscalation: false
   runAsNonRoot: true
-  runAsUser: 10000
+  runAsUser: 65534
   seccompProfile:
     type: RuntimeDefault
   capabilities:
@@ -70,10 +71,10 @@ services:
   ports:
     - name: http
       port: 80
-      protocol: uDp
+      protocol: UDP
     - name: https
       port: 443
-      protocol: TCp
+      protocol: TCP
 serviceMonitor:
   enabled: true
   labels:

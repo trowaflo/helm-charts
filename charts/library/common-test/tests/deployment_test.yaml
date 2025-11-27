@@ -32,6 +32,7 @@ tests:
   - it: should respect probe enabled flags
     documentIndex: 1
     set:
+      probes.enabled: true
       probes.liveness.enabled: false
       probes.readiness.enabled: true
       probes.startup.enabled: false
@@ -39,6 +40,18 @@ tests:
       - isNull:
           path: spec.template.spec.containers[0].livenessProbe
       - isNotNull:
+          path: spec.template.spec.containers[0].readinessProbe
+      - isNull:
+          path: spec.template.spec.containers[0].startupProbe
+
+  - it: should disable all probes when global disabled
+    documentIndex: 1
+    set:
+      probes.enabled: false
+    asserts:
+      - isNull:
+          path: spec.template.spec.containers[0].livenessProbe
+      - isNull:
           path: spec.template.spec.containers[0].readinessProbe
       - isNull:
           path: spec.template.spec.containers[0].startupProbe

@@ -1,0 +1,16 @@
+should match snapshot when enabled:
+  1: |
+    apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      labels:
+        release: prometheus
+      name: RELEASE-NAME-frigate-exporter
+      namespace: RELEASE-NAME-frigate-exporter
+    spec:
+      endpoints:
+        - port: exporter
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: frigate-exporter

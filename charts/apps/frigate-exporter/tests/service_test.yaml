@@ -1,27 +1,24 @@
-suite: test frigate-exporter service
+suite: test frigate-exporter chart - Service
 templates:
   - templates/common.yaml
 tests:
-  - it: should create a Service with correct name
+  # Snapshot = validates complete coherence with default values
+  - it: should match snapshot with default values
     documentIndex: 0
-    set:
-      fullnameOverride: "my-frigate-exporter"
     asserts:
-      - isKind:
-          of: Service
-      - equal:
-          path: metadata.name
-          value: my-frigate-exporter
+      - matchSnapshot: {}
 
-  - it: should configure service port correctly
+  - it: should have correct ports defined
     documentIndex: 0
     asserts:
-      - isKind:
-          of: Service
-      - contains:
-          path: spec.ports
-          content:
-            name: exporter
+      # Number of ports defined
+      - lengthEqual:
+          path: "spec.ports"
+          count: 1
+      - equal:
+          path: "spec.ports[0]"
+          value:
+            name: "exporter"
             port: 9100
-            protocol: TCP
+            protocol: "TCP"
             targetPort: exporter

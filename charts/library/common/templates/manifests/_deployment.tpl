@@ -47,7 +47,7 @@ spec:
               containerPort: {{ .port }}
               protocol: {{ include "common.helpers.protocol" .protocol }}
           {{- end }}
-          {{- if .Values.probes.liveness.enabled }}
+          {{- if and .Values.probes.enabled .Values.probes.liveness.enabled }}
           livenessProbe:
             httpGet:
               path: {{ .Values.probes.liveness.httpGet.path }}
@@ -59,19 +59,19 @@ spec:
             periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
             timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
           {{- end }}
-          {{- if .Values.probes.readiness.enabled }}
+          {{- if and .Values.probes.enabled .Values.probes.readiness.enabled }}
           readinessProbe:
             httpGet:
-              path: {{ .Values.probes.liveness.httpGet.path }}
-              port: {{ .Values.probes.liveness.httpGet.port }}
-              scheme: {{ .Values.probes.liveness.httpGet.scheme }}
-            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
-            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
-            successThreshold: {{ .Values.probes.liveness.successThreshold }}
-            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
-            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+              path: {{ .Values.probes.readiness.httpGet.path }}
+              port: {{ .Values.probes.readiness.httpGet.port }}
+              scheme: {{ .Values.probes.readiness.httpGet.scheme }}
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+            successThreshold: {{ .Values.probes.readiness.successThreshold }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
           {{- end }}
-          {{- if .Values.probes.startup.enabled }}
+          {{- if and .Values.probes.enabled .Values.probes.startup.enabled }}
           startupProbe:
             httpGet:
               path: {{ .Values.probes.startup.httpGet.path }}
@@ -84,7 +84,15 @@ spec:
             timeoutSeconds: {{ .Values.probes.startup.timeoutSeconds }}
           {{- end }}
           env:
-            {{- toYaml .Values.env | nindent 12 }}
+            {{- range .Values.env }}
+            - name: {{ .name | quote }}
+              {{- if .value }}
+              value: {{ tpl .value $ | quote }}
+              {{- else if .valueFrom }}
+              valueFrom:
+                {{- toYaml .valueFrom | nindent 16 }}
+              {{- end }}
+            {{- end }}
           resources:
             {{- include "common.helpers.resources" . | nindent 12 }}
         {{- if .Values.podSecurityContext }}

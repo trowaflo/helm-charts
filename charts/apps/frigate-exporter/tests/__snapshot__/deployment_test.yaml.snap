@@ -6,17 +6,17 @@ should match snapshot with default values:
       labels:
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: common-test
-        helm.sh/chart: common-test-0.1.0
-      name: RELEASE-NAME-common-test
-      namespace: RELEASE-NAME-common-test
+        app.kubernetes.io/name: frigate-exporter
+        helm.sh/chart: frigate-exporter-0.0.14
+      name: RELEASE-NAME-frigate-exporter
+      namespace: RELEASE-NAME-frigate-exporter
     spec:
       replicas: 1
       revisionHistoryLimit: 3
       selector:
         matchLabels:
           app.kubernetes.io/instance: RELEASE-NAME
-          app.kubernetes.io/name: common-test
+          app.kubernetes.io/name: frigate-exporter
       strategy:
         type: Recreate
       template:
@@ -24,37 +24,34 @@ should match snapshot with default values:
           annotations: null
           labels:
             app.kubernetes.io/instance: RELEASE-NAME
-            app.kubernetes.io/name: common-test
+            app.kubernetes.io/name: frigate-exporter
         spec:
           automountServiceAccountToken: false
           containers:
             - env:
-                - name: ENVVAR
-                  value: TEST
-              image: traefik/whoami:v1.10@sha256:1699d99cb4b9acc17f74ca670b3d8d0b7ba27c948b3445f0593b58ebece92f04
-              imagePullPolicy: Always
+                - name: FRIGATE_STATS_URL
+                  value: http://RELEASE-NAME-frigate-exporter.RELEASE-NAME-frigate-exporter.svc.cluster.local:5000/api/stats
+              image: rhysbailey/prometheus-frigate-exporter:0.1.1@sha256:6df30ca30c5a69df4f3b21c06a93043a52baf523f808de56f4a40982393b8aff
+              imagePullPolicy: IfNotPresent
               livenessProbe:
                 failureThreshold: 3
                 httpGet:
-                  path: /health
+                  path: /metrics
                   port: http
                   scheme: HTTP
                 initialDelaySeconds: 30
                 periodSeconds: 10
                 successThreshold: 1
                 timeoutSeconds: 5
-              name: common-test
+              name: frigate-exporter
               ports:
-                - containerPort: 80
-                  name: http
-                  protocol: UDP
-                - containerPort: 443
-                  name: https
+                - containerPort: 9100
+                  name: exporter
                   protocol: TCP
               readinessProbe:
                 failureThreshold: 3
                 httpGet:
-                  path: /health
+                  path: /metrics
                   port: http
                   scheme: HTTP
                 initialDelaySeconds: 30
@@ -75,13 +72,13 @@ should match snapshot with default values:
                     - ALL
                 readOnlyRootFilesystem: true
                 runAsNonRoot: true
-                runAsUser: 10000
+                runAsUser: 1000
                 seccompProfile:
                   type: RuntimeDefault
               startupProbe:
                 failureThreshold: 3
                 httpGet:
-                  path: /health
+                  path: /metrics
                   port: http
                   scheme: HTTP
                 initialDelaySeconds: 60
