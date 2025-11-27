@@ -1,0 +1,93 @@
+suite: test graphite-exporter deployment
+# templates:
+#   - templates/common.yaml
+tests:
+  - it: should create a deployment with correct name
+    documentIndex: 1
+    set:
+      fullnameOverride: "my-graphite-exporter"
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: metadata.name
+          value: my-graphite-exporter
+      - matchSnapshot: {}
+
+  # - it: should set correct image repository and tag
+  #   documentIndex: 1
+  #   asserts:
+  #     - isKind:
+  #         of: Deployment
+  #     - equal:
+  #         path: spec.template.spec.containers[0].image
+  #         value: "rhysbailey/prometheus-frigate-exporter:0.1.1@sha256:6df30ca30c5a69df4f3b21c06a93043a52baf523f808de56f4a40982393b8aff"
+
+  # - it: should configure environment variables correctly
+  #   documentIndex: 1
+  #   asserts:
+  #     - isKind:
+  #         of: Deployment
+  #     - contains:
+  #         path: spec.template.spec.containers[0].env
+  #         content:
+  #           name: "FRIGATE_STATS_URL"
+  #           value: "http://frigate.frigate.svc.cluster.local.:5000/api/stats"
+
+  # - it: should set resource limits and requests
+  #   documentIndex: 1
+  #   asserts:
+  #     - isKind:
+  #         of: Deployment
+  #     - equal:
+  #         path: spec.template.spec.containers[0].resources.limits.cpu
+  #         value: "100m"
+  #     - equal:
+  #         path: spec.template.spec.containers[0].resources.limits.memory
+  #         value: "64Mi"
+  #     - equal:
+  #         path: spec.template.spec.containers[0].resources.requests.cpu
+  #         value: "1m"
+  #     - equal:
+  #         path: spec.template.spec.containers[0].resources.requests.memory
+  #         value: "32Mi"
+
+  # - it: should configure security context correctly
+  #   documentIndex: 1
+  #   asserts:
+  #     - isKind:
+  #         of: Deployment
+  #     - equal:
+  #         path: spec.template.spec.containers[0].securityContext.runAsNonRoot
+  #         value: true
+  #     - equal:
+  #         path: spec.template.spec.containers[0].securityContext.runAsUser
+  #         value: 1000
+  #     - equal:
+  #         path: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+  #         value: false
+
+  # - it: should configure liveness probe
+  #   documentIndex: 1
+  #   asserts:
+  #     - isKind:
+  #         of: Deployment
+  #     - isNotNull:
+  #         path: spec.template.spec.containers[0].livenessProbe
+  #     - equal:
+  #         path: spec.template.spec.containers[0].livenessProbe.httpGet.path
+  #         value: "/metrics"
+  #     - equal:
+  #         path: spec.template.spec.containers[0].livenessProbe.httpGet.port
+  #         value: exporter
+
+  # - it: should configure readiness probe
+  #   documentIndex: 1
+  #   asserts:
+  #     - isKind:
+  #         of: Deployment
+  #     - isNotNull:
+  #         path: spec.template.spec.containers[0].readinessProbe
+  #     - equal:
+  #         path: spec.template.spec.containers[0].readinessProbe.httpGet.path
+  #         value: "/metrics"

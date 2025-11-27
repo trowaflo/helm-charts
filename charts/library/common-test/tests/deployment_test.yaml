@@ -1,0 +1,44 @@
+suite: test common chart - Deployment
+templates:
+  - templates/common.yaml
+tests:
+  # Snapshot = validates complete coherence with default values
+  - it: should match snapshot with default values
+    documentIndex: 1
+    asserts:
+      - matchSnapshot: {}
+
+  # Test computed values - fullnameOverride
+  - it: should compute fullnameOverride correctly
+    documentIndex: 1
+    set:
+      fullnameOverride: "my-custom-name"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-custom-name
+
+  # Test computed values - nameOverride
+  - it: should compute nameOverride correctly
+    documentIndex: 1
+    set:
+      nameOverride: "custom"
+    asserts:
+      - equal:
+          path: "metadata.labels[\"app.kubernetes.io/name\"]"
+          value: custom
+
+  # Test conditional logic - probes
+  - it: should respect probe enabled flags
+    documentIndex: 1
+    set:
+      probes.liveness.enabled: false
+      probes.readiness.enabled: true
+      probes.startup.enabled: false
+    asserts:
+      - isNull:
+          path: spec.template.spec.containers[0].livenessProbe
+      - isNotNull:
+          path: spec.template.spec.containers[0].readinessProbe
+      - isNull:
+          path: spec.template.spec.containers[0].startupProbe

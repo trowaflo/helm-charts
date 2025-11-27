@@ -1,0 +1,16 @@
+should match snapshot when enabled:
+  1: |
+    apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      labels:
+        release: prometheus
+      name: RELEASE-NAME-common-test
+      namespace: RELEASE-NAME-common-test
+    spec:
+      endpoints:
+        - port: https
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: common-test

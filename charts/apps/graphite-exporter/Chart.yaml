@@ -1,0 +1,23 @@
+apiVersion: v2
+name: graphite-exporter
+version: 0.0.1
+description: A Prometheus exporter for Graphite metrics
+type: application
+keywords:
+  - prometheus
+  - exporter
+  - graphite
+  - monitoring
+  - metrics
+home: https://github.com/trowaflo/helm-charts
+icon: https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/images/prometheus-logo.svg
+maintainers:
+  - name: trowaflo
+    email: trowa.flo@gmail.com
+sources:
+  - https://github.com/prometheus/graphite_exporter
+  - https://github.com/trowaflo/helm-charts
+dependencies:
+  - name: common
+    version: 0.1.0
+    repository: https://trowaflo.github.io/helm-charts

@@ -1,0 +1,14 @@
+apiVersion: v2
+name: common-test
+version: 0.1.0
+description: Test chart for common library chart
+type: application
+maintainers:
+  - name: trowaflo
+    email: trowa.flo@gmail.com
+sources:
+  - https://github.com/trowaflo/helm-charts
+dependencies:
+  - name: common
+    version: 0.1.0
+    repository: file://../common

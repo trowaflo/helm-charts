@@ -1,0 +1,25 @@
+should match snapshot with default values:
+  1: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: common-test
+        helm.sh/chart: common-test-0.1.0
+      name: RELEASE-NAME-common-test
+      namespace: RELEASE-NAME-common-test
+    spec:
+      ports:
+        - name: http
+          port: 80
+          protocol: UDP
+          targetPort: http
+        - name: https
+          port: 443
+          protocol: TCP
+          targetPort: https
+      selector:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: common-test

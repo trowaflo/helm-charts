@@ -1,0 +1,32 @@
+suite: test common chart - Service
+templates:
+  - templates/common.yaml
+tests:
+  # Snapshot = validates complete coherence with default values
+  - it: should match snapshot with default values
+    documentIndex: 0
+    asserts:
+      - matchSnapshot: {}
+
+  # Test computed values - fullnameOverride
+  - it: should compute fullnameOverride correctly
+    documentIndex: 0
+    set:
+      fullnameOverride: "my-service"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-service
+
+  # Test computed values - nameOverride
+  - it: should compute nameOverride correctly
+    documentIndex: 0
+    set:
+      nameOverride: "custom"
+    asserts:
+      - equal:
+          path: "metadata.labels[\"app.kubernetes.io/name\"]"
+          value: custom
+      - equal:
+          path: "spec.selector[\"app.kubernetes.io/name\"]"
+          value: custom

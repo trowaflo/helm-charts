@@ -1,0 +1,44 @@
+suite: test common chart - ServiceMonitor
+templates:
+  - templates/common.yaml
+tests:
+  # Snapshot = validates complete coherence with default values
+  - it: should match snapshot when enabled
+    documentIndex: 2
+    asserts:
+      - matchSnapshot: {}
+
+  # Test computed values - fullnameOverride
+  - it: should compute fullnameOverride correctly
+    documentIndex: 2
+    set:
+      fullnameOverride: "my-servicemonitor"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-servicemonitor
+
+  # Test computed values - nameOverride
+  - it: should compute nameOverride correctly
+    documentIndex: 2
+    set:
+      nameOverride: "custom"
+    asserts:
+      - equal:
+          path: "spec.selector.matchLabels[\"app.kubernetes.io/name\"]"
+          value: custom
+
+  # Test conditional logic - serviceMonitor.enabled
+  - it: should create ServiceMonitor when enabled
+    set:
+      serviceMonitor.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 3
+
+  - it: should not create ServiceMonitor when disabled
+    set:
+      serviceMonitor.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 2
