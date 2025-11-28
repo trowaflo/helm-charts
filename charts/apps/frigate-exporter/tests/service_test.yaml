@@ -2,7 +2,7 @@ suite: test frigate-exporter chart - Service
 templates:
   - templates/common.yaml
 values:
-  - ./values/default.yaml
+  - values/default.yaml
 release:
   name: frigate-exporter-testing
   namespace: frigate-exporter-testing

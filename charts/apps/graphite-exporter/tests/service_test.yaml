@@ -1,4 +1,4 @@
-suite: test graphite-exporter chart - Deployment
+suite: test graphite-exporter chart - Service
 templates:
   - templates/common.yaml
 values:
@@ -6,6 +6,6 @@ values:
 tests:
   # Snapshot = validates complete coherence with default values
   - it: should match snapshot with default values
-    documentIndex: 1
+    documentIndex: 0
     asserts:
       - matchSnapshot: {}

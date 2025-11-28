@@ -1,0 +1,29 @@
+should match snapshot with default values:
+  1: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: name-override-test
+        helm.sh/chart: graphite-exporter-0.0.1
+      name: RELEASE-NAME-name-override-test
+      namespace: RELEASE-NAME-namespace-override-test
+    spec:
+      ports:
+        - name: graphite-tcp
+          port: 9109
+          protocol: TCP
+          targetPort: graphite-tcp
+        - name: graphite-udp
+          port: 9109
+          protocol: UDP
+          targetPort: graphite-udp
+        - name: main
+          port: 9108
+          protocol: TCP
+          targetPort: main
+      selector:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: name-override-test

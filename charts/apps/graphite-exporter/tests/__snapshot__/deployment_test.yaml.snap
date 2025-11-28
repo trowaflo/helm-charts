@@ -1,4 +1,4 @@
-should create a deployment with correct name:
+should match snapshot with default values:
   1: |
     apiVersion: apps/v1
     kind: Deployment
@@ -6,17 +6,17 @@ should create a deployment with correct name:
       labels:
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: graphite-exporter
+        app.kubernetes.io/name: name-override-test
         helm.sh/chart: graphite-exporter-0.0.1
-      name: my-graphite-exporter
-      namespace: RELEASE-NAME-graphite-exporter
+      name: RELEASE-NAME-name-override-test
+      namespace: RELEASE-NAME-namespace-override-test
     spec:
       replicas: 1
       revisionHistoryLimit: 3
       selector:
         matchLabels:
           app.kubernetes.io/instance: RELEASE-NAME
-          app.kubernetes.io/name: graphite-exporter
+          app.kubernetes.io/name: name-override-test
       strategy:
         type: Recreate
       template:
@@ -24,7 +24,7 @@ should create a deployment with correct name:
           annotations: null
           labels:
             app.kubernetes.io/instance: RELEASE-NAME
-            app.kubernetes.io/name: graphite-exporter
+            app.kubernetes.io/name: name-override-test
         spec:
           automountServiceAccountToken: false
           containers:
@@ -37,7 +37,7 @@ should create a deployment with correct name:
                 failureThreshold: 3
                 httpGet:
                   path: /metrics
-                  port: exporter
+                  port: main
                   scheme: HTTP
                 initialDelaySeconds: 30
                 periodSeconds: 10
@@ -45,20 +45,20 @@ should create a deployment with correct name:
                 timeoutSeconds: 5
               name: graphite-exporter
               ports:
-                - containerPort: 9108
-                  name: exporter
+                - containerPort: 9109
+                  name: graphite-tcp
                   protocol: TCP
                 - containerPort: 9109
                   name: graphite-udp
                   protocol: UDP
-                - containerPort: 9109
-                  name: graphite-tcp
+                - containerPort: 9108
+                  name: main
                   protocol: TCP
               readinessProbe:
                 failureThreshold: 3
                 httpGet:
                   path: /metrics
-                  port: exporter
+                  port: main
                   scheme: HTTP
                 initialDelaySeconds: 30
                 periodSeconds: 10
@@ -66,8 +66,8 @@ should create a deployment with correct name:
                 timeoutSeconds: 5
               resources:
                 limits:
-                  cpu: 100m
-                  memory: 64Mi
+                  cpu: 2
+                  memory: 2Gi
                 requests:
                   cpu: 1m
                   memory: 32Mi
@@ -78,16 +78,16 @@ should create a deployment with correct name:
                     - ALL
                 readOnlyRootFilesystem: true
                 runAsNonRoot: true
-                runAsUser: 10000
+                runAsUser: 65534
                 seccompProfile:
                   type: RuntimeDefault
               startupProbe:
                 failureThreshold: 3
                 httpGet:
                   path: /metrics
-                  port: exporter
+                  port: main
                   scheme: HTTP
-                initialDelaySeconds: 30
+                initialDelaySeconds: 60
                 periodSeconds: 10
                 successThreshold: 1
                 timeoutSeconds: 5

@@ -44,7 +44,10 @@ should match snapshot with default values:
                 successThreshold: 1
                 timeoutSeconds: 5
               name: frigate-exporter
-              ports: null
+              ports:
+                - containerPort: 9100
+                  name: main
+                  protocol: TCP
               readinessProbe:
                 failureThreshold: 3
                 httpGet:

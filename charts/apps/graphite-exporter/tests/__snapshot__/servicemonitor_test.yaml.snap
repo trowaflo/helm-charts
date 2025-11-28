@@ -1,0 +1,16 @@
+should match snapshot when enabled:
+  1: |
+    apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      labels:
+        release: prometheus
+      name: graphite-exporter-testing-name-override-test
+      namespace: graphite-exporter-testing-namespace-override-test
+    spec:
+      endpoints:
+        - port: https
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: graphite-exporter-testing
+          app.kubernetes.io/name: name-override-test
