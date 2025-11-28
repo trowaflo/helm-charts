@@ -6,17 +6,17 @@ should match snapshot with default values:
       labels:
         app.kubernetes.io/instance: common-test
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: testing-frigate-exporter
+        app.kubernetes.io/name: name-override-test
         helm.sh/chart: common-test-0.1.0
-      name: common-test-testing-frigate-exporter
-      namespace: common-test-testing-frigate-exporter
+      name: common-test-name-override-test
+      namespace: common-test-namespace-override-test
     spec:
       replicas: 1
       revisionHistoryLimit: 3
       selector:
         matchLabels:
           app.kubernetes.io/instance: common-test
-          app.kubernetes.io/name: testing-frigate-exporter
+          app.kubernetes.io/name: name-override-test
       strategy:
         type: Recreate
       template:
@@ -24,7 +24,7 @@ should match snapshot with default values:
           annotations: null
           labels:
             app.kubernetes.io/instance: common-test
-            app.kubernetes.io/name: testing-frigate-exporter
+            app.kubernetes.io/name: name-override-test
         spec:
           automountServiceAccountToken: false
           containers:
@@ -37,7 +37,7 @@ should match snapshot with default values:
                 failureThreshold: 3
                 httpGet:
                   path: /health
-                  port: http
+                  port: main
                   scheme: HTTP
                 initialDelaySeconds: 30
                 periodSeconds: 10
@@ -49,7 +49,7 @@ should match snapshot with default values:
                 failureThreshold: 3
                 httpGet:
                   path: /health
-                  port: http
+                  port: main
                   scheme: HTTP
                 initialDelaySeconds: 30
                 periodSeconds: 10
@@ -76,7 +76,7 @@ should match snapshot with default values:
                 failureThreshold: 3
                 httpGet:
                   path: /health
-                  port: http
+                  port: main
                   scheme: HTTP
                 initialDelaySeconds: 60
                 periodSeconds: 10

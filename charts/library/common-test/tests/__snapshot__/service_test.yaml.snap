@@ -6,10 +6,10 @@ should match snapshot with default values:
       labels:
         app.kubernetes.io/instance: common-test
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: testing-frigate-exporter
+        app.kubernetes.io/name: name-override-test
         helm.sh/chart: common-test-0.1.0
-      name: common-test-testing-frigate-exporter
-      namespace: common-test-testing-frigate-exporter
+      name: common-test-name-override-test
+      namespace: common-test-namespace-override-test
     spec:
       ports:
         - name: main
@@ -18,4 +18,4 @@ should match snapshot with default values:
           targetPort: main
       selector:
         app.kubernetes.io/instance: common-test
-        app.kubernetes.io/name: testing-frigate-exporter
+        app.kubernetes.io/name: name-override-test

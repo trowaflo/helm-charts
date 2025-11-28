@@ -21,7 +21,7 @@ probes:
     failureThreshold: 3
     httpGet:
       path: /health
-      port: http
+      port: main
       scheme: HTTP
     initialDelaySeconds: 30
     periodSeconds: 10
@@ -32,7 +32,7 @@ probes:
     failureThreshold: 3
     httpGet:
       path: /health
-      port: http
+      port: main
       scheme: HTTP
     initialDelaySeconds: 30
     periodSeconds: 10
@@ -43,7 +43,7 @@ probes:
     failureThreshold: 3
     httpGet:
       path: /health
-      port: http
+      port: main
       scheme: HTTP
     initialDelaySeconds: 60
     periodSeconds: 10
@@ -73,6 +73,7 @@ services:
     ports:
       protocol: TCP
       port: 80
+
 serviceMonitor:
   enabled: true
   labels:
