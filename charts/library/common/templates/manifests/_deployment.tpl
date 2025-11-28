@@ -83,16 +83,14 @@ spec:
             periodSeconds: {{ .Values.probes.startup.periodSeconds }}
             timeoutSeconds: {{ .Values.probes.startup.timeoutSeconds }}
           {{- end }}
+          {{- if .Values.args }}
+          args:
+            {{- toYaml .Values.args | nindent 12 }}
+          {{- end }}
+          {{- if .Values.env }}
           env:
-            {{- range .Values.env }}
-            - name: {{ .name | quote }}
-              {{- if .value }}
-              value: {{ tpl .value $ | quote }}
-              {{- else if .valueFrom }}
-              valueFrom:
-                {{- toYaml .valueFrom | nindent 16 }}
-              {{- end }}
-            {{- end }}
+            {{- toYaml .Values.env | nindent 12 }}
+          {{- end }}
           resources:
             {{- include "common.helpers.resources" . | nindent 12 }}
         {{- if .Values.podSecurityContext }}

@@ -60,3 +60,21 @@ tests:
           path: spec.template.spec.containers[0].readinessProbe
       - isNull:
           path: spec.template.spec.containers[0].startupProbe
+
+  - it: should have args and env from values
+    documentIndex: 1
+    set:
+      args:
+        - "--test-arg=value"
+      env:
+        - name: TEST_ENVVAR
+          value: "envvalue"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args[0]
+          value: "--test-arg=value"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: TEST_ENVVAR
+            value: "envvalue"

@@ -4,9 +4,8 @@ revisionHistoryLimit: 3
 fullnameOverride: ''
 containers:
   - name: main-container
-env:
-  - name: "ENVVAR"
-    value: "TEST"
+args: []
+env: {}
 image:
   pullPolicy: Always
   repository: traefik/whoami

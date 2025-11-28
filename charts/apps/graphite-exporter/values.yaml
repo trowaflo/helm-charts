@@ -13,6 +13,8 @@ probes:
   startup:
     httpGet:
       path: /metrics
+args:
+  - "--graphite.listen-address=:9109"
 services:
   main:
     enabled: true
@@ -35,3 +37,6 @@ services:
     ports:
       protocol: TCP
       port: 9109
+serviceMonitor:
+  endpoints:
+    port: main
