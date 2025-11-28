@@ -4,22 +4,18 @@ should match snapshot with default values:
     kind: Service
     metadata:
       labels:
-        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/instance: common-test
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: common-test
+        app.kubernetes.io/name: testing-frigate-exporter
         helm.sh/chart: common-test-0.1.0
-      name: RELEASE-NAME-common-test
-      namespace: RELEASE-NAME-common-test
+      name: common-test-testing-frigate-exporter
+      namespace: common-test-testing-frigate-exporter
     spec:
       ports:
-        - name: http
+        - name: main
           port: 80
-          protocol: UDP
-          targetPort: http
-        - name: https
-          port: 443
           protocol: TCP
-          targetPort: https
+          targetPort: main
       selector:
-        app.kubernetes.io/instance: RELEASE-NAME
-        app.kubernetes.io/name: common-test
+        app.kubernetes.io/instance: common-test
+        app.kubernetes.io/name: testing-frigate-exporter

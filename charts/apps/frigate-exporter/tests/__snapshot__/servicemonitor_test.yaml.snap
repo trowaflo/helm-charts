@@ -5,12 +5,12 @@ should match snapshot when enabled:
     metadata:
       labels:
         release: prometheus
-      name: RELEASE-NAME-frigate-exporter
-      namespace: RELEASE-NAME-frigate-exporter
+      name: frigate-exporter-testing-name-override-test
+      namespace: frigate-exporter-testing-namespace-override-test
     spec:
       endpoints:
         - port: exporter
       selector:
         matchLabels:
-          app.kubernetes.io/instance: RELEASE-NAME
-          app.kubernetes.io/name: frigate-exporter
+          app.kubernetes.io/instance: frigate-exporter-testing
+          app.kubernetes.io/name: name-override-test

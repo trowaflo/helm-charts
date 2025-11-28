@@ -1,6 +1,11 @@
 suite: test common chart - ServiceMonitor
 templates:
   - templates/common.yaml
+values:
+  - values/default.yaml
+release:
+  name: common-test
+  namespace: common-test
 tests:
   # Snapshot = validates complete coherence with default values
   - it: should match snapshot when enabled

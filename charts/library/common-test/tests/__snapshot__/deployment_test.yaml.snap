@@ -4,27 +4,27 @@ should match snapshot with default values:
     kind: Deployment
     metadata:
       labels:
-        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/instance: common-test
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: common-test
+        app.kubernetes.io/name: testing-frigate-exporter
         helm.sh/chart: common-test-0.1.0
-      name: RELEASE-NAME-common-test
-      namespace: RELEASE-NAME-common-test
+      name: common-test-testing-frigate-exporter
+      namespace: common-test-testing-frigate-exporter
     spec:
       replicas: 1
       revisionHistoryLimit: 3
       selector:
         matchLabels:
-          app.kubernetes.io/instance: RELEASE-NAME
-          app.kubernetes.io/name: common-test
+          app.kubernetes.io/instance: common-test
+          app.kubernetes.io/name: testing-frigate-exporter
       strategy:
         type: Recreate
       template:
         metadata:
           annotations: null
           labels:
-            app.kubernetes.io/instance: RELEASE-NAME
-            app.kubernetes.io/name: common-test
+            app.kubernetes.io/instance: common-test
+            app.kubernetes.io/name: testing-frigate-exporter
         spec:
           automountServiceAccountToken: false
           containers:
@@ -44,13 +44,7 @@ should match snapshot with default values:
                 successThreshold: 1
                 timeoutSeconds: 5
               name: common-test
-              ports:
-                - containerPort: 80
-                  name: http
-                  protocol: UDP
-                - containerPort: 443
-                  name: https
-                  protocol: TCP
+              ports: null
               readinessProbe:
                 failureThreshold: 3
                 httpGet:
@@ -63,8 +57,8 @@ should match snapshot with default values:
                 timeoutSeconds: 5
               resources:
                 limits:
-                  cpu: 100m
-                  memory: 64Mi
+                  cpu: 2
+                  memory: 2Gi
                 requests:
                   cpu: 1m
                   memory: 32Mi
@@ -75,7 +69,7 @@ should match snapshot with default values:
                     - ALL
                 readOnlyRootFilesystem: true
                 runAsNonRoot: true
-                runAsUser: 10000
+                runAsUser: 65534
                 seccompProfile:
                   type: RuntimeDefault
               startupProbe:

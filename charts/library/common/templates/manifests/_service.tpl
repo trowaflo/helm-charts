@@ -17,11 +17,11 @@ metadata:
 {{- end }}
 spec:
   ports:
-  {{- range .Values.services.ports }}
-    - name: {{ .name }}
-      port: {{ .port }}
-      protocol: {{ include "common.helpers.protocol" .protocol }}
-      targetPort: {{ .name }}
+  {{- range $name, $values := .Values.services }}
+    - name: {{ $name }}
+      port: {{ $values.ports.port }}
+      protocol: {{ include "common.helpers.protocol" $values.ports.protocol }}
+      targetPort: {{ $name }}
   {{- end }}
   selector:
     app.kubernetes.io/name: {{ include "common.helpers.name" . }}

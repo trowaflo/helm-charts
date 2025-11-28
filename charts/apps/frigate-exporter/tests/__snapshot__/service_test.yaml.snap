@@ -4,18 +4,18 @@ should match snapshot with default values:
     kind: Service
     metadata:
       labels:
-        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/instance: frigate-exporter-testing
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: frigate-exporter
+        app.kubernetes.io/name: name-override-test
         helm.sh/chart: frigate-exporter-0.0.14
-      name: RELEASE-NAME-frigate-exporter
-      namespace: RELEASE-NAME-frigate-exporter
+      name: frigate-exporter-testing-name-override-test
+      namespace: frigate-exporter-testing-namespace-override-test
     spec:
       ports:
-        - name: exporter
+        - name: main
           port: 9100
           protocol: TCP
-          targetPort: exporter
+          targetPort: main
       selector:
-        app.kubernetes.io/instance: RELEASE-NAME
-        app.kubernetes.io/name: frigate-exporter
+        app.kubernetes.io/instance: frigate-exporter-testing
+        app.kubernetes.io/name: name-override-test

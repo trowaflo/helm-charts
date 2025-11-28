@@ -27,10 +27,13 @@ env:
 podSecurityContext:
   runAsUser: 1000
 services:
-  ports:
-    - name: exporter
-      port: 9100
+  main:
+    enabled: true
+    annotations: {}
+    labels: {}
+    ports:
       protocol: TCP
+      port: 9100
 serviceMonitor:
   endpoints:
     port: exporter

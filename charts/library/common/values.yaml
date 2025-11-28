@@ -66,15 +66,13 @@ podSecurityContext:
     drop: ["ALL"]
   readOnlyRootFilesystem: true
 services:
-  annotations: {}
-  labels: {}
-  ports:
-    - name: http
-      port: 80
-      protocol: UDP
-    - name: https
-      port: 443
+  main:
+    enabled: true
+    annotations: {}
+    labels: {}
+    ports:
       protocol: TCP
+      port: 80
 serviceMonitor:
   enabled: true
   labels:
