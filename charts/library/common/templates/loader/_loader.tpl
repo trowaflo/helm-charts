@@ -6,6 +6,9 @@
   {{/* Render service */}}
   {{- include "common.manifests.service" . | nindent 0 -}}
 
+  {{/* Render ingress */}}
+  {{- include "common.manifests.ingress" . | nindent 0 -}}
+
   {{/* Render deployment */}}
   {{- include "common.manifests.deployment" . | nindent 0 -}}
 

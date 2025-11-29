@@ -3,19 +3,21 @@ templates:
   - templates/common.yaml
 values:
   - values/default.yaml
+set:
+  nameOverride: "service-monitor-name-override"
 release:
   name: common-test
   namespace: common-test
 tests:
   # Snapshot = validates complete coherence with default values
   - it: should match snapshot when enabled
-    documentIndex: 2
+    documentIndex: 3
     asserts:
       - matchSnapshot: {}
 
   # Test computed values - fullnameOverride
   - it: should compute fullnameOverride correctly
-    documentIndex: 2
+    documentIndex: 3
     set:
       fullnameOverride: "my-servicemonitor"
     asserts:
@@ -25,7 +27,7 @@ tests:
 
   # Test computed values - nameOverride
   - it: should compute nameOverride correctly
-    documentIndex: 2
+    documentIndex: 3
     set:
       nameOverride: "custom"
     asserts:
@@ -39,11 +41,11 @@ tests:
       serviceMonitor.enabled: true
     asserts:
       - hasDocuments:
-          count: 3
+          count: 4
 
   - it: should not create ServiceMonitor when disabled
     set:
       serviceMonitor.enabled: false
     asserts:
       - hasDocuments:
-          count: 2
+          count: 3

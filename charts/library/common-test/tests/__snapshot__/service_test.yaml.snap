@@ -6,9 +6,9 @@ should match snapshot with default values:
       labels:
         app.kubernetes.io/instance: common-test
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: name-override-test
+        app.kubernetes.io/name: service-name-override
         helm.sh/chart: common-test-0.1.0
-      name: common-test-name-override-test
+      name: common-test-service-name-override
       namespace: common-test-namespace-override-test
     spec:
       ports:
@@ -18,4 +18,4 @@ should match snapshot with default values:
           targetPort: main
       selector:
         app.kubernetes.io/instance: common-test
-        app.kubernetes.io/name: name-override-test
+        app.kubernetes.io/name: service-name-override

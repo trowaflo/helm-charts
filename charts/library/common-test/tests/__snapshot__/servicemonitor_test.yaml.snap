@@ -5,7 +5,7 @@ should match snapshot when enabled:
     metadata:
       labels:
         release: prometheus
-      name: common-test-name-override-test
+      name: common-test-service-monitor-name-override
       namespace: common-test-namespace-override-test
     spec:
       endpoints:
@@ -13,4 +13,4 @@ should match snapshot when enabled:
       selector:
         matchLabels:
           app.kubernetes.io/instance: common-test
-          app.kubernetes.io/name: name-override-test
+          app.kubernetes.io/name: service-monitor-name-override

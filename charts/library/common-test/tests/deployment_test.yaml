@@ -3,19 +3,21 @@ templates:
   - templates/common.yaml
 values:
   - values/default.yaml
+set:
+  nameOverride: "deployment-name-override"
 release:
   name: common-test
   namespace: common-test
 tests:
   # Snapshot = validates complete coherence with default values
   - it: should match snapshot with default values
-    documentIndex: 1
+    documentIndex: 2
     asserts:
       - matchSnapshot: {}
 
   # Test computed values - fullnameOverride
   - it: should compute fullnameOverride correctly
-    documentIndex: 1
+    documentIndex: 2
     set:
       fullnameOverride: "my-custom-name"
     asserts:
@@ -25,7 +27,7 @@ tests:
 
   # Test computed values - nameOverride
   - it: should compute nameOverride correctly
-    documentIndex: 1
+    documentIndex: 2
     set:
       nameOverride: "custom"
     asserts:
@@ -35,7 +37,7 @@ tests:
 
   # Test conditional logic - probes
   - it: should respect probe enabled flags
-    documentIndex: 1
+    documentIndex: 2
     set:
       probes.enabled: true
       probes.liveness.enabled: false
@@ -50,7 +52,7 @@ tests:
           path: spec.template.spec.containers[0].startupProbe
 
   - it: should disable all probes when global disabled
-    documentIndex: 1
+    documentIndex: 2
     set:
       probes.enabled: false
     asserts:
@@ -62,7 +64,7 @@ tests:
           path: spec.template.spec.containers[0].startupProbe
 
   - it: should have args and env from values
-    documentIndex: 1
+    documentIndex: 2
     set:
       args:
         - "--test-arg=value"

@@ -3,6 +3,8 @@ templates:
   - templates/common.yaml
 values:
   - values/default.yaml
+set:
+  nameOverride: "service-name-override"
 release:
   name: common-test
   namespace: common-test

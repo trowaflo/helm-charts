@@ -72,6 +72,23 @@ services:
     ports:
       protocol: TCP
       port: 80
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    main:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: Prefix
+          - path: /testpath
+            pathType: Prefix
+      - host: another-chart-example.local
+        paths:
+          - path: /
+            pathType: Prefix
+          - path: /testpath
+            pathType: Prefix
 
 serviceMonitor:
   enabled: true

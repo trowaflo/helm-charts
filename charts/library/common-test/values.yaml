@@ -8,3 +8,5 @@ env:
       secretKeyRef:
         name: my-secret
         key: password
+ingress:
+  enabled: true
