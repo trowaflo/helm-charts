@@ -11,21 +11,21 @@ should compute fullnameOverride correctly:
       name: my-ingress
       namespace: ingress-test-namespace-override-test
     spec:
-      ingressClassName: ""
+      ingressClassName: traefik
       rules:
         - host: chart-example.local
           http:
             paths:
               - backend:
                   service:
-                    name: my-ingress
+                    name: my-ingress-main
                     port:
                       name: main
                 path: /
                 pathType: Prefix
               - backend:
                   service:
-                    name: my-ingress
+                    name: my-ingress-main
                     port:
                       name: main
                 path: /testpath
@@ -35,14 +35,14 @@ should compute fullnameOverride correctly:
             paths:
               - backend:
                   service:
-                    name: my-ingress
+                    name: my-ingress-main
                     port:
                       name: main
                 path: /
                 pathType: Prefix
               - backend:
                   service:
-                    name: my-ingress
+                    name: my-ingress-main
                     port:
                       name: main
                 path: /testpath
@@ -60,21 +60,21 @@ should compute nameOverride correctly:
       name: ingress-test-name-override
       namespace: ingress-test-namespace-override-test
     spec:
-      ingressClassName: ""
+      ingressClassName: traefik
       rules:
         - host: chart-example.local
           http:
             paths:
               - backend:
                   service:
-                    name: ingress-test-name-override
+                    name: ingress-test-name-override-main
                     port:
                       name: main
                 path: /
                 pathType: Prefix
               - backend:
                   service:
-                    name: ingress-test-name-override
+                    name: ingress-test-name-override-main
                     port:
                       name: main
                 path: /testpath
@@ -84,14 +84,14 @@ should compute nameOverride correctly:
             paths:
               - backend:
                   service:
-                    name: ingress-test-name-override
+                    name: ingress-test-name-override-main
                     port:
                       name: main
                 path: /
                 pathType: Prefix
               - backend:
                   service:
-                    name: ingress-test-name-override
+                    name: ingress-test-name-override-main
                     port:
                       name: main
                 path: /testpath
@@ -109,24 +109,14 @@ should have the right host configured:
       name: ingress-test-common-test
       namespace: ingress-test-namespace-override-test
     spec:
-      ingressClassName: ""
+      ingressClassName: traefik
       rules:
-        - host: main.example.com
-          http:
-            paths:
-              - backend:
-                  service:
-                    name: ingress-test-common-test
-                    port:
-                      name: main
-                path: /main-host-path
-                pathType: Prefix
         - host: other.example.com
           http:
             paths:
               - backend:
                   service:
-                    name: ingress-test-common-test
+                    name: ingress-test-common-test-other
                     port:
                       name: other
                 path: /other-host-path
@@ -144,21 +134,21 @@ should match snapshot with default values:
       name: ingress-test-common-test
       namespace: ingress-test-namespace-override-test
     spec:
-      ingressClassName: ""
+      ingressClassName: traefik
       rules:
         - host: chart-example.local
           http:
             paths:
               - backend:
                   service:
-                    name: ingress-test-common-test
+                    name: ingress-test-common-test-main
                     port:
                       name: main
                 path: /
                 pathType: Prefix
               - backend:
                   service:
-                    name: ingress-test-common-test
+                    name: ingress-test-common-test-main
                     port:
                       name: main
                 path: /testpath
@@ -168,14 +158,14 @@ should match snapshot with default values:
             paths:
               - backend:
                   service:
-                    name: ingress-test-common-test
+                    name: ingress-test-common-test-main
                     port:
                       name: main
                 path: /
                 pathType: Prefix
               - backend:
                   service:
-                    name: ingress-test-common-test
+                    name: ingress-test-common-test-main
                     port:
                       name: main
                 path: /testpath

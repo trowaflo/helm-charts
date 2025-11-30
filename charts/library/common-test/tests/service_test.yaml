@@ -23,7 +23,8 @@ tests:
     asserts:
       - equal:
           path: metadata.name
-          value: my-service
+          value: my-service-main
+      - matchSnapshot: {}
 
   # Test computed values - nameOverride
   - it: should compute nameOverride correctly
@@ -37,3 +38,51 @@ tests:
       - equal:
           path: "spec.selector[\"app.kubernetes.io/name\"]"
           value: custom
+      - matchSnapshot: {}
+
+  - it: should have the correct service type
+    documentIndex: 0
+    set:
+      services:
+        main:
+          enabled: true
+          type: LoadBalancer
+    asserts:
+      - equal:
+          path: "spec.type"
+          value: LoadBalancer
+      - matchSnapshot: {}
+
+  - it: should have all defined service type and ports
+    documentIndex: 0
+    set:
+      services:
+        main: # main is documentIndex 1 because of ordering by name
+          enabled: true
+          ports:
+            main:
+              port: 9200
+              protocol: TCP
+        extra: # extra is documentIndex 0 because of ordering by name
+          enabled: true
+          type: LoadBalancer
+          ports:
+            http:
+              port: 8080
+              protocol: TCP
+            metrics:
+              port: 9100
+              protocol: UDP
+    asserts:
+      - equal:
+          path: "spec.ports"
+          value:
+            - name: http
+              port: 8080
+              protocol: TCP
+              targetPort: http
+            - name: metrics
+              port: 9100
+              protocol: UDP
+              targetPort: metrics
+      - matchSnapshot: {}

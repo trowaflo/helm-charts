@@ -67,16 +67,17 @@ podSecurityContext:
 services:
   main:
     enabled: true
+    type: ClusterIP
     annotations: {}
     labels: {}
     ports:
-      protocol: TCP
-      port: 80
+      main:
+        protocol: TCP
+        port: 80
 ingress:
-  enabled: false
-  annotations: {}
-  hosts:
-    main:
+  main:
+    enabled: true
+    hosts:
       - host: chart-example.local
         paths:
           - path: /
@@ -95,5 +96,16 @@ serviceMonitor:
   labels:
     release: prometheus
   endpoints:
-    port: https
+    - port: main
+      # optional scrape settings
+      # path: /metrics
+      # scheme: http
+      # interval: 30s
+      # scrapeTimeout: 10s
+      metricRelabelings: []
+        # - action: replace
+        #   sourceLabels: ["__name__"]
+        #   regex: "scale_truenas_system_(.*)"
+        #   replacement: "truenas_$1"
+        #   targetLabel: "__name__"
 strategyType: Recreate

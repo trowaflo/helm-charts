@@ -21,22 +21,385 @@ services:
     annotations: {}
     labels: {}
     ports:
-      protocol: TCP
-      port: 9108
-  graphite-udp:
+      main:
+        protocol: TCP
+        port: 9108
+  graphite:
     enabled: true
+    type: LoadBalancer
     annotations: {}
     labels: {}
     ports:
-      protocol: UDP
-      port: 9109
-  graphite-tcp:
+      graphite-udp:
+        protocol: UDP
+        port: 9109
+      graphite-tcp:
+          protocol: TCP
+          port: 9109
+ingress:
+  main:
     enabled: true
-    annotations: {}
-    labels: {}
-    ports:
-      protocol: TCP
-      port: 9109
+    hosts:
+      - host: graphite-exporter.trowa-family.ovh
+        paths:
+          - path: /
+            pathType: Prefix
 serviceMonitor:
+  enabled: true
   endpoints:
-    port: main
+    - port: main
+      metricRelabelings:
+        # ==========================================
+        # FILTER METRICS TO ONLY SCALE RELATED ONES
+        # ==========================================
+        - sourceLabels: [__name__]
+          regex: ^(scale_.*)
+          action: keep
+
+        # ==========================================
+        # LABEL METRICS ENRICHMENT
+        # ==========================================
+        # Extract hostname from metric name
+        - sourceLabels: [__name__]
+          regex: ^scale_([^_]+)_.*
+          targetLabel: hostname
+          replacement: ${1}
+          action: replace
+        # Extract service name from metric name
+        - sourceLabels: [__name__]
+          regex: ^scale_[^_]+_([^_]+)_.*
+          targetLabel: service
+          replacement: ${1}
+          action: replace
+        # Extract CPU core number
+        - sourceLabels: [__name__]
+          regex: ^.*_cpu_cpu([0-9]+)
+          targetLabel: cpu
+          replacement: cpu${1}
+          action: replace
+        - sourceLabels: [__name__]
+          regex: ^.*_cputemp_temperatures_cpu([0-9]+)
+          targetLabel: cpu
+          replacement: cpu${1}
+          action: replace
+
+        # Extract network interface name
+        - sourceLabels: [__name__]
+          regex: ^.*_net_speed_([^_]+)_[^_\n]+
+          targetLabel: interface
+          replacement: ${1}
+          action: replace
+        - sourceLabels: [__name__]
+          regex: ^(.*_net_speed).*
+          targetLabel: __name__
+          replacement: ${1}
+          action: replace
+
+        # Remove duplicated truenas prefix in hostname
+        - sourceLabels: [__name__]
+          regex: ^(scale_truenas)_truenas_(.*)$
+          targetLabel: __name__
+          replacement: ${1}_${2}
+          action: replace
+
+        # ==========================================
+        # METRIC NAME CLEANUP
+        # ==========================================
+        # Normalize metric names by removing hostname
+        - sourceLabels: [__name__]
+          regex: ^scale_[^_]+_(.*)
+          targetLabel: __name__
+          replacement: truenas_${1}
+          action: replace
+        # Fix double suffixes
+        - sourceLabels: [__name__]
+          regex: ^(.*)_(uptime)_uptime
+          targetLabel: __name__
+          replacement: ${1}_${2}
+          action: replace
+        - sourceLabels: [__name__]
+          regex: ^(.*)_(cpu)_cpu([0-9]+)?
+          targetLabel: __name__
+          replacement: ${1}_${2}${3}
+          action: replace
+        - sourceLabels: [__name__]
+          regex: ^(.*)_(total)_total
+          targetLabel: __name__
+          replacement: ${1}_${2}
+          action: replace
+        - sourceLabels: [__name__]
+          regex: ^(.*)_(available)_available
+          targetLabel: __name__
+          replacement: ${1}_${2}
+          action: replace
+        - sourceLabels: [__name__]
+          regex: ^(.*)_(size)_size
+          targetLabel: __name__
+          replacement: ${1}_${2}
+          action: replace
+        - sourceLabels: [__name__]
+          regex: ^(.*)_(avail)_avail
+          targetLabel: __name__
+          replacement: ${1}_${2}
+          action: replace
+        - sourceLabels: [__name__]
+          regex: ^(.*)_(free)_free
+          targetLabel: __name__
+          replacement: ${1}_${2}
+          action: replace
+        - sourceLabels: [__name__]
+          regex: ^(.*)_(l2bytes)_l2bytes
+          targetLabel: __name__
+          replacement: ${1}_${2}
+          action: replace
+        - sourceLabels: [__name__]
+          regex: ^(.*)_(l2hits)_l2hits
+          targetLabel: __name__
+          replacement: ${1}_${2}
+          action: replace
+        - sourceLabels: [__name__]
+          regex: ^(.*)_(l2miss)_l2miss
+          targetLabel: __name__
+          replacement: ${1}_${2}
+          action: replace
+
+        # # Remove dynamic prefix (scale_truenas -> truenas)
+        # - sourceLabels: [__name__]
+        #   regex: '^[^_]+_truenas_(.+)$'
+        #   targetLabel: __name__
+        #   replacement: 'truenas_${1}'
+
+        # ==========================================
+        # SYSTEM METRICS
+        # ==========================================
+        # # System uptime
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_system_uptime_uptime'
+        #   action: keep
+
+        # # CPU usage (all cores + aggregate)
+        # - sourceLabels: [__name__]
+        #   regex: ".*_truenas_cpu_usage_cpu_.*"
+        #   action: keep
+
+        # # CPU temperatures
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_cputemp_temperatures_.*'
+        #   action: keep
+
+        # # System load (1, 5, 15 min)
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_system_load_load(1|5|15)'
+        #   action: keep
+
+        # # ==========================================
+        # # MEMORY METRICS
+        # # ==========================================
+
+        # # Memory info (available, total)
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_truenas_meminfo_(available|total)_.*'
+        #   action: keep
+
+        # # System RAM breakdown
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_system_ram_(used|free|cached|buffers)'
+        #   action: keep
+
+        # # Memory available
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_mem_available_avail'
+        #   action: keep
+
+        # # ==========================================
+        # # DISK SPACE METRICS
+        # # ==========================================
+
+        # # Disk space (avail, used, reserved)
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_disk_space_.*(avail|used|reserved_for_root)'
+        #   action: keep
+
+        # # Disk inodes
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_disk_inodes_.*(avail|used|reserved_for_root)'
+        #   action: keep
+
+        # # ==========================================
+        # # DISK I/O METRICS
+        # # ==========================================
+
+        # # Disk busy time (I/O utilization)
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_truenas_disk_stats_busy_.*'
+        #   action: keep
+
+        # # Disk operations (read/write ops)
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_truenas_disk_stats_ops_.*'
+        #   action: keep
+
+        # # Disk throughput (read/write bytes)
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_truenas_disk_stats__serial_lunid_.*(reads|writes)'
+        #   action: keep
+
+        # # ==========================================
+        # # ZFS ARC METRICS
+        # # ==========================================
+
+        # # ARC size and availability
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_truenas_arcstats_(size_size|avail_avail|free_free|l2bytes_l2bytes)'
+        #   action: keep
+
+        # # ARC hit/miss statistics
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_truenas_arcstats_(ddhit_ddhit|ddmis_ddmis|dmhit_dmhit|dmmis_dmmis|ddread_ddread|dmread_dmread|dread_dread|l2hits_l2hits|l2miss_l2miss|l2read_l2read)'
+        #   action: keep
+
+        # # ARC hit ratios
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_truenas_arcstats_(ddh_p_ddh|ddi_p_ddi|dmh_p_dmh|dmi_p_dmi|dmm_p_dmm|l2hit_p_l2hit|l2miss_p_l2miss)'
+        #   action: keep
+
+        # # ==========================================
+        # # NETWORK METRICS
+        # # ==========================================
+
+        # # Network packets (eno1 interface)
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_net_packets_eno1_(received|sent|multicast)'
+        #   action: keep
+
+        # # Network bandwidth (bytes)
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_net_eno1_(received|sent)'
+        #   action: keep
+
+        # # System-wide network totals
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_system_net_(received|sent)'
+        #   action: keep
+
+        # # Network carrier status
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_net_carrier_eno1_(up|down)'
+        #   action: keep
+
+        # # Network drops
+        # - sourceLabels: [__name__]
+        #   regex: '.*_truenas_net_drops_eno1_(inbound|outbound)'
+        #   action: keep
+
+        # # ==========================================
+        # # METRIC NAME CLEANUP
+        # # ==========================================
+
+        # # Remove dynamic prefix (scale_truenas -> truenas)
+        # - sourceLabels: [__name__]
+        #   regex: '^[^_]+_truenas_(.+)$'
+        #   targetLabel: __name__
+        #   replacement: 'truenas_${1}'
+
+        # # ==========================================
+        # # LABEL ENRICHMENT
+        # # ==========================================
+
+        # # Extract filesystem mount point from disk_space metrics
+        # - sourceLabels: [__name__]
+        #   regex: 'truenas_disk_space_(.+?)_(avail|used|reserved_for_root)'
+        #   targetLabel: mount
+        #   replacement: '${1}'
+
+        # # Extract disk serial from disk_stats metrics
+        # - sourceLabels: [__name__]
+        #   regex: '.*_disk_stats.*__serial_lunid_([^_]+)_.*'
+        #   targetLabel: disk_serial
+        #   replacement: '${1}'
+
+        # # Extract disk LUN ID
+        # - sourceLabels: [__name__]
+        #   regex: '.*_disk_stats.*__serial_lunid_[^_]+_([^_]+)_.*'
+        #   targetLabel: disk_lunid
+        #   replacement: '${1}'
+
+        # # Extract CPU core number
+        # - sourceLabels: [__name__]
+        #   regex: '.*_cpu_usage_cpu_(cpu\d*)'
+        #   targetLabel: cpu
+        #   replacement: '${1}'
+
+        # # Add static system label
+        # - targetLabel: system
+        #   replacement: 'truenas'
+        #   action: replace
+
+        # # ==========================================
+        # # FINAL FILTER - KEEP ONLY MATCHED METRICS
+        # # ==========================================
+
+        # - sourceLabels: [__name__]
+        #   regex: 'truenas_(system_uptime.*|truenas_cpu_usage.*|cputemp.*|system_load.*|truenas_meminfo.*|system_ram.*|mem_available.*|disk_space.*|disk_inodes.*|truenas_disk_stats.*|truenas_arcstats.*|net_packets.*|net_eno1.*|system_net.*|net_carrier.*|net_drops.*)'
+        #   action: keep
+
+
+
+
+        # # # 1. Remove variable prefix before truenas_
+        # # # Match ANY prefix ending with "_" before "truenas_"
+        # - action: replace
+        #   sourceLabels: [__name__]
+        #   regex: .+_truenas_(.*)
+        #   replacement: truenas_$1
+        #   targetLabel: __name__
+
+        # # 2. Remove duplicated "truenas_" if it happens
+        # - action: replace
+        #   sourceLabels: [__name__]
+        #   regex: truenas_truenas_(.*)
+        #   replacement: truenas_$1
+        #   targetLabel: __name__
+
+        # - action: replace
+        #   sourceLabels: [__name__]
+        #   regex: '.*cpu_cpu([0-9]+)?'
+        #   targetLabel: cpu
+        #   replacement: 'cpu$1'
+
+        # - action: replace
+        #   sourceLabels: [__name__]
+        #   regex: '.*_cputemp_temperatures_cpu([0-9]+)?'
+        #   replacement: 'cpu$1'
+        #   targetLabel: cpu
+
+        # - action: replace
+        #   sourceLabels: [__name__]
+        #   regex: (.*)_cpu_cpu([0-9]+)?
+        #   replacement: ${1}_cpu${2}
+        #   targetLabel: __name__
+
+        # # 3. Normalize meminfo and other double-suffixes
+        # - action: replace
+        #   sourceLabels: [__name__]
+        #   regex: (.*)_total_total
+        #   replacement: ${1}_total
+        #   targetLabel: __name__
+
+        # - action: replace
+        #   sourceLabels: [__name__]
+        #   regex: (.*)_used_used
+        #   replacement: ${1}_used
+        #   targetLabel: __name__
+
+        # - action: replace
+        #   sourceLabels: [__name__]
+        #   regex: (.*)_uptime_uptime
+        #   replacement: ${1}_uptime
+        #   targetLabel: __name__
+
+        # - action: replace
+        #   sourceLabels: [__name__]
+        #   regex: (.*)_available_available
+        #   replacement: ${1}_available
+        #   targetLabel: __name__

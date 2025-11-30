@@ -1,31 +1,36 @@
 {{- define "common.manifests.service" -}}
-{{- if gt (len .Values.services) 0 }}
+{{- if include "common.helpers.hasEnabled" .Values.services -}}
+{{- range $serviceName, $svcConfig := .Values.services }}
+  {{- if $svcConfig.enabled }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "common.helpers.fullname" . }}
-  namespace: {{ include "common.helpers.namespace" . }}
+  name: {{ include "common.helpers.fullname" $ }}-{{ $serviceName }}
+  namespace: {{ include "common.helpers.namespace" $ }}
   labels:
-    {{- include "common.helpers.labels" . | nindent 4 }}
-  {{- if .Values.services.labels }}
-    {{ toYaml .Values.services.labels | nindent 4 }}
-  {{- end }}
-{{- with .Values.services.annotations }}
+    {{- include "common.helpers.labels" $ | nindent 4 }}
+    {{- with $svcConfig.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with $svcConfig.annotations }}
   annotations:
-{{ toYaml . | indent 4 }}
-{{- end }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
+  type: {{ $svcConfig.type | default "ClusterIP" }}
   ports:
-  {{- range $name, $values := .Values.services }}
-    - name: {{ $name }}
-      port: {{ $values.ports.port }}
-      protocol: {{ include "common.helpers.protocol" $values.ports.protocol }}
-      targetPort: {{ $name }}
+  {{- range $portName, $portCfg := $svcConfig.ports }}
+    - name: {{ $portName }}
+      port: {{ $portCfg.port }}
+      protocol: {{ include "common.helpers.protocol" $portCfg.protocol }}
+      targetPort: {{ $portName }}
   {{- end }}
   selector:
-    app.kubernetes.io/name: {{ include "common.helpers.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: {{ include "common.helpers.name" $ }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
 ...
+  {{- end }}
+{{- end }}
 {{- end }}
 {{- end -}}

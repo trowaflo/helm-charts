@@ -42,10 +42,14 @@ spec:
           image: "{{ .Values.image.repository }}:{{ include "common.helpers.imageTag" . }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-          {{- range $name, $values := .Values.services }}
-            - name: {{ $name }}
-              containerPort: {{ $values.ports.port }}
-              protocol: {{ include "common.helpers.protocol" $values.ports.protocol }}
+          {{- range $serviceName, $svcConfig := .Values.services }}
+            {{- if $svcConfig.enabled }}
+              {{- range $portName, $portCfg := $svcConfig.ports }}
+            - name: {{ $portName }}
+              containerPort: {{ $portCfg.port }}
+              protocol: {{ include "common.helpers.protocol" $portCfg.protocol }}
+              {{- end }}
+            {{- end }}
           {{- end }}
           {{- if and .Values.probes.enabled .Values.probes.liveness.enabled }}
           livenessProbe:

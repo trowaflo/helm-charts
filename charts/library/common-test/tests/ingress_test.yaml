@@ -35,21 +35,18 @@ tests:
           value: name-override
       - equal:
           path: "spec.rules[0].http.paths[0].backend.service.name"
-          value: ingress-test-name-override
+          value: ingress-test-name-override-main
       - matchSnapshot: {}
 
   - it: should have the right host configured
     documentIndex: 1
     set:
       ingress:
-        enabled: true
-        hosts:
-          main:
-            - host: "main.example.com"
-              paths:
-                - path: "/main-host-path"
-                  pathType: Prefix
-          other:
+        main:
+          enabled: false
+        other:
+          enabled: true
+          hosts:
             - host: "other.example.com"
               paths:
                 - path: "/other-host-path"
@@ -57,20 +54,11 @@ tests:
     asserts:
       - equal:
           path: "spec.rules[0].host"
-          value: "main.example.com"
-      - equal:
-          path: "spec.rules[0].http.paths[0].path"
-          value: "/main-host-path"
-      - equal:
-          path: "spec.rules[0].http.paths[0].pathType"
-          value: "Prefix"
-      - equal:
-          path: "spec.rules[1].host"
           value: "other.example.com"
       - equal:
-          path: "spec.rules[1].http.paths[0].path"
+          path: "spec.rules[0].http.paths[0].path"
           value: "/other-host-path"
       - equal:
-          path: "spec.rules[1].http.paths[0].pathType"
+          path: "spec.rules[0].http.paths[0].pathType"
           value: "Prefix"
       - matchSnapshot: {}

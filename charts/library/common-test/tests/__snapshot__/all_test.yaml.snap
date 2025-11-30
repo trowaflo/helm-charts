@@ -8,7 +8,7 @@ should match snapshot with default values:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: common-test
         helm.sh/chart: common-test-0.1.0
-      name: common-test
+      name: common-test-main
       namespace: common-test-namespace-override-test
     spec:
       ports:
@@ -19,6 +19,7 @@ should match snapshot with default values:
       selector:
         app.kubernetes.io/instance: common-test
         app.kubernetes.io/name: common-test
+      type: ClusterIP
   2: |
     apiVersion: networking.k8s.io/v1
     kind: Ingress
@@ -31,21 +32,21 @@ should match snapshot with default values:
       name: common-test
       namespace: common-test-namespace-override-test
     spec:
-      ingressClassName: ""
+      ingressClassName: traefik
       rules:
         - host: chart-example.local
           http:
             paths:
               - backend:
                   service:
-                    name: common-test
+                    name: common-test-main
                     port:
                       name: main
                 path: /
                 pathType: Prefix
               - backend:
                   service:
-                    name: common-test
+                    name: common-test-main
                     port:
                       name: main
                 path: /testpath
@@ -55,14 +56,14 @@ should match snapshot with default values:
             paths:
               - backend:
                   service:
-                    name: common-test
+                    name: common-test-main
                     port:
                       name: main
                 path: /
                 pathType: Prefix
               - backend:
                   service:
-                    name: common-test
+                    name: common-test-main
                     port:
                       name: main
                 path: /testpath
@@ -170,7 +171,7 @@ should match snapshot with default values:
       namespace: common-test-namespace-override-test
     spec:
       endpoints:
-        - port: https
+        - port: main
       selector:
         matchLabels:
           app.kubernetes.io/instance: common-test

@@ -14,7 +14,18 @@ spec:
       app.kubernetes.io/name: {{ include "common.helpers.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   endpoints:
-    - port: {{ .Values.serviceMonitor.endpoints.port }}
+  {{- range $ep := .Values.serviceMonitor.endpoints }}
+    - port: {{ $ep.port }}
+    {{- with $ep.relabelings }}
+      relabelings:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with $ep.metricRelabelings }}
+      metricRelabelings:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+  {{- end }}
+
 ...
 {{- end }}
 {{- end -}}

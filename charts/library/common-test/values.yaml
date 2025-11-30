@@ -9,4 +9,6 @@ env:
         name: my-secret
         key: password
 ingress:
-  enabled: true
+  main:
+    enabled: true
+

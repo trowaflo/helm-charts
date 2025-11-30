@@ -58,3 +58,13 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 {{ $protocol }}
 {{- end -}}
+
+{{- define "common.helpers.hasEnabled" -}}
+{{- $hasEnabled := false -}}
+{{- range $name, $cfg := . -}}
+  {{- if and (kindIs "map" $cfg) $cfg.enabled -}}
+    {{- $hasEnabled = true -}}
+  {{- end -}}
+{{- end -}}
+{{- $hasEnabled -}}
+{{- end -}}

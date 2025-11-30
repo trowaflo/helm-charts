@@ -1,5 +1,5 @@
 {{- define "common.manifests.ingress" -}}
-{{- if .Values.ingress.enabled -}}
+{{- if include "common.helpers.hasEnabled" .Values.ingress -}}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -13,21 +13,23 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  ingressClassName: ""
+  ingressClassName: {{ .Values.ingress.className | default "traefik" | quote }}
   rules:
-  {{- range $serviceName, $hosts := .Values.ingress.hosts }}
-    {{- range $host := $hosts }}
-  - host: {{ $host.host }}
-    http:
-      paths:
-      {{- range $path := $host.paths }}
-      - path: {{ $path.path }}
-        pathType: {{ $path.pathType | default "Prefix" }}
-        backend:
-          service:
-            name: {{ include "common.helpers.fullname" $ }}
-            port:
-              name: {{ $serviceName }}
+  {{- range $serviceName, $cfg := .Values.ingress }}
+    {{- if $cfg.enabled }}
+      {{- range $host := $cfg.hosts }}
+    - host: {{ $host.host }}
+      http:
+        paths:
+        {{- range $path := $host.paths }}
+          - path: {{ $path.path }}
+            pathType: {{ $path.pathType | default "Prefix" }}
+            backend:
+              service:
+                name: {{ include "common.helpers.fullname" $ }}-{{ $serviceName }}
+                port:
+                  name: {{ $serviceName }}
+        {{- end }}
       {{- end }}
     {{- end }}
   {{- end }}

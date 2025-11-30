@@ -3,9 +3,6 @@ templates:
   - templates/common.yaml
 values:
   - values/default.yaml
-set:
-  ingress:
-    enabled: true
 release:
   name: common-test
   namespace: common-test
