@@ -36,7 +36,7 @@ find charts -mindepth 2 -maxdepth 2 -type d -exec bash -c '[ -d "$0/tests" ] && 
 Run tests for a specific chart (example: frigate-exporter):
 
 ```bash
-helm unittest charts/app/frigate-exporter
+helm unittest charts/apps/frigate-exporter
 ```
 
 ### Useful Options

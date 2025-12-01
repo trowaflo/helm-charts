@@ -32,8 +32,10 @@ services:
     annotations: {}
     labels: {}
     ports:
-      protocol: TCP
-      port: 9100
+      main:
+        protocol: TCP
+        port: 9100
 serviceMonitor:
+  enabled: true
   endpoints:
-    port: exporter
+    - port: main
