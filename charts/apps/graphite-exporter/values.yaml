@@ -162,6 +162,19 @@ serviceMonitor:
           targetLabel: __name__
           replacement: ${1}_${2}
           action: replace
+        - sourceLabels: [__name__]
+          regex: ^(.*)_(load)_load(1|5|15)
+          targetLabel: __name__
+          replacement: ${1}_${2}${3}
+          action: replace
+
+        # ==========================================
+        # KEEP ONLY RELEVANT METRICS
+        # ==========================================
+        - sourceLabels: [__name__]
+          regex: 'truenas_(system_uptime.*|cpu_usage.*|cputemp.*|system_load.*|meminfo.*|arcstats.*|net_.*(speed|received|sent).*|disk_stats_busy__serial_lunid.*)'
+          action: keep
+
 
         # # Remove dynamic prefix (scale_truenas -> truenas)
         # - sourceLabels: [__name__]
