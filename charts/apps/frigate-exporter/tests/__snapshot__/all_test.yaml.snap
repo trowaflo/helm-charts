@@ -1,21 +1,42 @@
-should match Deployment with correct ar:
+should match snapshot with default values:
   1: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/instance: frigate-exporter-testing
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: name-override-test
+        helm.sh/chart: frigate-exporter-0.0.14
+      name: frigate-exporter-testing-name-override-test-main
+      namespace: frigate-exporter-testing-namespace-override-test
+    spec:
+      ports:
+        - name: main
+          port: 9100
+          protocol: TCP
+          targetPort: main
+      selector:
+        app.kubernetes.io/instance: frigate-exporter-testing
+        app.kubernetes.io/name: name-override-test
+      type: ClusterIP
+  2: |
     apiVersion: apps/v1
     kind: Deployment
     metadata:
       labels:
-        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/instance: frigate-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: graphite-exporter-0.0.1
-      name: RELEASE-NAME-name-override-test
-      namespace: RELEASE-NAME-namespace-override-test
+        helm.sh/chart: frigate-exporter-0.0.14
+      name: frigate-exporter-testing-name-override-test
+      namespace: frigate-exporter-testing-namespace-override-test
     spec:
       replicas: 1
       revisionHistoryLimit: 3
       selector:
         matchLabels:
-          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/instance: frigate-exporter-testing
           app.kubernetes.io/name: name-override-test
       strategy:
         type: Recreate
@@ -23,14 +44,15 @@ should match Deployment with correct ar:
         metadata:
           annotations: null
           labels:
-            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/instance: frigate-exporter-testing
             app.kubernetes.io/name: name-override-test
         spec:
           automountServiceAccountToken: false
           containers:
-            - args:
-                - --graphite.listen-address=:9109
-              image: prom/graphite-exporter:v0.16.0@sha256:e54bca6645ea8a9e8c52312a8540de98ad08819d38476c021d77a0eae75bc797
+            - env:
+                - name: FRIGATE_STATS_URL
+                  value: http://frigate-exporter-testing-name-override-test.frigate-exporter-testing-namespace-override-test.svc.cluster.local:5000/api/stats
+              image: rhysbailey/prometheus-frigate-exporter:0.1.1@sha256:6df30ca30c5a69df4f3b21c06a93043a52baf523f808de56f4a40982393b8aff
               imagePullPolicy: IfNotPresent
               livenessProbe:
                 failureThreshold: 3
@@ -42,15 +64,9 @@ should match Deployment with correct ar:
                 periodSeconds: 10
                 successThreshold: 1
                 timeoutSeconds: 5
-              name: graphite-exporter
+              name: frigate-exporter
               ports:
-                - containerPort: 9109
-                  name: graphite-tcp
-                  protocol: TCP
-                - containerPort: 9109
-                  name: graphite-udp
-                  protocol: UDP
-                - containerPort: 9108
+                - containerPort: 9100
                   name: main
                   protocol: TCP
               readinessProbe:
@@ -65,8 +81,8 @@ should match Deployment with correct ar:
                 timeoutSeconds: 5
               resources:
                 limits:
-                  cpu: 2
-                  memory: 2Gi
+                  cpu: 100m
+                  memory: 64Mi
                 requests:
                   cpu: 1m
                   memory: 32Mi
@@ -77,7 +93,7 @@ should match Deployment with correct ar:
                     - ALL
                 readOnlyRootFilesystem: true
                 runAsNonRoot: true
-                runAsUser: 65534
+                runAsUser: 1000
                 seccompProfile:
                   type: RuntimeDefault
               startupProbe:
@@ -90,3 +106,18 @@ should match Deployment with correct ar:
                 periodSeconds: 10
                 successThreshold: 1
                 timeoutSeconds: 5
+  3: |
+    apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      labels:
+        release: prometheus
+      name: frigate-exporter-testing-name-override-test
+      namespace: frigate-exporter-testing-namespace-override-test
+    spec:
+      endpoints:
+        - port: main
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: frigate-exporter-testing
+          app.kubernetes.io/name: name-override-test

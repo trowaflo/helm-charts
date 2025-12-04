@@ -1,0 +1,129 @@
+---
+# Source: frigate-exporter/templates/common.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ma-release-frigate-exporter-main
+  namespace: ma-release-frigate-exporter
+  labels:
+    app.kubernetes.io/name: frigate-exporter
+    helm.sh/chart: frigate-exporter-0.0.14
+    app.kubernetes.io/instance: ma-release
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: main
+      port: 9100
+      protocol: TCP
+      targetPort: main
+  selector:
+    app.kubernetes.io/name: frigate-exporter
+    app.kubernetes.io/instance: ma-release
+...
+---
+# Source: frigate-exporter/templates/common.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ma-release-frigate-exporter
+  namespace: ma-release-frigate-exporter
+  labels:
+    app.kubernetes.io/name: frigate-exporter
+    helm.sh/chart: frigate-exporter-0.0.14
+    app.kubernetes.io/instance: ma-release
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: frigate-exporter
+      app.kubernetes.io/instance: ma-release
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: frigate-exporter
+        app.kubernetes.io/instance: ma-release
+      annotations:
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: frigate-exporter
+          image: "rhysbailey/prometheus-frigate-exporter:0.1.1@sha256:6df30ca30c5a69df4f3b21c06a93043a52baf523f808de56f4a40982393b8aff"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: main
+              containerPort: 9100
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: main
+              scheme: HTTP
+            initialDelaySeconds: 30
+            failureThreshold: 3
+            successThreshold: 1
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: main
+              scheme: HTTP
+            initialDelaySeconds: 30
+            failureThreshold: 3
+            successThreshold: 1
+            periodSeconds: 10
+            timeoutSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /metrics
+              port: main
+              scheme: HTTP
+            initialDelaySeconds: 60
+            failureThreshold: 3
+            successThreshold: 1
+            periodSeconds: 10
+            timeoutSeconds: 5
+          env:
+            - name: FRIGATE_STATS_URL
+              value: http://ma-release-frigate-exporter.ma-release-frigate-exporter.svc.cluster.local:5000/api/stats
+          resources:
+            limits:
+              cpu: 100m
+              memory: 64Mi
+            requests:
+              cpu: 1m
+              memory: 32Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+...
+---
+# Source: frigate-exporter/templates/common.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ma-release-frigate-exporter
+  namespace: ma-release-frigate-exporter
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: frigate-exporter
+      app.kubernetes.io/instance: ma-release
+  endpoints:
+    - port: main
+
+...

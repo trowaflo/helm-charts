@@ -7,8 +7,17 @@ release:
   name: graphite-exporter-testing
   namespace: graphite-exporter-testing
 tests:
-  # Snapshot = validates complete coherence with default values
-  - it: should match snapshot when enabled
-    documentIndex: 2
+  - it: should match ServiceMonitor with correct metric relabelings
+    documentIndex: 4
     asserts:
+      - containsDocument:
+          apiVersion: monitoring.coreos.com/v1
+          kind: ServiceMonitor
+      - contains:
+          path: spec.endpoints[0].metricRelabelings
+          content:
+            action: keep
+            regex: ^(scale_.*)
+            sourceLabels:
+              - __name__
       - matchSnapshot: {}

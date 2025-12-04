@@ -40,7 +40,7 @@ ingress:
   main:
     enabled: true
     hosts:
-      - host: graphite-exporter.trowa-family.ovh
+      - host: graphite-exporter.fqdn.example.com
         paths:
           - path: /
             pathType: Prefix

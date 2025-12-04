@@ -1,4 +1,4 @@
-should match snapshot with default values:
+should have the correct environment variables defined:
   1: |
     apiVersion: apps/v1
     kind: Deployment

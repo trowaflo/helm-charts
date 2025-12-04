@@ -1,5 +1,6 @@
 suite: test frigate-exporter chart - Deployment
 templates:
+  - templates/env.tpl
   - templates/common.yaml
 values:
   - values/default.yaml
@@ -7,18 +8,16 @@ release:
   name: frigate-exporter-testing
   namespace: frigate-exporter-testing
 tests:
-  # Snapshot = validates complete coherence with default values
-  - it: should match snapshot with default values
+  - it: should have the correct environment variables defined
+    template: templates/common.yaml
     documentIndex: 1
     asserts:
-      - matchSnapshot: {}
-
-  # Test app-specific: environment variable templating
-  - it: should render FRIGATE_STATS_URL with tpl
-    documentIndex: 1
-    asserts:
+      - containsDocument:
+          apiVersion: apps/v1
+          kind: Deployment
       - contains:
           path: spec.template.spec.containers[0].env
           content:
             name: "FRIGATE_STATS_URL"
             value: "http://frigate-exporter-testing-name-override-test.frigate-exporter-testing-namespace-override-test.svc.cluster.local:5000/api/stats"
+      - matchSnapshot: {}

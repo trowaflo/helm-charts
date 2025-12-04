@@ -4,8 +4,14 @@ templates:
 values:
   - values/default.yaml
 tests:
-  # Snapshot = validates complete coherence with default values
-  - it: should match snapshot with default values
-    documentIndex: 1
+  - it: should match Deployment with correct ar
+    documentIndex: 3
     asserts:
+      - containsDocument:
+          apiVersion: apps/v1
+          kind: Deployment
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content:
+            "--graphite.listen-address=:9109"
       - matchSnapshot: {}

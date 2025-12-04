@@ -1,5 +1,6 @@
 suite: test frigate-exporter chart - Service
 templates:
+  - templates/env.tpl
   - templates/common.yaml
 values:
   - values/default.yaml
@@ -7,16 +8,10 @@ release:
   name: frigate-exporter-testing
   namespace: frigate-exporter-testing
 tests:
-  # Snapshot = validates complete coherence with default values
-  - it: should match snapshot with default values
+  - it: should have the correct ports defined
+    template: templates/common.yaml
     documentIndex: 0
     asserts:
-      - matchSnapshot: {}
-
-  - it: should have correct ports defined
-    documentIndex: 0
-    asserts:
-      # Number of ports defined
       - lengthEqual:
           path: "spec.ports"
           count: 1
@@ -27,3 +22,4 @@ tests:
             port: 9100
             protocol: "TCP"
             targetPort: main
+      - matchSnapshot: {}
