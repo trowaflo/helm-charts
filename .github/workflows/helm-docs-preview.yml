@@ -6,9 +6,25 @@ on:
       - main
 
 jobs:
+  list-charts:
+    runs-on: ubuntu-latest
+    outputs:
+      charts: ${{ steps.list-charts.outputs.charts }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - id: list-charts
+        run: |
+          charts=$(find charts/apps -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | jq -R -s -c 'split("\n")[:-1]')
+          echo "charts=$charts" >> $GITHUB_OUTPUT
+
   preview-docs:
     runs-on: ubuntu-latest
-
+    needs: list-charts
+    strategy:
+      matrix:
+        chart: ${{ fromJSON(needs.list-charts.outputs.charts) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -55,33 +71,28 @@ jobs:
           tar -xzf helm-docs.tar.gz -C /usr/local/bin
           rm helm-docs.tar.gz
 
-      - name: Generate documentation
-        run: helm-docs
+      - name: Generate documentation for chart ${{ matrix.chart }}
+        run: helm-docs --chart-search-root charts/apps/${{ matrix.chart }}
 
       - name: Publish Helm Docs Summary
         run: |
           SUMMARY_FILE="${GITHUB_STEP_SUMMARY:-./summary.md}"
-          echo "## Helm Docs generated files" >> "$SUMMARY_FILE"
+          README="charts/apps/${{ matrix.chart }}/README.md"
 
-          for f in $(find charts -name README.md); do
-            # Titre pour chaque chart
-            CHART_NAME=$(basename $(dirname "$f"))
-            echo "### Chart: $CHART_NAME" >> "$SUMMARY_FILE"
+          echo "### Chart: ${{ matrix.chart }}" >> "$SUMMARY_FILE"
+          echo "" >> "$SUMMARY_FILE"
 
-            # Insérer un petit aperçu, mais pas en code block
-            echo "" >> "$SUMMARY_FILE"
-            head -n 10 "$f" >> "$SUMMARY_FILE"
+          if [[ -f "$README" ]]; then
+            head -n 15 "$README" >> "$SUMMARY_FILE"
             echo "..." >> "$SUMMARY_FILE"
             echo "" >> "$SUMMARY_FILE"
-
-            # Ajouter un lien vers le fichier complet dans le zip
-            echo "[Full README](./helm-docs-preview.zip#$f)" >> "$SUMMARY_FILE"
+          else
+            echo "_README not found_" >> "$SUMMARY_FILE"
             echo "" >> "$SUMMARY_FILE"
-          done
+          fi
 
       - name: Archive generated docs for download
         run: |
-          shopt -s globstar
           ZIP_FILE="helm-docs-preview.zip"
-          zip -r "$ZIP_FILE" charts/**/README.md
+          find charts -name README.md | zip -@ "$ZIP_FILE"
           echo "Helm docs archived: $ZIP_FILE" >> "${GITHUB_STEP_SUMMARY:-./summary.md}"
