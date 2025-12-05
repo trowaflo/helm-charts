@@ -77,9 +77,13 @@ jobs:
 
       - name: Commit Helm docs if changed
         run: |
-          git commit -a -m "chore: update helm chart documentation"
-          git push
-
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add .
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update helm chart documentation"
+            git push
+          fi
 
       # - name: Run chart-releaser
       #   uses: helm/chart-releaser-action@v1.7.0
