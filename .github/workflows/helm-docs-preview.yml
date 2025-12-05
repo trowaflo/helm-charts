@@ -73,6 +73,7 @@ jobs:
 
       - name: Archive generated docs for download
         run: |
+          shopt -s globstar
           ZIP_FILE="helm-docs-preview.zip"
           zip -r "$ZIP_FILE" charts/**/README.md
           echo "Helm docs archived: $ZIP_FILE" >> "${GITHUB_STEP_SUMMARY:-./summary.md}"
