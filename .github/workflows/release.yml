@@ -77,11 +77,9 @@ jobs:
 
       - name: Commit Helm docs if changed
         run: |
-          # git add .
-          # if ! git diff --cached --quiet; then
-            git commit -a -m "chore: update helm chart documentation"
-            git push
-          # fi
+          git commit -a -m "chore: update helm chart documentation"
+          git push
+
 
       # - name: Run chart-releaser
       #   uses: helm/chart-releaser-action@v1.7.0
