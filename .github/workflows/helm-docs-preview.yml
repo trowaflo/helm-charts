@@ -58,8 +58,21 @@ jobs:
       - name: Generate documentation
         run: helm-docs
 
-      - name: Upload generated docs
-        uses: actions/upload-artifact@v5
-        with:
-          name: helm-docs-preview
-          path: charts/**/README.md
+      - name: Publish Helm Docs Summary
+        run: |
+          SUMMARY_FILE="${GITHUB_STEP_SUMMARY:-./summary.md}"
+          echo "## Helm Docs generated files" >> "$SUMMARY_FILE"
+          for f in $(find charts -name README.md); do
+            echo "- **$f**" >> "$SUMMARY_FILE"
+            echo '```' >> "$SUMMARY_FILE"
+            head -n 15 "$f" >> "$SUMMARY_FILE"
+            echo '...' >> "$SUMMARY_FILE"
+            echo '```' >> "$SUMMARY_FILE"
+          done
+        shell: bash
+
+      - name: Archive generated docs for download
+        run: |
+          ZIP_FILE="helm-docs-preview.zip"
+          zip -r "$ZIP_FILE" charts/**/README.md
+          echo "Helm docs archived: $ZIP_FILE" >> "${GITHUB_STEP_SUMMARY:-./summary.md}"
