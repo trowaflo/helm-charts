@@ -70,21 +70,21 @@ jobs:
       - name: Find charts
         id: charts
         run: |
-          echo "paths=$(find . -type f -name Chart.yaml -exec dirname {} \; | tr '\n' ' ')" >> $GITHUB_OUTPUT
+          echo "paths=$(find . -type f -name Chart.yaml -exec dirname {} \;)" >> $GITHUB_OUTPUT
 
       - name: Generate Helm docs
         run: |
           for chart_dir in ${{ steps.charts.outputs.paths }}; do
-            helm-docs --chart-search-root $chart_dir
+            helm-docs --chart-search-root "$chart_dir"
           done
 
       - name: Commit Helm docs if changed
         run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          git add -A
-          git commit -m "chore: update Helm chart documentation"
-          git push origin ${{ github.head_ref }}
+          git add .
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update Helm chart documentation"
+            git push origin HEAD:${{ github.head_ref }}
+          fi
 
       # - name: Run chart-releaser
       #   uses: helm/chart-releaser-action@v1.7.0
