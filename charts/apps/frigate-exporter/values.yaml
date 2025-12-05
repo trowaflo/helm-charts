@@ -1,39 +1,95 @@
 ---
+# -- Container image configuration including repository, tag, and pull policy for Prometheus Frigate Exporter
 image:
+  # -- Kubelet image pull policy when accessing the registry (IfNotPresent pulls only if image not already on node, Always re-pulls on every container restart)
   pullPolicy: IfNotPresent
+  # -- OCI image registry URL containing the application container image (use container registries like quay.io, ghcr.io, or docker.io)
   repository: rhysbailey/prometheus-frigate-exporter
+  # -- Image tag or digest identifier (supports semantic versioning or immutable @sha256: digests for reproducible deployments)
   tag: 0.1.1@sha256:6df30ca30c5a69df4f3b21c06a93043a52baf523f808de56f4a40982393b8aff
+
+# -- Kubernetes liveness, readiness, and startup probe configurations for monitoring container health and automatic recovery
 probes:
+  # -- Enable all health checks (liveness, readiness, startup) globally. Disable to skip health monitoring entirely
   enabled: true
+
+  # -- Liveness probe configuration detects containers in deadlock/unresponsive state and triggers restarts. Essential for production resilience
   liveness:
+    # -- HTTP GET probe targeting the /metrics endpoint where the exporter exposes Prometheus metrics in text format
     httpGet:
+      # -- Metrics endpoint path (standard Prometheus exporter convention)
       path: /metrics
+
+  # -- Readiness probe ensures the exporter is fully operational and ready to accept scrape requests from Prometheus
   readiness:
+    # -- Verify metrics endpoint accessibility and exporter readiness status before receiving traffic
     httpGet:
       path: /metrics
+
+  # -- Startup probe grants additional initialization time during container launch, preventing premature liveness/readiness failures
   startup:
+    # -- Check metrics endpoint availability during the startup phase with extended timeouts
     httpGet:
       path: /metrics
+
+# -- CPU and memory resource constraints for the exporter container ensuring predictable cluster resource allocation
 resources:
+  # -- Hard resource limits preventing container runaway and protecting cluster stability
   limits:
+    # -- Maximum CPU allocation in millicores (100m = 0.1 core). Frigate exporter is lightweight
     cpu: 100m
+    # -- Maximum memory allocation preventing OOM kills on memory-constrained nodes
     memory: 64Mi
+
+  # -- Minimum guaranteed resources reserved on the worker node for the exporter pod
   requests:
+    # -- Guaranteed minimum CPU allocation for predictable scheduling and cluster planning
     cpu: 1m
+    # -- Guaranteed minimum memory to ensure container has minimal memory footprint
     memory: 32Mi
+
+# -- Environment variables passed to the exporter process for runtime configuration and integration setup
+# @default -- Empty list (no extra environment variables)
+# Example usage:
+# ```yaml
+# env:
+#   - name: FRIGATE_URL
+#     value: http://frigate.monitoring.svc.cluster.local:5000
+#   - name: FRIGATE_API_KEY
+#     valueFrom:
+#       secretKeyRef:
+#         name: frigate-credentials
+#         key: api-key
+# ```
 env: []
+
+# -- Pod-level security context enforcing least-privilege container execution and hardening the security posture
 podSecurityContext:
+  # -- Run exporter process as non-root user (UID 1000) to mitigate privilege escalation risks
   runAsUser: 1000
+
+# -- Kubernetes Service resources exposing the exporter metrics endpoint for Prometheus scraping
 services:
   main:
+    # -- Create the primary Service resource for metrics exposure
     enabled: true
+    # -- Metadata annotations for cloud provider integrations, load balancer configuration, or cert management
     annotations: {}
+    # -- Custom labels for service discovery, organization, and filtering in dashboards
     labels: {}
+    # -- Port definitions mapping container ports to external Service endpoints
     ports:
       main:
+        # -- Network protocol (TCP for Prometheus metrics, UDP for other protocols)
         protocol: TCP
+        # -- Service port number (9100 is the standard port for Prometheus exporters following convention)
         port: 9100
+
+# -- Prometheus Operator ServiceMonitor custom resource for automated metrics scraping by Prometheus
 serviceMonitor:
+  # -- Enable ServiceMonitor resource creation for automatic Prometheus discovery and scraping. Requires prometheus-operator to be installed
   enabled: true
+  # -- Scrape endpoint configuration specifying which Service ports and metrics paths to monitor
   endpoints:
+    # -- Endpoint targeting the 'main' service port for Prometheus metrics collection at /metrics
     - port: main

@@ -1,14 +1,26 @@
+---
+# -- Command-line arguments for the test container (overrides entrypoint)
 args:
+  # -- Example test argument passed to the container process
   - "--test-arg=value"
+
+# -- Environment variables injected into the test container for configuration
 env:
+  # -- Simple environment variable with static value
   - name: envtest
     value: thevalue
+  # -- Environment variable populated from a Secret reference
   - name: valuefrom
     valueFrom:
+      # -- Reference to a Kubernetes Secret in the same namespace
       secretKeyRef:
+        # -- Secret name containing the value
         name: my-secret
+        # -- Secret key containing the password value
         key: password
+
+# -- Kubernetes Ingress configuration for test HTTP(S) access (optional for testing)
 ingress:
   main:
+    # -- Enable Ingress creation for testing exposed endpoints
     enabled: true
-

@@ -66,5 +66,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
     {{- $hasEnabled = true -}}
   {{- end -}}
 {{- end -}}
-{{- $hasEnabled -}}
+{{- if $hasEnabled -}}
+true
+{{- end -}}
 {{- end -}}

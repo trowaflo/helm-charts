@@ -1,93 +1,118 @@
+---
+# -- Prometheus server and monitoring stack configuration wrapping prometheus-community/kube-prometheus-stack Helm chart
 prometheus:
+  # -- Prometheus server component configuration handling metrics scraping and long-term storage
   server:
 
-    ## Path to a configuration file on prometheus server container FS
+    # -- File path to Prometheus configuration file within the container filesystem
+    # The configuration file defines scrape jobs, recording rules, alert rules, and target discovery settings
     configPath: /etc/config/prometheus.yml
 
+    # -- Persistent storage configuration for Prometheus time-series database ensuring data durability
     persistentVolume:
-      ## If true, Prometheus server will create/use a Persistent Volume Claim
-      ## If false, use emptyDir
-      ##
+      # -- Enable persistent volume claim to retain metrics across pod restarts and rescheduling
+      # If false, metrics are stored in ephemeral emptyDir (lost on pod termination)
       enabled: false
+      # -- Existing persistent volume name to bind with the claim (leave empty for dynamic provisioning)
       volumeName: ""
+      # -- Kubernetes storage class for dynamic PV provisioning (use "-" to disable provisioning)
+      # Examples: "fast-ssd", "standard", "local" depending on your cluster
       storageClass: "-"
+      # -- Persistent volume size for time-series metrics storage (adjust based on retention and scrape volume)
+      # Estimate: 1GB per week per 1000 metric series at 15-second scrape intervals
       size: 10Gi
+      # -- NFS-backed persistent storage configuration for shared access across nodes
       nfs:
+        # -- Enable NFS backing for the persistent volume (useful for distributed clusters)
         enabled: false
+        # -- NFS server IP address or hostname providing the storage endpoint
         server: 10.0.0.1
+        # -- NFS export path on the server accessible to Kubernetes nodes
+
         path: /path
 
+    # -- Kubernetes Service exposing Prometheus query and admin endpoints
     service:
-      ## If false, no Service will be created for the Prometheus server
-      ##
+      # -- Create the Prometheus Service resource for internal and external access
+      # If false, no Service will be created and you must access Prometheus via port-forward or Ingress
       enabled: true
 
+    # -- Kubernetes Ingress configuration for HTTP(S) external access (standard Ingress controller)
     ingress:
-      ## If true, Prometheus server Ingress will be created
-      ##
+      # -- Enable traditional Ingress for external traffic routing via your cluster Ingress controller
+      # Set to true to use with nginx-ingress, AWS ALB, or other Ingress controllers
       enabled: false
 
+    # -- Traefik IngressRoute custom resource for advanced routing with middleware and SSL
     ingressroute:
-      ## If true, Prometheus server IngressRoute will be created
-      ##
+      # -- Enable Traefik IngressRoute for advanced routing capabilities and middleware integration
+      # Requires Traefik to be installed in the cluster
       enabled: true
+      # -- HTTP path prefix for accessing Prometheus UI and API (e.g., https://domain/prometheus/)
       path: /prometheus/
 
-    ## Prometheus data retention period (default if not specified is 15 days)
-    ##
+    # -- Prometheus TSDB data retention period determining how long metrics are stored
+    # Older metrics are automatically deleted when this period expires
+    # Adjust based on storage capacity and historical data needs
     retention: "15w"
 
+  # -- Kubernetes NetworkPolicy configuration for network isolation and traffic control
   networkPolicy:
-    ## Enable creation of NetworkPolicy resources.
-    ##
+    # -- Enable creation of NetworkPolicy resources restricting traffic to/from Prometheus
+    # Set to false if your cluster doesn't use network policies or if you need unrestricted access
     enabled: true
 
-  # Configuration of subcharts defined in Chart.yaml
+  # -- Configuration of dependency subcharts defined in Chart.yaml dependencies
+  # These are optional components from prometheus-community Helm charts
 
-  ## alertmanager sub-chart configurable values
-  ## Please see https://github.com/prometheus-community/helm-charts/tree/main/charts/alertmanager
-  ##
+  # -- Alertmanager configuration for alert routing, grouping, and notification management
+  # See: https://github.com/prometheus-community/helm-charts/tree/main/charts/alertmanager
   alertmanager:
-    ## If false, alertmanager will not be installed
-    ##
+    # -- Deploy Alertmanager component for alert routing and notifications
+    # Set to false to disable alerting and use external Alertmanager instead
     enabled: false
 
-  ## kube-state-metrics sub-chart configurable values
-  ## Please see https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-state-metrics
-  ##
+  # -- kube-state-metrics configuration for Kubernetes resource state metrics
+  # See: https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-state-metrics
   kube-state-metrics:
-    ## If false, kube-state-metrics sub-chart will not be installed
-    ##
+    # -- Deploy kube-state-metrics subchart for Kubernetes object state monitoring
+    # Provides metrics like pod_info, deployment_replicas_desired, node_status, etc.
     enabled: true
 
-  ## promtheus-node-exporter sub-chart configurable values
-  ## Please see https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter
-  ##
+  # -- Prometheus Node Exporter configuration for hardware/host metrics collection
+  # See: https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter
   prometheus-node-exporter:
-    ## If false, node-exporter will not be installed
-    ##
+    # -- Deploy node-exporter DaemonSet for per-node CPU, memory, disk, and network metrics
     enabled: true
 
+    # -- RBAC (Role-Based Access Control) configuration for node-exporter
     rbac:
+      # -- Disable pod security policy (deprecated Kubernetes 1.25+)
       pspEnabled: false
 
+    # -- Pod-level security context for node-exporter container hardening
     containerSecurityContext:
+      # -- Prevent privilege escalation for the node-exporter container
       allowPrivilegeEscalation: false
 
-  ## pprometheus-pushgateway sub-chart configurable values
-  ## Please see https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-pushgateway
-  ##
+  # -- Prometheus PushGateway configuration for ephemeral job metrics collection
+  # See: https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-pushgateway
   prometheus-pushgateway:
-    ## If false, pushgateway will not be installed
-    ##
+    # -- Deploy PushGateway for batch jobs and short-lived processes to push metrics
+    # Only needed if you have cron jobs, lambda functions, or other ephemeral workloads
     enabled: false
 
+  # -- Scrape job configurations defining targets and metric collection settings
+  # Each job specifies how to discover, authenticate, and scrape targets
   scrape_configs:
+    # -- Prometheus self-monitoring job scraping its own metrics endpoint for internal health monitoring
     - job_name: prometheus
       static_configs:
         - targets:
           - localhost:9090
 
+    # -- Kubernetes API server metrics collection job using Kubernetes service discovery
+    # Provides metrics on API server latency, request counts, and etcd performance
     # A scrape configuration for running Prometheus on a Kubernetes cluster.
     # This uses separate scrape configs for cluster components (i.e. API server, node)
     # and services to allow each to use different authentication configs.
@@ -136,6 +161,7 @@ prometheus:
           action: keep
           regex: default;kubernetes;https
 
+    # -- Kubernetes node metrics scraping job collecting per-node CPU, memory, disk, and kubelet metrics
     - job_name: 'kubernetes-nodes'
 
       # Default to scraping over https. If required, just disable this or change to
@@ -173,6 +199,7 @@ prometheus:
           replacement: /api/v1/nodes/$1/proxy/metrics
 
 
+    # -- cAdvisor container metrics collection from kubelet endpoint (CPU, memory, disk usage per container)
     - job_name: 'kubernetes-nodes-cadvisor'
 
       # Default to scraping over https. If required, just disable this or change to
@@ -220,6 +247,7 @@ prometheus:
       # - action: labeldrop
       #   regex: (kubernetes_io_hostname|failure_domain_beta_kubernetes_io_region|beta_kubernetes_io_os|beta_kubernetes_io_arch|beta_kubernetes_io_instance_type|failure_domain_beta_kubernetes_io_zone)
 
+    # -- Service endpoint metrics scraping job using pod annotations to discover exporters and metrics endpoints
     # Scrape config for service endpoints.
     #
     # The relabeling allows the actual service scrape endpoint to be configured
@@ -275,6 +303,7 @@ prometheus:
           action: replace
           target_label: node
 
+    # -- Slow-scrape service endpoints job with 5-minute intervals for expensive metrics endpoints
     # Scrape config for slow service endpoints; same as above, but with a larger
     # timeout and a larger interval
     #
@@ -330,6 +359,7 @@ prometheus:
           action: replace
           target_label: node
 
+    # -- PushGateway service discovery and scraping for ephemeral jobs and batch workloads
     - job_name: 'prometheus-pushgateway'
       honor_labels: true
 
@@ -341,6 +371,7 @@ prometheus:
           action: keep
           regex: pushgateway
 
+    # -- Blackbox exporter probe configuration for synthetic monitoring of HTTP/HTTPS/TCP/DNS endpoints
     # Example scrape config for probing services via the Blackbox Exporter.
     #
     # The relabeling allows the actual service scrape endpoint to be configured
@@ -374,6 +405,7 @@ prometheus:
         - source_labels: [__meta_kubernetes_service_name]
           target_label: service
 
+    # -- Pod-based metrics scraping job discovering and scraping pods annotated with prometheus.io labels
     # Example scrape config for pods
     #
     # The relabeling allows the actual pod scrape endpoint to be configured via the
@@ -434,6 +466,7 @@ prometheus:
           action: replace
           target_label: node
 
+    # -- Slow-interval pod metrics scraping for expensive metrics endpoints (5-minute scrape interval with 30s timeout)
     # Example Scrape config for pods which should be scraped slower. An useful example
     # would be stackriver-exporter which queries an API on every scrape of the pod
     #
@@ -494,47 +527,43 @@ prometheus:
           action: replace
           target_label: node
 
-# -- Provide a name in place of `prometheus-pve-exporter`
-
+# -- Prometheus PVE Exporter configuration for Proxmox Virtual Environment metrics collection
 pveExporter:
 
+  # -- Container image settings for the Proxmox VE exporter component
   image:
-    # -- image repository
+    # -- OCI image repository for the Proxmox VE Prometheus exporter
     repository: prompve/prometheus-pve-exporter
-    # -- Overrides the image tag
+    # -- Specific version of the PVE exporter to use (version-specific for compatibility)
     tag: "3.5.2"
 
-  # -- Number of replicas
+  # -- Number of exporter pod replicas for high availability and load distribution
   replicaCount: 1
 
-  # -- The number of old ReplicaSets to retain
+  # -- Number of previous ReplicaSets to retain for rollback capability
   revisionHistoryLimit: 10
 
+  # -- Kubernetes ServiceAccount configuration for RBAC and pod identity
   serviceAccount:
-    # -- Specifies whether a service account should be created
+    # -- Create a dedicated ServiceAccount for the PVE exporter component
     create: true
 
-  # -- container-level security context
+  # -- Container-level security context enforcing least-privilege execution
   securityContext:
+    # -- Drop all Linux kernel capabilities then explicitly add only necessary ones
     capabilities:
       drop:
       - ALL
+    # -- Mount container root filesystem as read-only for immutability and reduced attack surface
     readOnlyRootFilesystem: true
+    # -- Require the container to run as non-root user for privilege isolation
     runAsNonRoot: true
+    # -- UID for running the exporter process (65534 is the 'nobody' user)
     runAsUser: 65534
 
-  # service:
-  #   # -- Kubernetes service type
-  #   type: ClusterIP
-  #   # -- Kubernetes port where service is exposed
-  #   port: 80
-
-  # -- Resource limits and requests for the controller pods.
+  # -- Resource constraints for the PVE exporter container
   resources: {}
-    # We usually recommend not to specify default resources and to leave this as a conscious
-    # choice for the user. This also increases chances charts run on environments with little
-    # resources, such as Minikube. If you do want to specify resources, uncomment the following
-    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # -- Uncomment and adjust to set explicit resource limits and requests
     # limits:
     #   cpu: 100m
     #   memory: 128Mi
@@ -542,9 +571,12 @@ pveExporter:
     #   cpu: 100m
     #   memory: 128Mi
 
+  # -- Environment variables configuring Proxmox VE API connection
   env:
+    # -- Proxmox VE API user for authentication (format: username@pam or username@pve)
     pveUser: "prometheus@pve"
-    # if you provide an existing secret, no additional secret will be created. Depending on the setting in pveAuthType the secret needs to have password OR tokenName and tokenValue fields.
+    # -- Reference to existing Kubernetes Secret containing PVE authentication credentials
+    # If provided, no additional secret will be created. Secret must contain password OR tokenName and tokenValue fields
     pveExistingSecretName: "prometheus-pve-exporter"
-    # Optional: set to false to skip SSL/TLS verification
+    # -- Enable or disable SSL/TLS certificate verification for Proxmox API (set to false for self-signed certs)
     pveVerifySsl: false

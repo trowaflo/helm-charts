@@ -1,0 +1,120 @@
+{{/*
+Global README template for helm-docs.
+This template is applied to each chart to produce a consistent, detailed README.
+Docs: https://github.com/norwoodj/helm-docs
+*/}}
+
+{{ template "chart.header" . }}
+
+{{ template "chart.description" . }}
+
+---
+
+{{ template "chart.versionBadge" . }} {{ template "chart.typeBadge" . }} {{ template "chart.appVersionBadge" . }}
+
+{{- if .Chart.Home }}
+> Homepage: [{{ .Chart.Home }}]({{ .Chart.Home }})
+{{- end }}
+
+{{- if .Chart.Sources }}
+> Sources: {{ range $i, $s := .Chart.Sources }}{{ if $i }}, {{ end }}[{{ $s }}]({{ $s }}){{ end }}
+{{- end }}
+
+{{- if .Chart.Keywords }}
+> Keywords: {{ join ", " .Chart.Keywords }}
+{{- end }}
+
+## TL;DR
+
+- Production-ready Helm chart for {{ .Chart.Name }}
+- Defaults optimized for sensible security and resource usage
+- Fully documented values with types and examples
+
+## Requirements
+
+{{ template "chart.requirements" . }}
+
+- Kubernetes: compatible with supported versions of your cluster
+- Helm: v3+
+
+## Getting Started
+
+### Add repository
+
+```bash
+helm repo add {{ .Chart.Name }} https://example.com/helm-charts
+helm repo update
+```
+
+### Install
+
+```bash
+helm install my-{{ .Chart.Name }} {{ .Chart.Name }}/{{ .Chart.Name }} \
+  --namespace default \
+  --create-namespace
+```
+
+### Upgrade
+
+```bash
+helm upgrade my-{{ .Chart.Name }} {{ .Chart.Name }}/{{ .Chart.Name }} \
+  --namespace default \
+  --install
+```
+
+### Uninstall
+
+```bash
+helm uninstall my-{{ .Chart.Name }} --namespace default
+```
+
+## Values
+
+The following table lists the configurable parameters of the chart and their default values.
+
+{{ template "chart.valuesSection" . }}
+
+### Examples
+
+- Enable Prometheus scraping via ServiceMonitor
+- Configure resource requests/limits for predictable scheduling
+- Override container image and tag for air-gapped environments
+
+```yaml
+# values.yaml snippet
+serviceMonitor:
+  enabled: true
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+```
+
+## Security
+
+- Follows namespace-scoped, least-privilege defaults
+- Configure PodSecurityContext and SecurityContext as needed for your environment
+
+## Troubleshooting
+
+- Check pod logs and events: `kubectl logs -l app.kubernetes.io/name={{ .Chart.Name }}`
+- Verify CRDs (if any) are installed
+- Ensure network policies allow required traffic
+
+## Maintainers
+
+{{ template "chart.maintainers" . }}
+
+## License
+
+{{- if .Chart.Annotations.license }}
+{{ .Chart.Annotations.license }}
+{{- else }}
+This chart is distributed under the terms of the project license.
+{{- end }}
+
+{{ template "chart.footer" . }}

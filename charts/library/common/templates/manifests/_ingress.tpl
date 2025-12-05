@@ -7,6 +7,7 @@ metadata:
   name: {{ include "common.helpers.fullname" . }}
   namespace: {{ include "common.helpers.namespace" . }}
   labels:
+    test: {{include "common.helpers.hasEnabled" .Values.ingress}}
     {{- include "common.helpers.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:

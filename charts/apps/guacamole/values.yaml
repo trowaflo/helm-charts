@@ -1,26 +1,49 @@
+---
+# -- Container image configuration for Apache Guacamole web application (HTML5 remote desktop gateway)
 image:
+  # -- Container image registry URL for the Guacamole application
   repository: guacamole/guacamole
+  # -- Specific version of Guacamole application to deploy
   tag: 1.5.5
 
+# -- Apache Guacamole daemon (guacd) configuration providing RDP/SSH/VNC protocol handling
 guacd:
+  # -- Container image settings for the guacd protocol handler service
   image:
+    # -- guacd image repository URL (separate from main Guacamole image)
     repository: guacamole/guacd
+    # -- guacd specific version matching Guacamole application version for compatibility
     tag: 1.5.5
+  # -- Resource allocation for the guacd protocol handling container
   resources:
+    # -- Minimum guaranteed resources for guacd to operate
     requests:
+      # -- Minimum CPU for guacd (handles protocol encoding/decoding, typically lightweight)
       cpu: 1m
 
+# -- Apache Guacamole web application container resource configuration
 app:
+  # -- Resource constraints for the main Guacamole web application
   resources:
+    # -- Minimum guaranteed resources for web application stability
     requests:
+      # -- Minimum CPU for Guacamole web interface (low overhead for HTML5 frontend)
       cpu: 3m
 
+# -- PostgreSQL database service supporting Guacamole user/connection store
 db:
+  # -- Resource allocation for the PostgreSQL database container
   resources:
+    # -- Minimum guaranteed resources for database operations
     requests:
+      # -- Minimum CPU for PostgreSQL (light usage in most deployments)
       cpu: 10m
 
+# -- Helper pod configuration providing database initialization and management tasks
 helper:
+  # -- Resource constraints for helper pod running initialization scripts
   resources:
+    # -- Minimum guaranteed resources for helper container
     requests:
+      # -- Minimum CPU for init/helper tasks (usually short-lived)
       cpu: 5m
