@@ -38,7 +38,10 @@ jobs:
           rm "helm-docs_${VERSION#v}_Linux_${ARCH}.tar.gz"
 
       - name: Generate Helm docs
-        run: helm-docs --chart-search-root charts
+        run: |
+          helm-docs \
+            --chart-search-root charts \
+            --template-files .github/helm-docs/README.md.gotmpl
 
       - name: Check for changes
         id: git-check
