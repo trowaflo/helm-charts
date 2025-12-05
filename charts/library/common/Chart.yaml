@@ -1,8 +1,13 @@
 apiVersion: v2
 name: common
 version: 0.1.0
-description: A Helm chart for Kubernetes to deploy common resources
 type: library
+description: |-
+  Common library chart providing reusable Helm templates and default configurations.
+  Standardizes Kubernetes resource deployment (Deployments, Services, Ingress, ServiceMonitor)
+  across the chart repository with consistent security, observability, and best practices.
+
+  Used by all application charts in this repository for consistency.
 maintainers:
   - name: trowaflo
     email: trowa.flo@gmail.com
