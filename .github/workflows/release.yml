@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Configure Git
         run: |
@@ -77,12 +79,11 @@ jobs:
 
       - name: Commit Helm docs if changed
         run: |
-          BRANCH=$(git rev-parse --abbrev-ref HEAD)
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           git add -A
           git commit -m "chore: update Helm chart documentation"
-          git push origin $BRANCH
+          git push origin ${{ github.head_ref }}
 
       # - name: Run chart-releaser
       #   uses: helm/chart-releaser-action@v1.7.0
