@@ -16,8 +16,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
 
       - name: Configure Git
         run: |
@@ -79,11 +77,11 @@ jobs:
 
       - name: Commit Helm docs if changed
         run: |
-          git add .
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: update helm chart documentation"
+          # git add .
+          # if ! git diff --cached --quiet; then
+            git commit -a -m "chore: update helm chart documentation"
             git push
-          fi
+          # fi
 
       # - name: Run chart-releaser
       #   uses: helm/chart-releaser-action@v1.7.0
