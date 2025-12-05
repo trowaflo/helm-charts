@@ -62,14 +62,22 @@ jobs:
         run: |
           SUMMARY_FILE="${GITHUB_STEP_SUMMARY:-./summary.md}"
           echo "## Helm Docs generated files" >> "$SUMMARY_FILE"
+
           for f in $(find charts -name README.md); do
-            echo "- **$f**" >> "$SUMMARY_FILE"
-            echo '```' >> "$SUMMARY_FILE"
-            head -n 15 "$f" >> "$SUMMARY_FILE"
-            echo '...' >> "$SUMMARY_FILE"
-            echo '```' >> "$SUMMARY_FILE"
+            # Titre pour chaque chart
+            CHART_NAME=$(basename $(dirname "$f"))
+            echo "### Chart: $CHART_NAME" >> "$SUMMARY_FILE"
+
+            # Insérer un petit aperçu, mais pas en code block
+            echo "" >> "$SUMMARY_FILE"
+            head -n 10 "$f" >> "$SUMMARY_FILE"
+            echo "..." >> "$SUMMARY_FILE"
+            echo "" >> "$SUMMARY_FILE"
+
+            # Ajouter un lien vers le fichier complet dans le zip
+            echo "[Full README](./helm-docs-preview.zip#$f)" >> "$SUMMARY_FILE"
+            echo "" >> "$SUMMARY_FILE"
           done
-        shell: bash
 
       - name: Archive generated docs for download
         run: |
