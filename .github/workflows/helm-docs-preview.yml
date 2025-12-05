@@ -6,94 +6,56 @@ on:
       - main
 
 jobs:
-  list-charts:
-    runs-on: ubuntu-latest
-    outputs:
-      charts: ${{ steps.list-charts.outputs.charts }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - id: list-charts
-        run: |
-          charts=$(find charts/apps -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | jq -R -s -c 'split("\n")[:-1]')
-          echo "charts=$charts" >> $GITHUB_OUTPUT
-
   preview-docs:
     runs-on: ubuntu-latest
-    needs: list-charts
-    strategy:
-      matrix:
-        chart: ${{ fromJSON(needs.list-charts.outputs.charts) }}
-      max-parallel: 2
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
 
       - name: Install helm-docs
         run: |
-          OS=$(uname -s)
-          ARCH=$(uname -m)
-
-          case "$ARCH" in
+          # Détection et normalisation de l'architecture
+          case "$(uname -m)" in
             x86_64)
-              ASSET_ARCH="x86_64"
+              ARCH="x86_64"
               ;;
-            aarch64)
-              ASSET_ARCH="arm64"
-              ;;
-            *)
-              echo "Unsupported architecture: $ARCH"
-              exit 1
-              ;;
-          esac
-
-          case "$OS" in
-            Linux)
-              ASSET_OS="Linux"
-              ;;
-            Darwin)
-              ASSET_OS="Darwin"
+            aarch64|arm64)
+              ARCH="arm64"
               ;;
             *)
-              echo "Unsupported OS: $OS"
+              echo "Architecture non supportée: $(uname -m)"
               exit 1
               ;;
           esac
 
           VERSION=$(curl -s https://api.github.com/repos/norwoodj/helm-docs/releases/latest | jq -r '.tag_name')
-          echo "Latest version: $VERSION"
-          URL="https://github.com/norwoodj/helm-docs/releases/download/${VERSION}/helm-docs_${VERSION#v}_${ASSET_OS}_${ASSET_ARCH}.tar.gz"
+          wget -q "https://github.com/norwoodj/helm-docs/releases/download/${VERSION}/helm-docs_${VERSION#v}_Linux_${ARCH}.tar.gz"
+          tar -xzf "helm-docs_${VERSION#v}_Linux_${ARCH}.tar.gz" helm-docs
+          sudo mv helm-docs /usr/local/bin/
+          rm "helm-docs_${VERSION#v}_Linux_${ARCH}.tar.gz"
+          
+      - name: Generate Helm docs
+        run: helm-docs --chart-search-root charts
 
-          echo "Downloading from: $URL"
-          curl -sSL "$URL" \
-            -o helm-docs.tar.gz
-
-          tar -xzf helm-docs.tar.gz -C /usr/local/bin
-          rm helm-docs.tar.gz
-
-      - name: Generate documentation for chart ${{ matrix.chart }}
-        run: helm-docs --chart-search-root charts/apps/${{ matrix.chart }}
-
-      - name: Publish Helm Docs Summary
+      - name: Check for changes
+        id: git-check
         run: |
-          SUMMARY_FILE="${GITHUB_STEP_SUMMARY:-./summary.md}"
-          README="charts/apps/${{ matrix.chart }}/README.md"
-
-          echo "### Chart: ${{ matrix.chart }}" >> "$SUMMARY_FILE"
-          echo "" >> "$SUMMARY_FILE"
-
-          if [[ -f "$README" ]]; then
-            head -n 15 "$README" >> "$SUMMARY_FILE"
-            echo "..." >> "$SUMMARY_FILE"
-            echo "" >> "$SUMMARY_FILE"
+          git add .
+          if git diff --cached --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
           else
-            echo "_README not found_" >> "$SUMMARY_FILE"
-            echo "" >> "$SUMMARY_FILE"
+            echo "changed=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Archive generated docs for download
+      - name: Commit and push changes
+        if: steps.git-check.outputs.changed == 'true'
         run: |
-          ZIP_FILE="helm-docs-preview.zip"
-          find charts -name README.md | zip -@ "$ZIP_FILE"
-          echo "Helm docs archived: $ZIP_FILE" >> "${GITHUB_STEP_SUMMARY:-./summary.md}"
+          git commit -m "chore: update Helm chart documentation [skip ci]"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            git push origin HEAD:${{ github.head_ref }}
+          else
+            git push
+          fi
