@@ -1,4 +1,4 @@
-name: Preview Helm Docs
+name: Helm Docs
 
 on:
   pull_request:
@@ -36,7 +36,7 @@ jobs:
           tar -xzf "helm-docs_${VERSION#v}_Linux_${ARCH}.tar.gz" helm-docs
           sudo mv helm-docs /usr/local/bin/
           rm "helm-docs_${VERSION#v}_Linux_${ARCH}.tar.gz"
-          
+
       - name: Generate Helm docs
         run: helm-docs --chart-search-root charts
 
