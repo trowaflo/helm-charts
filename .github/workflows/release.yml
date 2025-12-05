@@ -27,63 +27,47 @@ jobs:
 
       - name: Install helm-docs
         run: |
-          OS=$(uname -s)
-          ARCH=$(uname -m)
-
-          case "$ARCH" in
+          # Détection et normalisation de l'architecture
+          case "$(uname -m)" in
             x86_64)
-              ASSET_ARCH="x86_64"
+              ARCH="x86_64"
               ;;
-            aarch64)
-              ASSET_ARCH="arm64"
-              ;;
-            *)
-              echo "Unsupported architecture: $ARCH"
-              exit 1
-              ;;
-          esac
-
-          case "$OS" in
-            Linux)
-              ASSET_OS="Linux"
-              ;;
-            Darwin)
-              ASSET_OS="Darwin"
+            aarch64|arm64)
+              ARCH="arm64"
               ;;
             *)
-              echo "Unsupported OS: $OS"
+              echo "Architecture non supportée: $(uname -m)"
               exit 1
               ;;
           esac
 
           VERSION=$(curl -s https://api.github.com/repos/norwoodj/helm-docs/releases/latest | jq -r '.tag_name')
-          echo "Latest version: $VERSION"
-          URL="https://github.com/norwoodj/helm-docs/releases/download/${VERSION}/helm-docs_${VERSION#v}_${ASSET_OS}_${ASSET_ARCH}.tar.gz"
-
-          echo "Downloading from: $URL"
-          curl -sSL "$URL" \
-            -o helm-docs.tar.gz
-
-          tar -xzf helm-docs.tar.gz -C /usr/local/bin
-          rm helm-docs.tar.gz
-
-      - name: Find charts
-        id: charts
-        run: |
-          echo "paths=$(find . -type f -name Chart.yaml -exec dirname {} \;)" >> $GITHUB_OUTPUT
+          wget -q "https://github.com/norwoodj/helm-docs/releases/download/${VERSION}/helm-docs_${VERSION#v}_Linux_${ARCH}.tar.gz"
+          tar -xzf "helm-docs_${VERSION#v}_Linux_${ARCH}.tar.gz" helm-docs
+          sudo mv helm-docs /usr/local/bin/
+          rm "helm-docs_${VERSION#v}_Linux_${ARCH}.tar.gz"
 
       - name: Generate Helm docs
-        run: |
-          for chart_dir in ${{ steps.charts.outputs.paths }}; do
-            helm-docs --chart-search-root "$chart_dir"
-          done
+        run: helm-docs --chart-search-root charts
 
-      - name: Commit Helm docs if changed
+      - name: Check for changes
+        id: git-check
         run: |
           git add .
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: update Helm chart documentation"
+          if git diff --cached --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.git-check.outputs.changed == 'true'
+        run: |
+          git commit -m "chore: update Helm chart documentation [skip ci]"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             git push origin HEAD:${{ github.head_ref }}
+          else
+            git push
           fi
 
       # - name: Run chart-releaser
