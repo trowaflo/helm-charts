@@ -57,3 +57,9 @@ jobs:
 
       - name: Generate documentation
         run: helm-docs
+
+      - name: Upload generated docs
+        uses: actions/upload-artifact@v5
+        with:
+          name: helm-docs-preview
+          path: charts/**/README.md
