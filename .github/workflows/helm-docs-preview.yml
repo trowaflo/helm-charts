@@ -25,6 +25,7 @@ jobs:
     strategy:
       matrix:
         chart: ${{ fromJSON(needs.list-charts.outputs.charts) }}
+      max-parallel: 2
     steps:
       - name: Checkout
         uses: actions/checkout@v6
