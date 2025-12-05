@@ -1,14 +1,22 @@
 # guacamole
 
-![Version: 0.3.3](https://img.shields.io/badge/Version-0.3.3-informational?style=flat-square)
+![Version: 0.3.3](https://img.shields.io/badge/Version-0.3.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-Chart for guacamole
+Apache Guacamole HTML5 remote desktop gateway for secure access to virtual machines and servers.
+Provides browser-based RDP, SSH, and VNC access without requiring client-side installations.
+
+**Homepage:** <https://guacamole.apache.org>
 
 ## Maintainers
 
 | Name | Email | Url |
 | ---- | ------ | --- |
 | trowaflo | <trowa.flo@gmail.com> |  |
+
+## Source Code
+
+* <https://github.com/apache/guacamole-server>
+* <https://github.com/trowaflo/helm-charts>
 
 ## Values
 

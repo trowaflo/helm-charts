@@ -1,8 +1,12 @@
 # frigate-exporter
 
-![Version: 0.0.14](https://img.shields.io/badge/Version-0.0.14-informational?style=flat-square)
+![Version: 0.0.14](https://img.shields.io/badge/Version-0.0.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-Chart for prometheus frigate exporter
+Prometheus exporter for Frigate NVR (Network Video Recorder) system.
+Exports metrics from Frigate cameras, detections, and recording statistics
+in Prometheus-compatible format for integration with monitoring stacks.
+
+**Homepage:** <https://github.com/bairhys/prometheus-frigate-exporter>
 
 ## Maintainers
 
@@ -13,7 +17,7 @@ Chart for prometheus frigate exporter
 ## Source Code
 
 * <https://github.com/bairhys/prometheus-frigate-exporter>
-* <https://github.com/trowaflo/helm-charts/charts/frigate-exporter>
+* <https://github.com/trowaflo/helm-charts>
 
 ## Requirements
 

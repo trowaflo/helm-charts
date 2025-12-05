@@ -2,7 +2,12 @@
 
 ![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-Test chart for common library chart
+Test application chart demonstrating and validating the common library chart functionality.
+Provides unit test scenarios covering common chart features including deployments,
+services, ingress, security contexts, and Prometheus integration.
+
+This chart is NOT intended for production use. It serves as a reference implementation
+and testing vehicle for the common library.
 
 ## Maintainers
 

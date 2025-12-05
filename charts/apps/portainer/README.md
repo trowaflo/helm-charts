@@ -1,14 +1,23 @@
 # portainer
 
-![Version: 0.0.7](https://img.shields.io/badge/Version-0.0.7-informational?style=flat-square)
+![Version: 0.0.7](https://img.shields.io/badge/Version-0.0.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-Chart to agregate existent helm chart with custom object
+Portainer Community Edition - container and Kubernetes environment management platform.
+Provides intuitive UI for managing Docker containers, Kubernetes clusters, and registries.
+Wraps the official Portainer Helm chart with custom persistence and networking configuration.
+
+**Homepage:** <https://www.portainer.io>
 
 ## Maintainers
 
 | Name | Email | Url |
 | ---- | ------ | --- |
 | trowaflo | <trowa.flo@gmail.com> |  |
+
+## Source Code
+
+* <https://github.com/portainer/k8s>
+* <https://github.com/trowaflo/helm-charts>
 
 ## Requirements
 

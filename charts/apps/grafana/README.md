@@ -1,8 +1,12 @@
 # grafana
 
-![Version: 0.1.7](https://img.shields.io/badge/Version-0.1.7-informational?style=flat-square)
+![Version: 0.1.7](https://img.shields.io/badge/Version-0.1.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-Chart to agregate existent helm chart with custom object
+Grafana visualization and dashboarding platform with custom extensions.
+Wraps the official Grafana Helm chart with domain-specific customizations,
+providing integrated dashboard provisioning and Traefik IngressRoute support.
+
+**Homepage:** <https://grafana.com>
 
 ## Maintainers
 
@@ -12,7 +16,8 @@ Chart to agregate existent helm chart with custom object
 
 ## Source Code
 
-* <https://github.com/trowaflo/helm-charts/>
+* <https://github.com/grafana/grafana>
+* <https://github.com/trowaflo/helm-charts>
 
 ## Requirements
 

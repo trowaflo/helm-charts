@@ -2,9 +2,11 @@
 
 ![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-A Prometheus exporter for Graphite metrics
+Prometheus exporter for converting Graphite plaintext protocol metrics to Prometheus format.
+Enables Prometheus to scrape metrics from legacy Graphite systems and sources
+(e.g., TrueNAS, custom monitoring systems) that emit Graphite-formatted metrics.
 
-**Homepage:** <https://github.com/trowaflo/helm-charts>
+**Homepage:** <https://github.com/prometheus/graphite_exporter>
 
 ## Maintainers
 

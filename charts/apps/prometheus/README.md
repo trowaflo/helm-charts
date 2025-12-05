@@ -1,14 +1,23 @@
 # prometheus
 
-![Version: 2.4.5](https://img.shields.io/badge/Version-2.4.5-informational?style=flat-square)
+![Version: 2.4.5](https://img.shields.io/badge/Version-2.4.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-Chart to agregate existent helm chart with custom object
+Wraps the official kube-prometheus-stack Helm chart providing production-ready monitoring
+stack including Prometheus, Grafana, Alertmanager, and node exporters.
+
+**Homepage:** <https://prometheus.io>
 
 ## Maintainers
 
 | Name | Email | Url |
 | ---- | ------ | --- |
 | trowaflo | <trowa.flo@gmail.com> |  |
+
+## Source Code
+
+* <https://github.com/prometheus/prometheus>
+* <https://github.com/prometheus-operator/prometheus-operator>
+* <https://github.com/trowaflo/helm-charts>
 
 ## Requirements
 
