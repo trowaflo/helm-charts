@@ -68,7 +68,7 @@ helm uninstall my-common --namespace default
 			<td>containers</td>
 			<td>object</td>
 			<td><pre lang="">
-the chart will always construnct the main container. Additional containers can be added under the 'containers' key.
+Additional containers can be added under the 'containers' key.
 </pre>
 </td>
 			<td>Containers configuration</td>
