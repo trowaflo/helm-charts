@@ -58,6 +58,8 @@ helm upgrade my-common-test common-test/common-test \
 helm uninstall my-common-test --namespace default
 ```
 
+## Values
+
 <table>
 	<thead>
 		<th>Key</th>
@@ -131,37 +133,6 @@ true
 		</tr>
 	</tbody>
 </table>
-
-### Examples
-
-- Enable Prometheus scraping via ServiceMonitor
-- Configure resource requests/limits for predictable scheduling
-- Override container image and tag for air-gapped environments
-
-```yaml
-# values.yaml snippet
-serviceMonitor:
-  enabled: true
-
-resources:
-  requests:
-    cpu: 100m
-    memory: 128Mi
-  limits:
-    cpu: 500m
-    memory: 256Mi
-```
-
-## Security
-
-- Follows namespace-scoped, least-privilege defaults
-- Configure PodSecurityContext and SecurityContext as needed for your environment
-
-## Troubleshooting
-
-- Check pod logs and events: `kubectl logs -l app.kubernetes.io/name=common-test`
-- Verify CRDs (if any) are installed
-- Ensure network policies allow required traffic
 
 ## Maintainers
 
