@@ -39,6 +39,9 @@ jobs:
 
       - name: Generate Helm docs
         run: |
+          pwd
+          ls .github/helm-docs/README.md.gotmpl
+          cat .github/helm-docs/README.md.gotmpl
           helm-docs \
             --chart-search-root charts \
             --template-files .github/helm-docs/README.md.gotmpl
