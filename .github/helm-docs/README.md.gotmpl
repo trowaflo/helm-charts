@@ -12,29 +12,16 @@ Docs: https://github.com/norwoodj/helm-docs
 
 {{ template "chart.versionBadge" . }} {{ template "chart.typeBadge" . }} {{ template "chart.appVersionBadge" . }}
 
-{{- if .Chart.Home }}
-> Homepage: [{{ .Chart.Home }}]({{ .Chart.Home }})
-{{- end }}
 
-{{- if .Chart.Sources }}
-> Sources: {{ range $i, $s := .Chart.Sources }}{{ if $i }}, {{ end }}[{{ $s }}]({{ $s }}){{ end }}
-{{- end }}
+{{ template "chart.homepageLine" . }}
 
-{{- if .Chart.Keywords }}
-> Keywords: {{ join ", " .Chart.Keywords }}
-{{- end }}
 
-## TL;DR
-
-- Production-ready Helm chart for {{ .Chart.Name }}
-- Defaults optimized for sensible security and resource usage
-- Fully documented values with types and examples
+{{ template "chart.sourcesSection" . }}
 
 ## Requirements
 
-{{ template "chart.requirements" . }}
+{{ template "chart.requirementsSection" . }}
 
-- Kubernetes: compatible with supported versions of your cluster
 - Helm: v3+
 
 ## Getting Started
@@ -42,14 +29,14 @@ Docs: https://github.com/norwoodj/helm-docs
 ### Add repository
 
 ```bash
-helm repo add {{ .Chart.Name }} https://example.com/helm-charts
+helm repo add {{ template "chart.name" . }} https://example.com/helm-charts
 helm repo update
 ```
 
 ### Install
 
 ```bash
-helm install my-{{ .Chart.Name }} {{ .Chart.Name }}/{{ .Chart.Name }} \
+helm install my-{{ template "chart.name" . }} {{ template "chart.name" . }}/{{ template "chart.name" . }} \
   --namespace default \
   --create-namespace
 ```
@@ -57,7 +44,7 @@ helm install my-{{ .Chart.Name }} {{ .Chart.Name }}/{{ .Chart.Name }} \
 ### Upgrade
 
 ```bash
-helm upgrade my-{{ .Chart.Name }} {{ .Chart.Name }}/{{ .Chart.Name }} \
+helm upgrade my-{{ template "chart.name" . }} {{ template "chart.name" . }}/{{ template "chart.name" . }} \
   --namespace default \
   --install
 ```
@@ -65,14 +52,10 @@ helm upgrade my-{{ .Chart.Name }} {{ .Chart.Name }}/{{ .Chart.Name }} \
 ### Uninstall
 
 ```bash
-helm uninstall my-{{ .Chart.Name }} --namespace default
+helm uninstall my-{{ template "chart.name" . }} --namespace default
 ```
 
-## Values
-
-The following table lists the configurable parameters of the chart and their default values.
-
-{{ template "chart.valuesSection" . }}
+{{ template "chart.valuesTableHtml" . }}
 
 ### Examples
 
@@ -101,20 +84,12 @@ resources:
 
 ## Troubleshooting
 
-- Check pod logs and events: `kubectl logs -l app.kubernetes.io/name={{ .Chart.Name }}`
+- Check pod logs and events: `kubectl logs -l app.kubernetes.io/name={{ template "chart.name" . }}`
 - Verify CRDs (if any) are installed
 - Ensure network policies allow required traffic
 
 ## Maintainers
 
-{{ template "chart.maintainers" . }}
+{{ template "chart.maintainersSection" . }}
 
-## License
-
-{{- if .Chart.Annotations.license }}
-{{ .Chart.Annotations.license }}
-{{- else }}
-This chart is distributed under the terms of the project license.
-{{- end }}
-
-{{ template "chart.footer" . }}
+{{ template "helm-docs.versionFooter" . }}
