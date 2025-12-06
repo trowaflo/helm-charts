@@ -43,8 +43,9 @@ jobs:
           ls .github/helm-docs/README.md.gotmpl
           cat .github/helm-docs/README.md.gotmpl
           helm-docs \
-            --chart-search-root charts \
-            --template-files .github/helm-docs/README.md.gotmpl
+            --chart-search-root \
+            --template-files .github/helm-docs/README.md.gotmpl \
+            charts
 
       - name: Check for changes
         id: git-check
