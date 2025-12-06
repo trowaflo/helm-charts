@@ -53,7 +53,10 @@ helm upgrade my-common common/common \
 helm uninstall my-common --namespace default
 ```
 
-<table height="400px" >
+## Values
+
+<h3>Containers configuration</h3>
+<table>
 	<thead>
 		<th>Key</th>
 		<th>Type</th>
@@ -62,87 +65,58 @@ helm uninstall my-common --namespace default
 	</thead>
 	<tbody>
 		<tr>
-			<td id="containers"><a href="./values.yaml#L23">containers</a></td>
-			<td>
-object
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="">
+			<td>containers</td>
+			<td>object</td>
+			<td><pre lang="">
 The chart will always construct the main container.
 </pre>
-</div>
-			</td>
+</td>
 			<td>Containers configuration. Additional containers can be added under the 'containers' key.</td>
 		</tr>
 		<tr>
-			<td id="containers--main--args"><a href="./values.yaml#L27">containers.main.args</a></td>
-			<td>
-list
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>containers.main.args</td>
+			<td>list</td>
+			<td><pre lang="json">
 []
 </pre>
-</div>
-			</td>
+</td>
 			<td>Command-line arguments passed to the container entrypoint. Use this to override or extend the container's startup command</td>
 		</tr>
 		<tr>
-			<td id="containers--main--env"><a href="./values.yaml#L31">containers.main.env</a></td>
-			<td>
-object
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>containers.main.env</td>
+			<td>object</td>
+			<td><pre lang="json">
 {}
 </pre>
-</div>
-			</td>
+</td>
 			<td>Environment variables injected into containers. Can reference ConfigMaps or Secrets via valueFrom</td>
 		</tr>
 		<tr>
-			<td id="containers--main--image"><a href="./values.yaml#L35">containers.main.image</a></td>
-			<td>
-object
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>containers.main.image</td>
+			<td>object</td>
+			<td><pre lang="json">
 {
   "pullPolicy": "Always",
   "repository": "traefik/whoami",
   "tag": "latest"
 }
 </pre>
-</div>
-			</td>
+</td>
 			<td>Container image configuration including repository, tag, and pull policy</td>
 		</tr>
 		<tr>
-			<td id="containers--main--imagePullSecrets"><a href="./values.yaml#L42">containers.main.imagePullSecrets</a></td>
-			<td>
-list
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>containers.main.imagePullSecrets</td>
+			<td>list</td>
+			<td><pre lang="json">
 []
 </pre>
-</div>
-			</td>
+</td>
 			<td>List of imagePullSecrets for private container registries. Reference pre-created Secrets in the same namespace</td>
 		</tr>
 		<tr>
-			<td id="containers--main--probes--liveness"><a href="./values.yaml#L47">containers.main.probes.liveness</a></td>
-			<td>
-object
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>containers.main.probes.liveness</td>
+			<td>object</td>
+			<td><pre lang="json">
 {
   "enabled": true,
   "failureThreshold": 3,
@@ -157,18 +131,13 @@ object
   "timeoutSeconds": 5
 }
 </pre>
-</div>
-			</td>
+</td>
 			<td>Liveness probe configuration</td>
 		</tr>
 		<tr>
-			<td id="containers--main--probes--readiness"><a href="./values.yaml#L61">containers.main.probes.readiness</a></td>
-			<td>
-object
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>containers.main.probes.readiness</td>
+			<td>object</td>
+			<td><pre lang="json">
 {
   "enabled": true,
   "failureThreshold": 3,
@@ -183,18 +152,13 @@ object
   "timeoutSeconds": 5
 }
 </pre>
-</div>
-			</td>
+</td>
 			<td>Readiness probe configuration</td>
 		</tr>
 		<tr>
-			<td id="containers--main--probes--startup"><a href="./values.yaml#L75">containers.main.probes.startup</a></td>
-			<td>
-object
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>containers.main.probes.startup</td>
+			<td>object</td>
+			<td><pre lang="json">
 {
   "enabled": true,
   "failureThreshold": 3,
@@ -209,18 +173,13 @@ object
   "timeoutSeconds": 5
 }
 </pre>
-</div>
-			</td>
+</td>
 			<td>Startup probe configuration</td>
 		</tr>
 		<tr>
-			<td id="containers--main--resources"><a href="./values.yaml#L89">containers.main.resources</a></td>
-			<td>
-object
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>containers.main.resources</td>
+			<td>object</td>
+			<td><pre lang="json">
 {
   "limits": {
     "cpu": 2,
@@ -232,32 +191,111 @@ object
   }
 }
 </pre>
-</div>
-			</td>
+</td>
 			<td>CPU and memory resource allocation for the container</td>
 		</tr>
+	</tbody>
+</table>
+<h3>Global settings</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
 		<tr>
-			<td id="fullnameOverride"><a href="./values.yaml#L15">fullnameOverride</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>fullnameOverride</td>
+			<td>string</td>
+			<td><pre lang="json">
 ""
 </pre>
-</div>
-			</td>
+</td>
 			<td>Fully override the chart name for Kubernetes resource names. Useful when deploying multiple instances with the same chart</td>
 		</tr>
 		<tr>
-			<td id="ingress"><a href="./values.yaml#L124">ingress</a></td>
-			<td>
-object
+			<td>nameOverride</td>
+			<td>string</td>
+			<td><pre lang="json">
+""
+</pre>
 </td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>Override the Helm-generated release name. Lower priority than fullnameOverride</td>
+		</tr>
+		<tr>
+			<td>namespaceOverride</td>
+			<td>string</td>
+			<td><pre lang="json">
+""
+</pre>
+</td>
+			<td>Override the namespace where resources are deployed. Leave empty to use the release namespace</td>
+		</tr>
+		<tr>
+			<td>podSecurityContext</td>
+			<td>object</td>
+			<td><pre lang="json">
+{
+  "allowPrivilegeEscalation": false,
+  "capabilities": {
+    "drop": [
+      "ALL"
+    ]
+  },
+  "readOnlyRootFilesystem": true,
+  "runAsNonRoot": true,
+  "runAsUser": 65534,
+  "seccompProfile": {
+    "type": "RuntimeDefault"
+  }
+}
+</pre>
+</td>
+			<td>Security context settings applied at the pod level for enhanced security</td>
+		</tr>
+		<tr>
+			<td>replicaCount</td>
+			<td>int</td>
+			<td><pre lang="json">
+1
+</pre>
+</td>
+			<td>Number of desired pods (replicas) for the deployment. Modify to scale the application horizontally</td>
+		</tr>
+		<tr>
+			<td>revisionHistoryLimit</td>
+			<td>int</td>
+			<td><pre lang="json">
+3
+</pre>
+</td>
+			<td>Number of revisions to keep for rollback purposes. Set to 3 for balanced history management</td>
+		</tr>
+		<tr>
+			<td>strategyType</td>
+			<td>string</td>
+			<td><pre lang="json">
+"Recreate"
+</pre>
+</td>
+			<td>Deployment update strategy configuration</td>
+		</tr>
+	</tbody>
+</table>
+<h3>Ingress configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>ingress</td>
+			<td>object</td>
+			<td><pre lang="json">
 {
   "main": {
     "enabled": false,
@@ -279,101 +317,24 @@ object
   }
 }
 </pre>
-</div>
-			</td>
+</td>
 			<td>Ingress configuration. Additional ingress resources can be added under the 'ingress' key.</td>
 		</tr>
+	</tbody>
+</table>
+<h3>Monitoring configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
 		<tr>
-			<td id="nameOverride"><a href="./values.yaml#L12">nameOverride</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
-""
-</pre>
-</div>
-			</td>
-			<td>Override the Helm-generated release name. Lower priority than fullnameOverride</td>
-		</tr>
-		<tr>
-			<td id="namespaceOverride"><a href="./values.yaml#L18">namespaceOverride</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
-""
-</pre>
-</div>
-			</td>
-			<td>Override the namespace where resources are deployed. Leave empty to use the release namespace</td>
-		</tr>
-		<tr>
-			<td id="podSecurityContext"><a href="./values.yaml#L99">podSecurityContext</a></td>
-			<td>
-object
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
-{
-  "allowPrivilegeEscalation": false,
-  "capabilities": {
-    "drop": [
-      "ALL"
-    ]
-  },
-  "readOnlyRootFilesystem": true,
-  "runAsNonRoot": true,
-  "runAsUser": 65534,
-  "seccompProfile": {
-    "type": "RuntimeDefault"
-  }
-}
-</pre>
-</div>
-			</td>
-			<td>Security context settings applied at the pod level for enhanced security</td>
-		</tr>
-		<tr>
-			<td id="replicaCount"><a href="./values.yaml#L4">replicaCount</a></td>
-			<td>
-int
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
-1
-</pre>
-</div>
-			</td>
-			<td>Number of desired pods (replicas) for the deployment. Modify to scale the application horizontally</td>
-		</tr>
-		<tr>
-			<td id="revisionHistoryLimit"><a href="./values.yaml#L8">revisionHistoryLimit</a></td>
-			<td>
-int
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
-3
-</pre>
-</div>
-			</td>
-			<td>Number of revisions to keep for rollback purposes. Set to 3 for balanced history management</td>
-		</tr>
-		<tr>
-			<td id="serviceMonitor"><a href="./values.yaml#L144">serviceMonitor</a></td>
-			<td>
-object
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>serviceMonitor</td>
+			<td>object</td>
+			<td><pre lang="json">
 {
   "enabled": true,
   "endpoints": [
@@ -397,18 +358,24 @@ object
   }
 }
 </pre>
-</div>
-			</td>
+</td>
 			<td>Monitoring configuration. Additional monitoring resources can be added under the 'serviceMonitor' key.</td>
 		</tr>
+	</tbody>
+</table>
+<h3>Services configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
 		<tr>
-			<td id="services"><a href="./values.yaml#L111">services</a></td>
-			<td>
-object
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>services</td>
+			<td>object</td>
+			<td><pre lang="json">
 {
   "main": {
     "annotations": {},
@@ -424,23 +391,8 @@ object
   }
 }
 </pre>
-</div>
-			</td>
-			<td>Service configuration. Additional services can be added under the 'services' key.</td>
-		</tr>
-		<tr>
-			<td id="strategyType"><a href="./values.yaml#L158">strategyType</a></td>
-			<td>
-string
 </td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
-"Recreate"
-</pre>
-</div>
-			</td>
-			<td>Deployment update strategy configuration</td>
+			<td>Service configuration. Additional services can be added under the 'services' key.</td>
 		</tr>
 	</tbody>
 </table>

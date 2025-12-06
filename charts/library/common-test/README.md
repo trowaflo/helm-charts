@@ -58,7 +58,9 @@ helm upgrade my-common-test common-test/common-test \
 helm uninstall my-common-test --namespace default
 ```
 
-<table height="400px" >
+## Values
+
+<table>
 	<thead>
 		<th>Key</th>
 		<th>Type</th>
@@ -67,101 +69,66 @@ helm uninstall my-common-test --namespace default
 	</thead>
 	<tbody>
 		<tr>
-			<td id="containers--main--args[0]"><a href="./values.yaml#L5">containers.main.args[0]</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>containers.main.args[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
 "--test-arg=value"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="containers--main--env[0]--name"><a href="./values.yaml#L8">containers.main.env[0].name</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>containers.main.env[0].name</td>
+			<td>string</td>
+			<td><pre lang="json">
 "envtest"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="containers--main--env[0]--value"><a href="./values.yaml#L9">containers.main.env[0].value</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>containers.main.env[0].value</td>
+			<td>string</td>
+			<td><pre lang="json">
 "thevalue"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="containers--main--env[1]--name"><a href="./values.yaml#L10">containers.main.env[1].name</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>containers.main.env[1].name</td>
+			<td>string</td>
+			<td><pre lang="json">
 "valuefrom"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="containers--main--env[1]--valueFrom--secretKeyRef--key"><a href="./values.yaml#L14">containers.main.env[1].valueFrom.secretKeyRef.key</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>containers.main.env[1].valueFrom.secretKeyRef.key</td>
+			<td>string</td>
+			<td><pre lang="json">
 "password"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="containers--main--env[1]--valueFrom--secretKeyRef--name"><a href="./values.yaml#L13">containers.main.env[1].valueFrom.secretKeyRef.name</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>containers.main.env[1].valueFrom.secretKeyRef.name</td>
+			<td>string</td>
+			<td><pre lang="json">
 "my-secret"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="ingress--main--enabled"><a href="./values.yaml#L18">ingress.main.enabled</a></td>
-			<td>
-bool
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>ingress.main.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
 true
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 	</tbody>

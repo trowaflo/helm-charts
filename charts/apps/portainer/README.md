@@ -58,7 +58,9 @@ helm upgrade my-portainer portainer/portainer \
 helm uninstall my-portainer --namespace default
 ```
 
-<table height="400px" >
+## Values
+
+<table>
 	<thead>
 		<th>Key</th>
 		<th>Type</th>
@@ -67,31 +69,21 @@ helm uninstall my-portainer --namespace default
 	</thead>
 	<tbody>
 		<tr>
-			<td id="pv"><a href="./values.yaml#L2">pv</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>pv</td>
+			<td>string</td>
+			<td><pre lang="json">
 null
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="pvc"><a href="./values.yaml#L4">pvc</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>pvc</td>
+			<td>string</td>
+			<td><pre lang="json">
 null
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 	</tbody>

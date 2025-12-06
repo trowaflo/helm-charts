@@ -51,7 +51,9 @@ helm upgrade my-guacamole guacamole/guacamole \
 helm uninstall my-guacamole --namespace default
 ```
 
-<table height="400px" >
+## Values
+
+<table>
 	<thead>
 		<th>Key</th>
 		<th>Type</th>
@@ -60,115 +62,75 @@ helm uninstall my-guacamole --namespace default
 	</thead>
 	<tbody>
 		<tr>
-			<td id="app--resources--requests--cpu"><a href="./values.yaml#L17">app.resources.requests.cpu</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>app.resources.requests.cpu</td>
+			<td>string</td>
+			<td><pre lang="json">
 "3m"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="db--resources--requests--cpu"><a href="./values.yaml#L22">db.resources.requests.cpu</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>db.resources.requests.cpu</td>
+			<td>string</td>
+			<td><pre lang="json">
 "10m"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="guacd--image--repository"><a href="./values.yaml#L8">guacd.image.repository</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>guacd.image.repository</td>
+			<td>string</td>
+			<td><pre lang="json">
 "guacamole/guacd"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="guacd--image--tag"><a href="./values.yaml#L9">guacd.image.tag</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>guacd.image.tag</td>
+			<td>string</td>
+			<td><pre lang="json">
 "1.5.5"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="guacd--resources--requests--cpu"><a href="./values.yaml#L12">guacd.resources.requests.cpu</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>guacd.resources.requests.cpu</td>
+			<td>string</td>
+			<td><pre lang="json">
 "1m"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="helper--resources--requests--cpu"><a href="./values.yaml#L27">helper.resources.requests.cpu</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>helper.resources.requests.cpu</td>
+			<td>string</td>
+			<td><pre lang="json">
 "5m"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="image--repository"><a href="./values.yaml#L3">image.repository</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>image.repository</td>
+			<td>string</td>
+			<td><pre lang="json">
 "guacamole/guacamole"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="image--tag"><a href="./values.yaml#L4">image.tag</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>image.tag</td>
+			<td>string</td>
+			<td><pre lang="json">
 "1.5.5"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 	</tbody>

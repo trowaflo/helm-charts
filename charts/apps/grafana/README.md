@@ -58,7 +58,9 @@ helm upgrade my-grafana grafana/grafana \
 helm uninstall my-grafana --namespace default
 ```
 
-<table height="400px" >
+## Values
+
+<table>
 	<thead>
 		<th>Key</th>
 		<th>Type</th>
@@ -67,129 +69,84 @@ helm uninstall my-grafana --namespace default
 	</thead>
 	<tbody>
 		<tr>
-			<td id="dashboards--default--custom-dashboard--file"><a href="./values.yaml#L25">dashboards.default.custom-dashboard.file</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>dashboards.default.custom-dashboard.file</td>
+			<td>string</td>
+			<td><pre lang="json">
 "dashboards/custom-dashboard.json"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="grafana--admin--existingSecret"><a href="./values.yaml#L14">grafana.admin.existingSecret</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>grafana.admin.existingSecret</td>
+			<td>string</td>
+			<td><pre lang="json">
 "grafana"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="grafana--admin--passwordKey"><a href="./values.yaml#L16">grafana.admin.passwordKey</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>grafana.admin.passwordKey</td>
+			<td>string</td>
+			<td><pre lang="json">
 "admin-password"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="grafana--admin--userKey"><a href="./values.yaml#L15">grafana.admin.userKey</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>grafana.admin.userKey</td>
+			<td>string</td>
+			<td><pre lang="json">
 "admin-user"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="grafana--ingress--enabled"><a href="./values.yaml#L7">grafana.ingress.enabled</a></td>
-			<td>
-bool
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>grafana.ingress.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
 false
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="grafana--ingressroute--enabled"><a href="./values.yaml#L10">grafana.ingressroute.enabled</a></td>
-			<td>
-bool
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>grafana.ingressroute.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
 true
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="grafana--ingressroute--path"><a href="./values.yaml#L11">grafana.ingressroute.path</a></td>
-			<td>
-string
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>grafana.ingressroute.path</td>
+			<td>string</td>
+			<td><pre lang="json">
 "/grafana/"
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="grafana--sidecar--dashboards--enabled"><a href="./values.yaml#L20">grafana.sidecar.dashboards.enabled</a></td>
-			<td>
-bool
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>grafana.sidecar.dashboards.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
 true
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td id="grafana--testFramework--enabled"><a href="./values.yaml#L4">grafana.testFramework.enabled</a></td>
-			<td>
-bool
-</td>
-			<td>
-				<div style="max-width: 300px;">
-<pre lang="json">
+			<td>grafana.testFramework.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
 false
 </pre>
-</div>
-			</td>
+</td>
 			<td></td>
 		</tr>
 	</tbody>
