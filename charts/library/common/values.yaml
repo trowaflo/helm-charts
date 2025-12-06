@@ -14,7 +14,7 @@ namespaceOverride: ''
 
 # -- Containers configuration
 # @default -- The chart will always construct the main container.
-# @default -- Additional containers can be added under the 'containers' key.
+#          -- Additional containers can be added under the 'containers' key.
 # @section -- Containers configuration
 containers:
   main:
