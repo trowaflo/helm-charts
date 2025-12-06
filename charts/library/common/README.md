@@ -232,8 +232,7 @@ true
 		</tr>
 	</tbody>
 </table>
-
-<h3>Other Values</h3>
+<h3>Global settings</h3>
 <table>
 	<thead>
 		<th>Key</th>
@@ -242,245 +241,302 @@ true
 		<th>Description</th>
 	</thead>
 	<tbody>
-	<tr>
-		<td>fullnameOverride</td>
-		<td>string</td>
-		<td><pre lang="json">
+		<tr>
+			<td>fullnameOverride</td>
+			<td>string</td>
+			<td><pre lang="json">
 ""
 </pre>
 </td>
-		<td>Fully override the chart name for Kubernetes resource names. Useful when deploying multiple instances with the same chart</td>
-	</tr>
-	<tr>
-		<td>ingress</td>
-		<td>object</td>
-		<td><pre lang="json">
-{
-  "main": {
-    "enabled": false,
-    "hosts": [
-      {
-        "host": "chart-example.local",
-        "paths": [
-          {
-            "path": "/",
-            "pathType": "Prefix"
-          },
-          {
-            "path": "/testpath",
-            "pathType": "Prefix"
-          }
-        ]
-      },
-      {
-        "host": "another-chart-example.local",
-        "paths": [
-          {
-            "path": "/",
-            "pathType": "Prefix"
-          },
-          {
-            "path": "/testpath",
-            "pathType": "Prefix"
-          }
-        ]
-      }
-    ]
-  }
-}
-</pre>
-</td>
-		<td>Kubernetes Ingress resource configuration for external access to the Service</td>
-	</tr>
-	<tr>
-		<td>nameOverride</td>
-		<td>string</td>
-		<td><pre lang="json">
+			<td>Fully override the chart name for Kubernetes resource names. Useful when deploying multiple instances with the same chart</td>
+		</tr>
+		<tr>
+			<td>nameOverride</td>
+			<td>string</td>
+			<td><pre lang="json">
 ""
 </pre>
 </td>
-		<td>Override the Helm-generated release name. Lower priority than fullnameOverride</td>
-	</tr>
-	<tr>
-		<td>namespaceOverride</td>
-		<td>string</td>
-		<td><pre lang="json">
+			<td>Override the Helm-generated release name. Lower priority than fullnameOverride</td>
+		</tr>
+		<tr>
+			<td>namespaceOverride</td>
+			<td>string</td>
+			<td><pre lang="json">
 ""
 </pre>
 </td>
-		<td>Override the namespace where resources are deployed. Leave empty to use the release namespace</td>
-	</tr>
-	<tr>
-		<td>podSecurityContext</td>
-		<td>object</td>
-		<td><pre lang="json">
+			<td>Override the namespace where resources are deployed. Leave empty to use the release namespace</td>
+		</tr>
+		<tr>
+			<td>podSecurityContext</td>
+			<td>object</td>
+			<td><pre lang="json">
 {
   "allowPrivilegeEscalation": false,
-  "capabilities": {},
+  "capabilities": {
+    "drop": [
+      "ALL"
+    ]
+  },
   "readOnlyRootFilesystem": true,
   "runAsNonRoot": true,
   "runAsUser": 65534,
-  "seccompProfile": {}
-}
-</pre>
-</td>
-		<td>Security context settings applied at the pod level for enhanced security</td>
-	</tr>
-	<tr>
-		<td>podSecurityContext.allowPrivilegeEscalation</td>
-		<td>bool</td>
-		<td><pre lang="json">
-false
-</pre>
-</td>
-		<td>Privilege escalation for all containers in the pod</td>
-	</tr>
-	<tr>
-		<td>podSecurityContext.capabilities</td>
-		<td>object</td>
-		<td><pre lang="json">
-{}
-</pre>
-</td>
-		<td>Capabilities to add or drop for all containers in the pod</td>
-	</tr>
-	<tr>
-		<td>podSecurityContext.readOnlyRootFilesystem</td>
-		<td>bool</td>
-		<td><pre lang="json">
-true
-</pre>
-</td>
-		<td>Mount the root filesystem as read-only for immutability and reduced attack surface</td>
-	</tr>
-	<tr>
-		<td>podSecurityContext.runAsNonRoot</td>
-		<td>bool</td>
-		<td><pre lang="json">
-true
-</pre>
-</td>
-		<td>Require containers to run as non-root user for security hardening</td>
-	</tr>
-	<tr>
-		<td>podSecurityContext.runAsUser</td>
-		<td>int</td>
-		<td><pre lang="json">
-65534
-</pre>
-</td>
-		<td>Default user ID for running containers in the pod</td>
-	</tr>
-	<tr>
-		<td>podSecurityContext.seccompProfile</td>
-		<td>object</td>
-		<td><pre lang="json">
-{}
-</pre>
-</td>
-		<td>Security profile preventing use of unconfined seccomp or AppArmor</td>
-	</tr>
-	<tr>
-		<td>replicaCount</td>
-		<td>int</td>
-		<td><pre lang="json">
-1
-</pre>
-</td>
-		<td>Number of desired pods (replicas) for the deployment. Modify to scale the application horizontally</td>
-	</tr>
-	<tr>
-		<td>revisionHistoryLimit</td>
-		<td>int</td>
-		<td><pre lang="json">
-3
-</pre>
-</td>
-		<td>Number of revisions to keep for rollback purposes. Set to 3 for balanced history management</td>
-	</tr>
-	<tr>
-		<td>serviceMonitor</td>
-		<td>object</td>
-		<td><pre lang="json">
-{
-  "enabled": true,
-  "endpoints": [
-    {
-      "metricRelabelings": [],
-      "port": "main"
-    }
-  ],
-  "labels": {
-    "release": "prometheus"
+  "seccompProfile": {
+    "type": "RuntimeDefault"
   }
 }
 </pre>
 </td>
-		<td>Prometheus ServiceMonitor configuration for metrics scraping</td>
-	</tr>
-	<tr>
-		<td>serviceMonitor.endpoints[0]</td>
-		<td>object</td>
-		<td><pre lang="json">
+			<td>Security context settings applied at the pod level for enhanced security</td>
+		</tr>
+		<tr>
+			<td>replicaCount</td>
+			<td>int</td>
+			<td><pre lang="json">
+1
+</pre>
+</td>
+			<td>Number of desired pods (replicas) for the deployment. Modify to scale the application horizontally</td>
+		</tr>
+		<tr>
+			<td>revisionHistoryLimit</td>
+			<td>int</td>
+			<td><pre lang="json">
+3
+</pre>
+</td>
+			<td>Number of revisions to keep for rollback purposes. Set to 3 for balanced history management</td>
+		</tr>
+		<tr>
+			<td>strategyType</td>
+			<td>string</td>
+			<td><pre lang="json">
+"Recreate"
+</pre>
+</td>
+			<td>Deployment update strategy configuration</td>
+		</tr>
+	</tbody>
+</table>
+<h3>Ingress configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>ingress</td>
+			<td>object</td>
+			<td><pre lang="">
+The chart will always construct the main ingress.
+</pre>
+</td>
+			<td>Ingress configuration. Additional ingress resources can be added under the 'ingress' key.</td>
+		</tr>
+		<tr>
+			<td>ingress.main.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+false
+</pre>
+</td>
+			<td>Enable the Ingress resource to expose the application externally</td>
+		</tr>
+		<tr>
+			<td>ingress.main.hosts</td>
+			<td>list</td>
+			<td><pre lang="json">
+[
+  {
+    "host": "chart-example.local",
+    "paths": [
+      {
+        "path": "/",
+        "pathType": "Prefix"
+      },
+      {
+        "path": "/testpath",
+        "pathType": "Prefix"
+      }
+    ]
+  }
+]
+</pre>
+</td>
+			<td>List of hostnames and paths for the Ingress resource</td>
+		</tr>
+	</tbody>
+</table>
+<h3>Monitoring configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>serviceMonitor</td>
+			<td>object</td>
+			<td><pre lang="">
+The chart will always construct the main serviceMonitor.
+</pre>
+</td>
+			<td>Monitoring configuration. Additional monitoring resources can be added under the 'serviceMonitor' key.</td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+			<td>Enable the ServiceMonitor resource for Prometheus monitoring</td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints</td>
+			<td>list</td>
+			<td><pre lang="json">
+[
+  {
+    "metricRelabelings": [
+      {
+        "action": "replace",
+        "regex": "olstring_(.*)",
+        "replacement": "newstring_$1",
+        "sourceLabels": [
+          "__name__"
+        ],
+        "targetLabel": "__name__"
+      }
+    ],
+    "port": "main"
+  }
+]
+</pre>
+</td>
+			<td>Endpoints configuration for scraping metrics from the service</td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0]</td>
+			<td>object</td>
+			<td><pre lang="json">
 {
-  "metricRelabelings": [],
+  "metricRelabelings": [
+    {
+      "action": "replace",
+      "regex": "olstring_(.*)",
+      "replacement": "newstring_$1",
+      "sourceLabels": [
+        "__name__"
+      ],
+      "targetLabel": "__name__"
+    }
+  ],
   "port": "main"
 }
 </pre>
 </td>
-		<td>List of endpoints to scrape metrics from</td>
-	</tr>
-	<tr>
-		<td>serviceMonitor.endpoints[0].metricRelabelings</td>
-		<td>list</td>
-		<td><pre lang="json">
-[]
-</pre>
-</td>
-		<td>Relabeling rules to modify metric labels before ingestion</td>
-	</tr>
-	<tr>
-		<td>serviceMonitor.labels</td>
-		<td>object</td>
-		<td><pre lang="json">
+			<td>List of endpoints to scrape metrics from</td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.labels</td>
+			<td>object</td>
+			<td><pre lang="json">
 {
   "release": "prometheus"
 }
 </pre>
 </td>
-		<td>Labels to add to the ServiceMonitor resource for identification and selection</td>
-	</tr>
-	<tr>
-		<td>services</td>
-		<td>object</td>
-		<td><pre lang="json">
+			<td>Labels to add to the ServiceMonitor resource for identification and selection</td>
+		</tr>
+	</tbody>
+</table>
+<h3>Services configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>services</td>
+			<td>object</td>
+			<td><pre lang="">
+The chart will always construct the main service.
+</pre>
+</td>
+			<td>Service configuration. Additional services can be added under the 'services' key.</td>
+		</tr>
+		<tr>
+			<td>services.main.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+			<td>Enable the Service resource to expose the application within the cluster</td>
+		</tr>
+		<tr>
+			<td>services.main.ports</td>
+			<td>object</td>
+			<td><pre lang="json">
 {
   "main": {
-    "annotations": {},
-    "enabled": true,
-    "labels": {},
-    "ports": {
-      "main": {
-        "port": 80,
-        "protocol": "TCP"
-      }
-    },
-    "type": "ClusterIP"
+    "port": 80,
+    "protocol": "TCP"
   }
 }
 </pre>
 </td>
-		<td>Kubernetes Service configuration for exposing the application</td>
-	</tr>
-	<tr>
-		<td>strategyType</td>
-		<td>string</td>
-		<td><pre lang="json">
-"Recreate"
+			<td>Port configuration for the Service</td>
+		</tr>
+		<tr>
+			<td>services.main.ports.main</td>
+			<td>object</td>
+			<td><pre lang="json">
+{
+  "port": 80,
+  "protocol": "TCP"
+}
 </pre>
 </td>
-		<td>Deployment update strategy configuration</td>
-	</tr>
+			<td>Port mapping for the main service port</td>
+		</tr>
+		<tr>
+			<td>services.main.ports.main.port</td>
+			<td>int</td>
+			<td><pre lang="json">
+80
+</pre>
+</td>
+			<td>Port number exposed by the Service</td>
+		</tr>
+		<tr>
+			<td>services.main.ports.main.protocol</td>
+			<td>string</td>
+			<td><pre lang="json">
+"TCP"
+</pre>
+</td>
+			<td>Protocol used by the Service port (TCP or UDP)</td>
+		</tr>
+		<tr>
+			<td>services.main.type</td>
+			<td>string</td>
+			<td><pre lang="json">
+"ClusterIP"
+</pre>
+</td>
+			<td>Type of Kubernetes Service to create (ClusterIP, NodePort, LoadBalancer, etc.)</td>
+		</tr>
 	</tbody>
 </table>
 
