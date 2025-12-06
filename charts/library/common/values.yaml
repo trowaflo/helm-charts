@@ -17,33 +17,33 @@ fullnameOverride: ''
 # @section -- Global settings
 namespaceOverride: ''
 
-# -- Pods configuration. Additional containers can be added under the 'containers' key.
+# -- Containers configuration. Additional containers can be added under the 'containers' key.
 # @default -- The chart will always construct the main container.
-# @section -- Pods configuration
+# @section -- Containers configuration
 containers:
   main:
     # -- Command-line arguments passed to the container entrypoint. Use this to override or extend the container's startup command
-    # @section -- Pods configuration
+    # @section -- Containers configuration
     args: []
 
     # -- Environment variables injected into containers. Can reference ConfigMaps or Secrets via valueFrom
-    # @section -- Pods configuration
+    # @section -- Containers configuration
     env: {}
 
     # -- Container image configuration including repository, tag, and pull policy
-    # @section -- Pods configuration
+    # @section -- Containers configuration
     image:
       pullPolicy: Always
       repository: traefik/whoami
       tag: latest
 
     # -- List of imagePullSecrets for private container registries. Reference pre-created Secrets in the same namespace
-    # @section -- Pods configuration
+    # @section -- Containers configuration
     imagePullSecrets: []
 
     probes:
       # -- Liveness probe configuration
-      # @section -- Pods configuration
+      # @section -- Containers configuration
       liveness:
         enabled: true
         failureThreshold: 3
@@ -57,7 +57,7 @@ containers:
         timeoutSeconds: 5
 
       # -- Readiness probe configuration
-      # @section -- Pods configuration
+      # @section -- Containers configuration
       readiness:
         enabled: true
         failureThreshold: 3
@@ -71,7 +71,7 @@ containers:
         timeoutSeconds: 5
 
       # -- Startup probe configuration
-      # @section -- Pods configuration
+      # @section -- Containers configuration
       startup:
         enabled: true
         failureThreshold: 3
@@ -85,7 +85,7 @@ containers:
         timeoutSeconds: 5
 
     # -- CPU and memory resource allocation for the container
-    # @section -- Pods configuration
+    # @section -- Containers configuration
     resources:
       limits:
         cpu: 2
