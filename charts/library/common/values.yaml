@@ -1,15 +1,20 @@
 ---
 # -- Number of desired pods (replicas) for the deployment. Modify to scale the application horizontally
+# @section -- Global settings
 replicaCount: 1
 
 # -- Number of revisions to keep for rollback purposes. Set to 3 for balanced history management
+# @section -- Global settings
 revisionHistoryLimit: 3
 
 # -- Override the Helm-generated release name. Lower priority than fullnameOverride
+# @section -- Global settings
 nameOverride: ''
 # -- Fully override the chart name for Kubernetes resource names. Useful when deploying multiple instances with the same chart
+# @section -- Global settings
 fullnameOverride: ''
 # -- Override the namespace where resources are deployed. Leave empty to use the release namespace
+# @section -- Global settings
 namespaceOverride: ''
 
 # -- Containers configuration. Additional containers can be added under the 'containers' key.
@@ -101,40 +106,53 @@ containers:
         memory: 32Mi
 
 # -- Security context settings applied at the pod level for enhanced security
+# @section -- Global settings
 podSecurityContext:
-  # -- Privilege escalation for all containers in the pod
   allowPrivilegeEscalation: false
-  # -- Require containers to run as non-root user for security hardening
   runAsNonRoot: true
-  # -- Default user ID for running containers in the pod
   runAsUser: 65534
-  # -- Security profile preventing use of unconfined seccomp or AppArmor
   seccompProfile:
-    # @ignored
     type: RuntimeDefault
-  # -- Capabilities to add or drop for all containers in the pod
   capabilities:
-    # @ignored
     drop: ["ALL"]
-  # -- Mount the root filesystem as read-only for immutability and reduced attack surface
   readOnlyRootFilesystem: true
 
-# -- Kubernetes Service configuration for exposing the application
+# -- Service configuration. Additional services can be added under the 'services' key.
+# @default -- The chart will always construct the main service.
+# @section -- Services configuration
 services:
   main:
+    # -- Enable the Service resource to expose the application within the cluster
+    # @section -- Services configuration
     enabled: true
+    # -- Type of Kubernetes Service to create (ClusterIP, NodePort, LoadBalancer, etc.)
+    # @section -- Services configuration
     type: ClusterIP
     annotations: {}
     labels: {}
+    # -- Port configuration for the Service
+    # @section -- Services configuration
     ports:
+      # -- Port mapping for the main service port
+      # @section -- Services configuration
       main:
+        # -- Protocol used by the Service port (TCP or UDP)
+        # @section -- Services configuration
         protocol: TCP
+        # -- Port number exposed by the Service
+        # @section -- Services configuration
         port: 80
 
-# -- Kubernetes Ingress resource configuration for external access to the Service
+# -- Ingress configuration. Additional ingress resources can be added under the 'ingress' key.
+# @default -- The chart will always construct the main ingress.
+# @section -- Ingress configuration
 ingress:
   main:
+    # -- Enable the Ingress resource to expose the application externally
+    # @section -- Ingress configuration
     enabled: false
+    # -- List of hostnames and paths for the Ingress resource
+    # @section -- Ingress configuration
     hosts:
       - host: chart-example.local
         paths:
@@ -142,6 +160,7 @@ ingress:
             pathType: Prefix
           - path: /testpath
             pathType: Prefix
+      # @ignored -- Example of adding another host to the Ingress configuration
       - host: another-chart-example.local
         paths:
           - path: /
@@ -149,26 +168,29 @@ ingress:
           - path: /testpath
             pathType: Prefix
 
-# -- Prometheus ServiceMonitor configuration for metrics scraping
+# -- Monitoring configuration. Additional monitoring resources can be added under the 'serviceMonitor' key.
+# @default -- The chart will always construct the main serviceMonitor.
+# @section -- Monitoring configuration
 serviceMonitor:
+  # -- Enable the ServiceMonitor resource for Prometheus monitoring
+  # @section -- Monitoring configuration
   enabled: true
   # -- Labels to add to the ServiceMonitor resource for identification and selection
+  # @section -- Monitoring configuration
   labels:
     release: prometheus
+  # -- Endpoints configuration for scraping metrics from the service
+  # @section -- Monitoring configuration
   endpoints:
     # -- List of endpoints to scrape metrics from
+    # @section -- Monitoring configuration
     - port: main
-      # -- optional scrape settings
-      # path: /metrics
-      # scheme: http
-      # interval: 30s
-      # scrapeTimeout: 10s
-      # -- Relabeling rules to modify metric labels before ingestion
-      metricRelabelings: []
-        # - action: replace
-        #   sourceLabels: ["__name__"]
-        #   regex: "scale_truenas_system_(.*)"
-        #   replacement: "truenas_$1"
-        #   targetLabel: "__name__"
+      metricRelabelings:
+        - action: replace
+          sourceLabels: ["__name__"]
+          regex: "olstring_(.*)"
+          replacement: "newstring_$1"
+          targetLabel: "__name__"
 # -- Deployment update strategy configuration
+# @section -- Global settings
 strategyType: Recreate
