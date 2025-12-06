@@ -58,8 +58,6 @@ helm upgrade my-grafana grafana/grafana \
 helm uninstall my-grafana --namespace default
 ```
 
-## Values
-
 <table height="400px" >
 	<thead>
 		<th>Key</th>

@@ -58,8 +58,6 @@ helm upgrade my-prometheus prometheus/prometheus \
 helm uninstall my-prometheus --namespace default
 ```
 
-## Values
-
 <table height="400px" >
 	<thead>
 		<th>Key</th>

@@ -58,8 +58,6 @@ helm upgrade my-common-test common-test/common-test \
 helm uninstall my-common-test --namespace default
 ```
 
-## Values
-
 <table height="400px" >
 	<thead>
 		<th>Key</th>

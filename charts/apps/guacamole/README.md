@@ -51,8 +51,6 @@ helm upgrade my-guacamole guacamole/guacamole \
 helm uninstall my-guacamole --namespace default
 ```
 
-## Values
-
 <table height="400px" >
 	<thead>
 		<th>Key</th>

@@ -58,8 +58,6 @@ helm upgrade my-graphite-exporter graphite-exporter/graphite-exporter \
 helm uninstall my-graphite-exporter --namespace default
 ```
 
-## Values
-
 <table height="400px" >
 	<thead>
 		<th>Key</th>

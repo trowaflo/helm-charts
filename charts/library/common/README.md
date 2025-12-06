@@ -53,8 +53,6 @@ helm upgrade my-common common/common \
 helm uninstall my-common --namespace default
 ```
 
-## Values
-
 <table height="400px" >
 	<thead>
 		<th>Key</th>

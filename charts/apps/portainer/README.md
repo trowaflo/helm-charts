@@ -58,8 +58,6 @@ helm upgrade my-portainer portainer/portainer \
 helm uninstall my-portainer --namespace default
 ```
 
-## Values
-
 <table height="400px" >
 	<thead>
 		<th>Key</th>

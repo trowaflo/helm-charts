@@ -58,8 +58,6 @@ helm upgrade my-frigate-exporter frigate-exporter/frigate-exporter \
 helm uninstall my-frigate-exporter --namespace default
 ```
 
-## Values
-
 <table height="400px" >
 	<thead>
 		<th>Key</th>
