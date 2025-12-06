@@ -12,12 +12,11 @@ fullnameOverride: ''
 # -- Override the namespace where resources are deployed. Leave empty to use the release namespace
 namespaceOverride: ''
 
-# -- Containers configuration
-# @default -- The chart will always construct the main container. Additional containers can be added under the 'containers' key.
+# -- Containers configuration. Additional containers can be added under the 'containers' key.
+# @default -- The chart will always construct the main container.
 # @section -- Containers configuration
 containers:
   main:
-
     # -- Command-line arguments passed to the container entrypoint. Use this to override or extend the container's startup command
     # @section -- Containers configuration
     args: []
