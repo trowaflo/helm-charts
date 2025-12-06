@@ -1,44 +1,25 @@
 ---
-# -- Grafana parent Helm chart configuration and subchart values. This chart wraps the official Grafana Helm chart with customizations
 grafana:
-  # -- Test framework configuration for Grafana (used for Helm testing, not production)
   testFramework:
-    # -- Disable test framework helpers to avoid installing unnecessary test resources
     enabled: false
 
-  # -- Kubernetes Ingress resource configuration for traditional HTTP(S) routing (alternative to IngressRoute)
   ingress:
-    # -- Disable traditional Ingress in favor of Traefik IngressRoute for advanced routing features
     enabled: false
 
-  # -- Traefik IngressRoute custom resource for advanced routing, middleware, and SSL termination
   ingressroute:
-    # -- Enable IngressRoute creation for Traefik integration with path-based routing and middleware
     enabled: true
-    # -- HTTP path prefix for accessing Grafana (e.g., https://domain/grafana/)
     path: /grafana/
 
-  # -- Grafana admin user credentials and authentication configuration
   admin:
-    # -- Reference to existing Kubernetes Secret containing admin credentials instead of creating new ones
     existingSecret: grafana
-    # -- Secret key name containing the admin username (must exist in the referenced Secret)
     userKey: admin-user
-    # -- Secret key name containing the admin password (must exist in the referenced Secret)
     passwordKey: admin-password
 
-  # -- Grafana sidecar configuration for injecting dashboards, datasources, and other configurations
   sidecar:
-    # -- Sidecar helper for automatically provisioning Grafana dashboards from ConfigMaps in the cluster
     dashboards:
-      # -- Enable automatic dashboard provisioning from mounted ConfigMaps (requires sidecar pod container)
       enabled: true
 
-# -- Custom Grafana dashboard definitions provisioned via ConfigMaps and mounted by the Grafana sidecar
 dashboards:
-  # -- Default dashboard category for organizing multiple dashboards
   default:
-    # -- Custom dashboard definition
     custom-dashboard:
-      # -- Path to JSON dashboard file relative to chart root (Helm renders JSON and mounts to /var/lib/grafana/dashboards/)
       file: dashboards/custom-dashboard.json

@@ -1,6 +1,6 @@
-# common-test
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+
+# common-test
 
 Test application chart demonstrating and validating the common library chart functionality.
 Provides unit test scenarios covering common chart features including deployments,
@@ -9,11 +9,9 @@ services, ingress, security contexts, and Prometheus integration.
 This chart is NOT intended for production use. It serves as a reference implementation
 and testing vehicle for the common library.
 
-## Maintainers
+---
 
-| Name | Email | Url |
-| ---- | ------ | --- |
-| trowaflo | <trowa.flo@gmail.com> |  |
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
 
 ## Source Code
 
@@ -21,24 +19,157 @@ and testing vehicle for the common library.
 
 ## Requirements
 
+## Requirements
+
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../common | common | 0.1.0 |
 
-## Values
+- Helm: v3+
 
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| args | list | `["--test-arg=value"]` | Command-line arguments for the test container (overrides entrypoint) |
-| args[0] | string | `"--test-arg=value"` | Example test argument passed to the container process |
-| env | list | `[{"name":"envtest","value":"thevalue"},{"name":"valuefrom","valueFrom":{"secretKeyRef":{"key":"password","name":"my-secret"}}}]` | Environment variables injected into the test container for configuration |
-| env[0] | object | `{"name":"envtest","value":"thevalue"}` | Simple environment variable with static value |
-| env[1] | object | `{"name":"valuefrom","valueFrom":{"secretKeyRef":{"key":"password","name":"my-secret"}}}` | Environment variable populated from a Secret reference |
-| env[1].valueFrom.secretKeyRef | object | `{"key":"password","name":"my-secret"}` | Reference to a Kubernetes Secret in the same namespace |
-| env[1].valueFrom.secretKeyRef.key | string | `"password"` | Secret key containing the password value |
-| env[1].valueFrom.secretKeyRef.name | string | `"my-secret"` | Secret name containing the value |
-| ingress | object | `{"main":{"enabled":true}}` | Kubernetes Ingress configuration for test HTTP(S) access (optional for testing) |
-| ingress.main.enabled | bool | `true` | Enable Ingress creation for testing exposed endpoints |
+## Getting Started
+
+### Add repository
+
+```bash
+helm repo add common-test https://example.com/helm-charts
+helm repo update
+```
+
+### Install
+
+```bash
+helm install my-common-test common-test/common-test \
+  --namespace default \
+  --create-namespace
+```
+
+### Upgrade
+
+```bash
+helm upgrade my-common-test common-test/common-test \
+  --namespace default \
+  --install
+```
+
+### Uninstall
+
+```bash
+helm uninstall my-common-test --namespace default
+```
+
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>args[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"--test-arg=value"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>env[0].name</td>
+			<td>string</td>
+			<td><pre lang="json">
+"envtest"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>env[0].value</td>
+			<td>string</td>
+			<td><pre lang="json">
+"thevalue"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>env[1].name</td>
+			<td>string</td>
+			<td><pre lang="json">
+"valuefrom"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>env[1].valueFrom.secretKeyRef.key</td>
+			<td>string</td>
+			<td><pre lang="json">
+"password"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>env[1].valueFrom.secretKeyRef.name</td>
+			<td>string</td>
+			<td><pre lang="json">
+"my-secret"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>ingress.main.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+			<td></td>
+		</tr>
+	</tbody>
+</table>
+
+### Examples
+
+- Enable Prometheus scraping via ServiceMonitor
+- Configure resource requests/limits for predictable scheduling
+- Override container image and tag for air-gapped environments
+
+```yaml
+# values.yaml snippet
+serviceMonitor:
+  enabled: true
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+```
+
+## Security
+
+- Follows namespace-scoped, least-privilege defaults
+- Configure PodSecurityContext and SecurityContext as needed for your environment
+
+## Troubleshooting
+
+- Check pod logs and events: `kubectl logs -l app.kubernetes.io/name=common-test`
+- Verify CRDs (if any) are installed
+- Ensure network policies allow required traffic
+
+## Maintainers
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| trowaflo | <trowa.flo@gmail.com> |  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

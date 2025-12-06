@@ -1,7 +1,4 @@
 ---
-# -- Kubernetes persistent volume configuration for Portainer application state and container data persistence
 pv:
-  # -- PersistentVolume resource specification for application data storage
 
-# -- Kubernetes persistent volume claim binding Portainer deployment to storage infrastructure
 pvc:

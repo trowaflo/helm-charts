@@ -5,55 +5,51 @@ replicaCount: 1
 # -- Number of revisions to keep for rollback purposes. Set to 3 for balanced history management
 revisionHistoryLimit: 3
 
+# -- Override the Helm-generated release name. Lower priority than fullnameOverride
+nameOverride: ''
 # -- Fully override the chart name for Kubernetes resource names. Useful when deploying multiple instances with the same chart
 fullnameOverride: ''
+# -- Override the namespace where resources are deployed. Leave empty to use the release namespace
+namespaceOverride: ''
 
 # -- List of container specifications. Each entry defines a container to run in the pod
 containers:
   - name: main-container
 
-# -- Command-line arguments passed to the container entrypoint. Use this to override or extend the container's startup command
-args: []
+    # -- Command-line arguments passed to the container entrypoint. Use this to override or extend the container's startup command
+    args: []
 
-# -- Environment variables injected into containers. Can reference ConfigMaps or Secrets via valueFrom
-env: {}
+    # -- Environment variables injected into containers. Can reference ConfigMaps or Secrets via valueFrom
+    env: {}
 
-# -- Container image configuration including repository, tag, and pull policy
-image:
-  # -- Image pull policy controlling when the kubelet should pull the image (Always, IfNotPresent, or Never)
-  pullPolicy: Always
-  # -- Container image repository URL. Should reference a registry accessible to your cluster
-  repository: traefik/whoami
-  # -- Specific image tag or digest (using @sha256: notation for immutable deployments)
-  tag: v1.10@sha256:1699d99cb4b9acc17f74ca670b3d8d0b7ba27c948b3445f0593b58ebece92f04
+    # -- Container image configuration including repository, tag, and pull policy
+    image:
+      # -- Image pull policy controlling when the kubelet should pull the image (Always, IfNotPresent, or Never)
+      pullPolicy: Always
+      # -- Container image repository URL. Should reference a registry accessible to your cluster
+      repository: traefik/whoami
+      # -- Specific image tag or digest (using @sha256: notation for immutable deployments)
+      tag: v1.10@sha256:1699d99cb4b9acc17f74ca670b3d8d0b7ba27c948b3445f0593b58ebece92f04
 
-# -- List of imagePullSecrets for private container registries. Reference pre-created Secrets in the same namespace
-imagePullSecrets: []
+    # -- List of imagePullSecrets for private container registries. Reference pre-created Secrets in the same namespace
+    imagePullSecrets: []
 
-# -- Override the Helm-generated release name. Lower priority than fullnameOverride
-nameOverride: ''
 
-# -- Override the namespace where resources are deployed. Leave empty to use the release namespace
-namespaceOverride: ''
-
-# -- Kubernetes probes configuration for liveness, readiness, and startup health checks
 probes:
-  # -- Enable or disable all probes globally
+  # -- Global toggle to enable/disable all probes for the container
   enabled: true
 
-  # -- Liveness probe detects and restarts containers that have deadlocked or are unresponsive. Critical for production stability
   liveness:
-    # -- Enable the liveness probe
+    # -- Enable the liveness probe to monitor container health and trigger restarts if unhealthy
     enabled: true
     # -- Number of consecutive failures before the container is restarted
     failureThreshold: 3
-    # -- HTTP GET probe configuration pointing to a health check endpoint
     httpGet:
-      # -- Request path for the health check endpoint
+      # -- HTTP GET probe configuration for liveness check
       path: /health
-      # -- Container port name or number (must match a port in the container spec)
+      # -- Port number or name to access on the container for the liveness probe
       port: main
-      # -- HTTP scheme (HTTP or HTTPS)
+      # -- HTTP scheme (HTTP or HTTPS) used for the liveness probe
       scheme: HTTP
     # -- Delay in seconds before the first liveness probe is executed after container startup
     initialDelaySeconds: 30
@@ -64,111 +60,96 @@ probes:
     # -- Timeout in seconds for each probe request
     timeoutSeconds: 5
 
-  # -- Readiness probe determines if the container is prepared to serve traffic. Used for load balancer targeting
   readiness:
-    # -- Enable the readiness probe
+    # -- Enable the readiness probe to signal when the container is ready to accept traffic
     enabled: true
     # -- Number of consecutive failures before the container is marked as not ready
     failureThreshold: 3
-    # -- HTTP GET probe configuration for readiness check
     httpGet:
+      # -- HTTP GET probe configuration for readiness check
       path: /health
+      # -- Port number or name to access on the container for the readiness probe
       port: main
+      # -- HTTP scheme (HTTP or HTTPS) used for the readiness probe
       scheme: HTTP
-    # -- Delay in seconds before the first readiness probe is executed
+    # -- Delay in seconds before the first readiness probe is executed after container startup
     initialDelaySeconds: 30
     # -- Frequency in seconds at which the readiness probe is performed
     periodSeconds: 10
     # -- Number of consecutive successful probes to mark the container as ready
     successThreshold: 1
-    # -- Timeout in seconds for the readiness probe request
+    # -- Timeout in seconds for each probe request
     timeoutSeconds: 5
 
-  # -- Startup probe gives containers additional time to initialize on first launch, preventing false liveness failures
   startup:
-    # -- Enable the startup probe
+    # -- Enable the startup probe to check if the application within the container has started successfully
     enabled: true
-    # -- Number of consecutive failures before the container startup fails
+    # -- Number of consecutive failures before the container is considered failed to start
     failureThreshold: 3
-    # -- HTTP GET probe configuration for startup check
     httpGet:
+      # -- HTTP GET probe configuration for startup check
       path: /health
+      # -- Port number or name to access on the container for the startup probe
       port: main
+      # -- HTTP scheme (HTTP or HTTPS) used for the startup probe
       scheme: HTTP
-    # -- Delay in seconds before the first startup probe is executed
+    # -- Delay in seconds before the first startup probe is executed after container startup
     initialDelaySeconds: 60
     # -- Frequency in seconds at which the startup probe is performed
     periodSeconds: 10
     # -- Number of consecutive successful probes to mark the container as started
     successThreshold: 1
-    # -- Timeout in seconds for the startup probe request
+    # -- Timeout in seconds for each probe request
     timeoutSeconds: 5
 
 # -- CPU and memory resource allocation for the container
 resources:
-  # -- Hard resource limits preventing the container from exceeding these thresholds
   limits:
-    # -- Maximum CPU allowed for the container (in millicores: 1000m = 1 CPU core)
     cpu: 2
-    # -- Maximum memory allowed for the container (in binary units: Gi, Mi, Ki)
     memory: 2Gi
-
-  # -- Minimum resource guarantees reserved for the container on the node
   requests:
-    # -- Guaranteed minimum CPU allocation (in millicores)
     cpu: 1m
-    # -- Guaranteed minimum memory allocation
     memory: 32Mi
 
-# -- Security context at the pod level, applied to all containers unless overridden. Enforces least-privilege principles
+# -- Security context settings applied at the pod level for enhanced security
 podSecurityContext:
-  # -- Prevent containers from gaining additional privileges through setuid/setgid binaries
+  # -- Privilege escalation for all containers in the pod
   allowPrivilegeEscalation: false
   # -- Require containers to run as non-root user for security hardening
   runAsNonRoot: true
-  # -- UID for the user running container processes (65534 is the 'nobody' user in most Linux images)
+  # -- Default user ID for running containers in the pod
   runAsUser: 65534
   # -- Security profile preventing use of unconfined seccomp or AppArmor
   seccompProfile:
-    # -- Restrict syscalls to the default seccomp filter (blocks dangerous operations)
+    # @ignored
     type: RuntimeDefault
-  # -- Drop all Linux kernel capabilities, then selectively add only necessary ones
+  # -- Capabilities to add or drop for all containers in the pod
   capabilities:
+    # @ignored
     drop: ["ALL"]
   # -- Mount the root filesystem as read-only for immutability and reduced attack surface
   readOnlyRootFilesystem: true
 
-# -- Kubernetes Service definitions exposing the application on the network
+# -- Kubernetes Service configuration for exposing the application
 services:
   main:
-    # -- Create the default Service resource
     enabled: true
-    # -- Service type determining how traffic is routed (ClusterIP, NodePort, LoadBalancer)
     type: ClusterIP
-    # -- Annotations for cloud provider integration (e.g., load balancer configuration, cert provisioning)
     annotations: {}
-    # -- Additional labels applied to the Service for selection and organization
     labels: {}
-    # -- Port definitions mapping container ports to Service endpoints
     ports:
       main:
-        # -- Protocol used by the Service port (TCP, UDP)
         protocol: TCP
-        # -- Port number exposed by the Service to clients
         port: 80
 
-# -- Kubernetes Ingress configuration for HTTP(S) routing and external access
+# -- Kubernetes Ingress resource configuration for external access to the Service
 ingress:
   main:
-    # -- Enable Ingress resource creation for external traffic routing
     enabled: false
-    # -- List of hostnames and paths for routing traffic to the Service
     hosts:
       - host: chart-example.local
         paths:
-          # -- Request path pattern (e.g., /app) matched by the ingress controller
           - path: /
-            # -- Path matching type: Prefix (starts with), Exact (exact match), or ImplementationSpecific
             pathType: Prefix
           - path: /testpath
             pathType: Prefix
@@ -179,26 +160,26 @@ ingress:
           - path: /testpath
             pathType: Prefix
 
-# -- Prometheus Operator ServiceMonitor for metrics scraping and monitoring integration
+# -- Prometheus ServiceMonitor configuration for metrics scraping
 serviceMonitor:
-  # -- Enable automatic metrics discovery and scraping by Prometheus
   enabled: true
-  # -- Labels matching Prometheus instance selectors (e.g., release: prometheus tells Prometheus to scrape this)
+  # -- Labels to add to the ServiceMonitor resource for identification and selection
   labels:
     release: prometheus
-  # -- Scrape endpoints configuration specifying how Prometheus collects metrics
   endpoints:
-    # -- Endpoint details for metrics collection
+    # -- List of endpoints to scrape metrics from
     - port: main
       # -- optional scrape settings
       # path: /metrics
       # scheme: http
       # interval: 30s
       # scrapeTimeout: 10s
+      # -- Relabeling rules to modify metric labels before ingestion
       metricRelabelings: []
         # - action: replace
         #   sourceLabels: ["__name__"]
         #   regex: "scale_truenas_system_(.*)"
         #   replacement: "truenas_$1"
         #   targetLabel: "__name__"
+# -- Deployment update strategy configuration
 strategyType: Recreate

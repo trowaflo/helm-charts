@@ -1,278 +1,180 @@
 ---
-# -- Container image configuration for the Prometheus Graphite Exporter (converts Graphite plaintext protocol to Prometheus metrics)
 image:
-  # -- Kubelet image pull policy determining when to fetch the image from registry (IfNotPresent = use cached if available)
   pullPolicy: IfNotPresent
-  # -- Container image repository URL from which the exporter image is pulled
   repository: prom/graphite-exporter
-  # -- Specific image version or digest for reproducible and predictable exporter behavior
   tag: v0.16.0@sha256:e54bca6645ea8a9e8c52312a8540de98ad08819d38476c021d77a0eae75bc797
 
-# -- Kubernetes health check probes (liveness, readiness, startup) for automatic pod recovery and traffic management
 probes:
-  # -- Liveness probe detects stuck/deadlocked exporter processes and restarts them automatically
   liveness:
     httpGet:
-      # -- Health check endpoint exposing Prometheus metrics (standard exporter convention)
       path: /metrics
 
-  # -- Readiness probe marks pod as ready once it's accepting scrape requests from Prometheus and graphite inputs
   readiness:
     httpGet:
       path: /metrics
 
-  # -- Startup probe allows extended initialization time before strict liveness/readiness checks apply
   startup:
     httpGet:
       path: /metrics
 
-# -- Command-line arguments passed to the exporter binary for runtime configuration and port binding
 args:
-  # -- Graphite listener address and port (UDP and TCP). Must match the 'graphite' service port configuration
   - "--graphite.listen-address=:9109"
 
-# -- Kubernetes Service definitions exposing metrics (Prometheus) and graphite input (TrueNAS/Graphite sources)
 services:
-  # -- Primary service exposing the Prometheus /metrics endpoint for scraping by Prometheus Operator
   main:
-    # -- Enable creation of the main metrics service
     enabled: true
-    # -- Cloud provider annotations for load balancer/ingress configuration and certificate provisioning
     annotations: {}
-    # -- Custom labels for service discovery filtering and organizational purposes
     labels: {}
-    # -- Network port mappings for metrics exposure
     ports:
       main:
-        # -- Network protocol for metrics endpoint (always TCP for Prometheus)
         protocol: TCP
-        # -- Service port number (9108 is standard for Prometheus exporters)
         port: 9108
 
-  # -- Secondary LoadBalancer service accepting Graphite plaintext protocol input from monitoring sources (TrueNAS, etc.)
   graphite:
-    # -- Enable LoadBalancer service for external Graphite metric ingestion from cluster external sources
     enabled: true
-    # -- Service type LoadBalancer exposes external IPs for sources outside the cluster to push metrics
     type: LoadBalancer
-    # -- Cloud provider annotations for load balancer provisioning and health checks
     annotations: {}
-    # -- Custom labels for external service organization and monitoring
     labels: {}
-    # -- Dual-protocol port configuration supporting both UDP (preferred) and TCP fallback for Graphite metrics
     ports:
       graphite-udp:
-        # -- UDP protocol for lightweight Graphite plaintext metric submissions from TrueNAS and other exporters
         protocol: UDP
-        # -- Port listening for incoming Graphite metrics (matches exporter --graphite.listen-address)
         port: 9109
       graphite-tcp:
-          # -- TCP protocol as fallback for Graphite metric delivery when UDP is unavailable or blocked
           protocol: TCP
-          # -- TCP port for Graphite plaintext protocol metric ingestion
           port: 9109
 
-# -- Kubernetes Ingress resource for HTTP(S) external access to the metrics endpoint
 ingress:
   main:
-    # -- Enable Ingress creation for external metrics access (useful for monitoring dashboards and health checks)
     enabled: true
-    # -- DNS hostnames and paths routing external traffic to the exporter metrics endpoint
     hosts:
-      # -- Example FQDN for the graphite-exporter Ingress (update to your domain)
       - host: graphite-exporter.fqdn.example.com
         paths:
-          # -- Root path routing all traffic to the metrics endpoint
           - path: /
-            # -- Path matching type (Prefix matches /anything, Exact requires exact match)
             pathType: Prefix
 
-# -- Prometheus Operator ServiceMonitor for automated metrics scraping with advanced relabeling and filtering
 serviceMonitor:
-  # -- Enable ServiceMonitor resource creation for Prometheus automated discovery and metric scraping
   enabled: true
-  # -- Scrape endpoint configuration with aggressive metric relabeling for TrueNAS-specific data processing
   endpoints:
-    # -- Metrics endpoint targeting the main service port with metric relabeling pipeline
     - port: main
-      # -- Metric relabeling pipeline for TrueNAS plaintext graphite metrics. Performs filtering, label enrichment, and cleanup
       metricRelabelings:
-        # ==========================================
-        # PHASE 1: FILTER TO SCALE-RELATED METRICS
-        # ==========================================
-        # Keep only scale_* metrics (TrueNAS iX Scale system metrics)
-        # -- Filter 1: Keep only TrueNAS Scale system metrics matching scale_* pattern. All other metrics are dropped
         - sourceLabels: [__name__]
           regex: ^(scale_.*)
           action: keep
 
-        # ==========================================
-        # PHASE 2: LABEL ENRICHMENT - EXTRACT METADATA
-        # ==========================================
-        # Extract hostname from metric name pattern scale_HOSTNAME_SERVICE_METRIC
-        # -- Extract TrueNAS hostname from metric name prefix for pod/node identification
         - sourceLabels: [__name__]
           regex: ^scale_([^_]+)_.*
           targetLabel: hostname
           replacement: ${1}
           action: replace
 
-        # Extract service name from metric name pattern scale_HOSTNAME_SERVICE_METRIC
-        # -- Extract TrueNAS service/component name from metric hierarchy for service-level filtering
         - sourceLabels: [__name__]
           regex: ^scale_[^_]+_([^_]+)_.*
           targetLabel: service
           replacement: ${1}
           action: replace
 
-        # Extract CPU core number from CPU-related metrics
-        # -- Extract specific CPU core identifier from cpu_cpuN metrics for per-core CPU temperature tracking
         - sourceLabels: [__name__]
           regex: ^.*_cpu_cpu([0-9]+)
           targetLabel: cpu
           replacement: cpu${1}
           action: replace
 
-        # Extract CPU core number from cputemp metrics
-        # -- Extract CPU core ID from cputemp_temperatures_cpuN metrics for temperature monitoring by core
         - sourceLabels: [__name__]
           regex: ^.*_cputemp_temperatures_cpu([0-9]+)
           targetLabel: cpu
           replacement: cpu${1}
           action: replace
 
-        # Extract network interface name from network speed metrics
-        # -- Extract network interface name (e.g., eth0, em0) from net_speed metrics for per-interface network stats
         - sourceLabels: [__name__]
           regex: ^.*_net_speed_([^_]+)_[^_\n]+
           targetLabel: interface
           replacement: ${1}
           action: replace
 
-        # Normalize network interface name in metric name
-        # -- Simplify network metric names by keeping only the prefix (net_speed) for cleaner metric naming
         - sourceLabels: [__name__]
           regex: ^(.*_net_speed).*
           targetLabel: __name__
           replacement: ${1}
           action: replace
 
-        # ==========================================
-        # PHASE 3: FIX NAMING CONFLICTS
-        # ==========================================
-        # Remove duplicated truenas prefix (scale_truenas_truenas_* -> scale_truenas_*)
-        # -- Fix double "truenas_" prefixes in metric names resulting from Graphite metric hierarchies
         - sourceLabels: [__name__]
           regex: ^(scale_truenas)_truenas_(.*)$
           targetLabel: __name__
           replacement: ${1}_${2}
           action: replace
 
-        # ==========================================
-        # PHASE 4: NORMALIZE METRIC NAMES
-        # ==========================================
-        # Remove hostname prefix from metric names (scale_HOSTNAME_* -> truenas_*)
-        # -- Normalize metric names by replacing hostname-specific prefix with generic "truenas_" for consistent naming
         - sourceLabels: [__name__]
           regex: ^scale_[^_]+_(.*)
           targetLabel: __name__
           replacement: truenas_${1}
           action: replace
 
-        # Fix double _uptime_uptime suffixes -> _uptime
-        # -- Deduplicate repeated suffix keywords in metric names resulting from Graphite plaintext format
         - sourceLabels: [__name__]
           regex: ^(.*)_(uptime)_uptime
           targetLabel: __name__
           replacement: ${1}_${2}
           action: replace
 
-        # Fix double _cpu_cpuN suffixes -> _cpuN
-        # -- Clean redundant CPU identifiers in metric names for consistent metric naming convention
         - sourceLabels: [__name__]
           regex: ^(.*)_(cpu)_cpu([0-9]+)?
           targetLabel: __name__
           replacement: ${1}_${2}${3}
           action: replace
 
-        # Fix double _total_total suffixes -> _total
-        # -- Deduplicate total counter metric suffixes for cleaner metric names
         - sourceLabels: [__name__]
           regex: ^(.*)_(total)_total
           targetLabel: __name__
           replacement: ${1}_${2}
           action: replace
 
-        # Fix double _available_available suffixes -> _available
-        # -- Simplify available metric suffixes for consistent naming
         - sourceLabels: [__name__]
           regex: ^(.*)_(available)_available
           targetLabel: __name__
           replacement: ${1}_${2}
           action: replace
 
-        # Fix double _size_size suffixes -> _size
-        # -- Deduplicate size metric suffixes
         - sourceLabels: [__name__]
           regex: ^(.*)_(size)_size
           targetLabel: __name__
           replacement: ${1}_${2}
           action: replace
 
-        # Fix double _avail_avail suffixes -> _avail
-        # -- Clean abbreviated available metric suffixes
         - sourceLabels: [__name__]
           regex: ^(.*)_(avail)_avail
           targetLabel: __name__
           replacement: ${1}_${2}
           action: replace
 
-        # Fix double _free_free suffixes -> _free
-        # -- Deduplicate free space metric suffixes
         - sourceLabels: [__name__]
           regex: ^(.*)_(free)_free
           targetLabel: __name__
           replacement: ${1}_${2}
           action: replace
 
-        # Fix double _l2bytes_l2bytes suffixes -> _l2bytes (ZFS ARC L2 cache)
-        # -- Clean L2 ARC cache byte count metrics
         - sourceLabels: [__name__]
           regex: ^(.*)_(l2bytes)_l2bytes
           targetLabel: __name__
           replacement: ${1}_${2}
           action: replace
 
-        # Fix double _l2hits_l2hits suffixes -> _l2hits (ZFS ARC L2 hits)
-        # -- Deduplicate L2 cache hit count metrics
         - sourceLabels: [__name__]
           regex: ^(.*)_(l2hits)_l2hits
           targetLabel: __name__
           replacement: ${1}_${2}
           action: replace
 
-        # Fix double _l2miss_l2miss suffixes -> _l2miss (ZFS ARC L2 misses)
-        # -- Simplify L2 cache miss count metrics
         - sourceLabels: [__name__]
           regex: ^(.*)_(l2miss)_l2miss
           targetLabel: __name__
           replacement: ${1}_${2}
           action: replace
 
-        # Fix load average metrics with double suffix (load1|load5|load15)
-        # -- Clean system load average metric suffixes
         - sourceLabels: [__name__]
           regex: ^(.*)_(load)_load(1|5|15)
           targetLabel: __name__
           replacement: ${1}_${2}${3}
           action: replace
 
-        # ==========================================
-        # PHASE 5: FINAL FILTER - KEEP RELEVANT METRICS
-        # ==========================================
-        # Final filter: keep only system monitoring metrics (excludes debug, internal metrics)
-        # -- Keep only relevant system metrics: uptime, CPU usage/temperature, load, memory, ARC cache, network, and disk I/O
-        # This is the final filter preventing cardinality explosion and storage waste from debug/unneeded metrics
         - sourceLabels: [__name__]
           regex: 'truenas_(system_uptime.*|cpu_usage.*|cputemp.*|system_load.*|meminfo.*|arcstats.*|net_.*(speed|received|sent).*|disk_stats_busy__serial_lunid.*)'
           action: keep
