@@ -12,7 +12,6 @@ fullnameOverride: ''
 # -- Override the namespace where resources are deployed. Leave empty to use the release namespace
 namespaceOverride: ''
 
-# -- List of container specifications. Each entry defines a container to run in the pod
 containers:
   main:
 
