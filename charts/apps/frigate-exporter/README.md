@@ -67,7 +67,7 @@ helm uninstall my-frigate-exporter --namespace default
 	</thead>
 	<tbody>
 		<tr>
-			<td>env</td>
+			<td>containers.main.env</td>
 			<td>list</td>
 			<td><pre lang="json">
 []
@@ -76,7 +76,7 @@ helm uninstall my-frigate-exporter --namespace default
 			<td></td>
 		</tr>
 		<tr>
-			<td>image.pullPolicy</td>
+			<td>containers.main.image.pullPolicy</td>
 			<td>string</td>
 			<td><pre lang="json">
 "IfNotPresent"
@@ -85,7 +85,7 @@ helm uninstall my-frigate-exporter --namespace default
 			<td></td>
 		</tr>
 		<tr>
-			<td>image.repository</td>
+			<td>containers.main.image.repository</td>
 			<td>string</td>
 			<td><pre lang="json">
 "rhysbailey/prometheus-frigate-exporter"
@@ -94,10 +94,82 @@ helm uninstall my-frigate-exporter --namespace default
 			<td></td>
 		</tr>
 		<tr>
-			<td>image.tag</td>
+			<td>containers.main.image.tag</td>
 			<td>string</td>
 			<td><pre lang="json">
 "0.1.1@sha256:6df30ca30c5a69df4f3b21c06a93043a52baf523f808de56f4a40982393b8aff"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.liveness.httpGet.path</td>
+			<td>string</td>
+			<td><pre lang="json">
+"/metrics"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.readiness.httpGet.path</td>
+			<td>string</td>
+			<td><pre lang="json">
+"/metrics"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.startup.httpGet.path</td>
+			<td>string</td>
+			<td><pre lang="json">
+"/metrics"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.resources.limits.cpu</td>
+			<td>string</td>
+			<td><pre lang="json">
+"100m"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.resources.limits.memory</td>
+			<td>string</td>
+			<td><pre lang="json">
+"64Mi"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.resources.requests.cpu</td>
+			<td>string</td>
+			<td><pre lang="json">
+"1m"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.resources.requests.memory</td>
+			<td>string</td>
+			<td><pre lang="json">
+"32Mi"
 </pre>
 </td>
 			<td></td>
@@ -107,78 +179,6 @@ helm uninstall my-frigate-exporter --namespace default
 			<td>int</td>
 			<td><pre lang="json">
 1000
-</pre>
-</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>probes.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>probes.liveness.httpGet.path</td>
-			<td>string</td>
-			<td><pre lang="json">
-"/metrics"
-</pre>
-</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>probes.readiness.httpGet.path</td>
-			<td>string</td>
-			<td><pre lang="json">
-"/metrics"
-</pre>
-</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>probes.startup.httpGet.path</td>
-			<td>string</td>
-			<td><pre lang="json">
-"/metrics"
-</pre>
-</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>resources.limits.cpu</td>
-			<td>string</td>
-			<td><pre lang="json">
-"100m"
-</pre>
-</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>resources.limits.memory</td>
-			<td>string</td>
-			<td><pre lang="json">
-"64Mi"
-</pre>
-</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>resources.requests.cpu</td>
-			<td>string</td>
-			<td><pre lang="json">
-"1m"
-</pre>
-</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>resources.requests.memory</td>
-			<td>string</td>
-			<td><pre lang="json">
-"32Mi"
 </pre>
 </td>
 			<td></td>

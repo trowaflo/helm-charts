@@ -67,7 +67,7 @@ helm uninstall my-graphite-exporter --namespace default
 	</thead>
 	<tbody>
 		<tr>
-			<td>args[0]</td>
+			<td>containers.main.args[0]</td>
 			<td>string</td>
 			<td><pre lang="json">
 "--graphite.listen-address=:9109"
@@ -76,7 +76,7 @@ helm uninstall my-graphite-exporter --namespace default
 			<td></td>
 		</tr>
 		<tr>
-			<td>image.pullPolicy</td>
+			<td>containers.main.image.pullPolicy</td>
 			<td>string</td>
 			<td><pre lang="json">
 "IfNotPresent"
@@ -85,7 +85,7 @@ helm uninstall my-graphite-exporter --namespace default
 			<td></td>
 		</tr>
 		<tr>
-			<td>image.repository</td>
+			<td>containers.main.image.repository</td>
 			<td>string</td>
 			<td><pre lang="json">
 "prom/graphite-exporter"
@@ -94,10 +94,37 @@ helm uninstall my-graphite-exporter --namespace default
 			<td></td>
 		</tr>
 		<tr>
-			<td>image.tag</td>
+			<td>containers.main.image.tag</td>
 			<td>string</td>
 			<td><pre lang="json">
 "v0.16.0@sha256:e54bca6645ea8a9e8c52312a8540de98ad08819d38476c021d77a0eae75bc797"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.liveness.httpGet.path</td>
+			<td>string</td>
+			<td><pre lang="json">
+"/metrics"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.readiness.httpGet.path</td>
+			<td>string</td>
+			<td><pre lang="json">
+"/metrics"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.startup.httpGet.path</td>
+			<td>string</td>
+			<td><pre lang="json">
+"/metrics"
 </pre>
 </td>
 			<td></td>
@@ -134,33 +161,6 @@ true
 			<td>string</td>
 			<td><pre lang="json">
 "Prefix"
-</pre>
-</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>probes.liveness.httpGet.path</td>
-			<td>string</td>
-			<td><pre lang="json">
-"/metrics"
-</pre>
-</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>probes.readiness.httpGet.path</td>
-			<td>string</td>
-			<td><pre lang="json">
-"/metrics"
-</pre>
-</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>probes.startup.httpGet.path</td>
-			<td>string</td>
-			<td><pre lang="json">
-"/metrics"
 </pre>
 </td>
 			<td></td>

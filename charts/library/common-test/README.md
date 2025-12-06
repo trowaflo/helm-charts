@@ -67,7 +67,7 @@ helm uninstall my-common-test --namespace default
 	</thead>
 	<tbody>
 		<tr>
-			<td>args[0]</td>
+			<td>containers.main.args[0]</td>
 			<td>string</td>
 			<td><pre lang="json">
 "--test-arg=value"
@@ -76,7 +76,7 @@ helm uninstall my-common-test --namespace default
 			<td></td>
 		</tr>
 		<tr>
-			<td>env[0].name</td>
+			<td>containers.main.env[0].name</td>
 			<td>string</td>
 			<td><pre lang="json">
 "envtest"
@@ -85,7 +85,7 @@ helm uninstall my-common-test --namespace default
 			<td></td>
 		</tr>
 		<tr>
-			<td>env[0].value</td>
+			<td>containers.main.env[0].value</td>
 			<td>string</td>
 			<td><pre lang="json">
 "thevalue"
@@ -94,7 +94,7 @@ helm uninstall my-common-test --namespace default
 			<td></td>
 		</tr>
 		<tr>
-			<td>env[1].name</td>
+			<td>containers.main.env[1].name</td>
 			<td>string</td>
 			<td><pre lang="json">
 "valuefrom"
@@ -103,7 +103,7 @@ helm uninstall my-common-test --namespace default
 			<td></td>
 		</tr>
 		<tr>
-			<td>env[1].valueFrom.secretKeyRef.key</td>
+			<td>containers.main.env[1].valueFrom.secretKeyRef.key</td>
 			<td>string</td>
 			<td><pre lang="json">
 "password"
@@ -112,7 +112,7 @@ helm uninstall my-common-test --namespace default
 			<td></td>
 		</tr>
 		<tr>
-			<td>env[1].valueFrom.secretKeyRef.name</td>
+			<td>containers.main.env[1].valueFrom.secretKeyRef.name</td>
 			<td>string</td>
 			<td><pre lang="json">
 "my-secret"

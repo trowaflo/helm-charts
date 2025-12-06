@@ -62,28 +62,7 @@ helm uninstall my-common --namespace default
 	</thead>
 	<tbody>
 		<tr>
-			<td>containers</td>
-			<td>list</td>
-			<td><pre lang="json">
-[
-  {
-    "args": [],
-    "env": {},
-    "image": {
-      "pullPolicy": "Always",
-      "repository": "traefik/whoami",
-      "tag": "v1.10@sha256:1699d99cb4b9acc17f74ca670b3d8d0b7ba27c948b3445f0593b58ebece92f04"
-    },
-    "imagePullSecrets": [],
-    "name": "main-container"
-  }
-]
-</pre>
-</td>
-			<td>List of container specifications. Each entry defines a container to run in the pod</td>
-		</tr>
-		<tr>
-			<td>containers[0].args</td>
+			<td>containers.main.args</td>
 			<td>list</td>
 			<td><pre lang="json">
 []
@@ -92,7 +71,7 @@ helm uninstall my-common --namespace default
 			<td>Command-line arguments passed to the container entrypoint. Use this to override or extend the container's startup command</td>
 		</tr>
 		<tr>
-			<td>containers[0].env</td>
+			<td>containers.main.env</td>
 			<td>object</td>
 			<td><pre lang="json">
 {}
@@ -101,7 +80,7 @@ helm uninstall my-common --namespace default
 			<td>Environment variables injected into containers. Can reference ConfigMaps or Secrets via valueFrom</td>
 		</tr>
 		<tr>
-			<td>containers[0].image</td>
+			<td>containers.main.image</td>
 			<td>object</td>
 			<td><pre lang="json">
 {
@@ -114,7 +93,7 @@ helm uninstall my-common --namespace default
 			<td>Container image configuration including repository, tag, and pull policy</td>
 		</tr>
 		<tr>
-			<td>containers[0].image.pullPolicy</td>
+			<td>containers.main.image.pullPolicy</td>
 			<td>string</td>
 			<td><pre lang="json">
 "Always"
@@ -123,7 +102,7 @@ helm uninstall my-common --namespace default
 			<td>Image pull policy controlling when the kubelet should pull the image (Always, IfNotPresent, or Never)</td>
 		</tr>
 		<tr>
-			<td>containers[0].image.repository</td>
+			<td>containers.main.image.repository</td>
 			<td>string</td>
 			<td><pre lang="json">
 "traefik/whoami"
@@ -132,7 +111,7 @@ helm uninstall my-common --namespace default
 			<td>Container image repository URL. Should reference a registry accessible to your cluster</td>
 		</tr>
 		<tr>
-			<td>containers[0].image.tag</td>
+			<td>containers.main.image.tag</td>
 			<td>string</td>
 			<td><pre lang="json">
 "v1.10@sha256:1699d99cb4b9acc17f74ca670b3d8d0b7ba27c948b3445f0593b58ebece92f04"
@@ -141,13 +120,283 @@ helm uninstall my-common --namespace default
 			<td>Specific image tag or digest (using @sha256: notation for immutable deployments)</td>
 		</tr>
 		<tr>
-			<td>containers[0].imagePullSecrets</td>
+			<td>containers.main.imagePullSecrets</td>
 			<td>list</td>
 			<td><pre lang="json">
 []
 </pre>
 </td>
 			<td>List of imagePullSecrets for private container registries. Reference pre-created Secrets in the same namespace</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+			<td>Global toggle to enable/disable all probes for the container</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.liveness.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+			<td>Enable the liveness probe to monitor container health and trigger restarts if unhealthy</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.liveness.failureThreshold</td>
+			<td>int</td>
+			<td><pre lang="json">
+3
+</pre>
+</td>
+			<td>Number of consecutive failures before the container is restarted</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.liveness.httpGet.path</td>
+			<td>string</td>
+			<td><pre lang="json">
+"/health"
+</pre>
+</td>
+			<td>HTTP GET probe configuration for liveness check</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.liveness.httpGet.port</td>
+			<td>string</td>
+			<td><pre lang="json">
+"main"
+</pre>
+</td>
+			<td>Port number or name to access on the container for the liveness probe</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.liveness.httpGet.scheme</td>
+			<td>string</td>
+			<td><pre lang="json">
+"HTTP"
+</pre>
+</td>
+			<td>HTTP scheme (HTTP or HTTPS) used for the liveness probe</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.liveness.initialDelaySeconds</td>
+			<td>int</td>
+			<td><pre lang="json">
+30
+</pre>
+</td>
+			<td>Delay in seconds before the first liveness probe is executed after container startup</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.liveness.periodSeconds</td>
+			<td>int</td>
+			<td><pre lang="json">
+10
+</pre>
+</td>
+			<td>Frequency in seconds at which the liveness probe is performed</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.liveness.successThreshold</td>
+			<td>int</td>
+			<td><pre lang="json">
+1
+</pre>
+</td>
+			<td>Number of consecutive successful probes to mark the container as healthy</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.liveness.timeoutSeconds</td>
+			<td>int</td>
+			<td><pre lang="json">
+5
+</pre>
+</td>
+			<td>Timeout in seconds for each probe request</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.readiness.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+			<td>Enable the readiness probe to signal when the container is ready to accept traffic</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.readiness.failureThreshold</td>
+			<td>int</td>
+			<td><pre lang="json">
+3
+</pre>
+</td>
+			<td>Number of consecutive failures before the container is marked as not ready</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.readiness.httpGet.path</td>
+			<td>string</td>
+			<td><pre lang="json">
+"/health"
+</pre>
+</td>
+			<td>HTTP GET probe configuration for readiness check</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.readiness.httpGet.port</td>
+			<td>string</td>
+			<td><pre lang="json">
+"main"
+</pre>
+</td>
+			<td>Port number or name to access on the container for the readiness probe</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.readiness.httpGet.scheme</td>
+			<td>string</td>
+			<td><pre lang="json">
+"HTTP"
+</pre>
+</td>
+			<td>HTTP scheme (HTTP or HTTPS) used for the readiness probe</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.readiness.initialDelaySeconds</td>
+			<td>int</td>
+			<td><pre lang="json">
+30
+</pre>
+</td>
+			<td>Delay in seconds before the first readiness probe is executed after container startup</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.readiness.periodSeconds</td>
+			<td>int</td>
+			<td><pre lang="json">
+10
+</pre>
+</td>
+			<td>Frequency in seconds at which the readiness probe is performed</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.readiness.successThreshold</td>
+			<td>int</td>
+			<td><pre lang="json">
+1
+</pre>
+</td>
+			<td>Number of consecutive successful probes to mark the container as ready</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.readiness.timeoutSeconds</td>
+			<td>int</td>
+			<td><pre lang="json">
+5
+</pre>
+</td>
+			<td>Timeout in seconds for each probe request</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.startup.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+			<td>Enable the startup probe to check if the application within the container has started successfully</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.startup.failureThreshold</td>
+			<td>int</td>
+			<td><pre lang="json">
+3
+</pre>
+</td>
+			<td>Number of consecutive failures before the container is considered failed to start</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.startup.httpGet.path</td>
+			<td>string</td>
+			<td><pre lang="json">
+"/health"
+</pre>
+</td>
+			<td>HTTP GET probe configuration for startup check</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.startup.httpGet.port</td>
+			<td>string</td>
+			<td><pre lang="json">
+"main"
+</pre>
+</td>
+			<td>Port number or name to access on the container for the startup probe</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.startup.httpGet.scheme</td>
+			<td>string</td>
+			<td><pre lang="json">
+"HTTP"
+</pre>
+</td>
+			<td>HTTP scheme (HTTP or HTTPS) used for the startup probe</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.startup.initialDelaySeconds</td>
+			<td>int</td>
+			<td><pre lang="json">
+60
+</pre>
+</td>
+			<td>Delay in seconds before the first startup probe is executed after container startup</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.startup.periodSeconds</td>
+			<td>int</td>
+			<td><pre lang="json">
+10
+</pre>
+</td>
+			<td>Frequency in seconds at which the startup probe is performed</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.startup.successThreshold</td>
+			<td>int</td>
+			<td><pre lang="json">
+1
+</pre>
+</td>
+			<td>Number of consecutive successful probes to mark the container as started</td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.startup.timeoutSeconds</td>
+			<td>int</td>
+			<td><pre lang="json">
+5
+</pre>
+</td>
+			<td>Timeout in seconds for each probe request</td>
+		</tr>
+		<tr>
+			<td>containers.main.resources</td>
+			<td>object</td>
+			<td><pre lang="json">
+{
+  "limits": {
+    "cpu": 2,
+    "memory": "2Gi"
+  },
+  "requests": {
+    "cpu": "1m",
+    "memory": "32Mi"
+  }
+}
+</pre>
+</td>
+			<td>CPU and memory resource allocation for the container</td>
 		</tr>
 		<tr>
 			<td>fullnameOverride</td>
@@ -288,258 +537,6 @@ true
 			<td>Security profile preventing use of unconfined seccomp or AppArmor</td>
 		</tr>
 		<tr>
-			<td>probes.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td>Global toggle to enable/disable all probes for the container</td>
-		</tr>
-		<tr>
-			<td>probes.liveness.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td>Enable the liveness probe to monitor container health and trigger restarts if unhealthy</td>
-		</tr>
-		<tr>
-			<td>probes.liveness.failureThreshold</td>
-			<td>int</td>
-			<td><pre lang="json">
-3
-</pre>
-</td>
-			<td>Number of consecutive failures before the container is restarted</td>
-		</tr>
-		<tr>
-			<td>probes.liveness.httpGet.path</td>
-			<td>string</td>
-			<td><pre lang="json">
-"/health"
-</pre>
-</td>
-			<td>HTTP GET probe configuration for liveness check</td>
-		</tr>
-		<tr>
-			<td>probes.liveness.httpGet.port</td>
-			<td>string</td>
-			<td><pre lang="json">
-"main"
-</pre>
-</td>
-			<td>Port number or name to access on the container for the liveness probe</td>
-		</tr>
-		<tr>
-			<td>probes.liveness.httpGet.scheme</td>
-			<td>string</td>
-			<td><pre lang="json">
-"HTTP"
-</pre>
-</td>
-			<td>HTTP scheme (HTTP or HTTPS) used for the liveness probe</td>
-		</tr>
-		<tr>
-			<td>probes.liveness.initialDelaySeconds</td>
-			<td>int</td>
-			<td><pre lang="json">
-30
-</pre>
-</td>
-			<td>Delay in seconds before the first liveness probe is executed after container startup</td>
-		</tr>
-		<tr>
-			<td>probes.liveness.periodSeconds</td>
-			<td>int</td>
-			<td><pre lang="json">
-10
-</pre>
-</td>
-			<td>Frequency in seconds at which the liveness probe is performed</td>
-		</tr>
-		<tr>
-			<td>probes.liveness.successThreshold</td>
-			<td>int</td>
-			<td><pre lang="json">
-1
-</pre>
-</td>
-			<td>Number of consecutive successful probes to mark the container as healthy</td>
-		</tr>
-		<tr>
-			<td>probes.liveness.timeoutSeconds</td>
-			<td>int</td>
-			<td><pre lang="json">
-5
-</pre>
-</td>
-			<td>Timeout in seconds for each probe request</td>
-		</tr>
-		<tr>
-			<td>probes.readiness.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td>Enable the readiness probe to signal when the container is ready to accept traffic</td>
-		</tr>
-		<tr>
-			<td>probes.readiness.failureThreshold</td>
-			<td>int</td>
-			<td><pre lang="json">
-3
-</pre>
-</td>
-			<td>Number of consecutive failures before the container is marked as not ready</td>
-		</tr>
-		<tr>
-			<td>probes.readiness.httpGet.path</td>
-			<td>string</td>
-			<td><pre lang="json">
-"/health"
-</pre>
-</td>
-			<td>HTTP GET probe configuration for readiness check</td>
-		</tr>
-		<tr>
-			<td>probes.readiness.httpGet.port</td>
-			<td>string</td>
-			<td><pre lang="json">
-"main"
-</pre>
-</td>
-			<td>Port number or name to access on the container for the readiness probe</td>
-		</tr>
-		<tr>
-			<td>probes.readiness.httpGet.scheme</td>
-			<td>string</td>
-			<td><pre lang="json">
-"HTTP"
-</pre>
-</td>
-			<td>HTTP scheme (HTTP or HTTPS) used for the readiness probe</td>
-		</tr>
-		<tr>
-			<td>probes.readiness.initialDelaySeconds</td>
-			<td>int</td>
-			<td><pre lang="json">
-30
-</pre>
-</td>
-			<td>Delay in seconds before the first readiness probe is executed after container startup</td>
-		</tr>
-		<tr>
-			<td>probes.readiness.periodSeconds</td>
-			<td>int</td>
-			<td><pre lang="json">
-10
-</pre>
-</td>
-			<td>Frequency in seconds at which the readiness probe is performed</td>
-		</tr>
-		<tr>
-			<td>probes.readiness.successThreshold</td>
-			<td>int</td>
-			<td><pre lang="json">
-1
-</pre>
-</td>
-			<td>Number of consecutive successful probes to mark the container as ready</td>
-		</tr>
-		<tr>
-			<td>probes.readiness.timeoutSeconds</td>
-			<td>int</td>
-			<td><pre lang="json">
-5
-</pre>
-</td>
-			<td>Timeout in seconds for each probe request</td>
-		</tr>
-		<tr>
-			<td>probes.startup.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td>Enable the startup probe to check if the application within the container has started successfully</td>
-		</tr>
-		<tr>
-			<td>probes.startup.failureThreshold</td>
-			<td>int</td>
-			<td><pre lang="json">
-3
-</pre>
-</td>
-			<td>Number of consecutive failures before the container is considered failed to start</td>
-		</tr>
-		<tr>
-			<td>probes.startup.httpGet.path</td>
-			<td>string</td>
-			<td><pre lang="json">
-"/health"
-</pre>
-</td>
-			<td>HTTP GET probe configuration for startup check</td>
-		</tr>
-		<tr>
-			<td>probes.startup.httpGet.port</td>
-			<td>string</td>
-			<td><pre lang="json">
-"main"
-</pre>
-</td>
-			<td>Port number or name to access on the container for the startup probe</td>
-		</tr>
-		<tr>
-			<td>probes.startup.httpGet.scheme</td>
-			<td>string</td>
-			<td><pre lang="json">
-"HTTP"
-</pre>
-</td>
-			<td>HTTP scheme (HTTP or HTTPS) used for the startup probe</td>
-		</tr>
-		<tr>
-			<td>probes.startup.initialDelaySeconds</td>
-			<td>int</td>
-			<td><pre lang="json">
-60
-</pre>
-</td>
-			<td>Delay in seconds before the first startup probe is executed after container startup</td>
-		</tr>
-		<tr>
-			<td>probes.startup.periodSeconds</td>
-			<td>int</td>
-			<td><pre lang="json">
-10
-</pre>
-</td>
-			<td>Frequency in seconds at which the startup probe is performed</td>
-		</tr>
-		<tr>
-			<td>probes.startup.successThreshold</td>
-			<td>int</td>
-			<td><pre lang="json">
-1
-</pre>
-</td>
-			<td>Number of consecutive successful probes to mark the container as started</td>
-		</tr>
-		<tr>
-			<td>probes.startup.timeoutSeconds</td>
-			<td>int</td>
-			<td><pre lang="json">
-5
-</pre>
-</td>
-			<td>Timeout in seconds for each probe request</td>
-		</tr>
-		<tr>
 			<td>replicaCount</td>
 			<td>int</td>
 			<td><pre lang="json">
@@ -547,24 +544,6 @@ true
 </pre>
 </td>
 			<td>Number of desired pods (replicas) for the deployment. Modify to scale the application horizontally</td>
-		</tr>
-		<tr>
-			<td>resources</td>
-			<td>object</td>
-			<td><pre lang="json">
-{
-  "limits": {
-    "cpu": 2,
-    "memory": "2Gi"
-  },
-  "requests": {
-    "cpu": "1m",
-    "memory": "32Mi"
-  }
-}
-</pre>
-</td>
-			<td>CPU and memory resource allocation for the container</td>
 		</tr>
 		<tr>
 			<td>revisionHistoryLimit</td>
