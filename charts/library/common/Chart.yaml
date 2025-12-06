@@ -8,6 +8,7 @@ description: |-
   across the chart repository with consistent security, observability, and best practices.
 
   Used by all application charts in this repository for consistency.
+home: https://github.com/trowaflo/helm-charts
 maintainers:
   - name: trowaflo
     email: trowa.flo@gmail.com
