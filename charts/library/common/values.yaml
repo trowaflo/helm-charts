@@ -12,6 +12,7 @@ fullnameOverride: ''
 # -- Override the namespace where resources are deployed. Leave empty to use the release namespace
 namespaceOverride: ''
 
+# @section -- containers Configuration
 containers:
   main:
 
