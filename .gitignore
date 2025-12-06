@@ -2,3 +2,8 @@
 .DS_Store
 .terraform*
 .decrypted~*
+.env
+
+# Helm chart artifacts
+charts/**/charts/*.tgz
+Chart.lock

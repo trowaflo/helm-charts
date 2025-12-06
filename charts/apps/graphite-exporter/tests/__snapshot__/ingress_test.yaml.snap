@@ -1,0 +1,26 @@
+should match Ingress with correct hosts:
+  1: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      labels:
+        app.kubernetes.io/instance: graphite-exporter-testing
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: name-override-test
+        helm.sh/chart: graphite-exporter-0.0.1
+        test: true
+      name: graphite-exporter-testing-name-override-test
+      namespace: graphite-exporter-testing-namespace-override-test
+    spec:
+      ingressClassName: traefik
+      rules:
+        - host: graphite-exporter.fqdn.example.com
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: graphite-exporter-testing-name-override-test-main
+                    port:
+                      name: main
+                path: /
+                pathType: Prefix

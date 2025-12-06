@@ -1,0 +1,23 @@
+suite: test graphite-exporter chart - ServiceMonitor
+templates:
+  - templates/common.yaml
+values:
+  - values/default.yaml
+release:
+  name: graphite-exporter-testing
+  namespace: graphite-exporter-testing
+tests:
+  - it: should match ServiceMonitor with correct metric relabelings
+    documentIndex: 4
+    asserts:
+      - containsDocument:
+          apiVersion: monitoring.coreos.com/v1
+          kind: ServiceMonitor
+      - contains:
+          path: spec.endpoints[0].metricRelabelings
+          content:
+            action: keep
+            regex: ^(scale_.*)
+            sourceLabels:
+              - __name__
+      - matchSnapshot: {}

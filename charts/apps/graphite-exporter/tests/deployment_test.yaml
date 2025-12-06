@@ -1,0 +1,17 @@
+suite: test graphite-exporter chart - Deployment
+templates:
+  - templates/common.yaml
+values:
+  - values/default.yaml
+tests:
+  - it: should match Deployment with correct args
+    documentIndex: 3
+    asserts:
+      - containsDocument:
+          apiVersion: apps/v1
+          kind: Deployment
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content:
+            "--graphite.listen-address=:9109"
+      - matchSnapshot: {}

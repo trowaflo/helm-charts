@@ -1,0 +1,176 @@
+should compute fullnameOverride correctly:
+  1: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      labels:
+        app.kubernetes.io/instance: ingress-test
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: common-test
+        helm.sh/chart: common-test-0.1.0
+        test: true
+      name: my-ingress
+      namespace: ingress-test-namespace-override-test
+    spec:
+      ingressClassName: traefik
+      rules:
+        - host: chart-example.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: my-ingress-main
+                    port:
+                      name: main
+                path: /
+                pathType: Prefix
+              - backend:
+                  service:
+                    name: my-ingress-main
+                    port:
+                      name: main
+                path: /testpath
+                pathType: Prefix
+        - host: another-chart-example.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: my-ingress-main
+                    port:
+                      name: main
+                path: /
+                pathType: Prefix
+              - backend:
+                  service:
+                    name: my-ingress-main
+                    port:
+                      name: main
+                path: /testpath
+                pathType: Prefix
+should compute nameOverride correctly:
+  1: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      labels:
+        app.kubernetes.io/instance: ingress-test
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: name-override
+        helm.sh/chart: common-test-0.1.0
+        test: true
+      name: ingress-test-name-override
+      namespace: ingress-test-namespace-override-test
+    spec:
+      ingressClassName: traefik
+      rules:
+        - host: chart-example.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: ingress-test-name-override-main
+                    port:
+                      name: main
+                path: /
+                pathType: Prefix
+              - backend:
+                  service:
+                    name: ingress-test-name-override-main
+                    port:
+                      name: main
+                path: /testpath
+                pathType: Prefix
+        - host: another-chart-example.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: ingress-test-name-override-main
+                    port:
+                      name: main
+                path: /
+                pathType: Prefix
+              - backend:
+                  service:
+                    name: ingress-test-name-override-main
+                    port:
+                      name: main
+                path: /testpath
+                pathType: Prefix
+should have the right host configured:
+  1: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      labels:
+        app.kubernetes.io/instance: ingress-test
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: common-test
+        helm.sh/chart: common-test-0.1.0
+        test: true
+      name: ingress-test-common-test
+      namespace: ingress-test-namespace-override-test
+    spec:
+      ingressClassName: traefik
+      rules:
+        - host: other.example.com
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: ingress-test-common-test-other
+                    port:
+                      name: other
+                path: /other-host-path
+                pathType: Prefix
+should match snapshot with default values:
+  1: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      labels:
+        app.kubernetes.io/instance: ingress-test
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: common-test
+        helm.sh/chart: common-test-0.1.0
+        test: true
+      name: ingress-test-common-test
+      namespace: ingress-test-namespace-override-test
+    spec:
+      ingressClassName: traefik
+      rules:
+        - host: chart-example.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: ingress-test-common-test-main
+                    port:
+                      name: main
+                path: /
+                pathType: Prefix
+              - backend:
+                  service:
+                    name: ingress-test-common-test-main
+                    port:
+                      name: main
+                path: /testpath
+                pathType: Prefix
+        - host: another-chart-example.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: ingress-test-common-test-main
+                    port:
+                      name: main
+                path: /
+                pathType: Prefix
+              - backend:
+                  service:
+                    name: ingress-test-common-test-main
+                    port:
+                      name: main
+                path: /testpath
+                pathType: Prefix

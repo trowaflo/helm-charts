@@ -1,0 +1,2 @@
+nameOverride: "name-override-test"
+namespaceOverride: "namespace-override-test"

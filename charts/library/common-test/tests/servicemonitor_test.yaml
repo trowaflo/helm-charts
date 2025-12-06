@@ -1,0 +1,87 @@
+suite: test common chart - ServiceMonitor
+templates:
+  - templates/common.yaml
+values:
+  - values/default.yaml
+set:
+  nameOverride: "service-monitor-name-override"
+release:
+  name: common-test
+  namespace: common-test
+tests:
+  # Snapshot = validates complete coherence with default values
+  - it: should match snapshot when enabled
+    documentIndex: 3
+    asserts:
+      - matchSnapshot: {}
+
+  # Test computed values - fullnameOverride
+  - it: should compute fullnameOverride correctly
+    documentIndex: 3
+    set:
+      fullnameOverride: "my-servicemonitor"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-servicemonitor
+      - matchSnapshot: {}
+
+  # Test computed values - nameOverride
+  - it: should compute nameOverride correctly
+    documentIndex: 3
+    set:
+      nameOverride: "custom"
+    asserts:
+      - equal:
+          path: "spec.selector.matchLabels[\"app.kubernetes.io/name\"]"
+          value: custom
+      - matchSnapshot: {}
+
+  # Test conditional logic - serviceMonitor.enabled
+  - it: should create ServiceMonitor when enabled
+    set:
+      serviceMonitor.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 4
+      - matchSnapshot: {}
+
+  - it: should not create ServiceMonitor when disabled
+    set:
+      serviceMonitor.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 3
+      - matchSnapshot: {}
+
+  - it: should contain metricRelabelings when defined
+    documentIndex: 3
+    set:
+      serviceMonitor.enabled: true
+      serviceMonitor.endpoints:
+        - port: main
+          metricRelabelings:
+            - sourceLabels: ["__name__"]
+              regex: "go_.*"
+              action: "keep"
+    asserts:
+      - lengthEqual:
+          path: "spec.endpoints[0].metricRelabelings"
+          count: 1
+      - matchSnapshot: {}
+
+  - it: should contain relabelings when defined
+    documentIndex: 3
+    set:
+      serviceMonitor.enabled: true
+      serviceMonitor.endpoints:
+        - port: main
+          relabelings:
+            - sourceLabels: ["__name__"]
+              regex: "go_.*"
+              action: "keep"
+    asserts:
+      - lengthEqual:
+          path: "spec.endpoints[0].relabelings"
+          count: 1
+      - matchSnapshot: {}

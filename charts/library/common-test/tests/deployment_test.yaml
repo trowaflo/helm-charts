@@ -1,0 +1,82 @@
+suite: test common chart - Deployment
+templates:
+  - templates/common.yaml
+values:
+  - values/default.yaml
+set:
+  nameOverride: "deployment-name-override"
+release:
+  name: common-test
+  namespace: common-test
+tests:
+  # Snapshot = validates complete coherence with default values
+  - it: should match snapshot with default values
+    documentIndex: 2
+    asserts:
+      - matchSnapshot: {}
+
+  # Test computed values - fullnameOverride
+  - it: should compute fullnameOverride correctly
+    documentIndex: 2
+    set:
+      fullnameOverride: "my-custom-name"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-custom-name
+
+  # Test computed values - nameOverride
+  - it: should compute nameOverride correctly
+    documentIndex: 2
+    set:
+      nameOverride: "custom"
+    asserts:
+      - equal:
+          path: "metadata.labels[\"app.kubernetes.io/name\"]"
+          value: custom
+
+  # Test conditional logic - probes
+  - it: should respect probe enabled flags
+    documentIndex: 2
+    set:
+      containers.main.probes.enabled: true
+      containers.main.probes.liveness.enabled: false
+      containers.main.probes.readiness.enabled: true
+      containers.main.probes.startup.enabled: false
+    asserts:
+      - isNull:
+          path: spec.template.spec.containers[0].livenessProbe
+      - isNotNull:
+          path: spec.template.spec.containers[0].readinessProbe
+      - isNull:
+          path: spec.template.spec.containers[0].startupProbe
+
+  - it: should disable all probes when global disabled
+    documentIndex: 2
+    set:
+      containers.main.probes.enabled: false
+    asserts:
+      - isNull:
+          path: spec.template.spec.containers[0].livenessProbe
+      - isNull:
+          path: spec.template.spec.containers[0].readinessProbe
+      - isNull:
+          path: spec.template.spec.containers[0].startupProbe
+
+  - it: should have args and env from values
+    documentIndex: 2
+    set:
+      containers.main.args:
+        - "--test-arg=value"
+      containers.main.env:
+        - name: TEST_ENVVAR
+          value: "envvalue"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args[0]
+          value: "--test-arg=value"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: TEST_ENVVAR
+            value: "envvalue"
