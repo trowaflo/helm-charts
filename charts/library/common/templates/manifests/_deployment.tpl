@@ -38,11 +38,12 @@ spec:
         {{- toYaml .Values.securityContext | nindent 8 }}
     {{- end }}
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ include "common.helpers.imageTag" . }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+      {{- range $name, $container := .Values.containers }}
+        - name: {{ $name }}
+          image: "{{ $container.image.repository }}:{{ include "common.helpers.imageTag" $container }}"
+          imagePullPolicy: {{ $container.image.pullPolicy }}
           ports:
-          {{- range $serviceName, $svcConfig := .Values.services }}
+          {{- range $serviceName, $svcConfig := $.Values.services }}
             {{- if $svcConfig.enabled }}
               {{- range $portName, $portCfg := $svcConfig.ports }}
             - name: {{ $portName }}
@@ -51,56 +52,57 @@ spec:
               {{- end }}
             {{- end }}
           {{- end }}
-          {{- if and .Values.probes.enabled .Values.probes.liveness.enabled }}
+          {{- if and $container.probes.enabled $container.probes.liveness.enabled }}
           livenessProbe:
             httpGet:
-              path: {{ .Values.probes.liveness.httpGet.path }}
-              port: {{ .Values.probes.liveness.httpGet.port }}
-              scheme: {{ .Values.probes.liveness.httpGet.scheme }}
-            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
-            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
-            successThreshold: {{ .Values.probes.liveness.successThreshold }}
-            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
-            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+              path: {{ $container.probes.liveness.httpGet.path }}
+              port: {{ $container.probes.liveness.httpGet.port }}
+              scheme: {{ $container.probes.liveness.httpGet.scheme }}
+            initialDelaySeconds: {{ $container.probes.liveness.initialDelaySeconds }}
+            failureThreshold: {{ $container.probes.liveness.failureThreshold }}
+            successThreshold: {{ $container.probes.liveness.successThreshold }}
+            periodSeconds: {{ $container.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ $container.probes.liveness.timeoutSeconds }}
           {{- end }}
-          {{- if and .Values.probes.enabled .Values.probes.readiness.enabled }}
+          {{- if and $container.probes.enabled $container.probes.readiness.enabled }}
           readinessProbe:
             httpGet:
-              path: {{ .Values.probes.readiness.httpGet.path }}
-              port: {{ .Values.probes.readiness.httpGet.port }}
-              scheme: {{ .Values.probes.readiness.httpGet.scheme }}
-            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
-            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
-            successThreshold: {{ .Values.probes.readiness.successThreshold }}
-            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
-            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+              path: {{ $container.probes.readiness.httpGet.path }}
+              port: {{ $container.probes.readiness.httpGet.port }}
+              scheme: {{ $container.probes.readiness.httpGet.scheme }}
+            initialDelaySeconds: {{ $container.probes.readiness.initialDelaySeconds }}
+            failureThreshold: {{ $container.probes.readiness.failureThreshold }}
+            successThreshold: {{ $container.probes.readiness.successThreshold }}
+            periodSeconds: {{ $container.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ $container.probes.readiness.timeoutSeconds }}
           {{- end }}
-          {{- if and .Values.probes.enabled .Values.probes.startup.enabled }}
+          {{- if and $container.probes.enabled $container.probes.startup.enabled }}
           startupProbe:
             httpGet:
-              path: {{ .Values.probes.startup.httpGet.path }}
-              port: {{ .Values.probes.startup.httpGet.port }}
-              scheme: {{ .Values.probes.startup.httpGet.scheme }}
-            initialDelaySeconds: {{ .Values.probes.startup.initialDelaySeconds }}
-            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
-            successThreshold: {{ .Values.probes.startup.successThreshold }}
-            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
-            timeoutSeconds: {{ .Values.probes.startup.timeoutSeconds }}
+              path: {{ $container.probes.startup.httpGet.path }}
+              port: {{ $container.probes.startup.httpGet.port }}
+              scheme: {{ $container.probes.startup.httpGet.scheme }}
+            initialDelaySeconds: {{ $container.probes.startup.initialDelaySeconds }}
+            failureThreshold: {{ $container.probes.startup.failureThreshold }}
+            successThreshold: {{ $container.probes.startup.successThreshold }}
+            periodSeconds: {{ $container.probes.startup.periodSeconds }}
+            timeoutSeconds: {{ $container.probes.startup.timeoutSeconds }}
           {{- end }}
-          {{- if .Values.args }}
+          {{- if $container.args }}
           args:
-            {{- toYaml .Values.args | nindent 12 }}
+            {{- toYaml $container.args | nindent 12 }}
           {{- end }}
-          {{- if .Values.env }}
+          {{- if $container.env }}
           env:
-            {{- toYaml .Values.env | nindent 12 }}
+            {{- toYaml $container.env | nindent 12 }}
           {{- end }}
           resources:
-            {{- include "common.helpers.resources" . | nindent 12 }}
-        {{- if .Values.podSecurityContext }}
+            {{- include "common.helpers.resources" $container | nindent 12 }}
+        {{- if $.Values.podSecurityContext }}
           securityContext:
-            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+            {{- toYaml $.Values.podSecurityContext | nindent 12 }}
         {{- end }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

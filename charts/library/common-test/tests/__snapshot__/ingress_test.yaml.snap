@@ -8,6 +8,7 @@ should compute fullnameOverride correctly:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: common-test
         helm.sh/chart: common-test-0.1.0
+        test: true
       name: my-ingress
       namespace: ingress-test-namespace-override-test
     spec:
@@ -57,6 +58,7 @@ should compute nameOverride correctly:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override
         helm.sh/chart: common-test-0.1.0
+        test: true
       name: ingress-test-name-override
       namespace: ingress-test-namespace-override-test
     spec:
@@ -106,6 +108,7 @@ should have the right host configured:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: common-test
         helm.sh/chart: common-test-0.1.0
+        test: true
       name: ingress-test-common-test
       namespace: ingress-test-namespace-override-test
     spec:
@@ -131,6 +134,7 @@ should match snapshot with default values:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: common-test
         helm.sh/chart: common-test-0.1.0
+        test: true
       name: ingress-test-common-test
       namespace: ingress-test-namespace-override-test
     spec:

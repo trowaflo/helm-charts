@@ -103,6 +103,7 @@ should create ServiceMonitor when enabled:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: service-monitor-name-override
         helm.sh/chart: common-test-0.1.0
+        test: true
       name: common-test-service-monitor-name-override
       namespace: common-test-namespace-override-test
     spec:
@@ -193,7 +194,7 @@ should create ServiceMonitor when enabled:
                 periodSeconds: 10
                 successThreshold: 1
                 timeoutSeconds: 5
-              name: common-test
+              name: main
               ports:
                 - containerPort: 80
                   name: main
@@ -297,6 +298,7 @@ should not create ServiceMonitor when disabled:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: service-monitor-name-override
         helm.sh/chart: common-test-0.1.0
+        test: true
       name: common-test-service-monitor-name-override
       namespace: common-test-namespace-override-test
     spec:
@@ -387,7 +389,7 @@ should not create ServiceMonitor when disabled:
                 periodSeconds: 10
                 successThreshold: 1
                 timeoutSeconds: 5
-              name: common-test
+              name: main
               ports:
                 - containerPort: 80
                   name: main

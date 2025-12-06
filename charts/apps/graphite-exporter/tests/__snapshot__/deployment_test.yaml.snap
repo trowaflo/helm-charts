@@ -1,4 +1,4 @@
-should match Deployment with correct ar:
+should match Deployment with correct args:
   1: |
     apiVersion: apps/v1
     kind: Deployment
@@ -42,7 +42,7 @@ should match Deployment with correct ar:
                 periodSeconds: 10
                 successThreshold: 1
                 timeoutSeconds: 5
-              name: graphite-exporter
+              name: main
               ports:
                 - containerPort: 9109
                   name: graphite-tcp

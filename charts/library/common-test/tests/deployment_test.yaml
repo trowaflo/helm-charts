@@ -39,10 +39,10 @@ tests:
   - it: should respect probe enabled flags
     documentIndex: 2
     set:
-      probes.enabled: true
-      probes.liveness.enabled: false
-      probes.readiness.enabled: true
-      probes.startup.enabled: false
+      containers.main.probes.enabled: true
+      containers.main.probes.liveness.enabled: false
+      containers.main.probes.readiness.enabled: true
+      containers.main.probes.startup.enabled: false
     asserts:
       - isNull:
           path: spec.template.spec.containers[0].livenessProbe
@@ -54,7 +54,7 @@ tests:
   - it: should disable all probes when global disabled
     documentIndex: 2
     set:
-      probes.enabled: false
+      containers.main.probes.enabled: false
     asserts:
       - isNull:
           path: spec.template.spec.containers[0].livenessProbe
@@ -66,9 +66,9 @@ tests:
   - it: should have args and env from values
     documentIndex: 2
     set:
-      args:
+      containers.main.args:
         - "--test-arg=value"
-      env:
+      containers.main.env:
         - name: TEST_ENVVAR
           value: "envvalue"
     asserts:

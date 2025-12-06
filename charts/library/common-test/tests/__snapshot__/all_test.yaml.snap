@@ -29,6 +29,7 @@ should match snapshot with default values:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: common-test
         helm.sh/chart: common-test-0.1.0
+        test: true
       name: common-test
       namespace: common-test-namespace-override-test
     spec:
@@ -119,7 +120,7 @@ should match snapshot with default values:
                 periodSeconds: 10
                 successThreshold: 1
                 timeoutSeconds: 5
-              name: common-test
+              name: main
               ports:
                 - containerPort: 80
                   name: main

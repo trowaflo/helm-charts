@@ -39,15 +39,15 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
 {{- define "common.helpers.imageTag" -}}
-{{- if .Values.image.tag -}}
-{{ .Values.image.tag }}
+{{- if .image.tag -}}
+{{ .image.tag }}
 {{- else -}}
 {{ .Chart.AppVersion }}
 {{- end -}}
 {{- end -}}
 
 {{- define "common.helpers.resources" -}}
-{{- $resources := .Values.resources | default dict -}}
+{{- $resources := .resources | default dict -}}
 {{ $resources | toYaml }}
 {{- end -}}
 

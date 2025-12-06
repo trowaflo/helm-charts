@@ -43,7 +43,7 @@ should have the correct environment variables defined:
                 periodSeconds: 10
                 successThreshold: 1
                 timeoutSeconds: 5
-              name: frigate-exporter
+              name: main
               ports:
                 - containerPort: 9100
                   name: main
