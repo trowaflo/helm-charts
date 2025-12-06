@@ -1,18 +1,16 @@
-# grafana
 
-![Version: 0.1.7](https://img.shields.io/badge/Version-0.1.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+
+# grafana
 
 Grafana visualization and dashboarding platform with custom extensions.
 Wraps the official Grafana Helm chart with domain-specific customizations,
 providing integrated dashboard provisioning and Traefik IngressRoute support.
 
+---
+
+![Version: 0.1.7](https://img.shields.io/badge/Version-0.1.7-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
+
 **Homepage:** <https://grafana.com>
-
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| trowaflo | <trowa.flo@gmail.com> |  |
 
 ## Source Code
 
@@ -21,33 +19,175 @@ providing integrated dashboard provisioning and Traefik IngressRoute support.
 
 ## Requirements
 
+## Requirements
+
 | Repository | Name | Version |
 |------------|------|---------|
 | https://grafana.github.io/helm-charts | grafana | 8.11.4 |
 
-## Values
+- Helm: v3+
 
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| dashboards | object | `{"default":{"custom-dashboard":{"file":"dashboards/custom-dashboard.json"}}}` | Custom Grafana dashboard definitions provisioned via ConfigMaps and mounted by the Grafana sidecar |
-| dashboards.default | object | `{"custom-dashboard":{"file":"dashboards/custom-dashboard.json"}}` | Default dashboard category for organizing multiple dashboards |
-| dashboards.default.custom-dashboard | object | `{"file":"dashboards/custom-dashboard.json"}` | Custom dashboard definition |
-| dashboards.default.custom-dashboard.file | string | `"dashboards/custom-dashboard.json"` | Path to JSON dashboard file relative to chart root (Helm renders JSON and mounts to /var/lib/grafana/dashboards/) |
-| grafana | object | `{"admin":{"existingSecret":"grafana","passwordKey":"admin-password","userKey":"admin-user"},"ingress":{"enabled":false},"ingressroute":{"enabled":true,"path":"/grafana/"},"sidecar":{"dashboards":{"enabled":true}},"testFramework":{"enabled":false}}` | Grafana parent Helm chart configuration and subchart values. This chart wraps the official Grafana Helm chart with customizations |
-| grafana.admin | object | `{"existingSecret":"grafana","passwordKey":"admin-password","userKey":"admin-user"}` | Grafana admin user credentials and authentication configuration |
-| grafana.admin.existingSecret | string | `"grafana"` | Reference to existing Kubernetes Secret containing admin credentials instead of creating new ones |
-| grafana.admin.passwordKey | string | `"admin-password"` | Secret key name containing the admin password (must exist in the referenced Secret) |
-| grafana.admin.userKey | string | `"admin-user"` | Secret key name containing the admin username (must exist in the referenced Secret) |
-| grafana.ingress | object | `{"enabled":false}` | Kubernetes Ingress resource configuration for traditional HTTP(S) routing (alternative to IngressRoute) |
-| grafana.ingress.enabled | bool | `false` | Disable traditional Ingress in favor of Traefik IngressRoute for advanced routing features |
-| grafana.ingressroute | object | `{"enabled":true,"path":"/grafana/"}` | Traefik IngressRoute custom resource for advanced routing, middleware, and SSL termination |
-| grafana.ingressroute.enabled | bool | `true` | Enable IngressRoute creation for Traefik integration with path-based routing and middleware |
-| grafana.ingressroute.path | string | `"/grafana/"` | HTTP path prefix for accessing Grafana (e.g., https://domain/grafana/) |
-| grafana.sidecar | object | `{"dashboards":{"enabled":true}}` | Grafana sidecar configuration for injecting dashboards, datasources, and other configurations |
-| grafana.sidecar.dashboards | object | `{"enabled":true}` | Sidecar helper for automatically provisioning Grafana dashboards from ConfigMaps in the cluster |
-| grafana.sidecar.dashboards.enabled | bool | `true` | Enable automatic dashboard provisioning from mounted ConfigMaps (requires sidecar pod container) |
-| grafana.testFramework | object | `{"enabled":false}` | Test framework configuration for Grafana (used for Helm testing, not production) |
-| grafana.testFramework.enabled | bool | `false` | Disable test framework helpers to avoid installing unnecessary test resources |
+## Getting Started
+
+### Add repository
+
+```bash
+helm repo add grafana https://example.com/helm-charts
+helm repo update
+```
+
+### Install
+
+```bash
+helm install my-grafana grafana/grafana \
+  --namespace default \
+  --create-namespace
+```
+
+### Upgrade
+
+```bash
+helm upgrade my-grafana grafana/grafana \
+  --namespace default \
+  --install
+```
+
+### Uninstall
+
+```bash
+helm uninstall my-grafana --namespace default
+```
+
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>dashboards.default.custom-dashboard.file</td>
+			<td>string</td>
+			<td><pre lang="json">
+"dashboards/custom-dashboard.json"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>grafana.admin.existingSecret</td>
+			<td>string</td>
+			<td><pre lang="json">
+"grafana"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>grafana.admin.passwordKey</td>
+			<td>string</td>
+			<td><pre lang="json">
+"admin-password"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>grafana.admin.userKey</td>
+			<td>string</td>
+			<td><pre lang="json">
+"admin-user"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>grafana.ingress.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+false
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>grafana.ingressroute.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>grafana.ingressroute.path</td>
+			<td>string</td>
+			<td><pre lang="json">
+"/grafana/"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>grafana.sidecar.dashboards.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>grafana.testFramework.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+false
+</pre>
+</td>
+			<td></td>
+		</tr>
+	</tbody>
+</table>
+
+### Examples
+
+- Enable Prometheus scraping via ServiceMonitor
+- Configure resource requests/limits for predictable scheduling
+- Override container image and tag for air-gapped environments
+
+```yaml
+# values.yaml snippet
+serviceMonitor:
+  enabled: true
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+```
+
+## Security
+
+- Follows namespace-scoped, least-privilege defaults
+- Configure PodSecurityContext and SecurityContext as needed for your environment
+
+## Troubleshooting
+
+- Check pod logs and events: `kubectl logs -l app.kubernetes.io/name=grafana`
+- Verify CRDs (if any) are installed
+- Ensure network policies allow required traffic
+
+## Maintainers
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| trowaflo | <trowa.flo@gmail.com> |  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

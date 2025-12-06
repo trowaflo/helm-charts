@@ -1,49 +1,177 @@
-# guacamole
 
-![Version: 0.3.3](https://img.shields.io/badge/Version-0.3.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+
+# guacamole
 
 Apache Guacamole HTML5 remote desktop gateway for secure access to virtual machines and servers.
 Provides browser-based RDP, SSH, and VNC access without requiring client-side installations.
 
+---
+
+![Version: 0.3.3](https://img.shields.io/badge/Version-0.3.3-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
+
 **Homepage:** <https://guacamole.apache.org>
-
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| trowaflo | <trowa.flo@gmail.com> |  |
 
 ## Source Code
 
 * <https://github.com/apache/guacamole-server>
 * <https://github.com/trowaflo/helm-charts>
 
-## Values
+## Requirements
 
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| app | object | `{"resources":{"requests":{"cpu":"3m"}}}` | Apache Guacamole web application container resource configuration |
-| app.resources | object | `{"requests":{"cpu":"3m"}}` | Resource constraints for the main Guacamole web application |
-| app.resources.requests | object | `{"cpu":"3m"}` | Minimum guaranteed resources for web application stability |
-| app.resources.requests.cpu | string | `"3m"` | Minimum CPU for Guacamole web interface (low overhead for HTML5 frontend) |
-| db | object | `{"resources":{"requests":{"cpu":"10m"}}}` | PostgreSQL database service supporting Guacamole user/connection store |
-| db.resources | object | `{"requests":{"cpu":"10m"}}` | Resource allocation for the PostgreSQL database container |
-| db.resources.requests | object | `{"cpu":"10m"}` | Minimum guaranteed resources for database operations |
-| db.resources.requests.cpu | string | `"10m"` | Minimum CPU for PostgreSQL (light usage in most deployments) |
-| guacd | object | `{"image":{"repository":"guacamole/guacd","tag":"1.5.5"},"resources":{"requests":{"cpu":"1m"}}}` | Apache Guacamole daemon (guacd) configuration providing RDP/SSH/VNC protocol handling |
-| guacd.image | object | `{"repository":"guacamole/guacd","tag":"1.5.5"}` | Container image settings for the guacd protocol handler service |
-| guacd.image.repository | string | `"guacamole/guacd"` | guacd image repository URL (separate from main Guacamole image) |
-| guacd.image.tag | string | `"1.5.5"` | guacd specific version matching Guacamole application version for compatibility |
-| guacd.resources | object | `{"requests":{"cpu":"1m"}}` | Resource allocation for the guacd protocol handling container |
-| guacd.resources.requests | object | `{"cpu":"1m"}` | Minimum guaranteed resources for guacd to operate |
-| guacd.resources.requests.cpu | string | `"1m"` | Minimum CPU for guacd (handles protocol encoding/decoding, typically lightweight) |
-| helper | object | `{"resources":{"requests":{"cpu":"5m"}}}` | Helper pod configuration providing database initialization and management tasks |
-| helper.resources | object | `{"requests":{"cpu":"5m"}}` | Resource constraints for helper pod running initialization scripts |
-| helper.resources.requests | object | `{"cpu":"5m"}` | Minimum guaranteed resources for helper container |
-| helper.resources.requests.cpu | string | `"5m"` | Minimum CPU for init/helper tasks (usually short-lived) |
-| image | object | `{"repository":"guacamole/guacamole","tag":"1.5.5"}` | Container image configuration for Apache Guacamole web application (HTML5 remote desktop gateway) |
-| image.repository | string | `"guacamole/guacamole"` | Container image registry URL for the Guacamole application |
-| image.tag | string | `"1.5.5"` | Specific version of Guacamole application to deploy |
+- Helm: v3+
+
+## Getting Started
+
+### Add repository
+
+```bash
+helm repo add guacamole https://example.com/helm-charts
+helm repo update
+```
+
+### Install
+
+```bash
+helm install my-guacamole guacamole/guacamole \
+  --namespace default \
+  --create-namespace
+```
+
+### Upgrade
+
+```bash
+helm upgrade my-guacamole guacamole/guacamole \
+  --namespace default \
+  --install
+```
+
+### Uninstall
+
+```bash
+helm uninstall my-guacamole --namespace default
+```
+
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>app.resources.requests.cpu</td>
+			<td>string</td>
+			<td><pre lang="json">
+"3m"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>db.resources.requests.cpu</td>
+			<td>string</td>
+			<td><pre lang="json">
+"10m"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>guacd.image.repository</td>
+			<td>string</td>
+			<td><pre lang="json">
+"guacamole/guacd"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>guacd.image.tag</td>
+			<td>string</td>
+			<td><pre lang="json">
+"1.5.5"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>guacd.resources.requests.cpu</td>
+			<td>string</td>
+			<td><pre lang="json">
+"1m"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>helper.resources.requests.cpu</td>
+			<td>string</td>
+			<td><pre lang="json">
+"5m"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>image.repository</td>
+			<td>string</td>
+			<td><pre lang="json">
+"guacamole/guacamole"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>image.tag</td>
+			<td>string</td>
+			<td><pre lang="json">
+"1.5.5"
+</pre>
+</td>
+			<td></td>
+		</tr>
+	</tbody>
+</table>
+
+### Examples
+
+- Enable Prometheus scraping via ServiceMonitor
+- Configure resource requests/limits for predictable scheduling
+- Override container image and tag for air-gapped environments
+
+```yaml
+# values.yaml snippet
+serviceMonitor:
+  enabled: true
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+```
+
+## Security
+
+- Follows namespace-scoped, least-privilege defaults
+- Configure PodSecurityContext and SecurityContext as needed for your environment
+
+## Troubleshooting
+
+- Check pod logs and events: `kubectl logs -l app.kubernetes.io/name=guacamole`
+- Verify CRDs (if any) are installed
+- Ensure network policies allow required traffic
+
+## Maintainers
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| trowaflo | <trowa.flo@gmail.com> |  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

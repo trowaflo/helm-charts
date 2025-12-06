@@ -1,18 +1,16 @@
-# graphite-exporter
 
-![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+
+# graphite-exporter
 
 Prometheus exporter for converting Graphite plaintext protocol metrics to Prometheus format.
 Enables Prometheus to scrape metrics from legacy Graphite systems and sources
 (e.g., TrueNAS, custom monitoring systems) that emit Graphite-formatted metrics.
 
+---
+
+![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
+
 **Homepage:** <https://github.com/prometheus/graphite_exporter>
-
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| trowaflo | <trowa.flo@gmail.com> |  |
 
 ## Source Code
 
@@ -21,74 +19,1237 @@ Enables Prometheus to scrape metrics from legacy Graphite systems and sources
 
 ## Requirements
 
+## Requirements
+
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../../library/common | common | 0.1.0 |
 
-## Values
+- Helm: v3+
 
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| args | list | `["--graphite.listen-address=:9109"]` | Command-line arguments passed to the exporter binary for runtime configuration and port binding |
-| args[0] | string | `"--graphite.listen-address=:9109"` | Graphite listener address and port (UDP and TCP). Must match the 'graphite' service port configuration |
-| image | object | `{"pullPolicy":"IfNotPresent","repository":"prom/graphite-exporter","tag":"v0.16.0@sha256:e54bca6645ea8a9e8c52312a8540de98ad08819d38476c021d77a0eae75bc797"}` | Container image configuration for the Prometheus Graphite Exporter (converts Graphite plaintext protocol to Prometheus metrics) |
-| image.pullPolicy | string | `"IfNotPresent"` | Kubelet image pull policy determining when to fetch the image from registry (IfNotPresent = use cached if available) |
-| image.repository | string | `"prom/graphite-exporter"` | Container image repository URL from which the exporter image is pulled |
-| image.tag | string | `"v0.16.0@sha256:e54bca6645ea8a9e8c52312a8540de98ad08819d38476c021d77a0eae75bc797"` | Specific image version or digest for reproducible and predictable exporter behavior |
-| ingress | object | `{"main":{"enabled":true,"hosts":[{"host":"graphite-exporter.fqdn.example.com","paths":[{"path":"/","pathType":"Prefix"}]}]}}` | Kubernetes Ingress resource for HTTP(S) external access to the metrics endpoint |
-| ingress.main.enabled | bool | `true` | Enable Ingress creation for external metrics access (useful for monitoring dashboards and health checks) |
-| ingress.main.hosts | list | `[{"host":"graphite-exporter.fqdn.example.com","paths":[{"path":"/","pathType":"Prefix"}]}]` | DNS hostnames and paths routing external traffic to the exporter metrics endpoint |
-| ingress.main.hosts[0] | object | `{"host":"graphite-exporter.fqdn.example.com","paths":[{"path":"/","pathType":"Prefix"}]}` | Example FQDN for the graphite-exporter Ingress (update to your domain) |
-| ingress.main.hosts[0].paths[0] | object | `{"path":"/","pathType":"Prefix"}` | Root path routing all traffic to the metrics endpoint |
-| ingress.main.hosts[0].paths[0].pathType | string | `"Prefix"` | Path matching type (Prefix matches /anything, Exact requires exact match) |
-| probes | object | `{"liveness":{"httpGet":{"path":"/metrics"}},"readiness":{"httpGet":{"path":"/metrics"}},"startup":{"httpGet":{"path":"/metrics"}}}` | Kubernetes health check probes (liveness, readiness, startup) for automatic pod recovery and traffic management |
-| probes.liveness | object | `{"httpGet":{"path":"/metrics"}}` | Liveness probe detects stuck/deadlocked exporter processes and restarts them automatically |
-| probes.liveness.httpGet.path | string | `"/metrics"` | Health check endpoint exposing Prometheus metrics (standard exporter convention) |
-| probes.readiness | object | `{"httpGet":{"path":"/metrics"}}` | Readiness probe marks pod as ready once it's accepting scrape requests from Prometheus and graphite inputs |
-| probes.startup | object | `{"httpGet":{"path":"/metrics"}}` | Startup probe allows extended initialization time before strict liveness/readiness checks apply |
-| serviceMonitor | object | `{"enabled":true,"endpoints":[{"metricRelabelings":[{"action":"keep","regex":"^(scale_.*)","sourceLabels":["__name__"]},{"action":"replace","regex":"^scale_([^_]+)_.*","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"hostname"},{"action":"replace","regex":"^scale_[^_]+_([^_]+)_.*","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"service"},{"action":"replace","regex":"^.*_cpu_cpu([0-9]+)","replacement":"cpu${1}","sourceLabels":["__name__"],"targetLabel":"cpu"},{"action":"replace","regex":"^.*_cputemp_temperatures_cpu([0-9]+)","replacement":"cpu${1}","sourceLabels":["__name__"],"targetLabel":"cpu"},{"action":"replace","regex":"^.*_net_speed_([^_]+)_[^_\\n]+","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"interface"},{"action":"replace","regex":"^(.*_net_speed).*","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(scale_truenas)_truenas_(.*)$","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^scale_[^_]+_(.*)","replacement":"truenas_${1}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(uptime)_uptime","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(cpu)_cpu([0-9]+)?","replacement":"${1}_${2}${3}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(total)_total","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(available)_available","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(size)_size","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(avail)_avail","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(free)_free","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(l2bytes)_l2bytes","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(l2hits)_l2hits","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(l2miss)_l2miss","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(load)_load(1|5|15)","replacement":"${1}_${2}${3}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"keep","regex":"truenas_(system_uptime.*|cpu_usage.*|cputemp.*|system_load.*|meminfo.*|arcstats.*|net_.*(speed|received|sent).*|disk_stats_busy__serial_lunid.*)","sourceLabels":["__name__"]}],"port":"main"}]}` | Prometheus Operator ServiceMonitor for automated metrics scraping with advanced relabeling and filtering |
-| serviceMonitor.enabled | bool | `true` | Enable ServiceMonitor resource creation for Prometheus automated discovery and metric scraping |
-| serviceMonitor.endpoints | list | `[{"metricRelabelings":[{"action":"keep","regex":"^(scale_.*)","sourceLabels":["__name__"]},{"action":"replace","regex":"^scale_([^_]+)_.*","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"hostname"},{"action":"replace","regex":"^scale_[^_]+_([^_]+)_.*","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"service"},{"action":"replace","regex":"^.*_cpu_cpu([0-9]+)","replacement":"cpu${1}","sourceLabels":["__name__"],"targetLabel":"cpu"},{"action":"replace","regex":"^.*_cputemp_temperatures_cpu([0-9]+)","replacement":"cpu${1}","sourceLabels":["__name__"],"targetLabel":"cpu"},{"action":"replace","regex":"^.*_net_speed_([^_]+)_[^_\\n]+","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"interface"},{"action":"replace","regex":"^(.*_net_speed).*","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(scale_truenas)_truenas_(.*)$","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^scale_[^_]+_(.*)","replacement":"truenas_${1}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(uptime)_uptime","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(cpu)_cpu([0-9]+)?","replacement":"${1}_${2}${3}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(total)_total","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(available)_available","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(size)_size","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(avail)_avail","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(free)_free","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(l2bytes)_l2bytes","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(l2hits)_l2hits","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(l2miss)_l2miss","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(load)_load(1|5|15)","replacement":"${1}_${2}${3}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"keep","regex":"truenas_(system_uptime.*|cpu_usage.*|cputemp.*|system_load.*|meminfo.*|arcstats.*|net_.*(speed|received|sent).*|disk_stats_busy__serial_lunid.*)","sourceLabels":["__name__"]}],"port":"main"}]` | Scrape endpoint configuration with aggressive metric relabeling for TrueNAS-specific data processing |
-| serviceMonitor.endpoints[0] | object | `{"metricRelabelings":[{"action":"keep","regex":"^(scale_.*)","sourceLabels":["__name__"]},{"action":"replace","regex":"^scale_([^_]+)_.*","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"hostname"},{"action":"replace","regex":"^scale_[^_]+_([^_]+)_.*","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"service"},{"action":"replace","regex":"^.*_cpu_cpu([0-9]+)","replacement":"cpu${1}","sourceLabels":["__name__"],"targetLabel":"cpu"},{"action":"replace","regex":"^.*_cputemp_temperatures_cpu([0-9]+)","replacement":"cpu${1}","sourceLabels":["__name__"],"targetLabel":"cpu"},{"action":"replace","regex":"^.*_net_speed_([^_]+)_[^_\\n]+","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"interface"},{"action":"replace","regex":"^(.*_net_speed).*","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(scale_truenas)_truenas_(.*)$","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^scale_[^_]+_(.*)","replacement":"truenas_${1}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(uptime)_uptime","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(cpu)_cpu([0-9]+)?","replacement":"${1}_${2}${3}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(total)_total","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(available)_available","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(size)_size","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(avail)_avail","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(free)_free","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(l2bytes)_l2bytes","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(l2hits)_l2hits","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(l2miss)_l2miss","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(load)_load(1|5|15)","replacement":"${1}_${2}${3}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"keep","regex":"truenas_(system_uptime.*|cpu_usage.*|cputemp.*|system_load.*|meminfo.*|arcstats.*|net_.*(speed|received|sent).*|disk_stats_busy__serial_lunid.*)","sourceLabels":["__name__"]}],"port":"main"}` | Metrics endpoint targeting the main service port with metric relabeling pipeline |
-| serviceMonitor.endpoints[0].metricRelabelings | list | `[{"action":"keep","regex":"^(scale_.*)","sourceLabels":["__name__"]},{"action":"replace","regex":"^scale_([^_]+)_.*","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"hostname"},{"action":"replace","regex":"^scale_[^_]+_([^_]+)_.*","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"service"},{"action":"replace","regex":"^.*_cpu_cpu([0-9]+)","replacement":"cpu${1}","sourceLabels":["__name__"],"targetLabel":"cpu"},{"action":"replace","regex":"^.*_cputemp_temperatures_cpu([0-9]+)","replacement":"cpu${1}","sourceLabels":["__name__"],"targetLabel":"cpu"},{"action":"replace","regex":"^.*_net_speed_([^_]+)_[^_\\n]+","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"interface"},{"action":"replace","regex":"^(.*_net_speed).*","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(scale_truenas)_truenas_(.*)$","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^scale_[^_]+_(.*)","replacement":"truenas_${1}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(uptime)_uptime","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(cpu)_cpu([0-9]+)?","replacement":"${1}_${2}${3}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(total)_total","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(available)_available","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(size)_size","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(avail)_avail","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(free)_free","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(l2bytes)_l2bytes","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(l2hits)_l2hits","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(l2miss)_l2miss","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"replace","regex":"^(.*)_(load)_load(1|5|15)","replacement":"${1}_${2}${3}","sourceLabels":["__name__"],"targetLabel":"__name__"},{"action":"keep","regex":"truenas_(system_uptime.*|cpu_usage.*|cputemp.*|system_load.*|meminfo.*|arcstats.*|net_.*(speed|received|sent).*|disk_stats_busy__serial_lunid.*)","sourceLabels":["__name__"]}]` | Metric relabeling pipeline for TrueNAS plaintext graphite metrics. Performs filtering, label enrichment, and cleanup |
-| serviceMonitor.endpoints[0].metricRelabelings[0] | object | `{"action":"keep","regex":"^(scale_.*)","sourceLabels":["__name__"]}` | Filter 1: Keep only TrueNAS Scale system metrics matching scale_* pattern. All other metrics are dropped |
-| serviceMonitor.endpoints[0].metricRelabelings[10] | object | `{"action":"replace","regex":"^(.*)_(cpu)_cpu([0-9]+)?","replacement":"${1}_${2}${3}","sourceLabels":["__name__"],"targetLabel":"__name__"}` | Clean redundant CPU identifiers in metric names for consistent metric naming convention |
-| serviceMonitor.endpoints[0].metricRelabelings[11] | object | `{"action":"replace","regex":"^(.*)_(total)_total","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"}` | Deduplicate total counter metric suffixes for cleaner metric names |
-| serviceMonitor.endpoints[0].metricRelabelings[12] | object | `{"action":"replace","regex":"^(.*)_(available)_available","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"}` | Simplify available metric suffixes for consistent naming |
-| serviceMonitor.endpoints[0].metricRelabelings[13] | object | `{"action":"replace","regex":"^(.*)_(size)_size","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"}` | Deduplicate size metric suffixes |
-| serviceMonitor.endpoints[0].metricRelabelings[14] | object | `{"action":"replace","regex":"^(.*)_(avail)_avail","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"}` | Clean abbreviated available metric suffixes |
-| serviceMonitor.endpoints[0].metricRelabelings[15] | object | `{"action":"replace","regex":"^(.*)_(free)_free","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"}` | Deduplicate free space metric suffixes |
-| serviceMonitor.endpoints[0].metricRelabelings[16] | object | `{"action":"replace","regex":"^(.*)_(l2bytes)_l2bytes","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"}` | Clean L2 ARC cache byte count metrics |
-| serviceMonitor.endpoints[0].metricRelabelings[17] | object | `{"action":"replace","regex":"^(.*)_(l2hits)_l2hits","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"}` | Deduplicate L2 cache hit count metrics |
-| serviceMonitor.endpoints[0].metricRelabelings[18] | object | `{"action":"replace","regex":"^(.*)_(l2miss)_l2miss","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"}` | Simplify L2 cache miss count metrics |
-| serviceMonitor.endpoints[0].metricRelabelings[19] | object | `{"action":"replace","regex":"^(.*)_(load)_load(1|5|15)","replacement":"${1}_${2}${3}","sourceLabels":["__name__"],"targetLabel":"__name__"}` | Clean system load average metric suffixes |
-| serviceMonitor.endpoints[0].metricRelabelings[1] | object | `{"action":"replace","regex":"^scale_([^_]+)_.*","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"hostname"}` | Extract TrueNAS hostname from metric name prefix for pod/node identification |
-| serviceMonitor.endpoints[0].metricRelabelings[20] | object | `{"action":"keep","regex":"truenas_(system_uptime.*|cpu_usage.*|cputemp.*|system_load.*|meminfo.*|arcstats.*|net_.*(speed|received|sent).*|disk_stats_busy__serial_lunid.*)","sourceLabels":["__name__"]}` | Keep only relevant system metrics: uptime, CPU usage/temperature, load, memory, ARC cache, network, and disk I/O This is the final filter preventing cardinality explosion and storage waste from debug/unneeded metrics |
-| serviceMonitor.endpoints[0].metricRelabelings[2] | object | `{"action":"replace","regex":"^scale_[^_]+_([^_]+)_.*","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"service"}` | Extract TrueNAS service/component name from metric hierarchy for service-level filtering |
-| serviceMonitor.endpoints[0].metricRelabelings[3] | object | `{"action":"replace","regex":"^.*_cpu_cpu([0-9]+)","replacement":"cpu${1}","sourceLabels":["__name__"],"targetLabel":"cpu"}` | Extract specific CPU core identifier from cpu_cpuN metrics for per-core CPU temperature tracking |
-| serviceMonitor.endpoints[0].metricRelabelings[4] | object | `{"action":"replace","regex":"^.*_cputemp_temperatures_cpu([0-9]+)","replacement":"cpu${1}","sourceLabels":["__name__"],"targetLabel":"cpu"}` | Extract CPU core ID from cputemp_temperatures_cpuN metrics for temperature monitoring by core |
-| serviceMonitor.endpoints[0].metricRelabelings[5] | object | `{"action":"replace","regex":"^.*_net_speed_([^_]+)_[^_\\n]+","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"interface"}` | Extract network interface name (e.g., eth0, em0) from net_speed metrics for per-interface network stats |
-| serviceMonitor.endpoints[0].metricRelabelings[6] | object | `{"action":"replace","regex":"^(.*_net_speed).*","replacement":"${1}","sourceLabels":["__name__"],"targetLabel":"__name__"}` | Simplify network metric names by keeping only the prefix (net_speed) for cleaner metric naming |
-| serviceMonitor.endpoints[0].metricRelabelings[7] | object | `{"action":"replace","regex":"^(scale_truenas)_truenas_(.*)$","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"}` | Fix double "truenas_" prefixes in metric names resulting from Graphite metric hierarchies |
-| serviceMonitor.endpoints[0].metricRelabelings[8] | object | `{"action":"replace","regex":"^scale_[^_]+_(.*)","replacement":"truenas_${1}","sourceLabels":["__name__"],"targetLabel":"__name__"}` | Normalize metric names by replacing hostname-specific prefix with generic "truenas_" for consistent naming |
-| serviceMonitor.endpoints[0].metricRelabelings[9] | object | `{"action":"replace","regex":"^(.*)_(uptime)_uptime","replacement":"${1}_${2}","sourceLabels":["__name__"],"targetLabel":"__name__"}` | Deduplicate repeated suffix keywords in metric names resulting from Graphite plaintext format |
-| services | object | `{"graphite":{"annotations":{},"enabled":true,"labels":{},"ports":{"graphite-tcp":{"port":9109,"protocol":"TCP"},"graphite-udp":{"port":9109,"protocol":"UDP"}},"type":"LoadBalancer"},"main":{"annotations":{},"enabled":true,"labels":{},"ports":{"main":{"port":9108,"protocol":"TCP"}}}}` | Kubernetes Service definitions exposing metrics (Prometheus) and graphite input (TrueNAS/Graphite sources) |
-| services.graphite | object | `{"annotations":{},"enabled":true,"labels":{},"ports":{"graphite-tcp":{"port":9109,"protocol":"TCP"},"graphite-udp":{"port":9109,"protocol":"UDP"}},"type":"LoadBalancer"}` | Secondary LoadBalancer service accepting Graphite plaintext protocol input from monitoring sources (TrueNAS, etc.) |
-| services.graphite.annotations | object | `{}` | Cloud provider annotations for load balancer provisioning and health checks |
-| services.graphite.enabled | bool | `true` | Enable LoadBalancer service for external Graphite metric ingestion from cluster external sources |
-| services.graphite.labels | object | `{}` | Custom labels for external service organization and monitoring |
-| services.graphite.ports | object | `{"graphite-tcp":{"port":9109,"protocol":"TCP"},"graphite-udp":{"port":9109,"protocol":"UDP"}}` | Dual-protocol port configuration supporting both UDP (preferred) and TCP fallback for Graphite metrics |
-| services.graphite.ports.graphite-tcp.port | int | `9109` | TCP port for Graphite plaintext protocol metric ingestion |
-| services.graphite.ports.graphite-tcp.protocol | string | `"TCP"` | TCP protocol as fallback for Graphite metric delivery when UDP is unavailable or blocked |
-| services.graphite.ports.graphite-udp.protocol | string | `"UDP"` | UDP protocol for lightweight Graphite plaintext metric submissions from TrueNAS and other exporters |
-| services.graphite.type | string | `"LoadBalancer"` | Service type LoadBalancer exposes external IPs for sources outside the cluster to push metrics |
-| services.main | object | `{"annotations":{},"enabled":true,"labels":{},"ports":{"main":{"port":9108,"protocol":"TCP"}}}` | Primary service exposing the Prometheus /metrics endpoint for scraping by Prometheus Operator |
-| services.main.annotations | object | `{}` | Cloud provider annotations for load balancer/ingress configuration and certificate provisioning |
-| services.main.enabled | bool | `true` | Enable creation of the main metrics service |
-| services.main.labels | object | `{}` | Custom labels for service discovery filtering and organizational purposes |
-| services.main.ports | object | `{"main":{"port":9108,"protocol":"TCP"}}` | Network port mappings for metrics exposure |
-| services.main.ports.main.port | int | `9108` | Service port number (9108 is standard for Prometheus exporters) |
-| services.main.ports.main.protocol | string | `"TCP"` | Network protocol for metrics endpoint (always TCP for Prometheus) |
+## Getting Started
+
+### Add repository
+
+```bash
+helm repo add graphite-exporter https://example.com/helm-charts
+helm repo update
+```
+
+### Install
+
+```bash
+helm install my-graphite-exporter graphite-exporter/graphite-exporter \
+  --namespace default \
+  --create-namespace
+```
+
+### Upgrade
+
+```bash
+helm upgrade my-graphite-exporter graphite-exporter/graphite-exporter \
+  --namespace default \
+  --install
+```
+
+### Uninstall
+
+```bash
+helm uninstall my-graphite-exporter --namespace default
+```
+
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>args[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"--graphite.listen-address=:9109"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>image.pullPolicy</td>
+			<td>string</td>
+			<td><pre lang="json">
+"IfNotPresent"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>image.repository</td>
+			<td>string</td>
+			<td><pre lang="json">
+"prom/graphite-exporter"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>image.tag</td>
+			<td>string</td>
+			<td><pre lang="json">
+"v0.16.0@sha256:e54bca6645ea8a9e8c52312a8540de98ad08819d38476c021d77a0eae75bc797"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>ingress.main.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>ingress.main.hosts[0].host</td>
+			<td>string</td>
+			<td><pre lang="json">
+"graphite-exporter.fqdn.example.com"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>ingress.main.hosts[0].paths[0].path</td>
+			<td>string</td>
+			<td><pre lang="json">
+"/"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>ingress.main.hosts[0].paths[0].pathType</td>
+			<td>string</td>
+			<td><pre lang="json">
+"Prefix"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>probes.liveness.httpGet.path</td>
+			<td>string</td>
+			<td><pre lang="json">
+"/metrics"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>probes.readiness.httpGet.path</td>
+			<td>string</td>
+			<td><pre lang="json">
+"/metrics"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>probes.startup.httpGet.path</td>
+			<td>string</td>
+			<td><pre lang="json">
+"/metrics"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[0].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"keep"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[0].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^(scale_.*)"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[0].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[10].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[10].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^(.*)_(cpu)_cpu([0-9]+)?"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[10].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"${1}_${2}${3}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[10].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[10].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[11].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[11].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^(.*)_(total)_total"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[11].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"${1}_${2}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[11].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[11].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[12].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[12].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^(.*)_(available)_available"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[12].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"${1}_${2}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[12].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[12].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[13].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[13].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^(.*)_(size)_size"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[13].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"${1}_${2}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[13].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[13].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[14].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[14].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^(.*)_(avail)_avail"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[14].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"${1}_${2}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[14].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[14].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[15].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[15].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^(.*)_(free)_free"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[15].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"${1}_${2}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[15].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[15].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[16].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[16].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^(.*)_(l2bytes)_l2bytes"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[16].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"${1}_${2}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[16].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[16].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[17].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[17].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^(.*)_(l2hits)_l2hits"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[17].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"${1}_${2}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[17].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[17].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[18].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[18].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^(.*)_(l2miss)_l2miss"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[18].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"${1}_${2}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[18].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[18].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[19].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[19].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^(.*)_(load)_load(1|5|15)"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[19].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"${1}_${2}${3}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[19].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[19].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[1].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[1].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^scale_([^_]+)_.*"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[1].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"${1}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[1].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[1].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"hostname"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[20].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"keep"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[20].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"truenas_(system_uptime.*|cpu_usage.*|cputemp.*|system_load.*|meminfo.*|arcstats.*|net_.*(speed|received|sent).*|disk_stats_busy__serial_lunid.*)"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[20].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[2].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[2].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^scale_[^_]+_([^_]+)_.*"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[2].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"${1}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[2].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[2].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"service"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[3].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[3].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^.*_cpu_cpu([0-9]+)"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[3].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"cpu${1}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[3].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[3].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"cpu"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[4].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[4].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^.*_cputemp_temperatures_cpu([0-9]+)"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[4].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"cpu${1}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[4].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[4].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"cpu"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[5].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[5].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^.*_net_speed_([^_]+)_[^_\\n]+"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[5].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"${1}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[5].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[5].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"interface"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[6].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[6].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^(.*_net_speed).*"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[6].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"${1}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[6].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[6].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[7].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[7].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^(scale_truenas)_truenas_(.*)$"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[7].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"${1}_${2}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[7].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[7].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[8].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[8].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^scale_[^_]+_(.*)"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[8].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"truenas_${1}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[8].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[8].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[9].action</td>
+			<td>string</td>
+			<td><pre lang="json">
+"replace"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[9].regex</td>
+			<td>string</td>
+			<td><pre lang="json">
+"^(.*)_(uptime)_uptime"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[9].replacement</td>
+			<td>string</td>
+			<td><pre lang="json">
+"${1}_${2}"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[9].sourceLabels[0]</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].metricRelabelings[9].targetLabel</td>
+			<td>string</td>
+			<td><pre lang="json">
+"__name__"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].port</td>
+			<td>string</td>
+			<td><pre lang="json">
+"main"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.graphite.annotations</td>
+			<td>object</td>
+			<td><pre lang="json">
+{}
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.graphite.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.graphite.labels</td>
+			<td>object</td>
+			<td><pre lang="json">
+{}
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.graphite.ports.graphite-tcp.port</td>
+			<td>int</td>
+			<td><pre lang="json">
+9109
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.graphite.ports.graphite-tcp.protocol</td>
+			<td>string</td>
+			<td><pre lang="json">
+"TCP"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.graphite.ports.graphite-udp.port</td>
+			<td>int</td>
+			<td><pre lang="json">
+9109
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.graphite.ports.graphite-udp.protocol</td>
+			<td>string</td>
+			<td><pre lang="json">
+"UDP"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.graphite.type</td>
+			<td>string</td>
+			<td><pre lang="json">
+"LoadBalancer"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.main.annotations</td>
+			<td>object</td>
+			<td><pre lang="json">
+{}
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.main.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.main.labels</td>
+			<td>object</td>
+			<td><pre lang="json">
+{}
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.main.ports.main.port</td>
+			<td>int</td>
+			<td><pre lang="json">
+9108
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.main.ports.main.protocol</td>
+			<td>string</td>
+			<td><pre lang="json">
+"TCP"
+</pre>
+</td>
+			<td></td>
+		</tr>
+	</tbody>
+</table>
+
+### Examples
+
+- Enable Prometheus scraping via ServiceMonitor
+- Configure resource requests/limits for predictable scheduling
+- Override container image and tag for air-gapped environments
+
+```yaml
+# values.yaml snippet
+serviceMonitor:
+  enabled: true
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+```
+
+## Security
+
+- Follows namespace-scoped, least-privilege defaults
+- Configure PodSecurityContext and SecurityContext as needed for your environment
+
+## Troubleshooting
+
+- Check pod logs and events: `kubectl logs -l app.kubernetes.io/name=graphite-exporter`
+- Verify CRDs (if any) are installed
+- Ensure network policies allow required traffic
+
+## Maintainers
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| trowaflo | <trowa.flo@gmail.com> |  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
