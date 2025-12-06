@@ -55,7 +55,7 @@ helm uninstall my-common --namespace default
 
 ## Values
 
-<h3>Containers configuration</h3>
+<h3>Pods configuration</h3>
 <table>
 	<thead>
 		<th>Key</th>
@@ -71,7 +71,7 @@ helm uninstall my-common --namespace default
 The chart will always construct the main container.
 </pre>
 </td>
-			<td>Containers configuration. Additional containers can be added under the 'containers' key.</td>
+			<td>Pods configuration. Additional containers can be added under the 'containers' key.</td>
 		</tr>
 		<tr>
 			<td>containers.main.args</td>
@@ -114,15 +114,6 @@ The chart will always construct the main container.
 			<td>List of imagePullSecrets for private container registries. Reference pre-created Secrets in the same namespace</td>
 		</tr>
 		<tr>
-			<td>containers.main.probes.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td>Global toggle to enable/disable all probes for the container</td>
-		</tr>
-		<tr>
 			<td>containers.main.probes.liveness</td>
 			<td>object</td>
 			<td><pre lang="json">
@@ -142,15 +133,6 @@ true
 </pre>
 </td>
 			<td>Liveness probe configuration</td>
-		</tr>
-		<tr>
-			<td>containers.main.probes.liveness.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td>Enable the liveness probe to monitor container health and trigger restarts if unhealthy</td>
 		</tr>
 		<tr>
 			<td>containers.main.probes.readiness</td>
@@ -174,15 +156,6 @@ true
 			<td>Readiness probe configuration</td>
 		</tr>
 		<tr>
-			<td>containers.main.probes.readiness.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td>Enable the readiness probe to signal when the container is ready to accept traffic</td>
-		</tr>
-		<tr>
 			<td>containers.main.probes.startup</td>
 			<td>object</td>
 			<td><pre lang="json">
@@ -202,15 +175,6 @@ true
 </pre>
 </td>
 			<td>Startup probe configuration</td>
-		</tr>
-		<tr>
-			<td>containers.main.probes.startup.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td>Enable the startup probe to check if the application within the container has started successfully</td>
 		</tr>
 		<tr>
 			<td>containers.main.resources</td>
@@ -331,43 +295,30 @@ true
 		<tr>
 			<td>ingress</td>
 			<td>object</td>
-			<td><pre lang="">
-The chart will always construct the main ingress.
-</pre>
-</td>
-			<td>Ingress configuration. Additional ingress resources can be added under the 'ingress' key.</td>
-		</tr>
-		<tr>
-			<td>ingress.main.enabled</td>
-			<td>bool</td>
 			<td><pre lang="json">
-false
-</pre>
-</td>
-			<td>Enable the Ingress resource to expose the application externally</td>
-		</tr>
-		<tr>
-			<td>ingress.main.hosts</td>
-			<td>list</td>
-			<td><pre lang="json">
-[
-  {
-    "host": "chart-example.local",
-    "paths": [
+{
+  "main": {
+    "enabled": false,
+    "hosts": [
       {
-        "path": "/",
-        "pathType": "Prefix"
-      },
-      {
-        "path": "/testpath",
-        "pathType": "Prefix"
+        "host": "chart-example.local",
+        "paths": [
+          {
+            "path": "/",
+            "pathType": "Prefix"
+          },
+          {
+            "path": "/testpath",
+            "pathType": "Prefix"
+          }
+        ]
       }
     ]
   }
-]
+}
 </pre>
 </td>
-			<td>List of hostnames and paths for the Ingress resource</td>
+			<td>Ingress configuration. Additional ingress resources can be added under the 'ingress' key.</td>
 		</tr>
 	</tbody>
 </table>
@@ -383,77 +334,32 @@ false
 		<tr>
 			<td>serviceMonitor</td>
 			<td>object</td>
-			<td><pre lang="">
-The chart will always construct the main serviceMonitor.
+			<td><pre lang="json">
+{
+  "enabled": true,
+  "endpoints": [
+    {
+      "metricRelabelings": [
+        {
+          "action": "replace",
+          "regex": "olstring_(.*)",
+          "replacement": "newstring_$1",
+          "sourceLabels": [
+            "__name__"
+          ],
+          "targetLabel": "__name__"
+        }
+      ],
+      "port": "main"
+    }
+  ],
+  "labels": {
+    "release": "prometheus"
+  }
+}
 </pre>
 </td>
 			<td>Monitoring configuration. Additional monitoring resources can be added under the 'serviceMonitor' key.</td>
-		</tr>
-		<tr>
-			<td>serviceMonitor.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td>Enable the ServiceMonitor resource for Prometheus monitoring</td>
-		</tr>
-		<tr>
-			<td>serviceMonitor.endpoints</td>
-			<td>list</td>
-			<td><pre lang="json">
-[
-  {
-    "metricRelabelings": [
-      {
-        "action": "replace",
-        "regex": "olstring_(.*)",
-        "replacement": "newstring_$1",
-        "sourceLabels": [
-          "__name__"
-        ],
-        "targetLabel": "__name__"
-      }
-    ],
-    "port": "main"
-  }
-]
-</pre>
-</td>
-			<td>Endpoints configuration for scraping metrics from the service</td>
-		</tr>
-		<tr>
-			<td>serviceMonitor.endpoints[0]</td>
-			<td>object</td>
-			<td><pre lang="json">
-{
-  "metricRelabelings": [
-    {
-      "action": "replace",
-      "regex": "olstring_(.*)",
-      "replacement": "newstring_$1",
-      "sourceLabels": [
-        "__name__"
-      ],
-      "targetLabel": "__name__"
-    }
-  ],
-  "port": "main"
-}
-</pre>
-</td>
-			<td>List of endpoints to scrape metrics from</td>
-		</tr>
-		<tr>
-			<td>serviceMonitor.labels</td>
-			<td>object</td>
-			<td><pre lang="json">
-{
-  "release": "prometheus"
-}
-</pre>
-</td>
-			<td>Labels to add to the ServiceMonitor resource for identification and selection</td>
 		</tr>
 	</tbody>
 </table>
@@ -469,73 +375,24 @@ true
 		<tr>
 			<td>services</td>
 			<td>object</td>
-			<td><pre lang="">
-The chart will always construct the main service.
-</pre>
-</td>
-			<td>Service configuration. Additional services can be added under the 'services' key.</td>
-		</tr>
-		<tr>
-			<td>services.main.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td>Enable the Service resource to expose the application within the cluster</td>
-		</tr>
-		<tr>
-			<td>services.main.ports</td>
-			<td>object</td>
 			<td><pre lang="json">
 {
   "main": {
-    "port": 80,
-    "protocol": "TCP"
+    "annotations": {},
+    "enabled": true,
+    "labels": {},
+    "ports": {
+      "main": {
+        "port": 80,
+        "protocol": "TCP"
+      }
+    },
+    "type": "ClusterIP"
   }
 }
 </pre>
 </td>
-			<td>Port configuration for the Service</td>
-		</tr>
-		<tr>
-			<td>services.main.ports.main</td>
-			<td>object</td>
-			<td><pre lang="json">
-{
-  "port": 80,
-  "protocol": "TCP"
-}
-</pre>
-</td>
-			<td>Port mapping for the main service port</td>
-		</tr>
-		<tr>
-			<td>services.main.ports.main.port</td>
-			<td>int</td>
-			<td><pre lang="json">
-80
-</pre>
-</td>
-			<td>Port number exposed by the Service</td>
-		</tr>
-		<tr>
-			<td>services.main.ports.main.protocol</td>
-			<td>string</td>
-			<td><pre lang="json">
-"TCP"
-</pre>
-</td>
-			<td>Protocol used by the Service port (TCP or UDP)</td>
-		</tr>
-		<tr>
-			<td>services.main.type</td>
-			<td>string</td>
-			<td><pre lang="json">
-"ClusterIP"
-</pre>
-</td>
-			<td>Type of Kubernetes Service to create (ClusterIP, NodePort, LoadBalancer, etc.)</td>
+			<td>Service configuration. Additional services can be added under the 'services' key.</td>
 		</tr>
 	</tbody>
 </table>
