@@ -91,8 +91,6 @@ null
 
 ## Maintainers
 
-## Maintainers
-
 | Name | Email | Url |
 | ---- | ------ | --- |
 | trowaflo | <trowa.flo@gmail.com> |  |
