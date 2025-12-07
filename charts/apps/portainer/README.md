@@ -23,7 +23,7 @@ Wraps the official Portainer Helm chart with custom persistence and networking c
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://portainer.github.io/k8s | portainer | 1.0.63 |
+| https://portainer.github.io/k8s | portainer | 1.0.69 |
 
 - Helm: v3+
 
