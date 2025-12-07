@@ -74,7 +74,7 @@ jobs:
       - name: Run Helm Unit Tests
         run: |
           echo "Running tests for ${{ matrix.chart }} chart..."
-          helm unittest --color --output-type JUnit --output-file test-results-${{ matrix.chart }}.xml "${{ matrix.chart }}"
+          helm unittest --output-type JUnit --output-file test-results-${{ matrix.chart }}.xml "${{ matrix.chart }}"
 
       - name: Publish Test Results
         if: always()
