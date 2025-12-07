@@ -1,0 +1,24 @@
+suite: test graphite-exporter chart - Service
+templates:
+  - templates/common.yaml
+values:
+  - values/default.yaml
+tests:
+  - it: should match Service with correct ports
+    documentIndex: 0
+    asserts:
+      - containsDocument:
+          apiVersion: v1
+          kind: Service
+      - equal:
+          path: spec.ports
+          value:
+            - name: graphite-tcp
+              port: 9109
+              protocol: TCP
+              targetPort: graphite-tcp
+            - name: graphite-udp
+              port: 9109
+              protocol: UDP
+              targetPort: graphite-udp
+      - matchSnapshot: {}

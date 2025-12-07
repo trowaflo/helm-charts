@@ -1,0 +1,401 @@
+should compute fullnameOverride correctly:
+  1: |
+    apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      labels:
+        release: prometheus
+      name: my-servicemonitor
+      namespace: common-test-namespace-override-test
+    spec:
+      endpoints:
+        - metricRelabelings:
+            - action: replace
+              regex: olstring_(.*)
+              replacement: newstring_$1
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+          port: main
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: common-test
+          app.kubernetes.io/name: service-monitor-name-override
+should compute nameOverride correctly:
+  1: |
+    apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      labels:
+        release: prometheus
+      name: common-test-custom
+      namespace: common-test-namespace-override-test
+    spec:
+      endpoints:
+        - metricRelabelings:
+            - action: replace
+              regex: olstring_(.*)
+              replacement: newstring_$1
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+          port: main
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: common-test
+          app.kubernetes.io/name: custom
+should contain metricRelabelings when defined:
+  1: |
+    apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      labels:
+        release: prometheus
+      name: common-test-service-monitor-name-override
+      namespace: common-test-namespace-override-test
+    spec:
+      endpoints:
+        - metricRelabelings:
+            - action: keep
+              regex: go_.*
+              sourceLabels:
+                - __name__
+          port: main
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: common-test
+          app.kubernetes.io/name: service-monitor-name-override
+should contain relabelings when defined:
+  1: |
+    apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      labels:
+        release: prometheus
+      name: common-test-service-monitor-name-override
+      namespace: common-test-namespace-override-test
+    spec:
+      endpoints:
+        - port: main
+          relabelings:
+            - action: keep
+              regex: go_.*
+              sourceLabels:
+                - __name__
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: common-test
+          app.kubernetes.io/name: service-monitor-name-override
+should create ServiceMonitor when enabled:
+  1: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/instance: common-test
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: service-monitor-name-override
+        helm.sh/chart: common-test-0.1.0
+      name: common-test-service-monitor-name-override-main
+      namespace: common-test-namespace-override-test
+    spec:
+      ports:
+        - name: main
+          port: 80
+          protocol: TCP
+          targetPort: main
+      selector:
+        app.kubernetes.io/instance: common-test
+        app.kubernetes.io/name: service-monitor-name-override
+      type: ClusterIP
+  2: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      labels:
+        app.kubernetes.io/instance: common-test
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: service-monitor-name-override
+        helm.sh/chart: common-test-0.1.0
+        test: true
+      name: common-test-service-monitor-name-override
+      namespace: common-test-namespace-override-test
+    spec:
+      ingressClassName: traefik
+      rules:
+        - host: chart-example.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: common-test-service-monitor-name-override-main
+                    port:
+                      name: main
+                path: /
+                pathType: Prefix
+              - backend:
+                  service:
+                    name: common-test-service-monitor-name-override-main
+                    port:
+                      name: main
+                path: /testpath
+                pathType: Prefix
+        - host: another-chart-example.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: common-test-service-monitor-name-override-main
+                    port:
+                      name: main
+                path: /
+                pathType: Prefix
+              - backend:
+                  service:
+                    name: common-test-service-monitor-name-override-main
+                    port:
+                      name: main
+                path: /testpath
+                pathType: Prefix
+  3: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/instance: common-test
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: service-monitor-name-override
+        helm.sh/chart: common-test-0.1.0
+      name: common-test-service-monitor-name-override
+      namespace: common-test-namespace-override-test
+    spec:
+      replicas: 1
+      revisionHistoryLimit: 3
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: common-test
+          app.kubernetes.io/name: service-monitor-name-override
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          annotations: null
+          labels:
+            app.kubernetes.io/instance: common-test
+            app.kubernetes.io/name: service-monitor-name-override
+        spec:
+          automountServiceAccountToken: false
+          containers:
+            - args:
+                - --test-arg=value
+              env:
+                - name: envtest
+                  value: thevalue
+                - name: valuefrom
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: my-secret
+              image: traefik/whoami:latest
+              imagePullPolicy: Always
+              name: main
+              ports:
+                - containerPort: 80
+                  name: main
+                  protocol: TCP
+              resources:
+                limits:
+                  cpu: 2
+                  memory: 2Gi
+                requests:
+                  cpu: 1m
+                  memory: 32Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                runAsUser: 65534
+                seccompProfile:
+                  type: RuntimeDefault
+  4: |
+    apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      labels:
+        release: prometheus
+      name: common-test-service-monitor-name-override
+      namespace: common-test-namespace-override-test
+    spec:
+      endpoints:
+        - metricRelabelings:
+            - action: replace
+              regex: olstring_(.*)
+              replacement: newstring_$1
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+          port: main
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: common-test
+          app.kubernetes.io/name: service-monitor-name-override
+should match snapshot when enabled:
+  1: |
+    apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      labels:
+        release: prometheus
+      name: common-test-service-monitor-name-override
+      namespace: common-test-namespace-override-test
+    spec:
+      endpoints:
+        - metricRelabelings:
+            - action: replace
+              regex: olstring_(.*)
+              replacement: newstring_$1
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+          port: main
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: common-test
+          app.kubernetes.io/name: service-monitor-name-override
+should not create ServiceMonitor when disabled:
+  1: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/instance: common-test
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: service-monitor-name-override
+        helm.sh/chart: common-test-0.1.0
+      name: common-test-service-monitor-name-override-main
+      namespace: common-test-namespace-override-test
+    spec:
+      ports:
+        - name: main
+          port: 80
+          protocol: TCP
+          targetPort: main
+      selector:
+        app.kubernetes.io/instance: common-test
+        app.kubernetes.io/name: service-monitor-name-override
+      type: ClusterIP
+  2: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      labels:
+        app.kubernetes.io/instance: common-test
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: service-monitor-name-override
+        helm.sh/chart: common-test-0.1.0
+        test: true
+      name: common-test-service-monitor-name-override
+      namespace: common-test-namespace-override-test
+    spec:
+      ingressClassName: traefik
+      rules:
+        - host: chart-example.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: common-test-service-monitor-name-override-main
+                    port:
+                      name: main
+                path: /
+                pathType: Prefix
+              - backend:
+                  service:
+                    name: common-test-service-monitor-name-override-main
+                    port:
+                      name: main
+                path: /testpath
+                pathType: Prefix
+        - host: another-chart-example.local
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: common-test-service-monitor-name-override-main
+                    port:
+                      name: main
+                path: /
+                pathType: Prefix
+              - backend:
+                  service:
+                    name: common-test-service-monitor-name-override-main
+                    port:
+                      name: main
+                path: /testpath
+                pathType: Prefix
+  3: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/instance: common-test
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: service-monitor-name-override
+        helm.sh/chart: common-test-0.1.0
+      name: common-test-service-monitor-name-override
+      namespace: common-test-namespace-override-test
+    spec:
+      replicas: 1
+      revisionHistoryLimit: 3
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: common-test
+          app.kubernetes.io/name: service-monitor-name-override
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          annotations: null
+          labels:
+            app.kubernetes.io/instance: common-test
+            app.kubernetes.io/name: service-monitor-name-override
+        spec:
+          automountServiceAccountToken: false
+          containers:
+            - args:
+                - --test-arg=value
+              env:
+                - name: envtest
+                  value: thevalue
+                - name: valuefrom
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: my-secret
+              image: traefik/whoami:latest
+              imagePullPolicy: Always
+              name: main
+              ports:
+                - containerPort: 80
+                  name: main
+                  protocol: TCP
+              resources:
+                limits:
+                  cpu: 2
+                  memory: 2Gi
+                requests:
+                  cpu: 1m
+                  memory: 32Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                runAsUser: 65534
+                seccompProfile:
+                  type: RuntimeDefault

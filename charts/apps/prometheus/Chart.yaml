@@ -1,0 +1,28 @@
+apiVersion: v2
+name: prometheus
+version: 2.4.5
+type: application
+description: |-
+  Wraps the official kube-prometheus-stack Helm chart providing production-ready monitoring
+  stack including Prometheus, Grafana, Alertmanager, and node exporters.
+keywords:
+  - prometheus
+  - monitoring
+  - alerting
+  - metrics
+  - kubernetes
+  - operator
+  - grafana
+  - observability
+home: https://prometheus.io
+maintainers:
+  - name: trowaflo
+    email: trowa.flo@gmail.com
+sources:
+  - https://github.com/prometheus/prometheus
+  - https://github.com/prometheus-operator/prometheus-operator
+  - https://github.com/trowaflo/helm-charts
+dependencies:
+  - name: prometheus
+    version: 27.8.0
+    repository: https://prometheus-community.github.io/helm-charts
