@@ -1,0 +1,25 @@
+suite: test frigate-exporter chart - Service
+templates:
+  - templates/env.tpl
+  - templates/common.yaml
+values:
+  - values/default.yaml
+release:
+  name: frigate-exporter-testing
+  namespace: frigate-exporter-testing
+tests:
+  - it: should have the correct ports defined
+    template: templates/common.yaml
+    documentIndex: 0
+    asserts:
+      - lengthEqual:
+          path: "spec.ports"
+          count: 1
+      - equal:
+          path: "spec.ports[0]"
+          value:
+            name: "main"
+            port: 9100
+            protocol: "TCP"
+            targetPort: main
+      - matchSnapshot: {}

@@ -1,0 +1,16 @@
+should have the correct ServiceMonitor defined:
+  1: |
+    apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      labels:
+        release: prometheus
+      name: frigate-exporter-testing-name-override-test
+      namespace: frigate-exporter-testing-namespace-override-test
+    spec:
+      endpoints:
+        - port: main
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: frigate-exporter-testing
+          app.kubernetes.io/name: name-override-test

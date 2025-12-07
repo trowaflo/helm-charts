@@ -1,0 +1,301 @@
+should match snapshot with default values:
+  1: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/instance: graphite-exporter-testing
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: name-override-test
+        helm.sh/chart: graphite-exporter-0.0.1
+      name: graphite-exporter-testing-name-override-test-graphite
+      namespace: graphite-exporter-testing-namespace-override-test
+    spec:
+      ports:
+        - name: graphite-tcp
+          port: 9109
+          protocol: TCP
+          targetPort: graphite-tcp
+        - name: graphite-udp
+          port: 9109
+          protocol: UDP
+          targetPort: graphite-udp
+      selector:
+        app.kubernetes.io/instance: graphite-exporter-testing
+        app.kubernetes.io/name: name-override-test
+      type: LoadBalancer
+  2: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/instance: graphite-exporter-testing
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: name-override-test
+        helm.sh/chart: graphite-exporter-0.0.1
+      name: graphite-exporter-testing-name-override-test-main
+      namespace: graphite-exporter-testing-namespace-override-test
+    spec:
+      ports:
+        - name: main
+          port: 9108
+          protocol: TCP
+          targetPort: main
+      selector:
+        app.kubernetes.io/instance: graphite-exporter-testing
+        app.kubernetes.io/name: name-override-test
+      type: ClusterIP
+  3: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      labels:
+        app.kubernetes.io/instance: graphite-exporter-testing
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: name-override-test
+        helm.sh/chart: graphite-exporter-0.0.1
+        test: true
+      name: graphite-exporter-testing-name-override-test
+      namespace: graphite-exporter-testing-namespace-override-test
+    spec:
+      ingressClassName: traefik
+      rules:
+        - host: graphite-exporter.fqdn.example.com
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: graphite-exporter-testing-name-override-test-main
+                    port:
+                      name: main
+                path: /
+                pathType: Prefix
+  4: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/instance: graphite-exporter-testing
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: name-override-test
+        helm.sh/chart: graphite-exporter-0.0.1
+      name: graphite-exporter-testing-name-override-test
+      namespace: graphite-exporter-testing-namespace-override-test
+    spec:
+      replicas: 1
+      revisionHistoryLimit: 3
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: graphite-exporter-testing
+          app.kubernetes.io/name: name-override-test
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          annotations: null
+          labels:
+            app.kubernetes.io/instance: graphite-exporter-testing
+            app.kubernetes.io/name: name-override-test
+        spec:
+          automountServiceAccountToken: false
+          containers:
+            - args:
+                - --graphite.listen-address=:9109
+              image: prom/graphite-exporter:v0.16.0@sha256:e54bca6645ea8a9e8c52312a8540de98ad08819d38476c021d77a0eae75bc797
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /metrics
+                  port: main
+                  scheme: HTTP
+                initialDelaySeconds: 30
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 5
+              name: main
+              ports:
+                - containerPort: 9109
+                  name: graphite-tcp
+                  protocol: TCP
+                - containerPort: 9109
+                  name: graphite-udp
+                  protocol: UDP
+                - containerPort: 9108
+                  name: main
+                  protocol: TCP
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /metrics
+                  port: main
+                  scheme: HTTP
+                initialDelaySeconds: 30
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 5
+              resources:
+                limits:
+                  cpu: 2
+                  memory: 2Gi
+                requests:
+                  cpu: 1m
+                  memory: 32Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                runAsUser: 65534
+                seccompProfile:
+                  type: RuntimeDefault
+              startupProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /metrics
+                  port: main
+                  scheme: HTTP
+                initialDelaySeconds: 60
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 5
+  5: |
+    apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      labels:
+        release: prometheus
+      name: graphite-exporter-testing-name-override-test
+      namespace: graphite-exporter-testing-namespace-override-test
+    spec:
+      endpoints:
+        - metricRelabelings:
+            - action: keep
+              regex: ^(scale_.*)
+              sourceLabels:
+                - __name__
+            - action: replace
+              regex: ^scale_([^_]+)_.*
+              replacement: ${1}
+              sourceLabels:
+                - __name__
+              targetLabel: hostname
+            - action: replace
+              regex: ^scale_[^_]+_([^_]+)_.*
+              replacement: ${1}
+              sourceLabels:
+                - __name__
+              targetLabel: service
+            - action: replace
+              regex: ^.*_cpu_cpu([0-9]+)
+              replacement: cpu${1}
+              sourceLabels:
+                - __name__
+              targetLabel: cpu
+            - action: replace
+              regex: ^.*_cputemp_temperatures_cpu([0-9]+)
+              replacement: cpu${1}
+              sourceLabels:
+                - __name__
+              targetLabel: cpu
+            - action: replace
+              regex: ^.*_net_speed_([^_]+)_[^_\n]+
+              replacement: ${1}
+              sourceLabels:
+                - __name__
+              targetLabel: interface
+            - action: replace
+              regex: ^(.*_net_speed).*
+              replacement: ${1}
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+            - action: replace
+              regex: ^(scale_truenas)_truenas_(.*)$
+              replacement: ${1}_${2}
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+            - action: replace
+              regex: ^scale_[^_]+_(.*)
+              replacement: truenas_${1}
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+            - action: replace
+              regex: ^(.*)_(uptime)_uptime
+              replacement: ${1}_${2}
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+            - action: replace
+              regex: ^(.*)_(cpu)_cpu([0-9]+)?
+              replacement: ${1}_${2}${3}
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+            - action: replace
+              regex: ^(.*)_(total)_total
+              replacement: ${1}_${2}
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+            - action: replace
+              regex: ^(.*)_(available)_available
+              replacement: ${1}_${2}
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+            - action: replace
+              regex: ^(.*)_(size)_size
+              replacement: ${1}_${2}
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+            - action: replace
+              regex: ^(.*)_(avail)_avail
+              replacement: ${1}_${2}
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+            - action: replace
+              regex: ^(.*)_(free)_free
+              replacement: ${1}_${2}
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+            - action: replace
+              regex: ^(.*)_(l2bytes)_l2bytes
+              replacement: ${1}_${2}
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+            - action: replace
+              regex: ^(.*)_(l2hits)_l2hits
+              replacement: ${1}_${2}
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+            - action: replace
+              regex: ^(.*)_(l2miss)_l2miss
+              replacement: ${1}_${2}
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+            - action: replace
+              regex: ^(.*)_(load)_load(1|5|15)
+              replacement: ${1}_${2}${3}
+              sourceLabels:
+                - __name__
+              targetLabel: __name__
+            - action: keep
+              regex: truenas_(system_uptime.*|cpu_usage.*|cputemp.*|system_load.*|meminfo.*|arcstats.*|net_.*(speed|received|sent).*|disk_stats_busy__serial_lunid.*)
+              sourceLabels:
+                - __name__
+          port: main
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: graphite-exporter-testing
+          app.kubernetes.io/name: name-override-test

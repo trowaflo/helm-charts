@@ -1,0 +1,87 @@
+should have the correct environment variables defined:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/instance: frigate-exporter-testing
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: name-override-test
+        helm.sh/chart: frigate-exporter-0.0.14
+      name: frigate-exporter-testing-name-override-test
+      namespace: frigate-exporter-testing-namespace-override-test
+    spec:
+      replicas: 1
+      revisionHistoryLimit: 3
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: frigate-exporter-testing
+          app.kubernetes.io/name: name-override-test
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          annotations: null
+          labels:
+            app.kubernetes.io/instance: frigate-exporter-testing
+            app.kubernetes.io/name: name-override-test
+        spec:
+          automountServiceAccountToken: false
+          containers:
+            - env:
+                - name: FRIGATE_STATS_URL
+                  value: http://frigate-exporter-testing-name-override-test.frigate-exporter-testing-namespace-override-test.svc.cluster.local:5000/api/stats
+              image: rhysbailey/prometheus-frigate-exporter:0.1.1@sha256:6df30ca30c5a69df4f3b21c06a93043a52baf523f808de56f4a40982393b8aff
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /metrics
+                  port: main
+                  scheme: HTTP
+                initialDelaySeconds: 30
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 5
+              name: main
+              ports:
+                - containerPort: 9100
+                  name: main
+                  protocol: TCP
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /metrics
+                  port: main
+                  scheme: HTTP
+                initialDelaySeconds: 30
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 5
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+                requests:
+                  cpu: 1m
+                  memory: 32Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                runAsUser: 1000
+                seccompProfile:
+                  type: RuntimeDefault
+              startupProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /metrics
+                  port: main
+                  scheme: HTTP
+                initialDelaySeconds: 60
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 5

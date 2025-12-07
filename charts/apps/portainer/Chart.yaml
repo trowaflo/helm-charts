@@ -1,0 +1,28 @@
+apiVersion: v2
+name: portainer
+version: 0.0.7
+type: application
+description: |-
+  Portainer Community Edition - container and Kubernetes environment management platform.
+  Provides intuitive UI for managing Docker containers, Kubernetes clusters, and registries.
+  Wraps the official Portainer Helm chart with custom persistence and networking configuration.
+keywords:
+  - portainer
+  - container-management
+  - kubernetes
+  - docker
+  - orchestration
+  - gui
+  - devops
+home: https://www.portainer.io
+icon: https://raw.githubusercontent.com/portainer/portainer/develop/app/assets/images/logo.png
+maintainers:
+  - name: trowaflo
+    email: trowa.flo@gmail.com
+sources:
+  - https://github.com/portainer/k8s
+  - https://github.com/trowaflo/helm-charts
+dependencies:
+  - name: portainer
+    version: 1.0.63
+    repository: https://portainer.github.io/k8s

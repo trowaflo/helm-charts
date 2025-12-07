@@ -1,0 +1,64 @@
+suite: test common chart - Ingress
+templates:
+  - templates/common.yaml
+values:
+  - values/default.yaml
+release:
+  name: ingress-test
+  namespace: namespace-test
+tests:
+  # Snapshot = validates complete coherence with default values
+  - it: should match snapshot with default values
+    documentIndex: 1
+    asserts:
+      - matchSnapshot: {}
+
+  # Test computed values - fullnameOverride
+  - it: should compute fullnameOverride correctly
+    documentIndex: 1
+    set:
+      fullnameOverride: "my-ingress"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-ingress
+      - matchSnapshot: {}
+
+  # Test computed values - nameOverride
+  - it: should compute nameOverride correctly
+    documentIndex: 1
+    set:
+      nameOverride: "name-override"
+    asserts:
+      - equal:
+          path: "metadata.labels[\"app.kubernetes.io/name\"]"
+          value: name-override
+      - equal:
+          path: "spec.rules[0].http.paths[0].backend.service.name"
+          value: ingress-test-name-override-main
+      - matchSnapshot: {}
+
+  - it: should have the right host configured
+    documentIndex: 1
+    set:
+      ingress:
+        main:
+          enabled: false
+        other:
+          enabled: true
+          hosts:
+            - host: "other.example.com"
+              paths:
+                - path: "/other-host-path"
+                  pathType: Prefix
+    asserts:
+      - equal:
+          path: "spec.rules[0].host"
+          value: "other.example.com"
+      - equal:
+          path: "spec.rules[0].http.paths[0].path"
+          value: "/other-host-path"
+      - equal:
+          path: "spec.rules[0].http.paths[0].pathType"
+          value: "Prefix"
+      - matchSnapshot: {}
