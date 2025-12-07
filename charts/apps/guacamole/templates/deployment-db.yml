@@ -1,0 +1,81 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-db
+  labels:
+    app: {{ .Release.Name }}
+    tier: backend
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+        tier: backend
+    spec:
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+      containers:
+        - name: {{ .Release.Name }}-db
+          image: mariadb:10.8.3
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", /opt/poststart.sh]
+          env:
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-db-sec
+                  key: dbuser_login
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-db-sec
+                  key: dbuser_password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-db-sec
+                  key: database
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-db-sec
+                  key: mysql_root_password
+          ports:
+            - name: {{ .Release.Name }}-db
+              containerPort: 3306
+          livenessProbe:
+            tcpSocket:
+              port: 3306
+            initialDelaySeconds: 25
+            periodSeconds: 25
+          {{- with .Values.db.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: {{ .Release.Name }}-db-volume
+              mountPath: "/var/lib/mysql"
+            - name: hookvolume
+              mountPath: /opt/poststart.sh
+              subPath: poststart.sh
+      volumes:
+        - name: {{ .Release.Name }}-db-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistentVolume.volumeName }}
+        - name: hookvolume
+          configMap:
+            name: {{ .Release.Name }}-poststarthook
+            defaultMode: 0755
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

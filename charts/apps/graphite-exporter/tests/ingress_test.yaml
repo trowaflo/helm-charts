@@ -1,0 +1,19 @@
+suite: test graphite-exporter chart - Ingress
+templates:
+  - templates/common.yaml
+values:
+  - values/default.yaml
+release:
+  name: graphite-exporter-testing
+  namespace: graphite-exporter-testing
+tests:
+  - it: should match Ingress with correct hosts
+    documentIndex: 2
+    asserts:
+      - containsDocument:
+          apiVersion: networking.k8s.io/v1
+          kind: Ingress
+      - equal:
+          path: spec.rules[0].host
+          value: "graphite-exporter.fqdn.example.com"
+      - matchSnapshot: {}

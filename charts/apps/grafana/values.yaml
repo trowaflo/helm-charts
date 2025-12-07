@@ -1,0 +1,25 @@
+---
+grafana:
+  testFramework:
+    enabled: false
+
+  ingress:
+    enabled: false
+
+  ingressroute:
+    enabled: true
+    path: /grafana/
+
+  admin:
+    existingSecret: grafana
+    userKey: admin-user
+    passwordKey: admin-password
+
+  sidecar:
+    dashboards:
+      enabled: true
+
+dashboards:
+  default:
+    custom-dashboard:
+      file: dashboards/custom-dashboard.json

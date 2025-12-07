@@ -1,0 +1,115 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+        tier: frontend
+    spec:
+      imagePullSecrets:
+        - name: guacamole-helper-registry-credentials
+      initContainers:
+        - name: {{ .Release.Name }}-init
+          image: {{ .Values.init.image.repository }}:{{ .Values.init.image.tag }}
+          # command: ["/bin/sh", "-c", "--"]
+          # args: ["while :; do :; done & kill -STOP $! && wait $!"]
+          imagePullPolicy: Always
+          env:
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: MYSQL_HOSTNAME
+              value: "{{ .Release.Name }}-db"
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-db-sec
+                  key: database
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-db-sec
+                  key: dbuser_login
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-db-sec
+                  key: dbuser_password
+      containers:
+        - name: {{ .Release.Name }}-app
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TOTP_ENABLED
+              value: 'true'
+            - name: GUACD_HOSTNAME
+              value: "localhost"
+            - name: GUACD_PORT
+              value: "4822"
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: MYSQL_HOSTNAME
+              value: "{{ .Release.Name }}-db"
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-db-sec
+                  key: database
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-db-sec
+                  key: dbuser_login
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-db-sec
+                  key: dbuser_password
+          ports:
+            - name: {{ .Release.Name }}-app
+              containerPort: 8080
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          {{- with .Values.app.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        - name: guacd
+          image: {{ .Values.guacd.image.repository }}:{{ .Values.guacd.image.tag }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 4822
+          readinessProbe:
+            tcpSocket:
+              port: 4822
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 4822
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          {{- with .Values.guacd.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

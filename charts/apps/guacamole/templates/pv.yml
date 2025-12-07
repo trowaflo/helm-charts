@@ -1,0 +1,22 @@
+{{- if .Values.persistentVolume.nfs.enabled -}}
+{{- if ne "" .Values.persistentVolume.volumeName  -}}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.persistentVolume.volumeName }}
+  labels:
+    app.kubernetes.io/name: {{ .Values.persistentVolume.volumeName }}
+spec:
+  capacity:
+    storage: {{ .Values.persistentVolume.size }}
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  nfs:
+    server: {{ .Values.persistentVolume.nfs.server }}
+    path: {{ .Values.persistentVolume.nfs.path }}
+{{- end -}}
+{{- end -}}

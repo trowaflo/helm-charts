@@ -1,0 +1,18 @@
+suite: test frigate-exporter chart - ServiceMonitor
+templates:
+  - templates/env.tpl
+  - templates/common.yaml
+values:
+  - values/default.yaml
+release:
+  name: frigate-exporter-testing
+  namespace: frigate-exporter-testing
+tests:
+  - it: should have the correct ServiceMonitor defined
+    template: templates/common.yaml
+    documentIndex: 2
+    asserts:
+      - containsDocument:
+          apiVersion: monitoring.coreos.com/v1
+          kind: ServiceMonitor
+      - matchSnapshot: {}

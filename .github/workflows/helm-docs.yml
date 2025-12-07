@@ -1,0 +1,70 @@
+name: Helm Docs
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  helm-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+
+      - name: Install helm-docs
+        run: |
+          # Détection et normalisation de l'architecture
+          case "$(uname -m)" in
+            x86_64)
+              ARCH="x86_64"
+              ;;
+            aarch64|arm64)
+              ARCH="arm64"
+              ;;
+            *)
+              echo "Architecture non supportée: $(uname -m)"
+              exit 1
+              ;;
+          esac
+
+          VERSION=$(curl -s https://api.github.com/repos/norwoodj/helm-docs/releases/latest | jq -r '.tag_name')
+          wget -q "https://github.com/norwoodj/helm-docs/releases/download/${VERSION}/helm-docs_${VERSION#v}_Linux_${ARCH}.tar.gz"
+          tar -xzf "helm-docs_${VERSION#v}_Linux_${ARCH}.tar.gz" helm-docs
+          sudo mv helm-docs /usr/local/bin/
+          rm "helm-docs_${VERSION#v}_Linux_${ARCH}.tar.gz"
+
+      - name: Generate Helm docs for apps
+        run: |
+          helm-docs \
+            --chart-search-root charts/apps \
+            --template-files ./README.md.gotmpl
+      - name: Generate Helm docs for common
+        run: |
+          helm-docs \
+            --chart-search-root charts/library/common
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git add .
+          if git diff --cached --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.git-check.outputs.changed == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: update Helm chart documentation [skip ci]"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            git push origin HEAD:${{ github.head_ref }}
+          else
+            git push
+          fi

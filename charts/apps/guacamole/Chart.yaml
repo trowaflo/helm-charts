@@ -1,0 +1,24 @@
+apiVersion: v2
+name: guacamole
+version: 0.3.3
+type: application
+description: |-
+  Apache Guacamole HTML5 remote desktop gateway for secure access to virtual machines and servers.
+  Provides browser-based RDP, SSH, and VNC access without requiring client-side installations.
+keywords:
+  - guacamole
+  - remote-desktop
+  - rdp
+  - ssh
+  - vnc
+  - gateway
+  - access
+  - html5
+home: https://guacamole.apache.org
+icon: https://guacamole.apache.org/images/logo.png
+maintainers:
+  - name: trowaflo
+    email: trowa.flo@gmail.com
+sources:
+  - https://github.com/apache/guacamole-server
+  - https://github.com/trowaflo/helm-charts
