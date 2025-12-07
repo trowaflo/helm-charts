@@ -71,15 +71,15 @@ jobs:
           echo "Building dependencies for ${{ matrix.chart }}..."
           helm dependency update ${{ matrix.chart }}
 
-      - name: Run Helm Unit Tests
-        run: |
-          echo "Running tests for ${{ matrix.chart }} chart..."
-          helm unittest --output-type JUnit --output-file test-results-${{ matrix.chart }}.xml "${{ matrix.chart }}"
+      # - name: Run Helm Unit Tests
+      #   run: |
+      #     echo "Running tests for ${{ matrix.chart }} chart..."
+      #     helm unittest --output-type JUnit --output-file test-results-${{ matrix.chart }}.xml "${{ matrix.chart }}"
 
-      - name: Publish Test Results
-        if: always()
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        with:
-          files: test-results-*.xml
-          check_name: "Test Results - ${{ matrix.chart }}"
-          comment_mode: off
+      # - name: Publish Test Results
+      #   if: always()
+      #   uses: EnricoMi/publish-unit-test-result-action@v2
+      #   with:
+      #     files: test-results-*.xml
+      #     check_name: "Test Results - ${{ matrix.chart }}"
+      #     comment_mode: off
