@@ -1,7 +1,0 @@
-apiVersion: v2
-name: guacamole
-version: 0.3.3
-description: Chart for guacamole
-maintainers:
-  - name: trowaflo
-    email: trowa.flo@gmail.com

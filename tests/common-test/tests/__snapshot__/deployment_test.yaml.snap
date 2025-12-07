@@ -1,0 +1,64 @@
+should match snapshot with default values:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/instance: common-test
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: deployment-name-override
+        helm.sh/chart: common-test-0.1.0
+      name: common-test-deployment-name-override
+      namespace: common-test-namespace-override-test
+    spec:
+      replicas: 1
+      revisionHistoryLimit: 3
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: common-test
+          app.kubernetes.io/name: deployment-name-override
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          annotations: null
+          labels:
+            app.kubernetes.io/instance: common-test
+            app.kubernetes.io/name: deployment-name-override
+        spec:
+          automountServiceAccountToken: false
+          containers:
+            - args:
+                - --test-arg=value
+              env:
+                - name: envtest
+                  value: thevalue
+                - name: valuefrom
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: my-secret
+              image: traefik/whoami:latest
+              imagePullPolicy: Always
+              name: main
+              ports:
+                - containerPort: 80
+                  name: main
+                  protocol: TCP
+              resources:
+                limits:
+                  cpu: 2
+                  memory: 2Gi
+                requests:
+                  cpu: 1m
+                  memory: 32Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                runAsUser: 65534
+                seccompProfile:
+                  type: RuntimeDefault
