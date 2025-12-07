@@ -23,7 +23,7 @@ in Prometheus-compatible format for integration with monitoring stacks.
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://trowaflo.github.io/helm-charts | common | 0.1.0 |
+| https://trowaflo.github.io/helm-charts | common | 1.0.0 |
 
 - Helm: v3+
 

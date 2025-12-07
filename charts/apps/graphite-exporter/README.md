@@ -23,7 +23,7 @@ Enables Prometheus to scrape metrics from legacy Graphite systems and sources
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://trowaflo.github.io/helm-charts | common | 0.1.0 |
+| https://trowaflo.github.io/helm-charts | common | 1.0.0 |
 
 - Helm: v3+
 
