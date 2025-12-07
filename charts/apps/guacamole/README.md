@@ -92,7 +92,7 @@ helm uninstall my-guacamole --namespace guacamole
 			<td>guacd.image.tag</td>
 			<td>string</td>
 			<td><pre lang="json">
-"1.5.5"
+"1.6.0"
 </pre>
 </td>
 			<td></td>
