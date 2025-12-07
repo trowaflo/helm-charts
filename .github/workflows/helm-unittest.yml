@@ -10,6 +10,7 @@ on:
     paths:
       - 'charts/**'
   workflow_dispatch:
+
 jobs:
   generate-matrix:
     runs-on: ubuntu-latest
@@ -17,38 +18,29 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v4
 
       - name: Generate chart matrix
         id: set-matrix
         run: |
-          charts=()
-          for chart in charts/*/*/; do
-            chart_name=$(basename "$chart")
-            if [ -d "${chart}tests" ]; then
-              charts+=("\"$chart_name\"")
-            fi
-          done
-
-          # Create the JSON matrix
-          matrix_json="[$(IFS=,; echo "${charts[*]}")]"
-          echo "matrix={\"chart\":${matrix_json}}" >> $GITHUB_OUTPUT
-          echo "Charts with tests: ${matrix_json}"
+          charts_json=$(find charts -type d -name tests -exec dirname {} \; | jq -R -s -c 'split("\n")[:-1]')
+          echo "matrix={\"chart\": $charts_json}" >> $GITHUB_OUTPUT
+          echo "Detected charts: $charts_json"
 
   test:
     needs: generate-matrix
-    if: needs.generate-matrix.outputs.matrix != '{"chart":[]}'
+    if: ${{ needs.generate-matrix.outputs.matrix != '{"chart":[]}' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       checks: write
       pull-requests: write
+
     strategy:
-      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
       fail-fast: false
       max-parallel: 5
+      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -56,16 +48,16 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Helm
-        uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4
+        uses: azure/setup-helm@v4
         with:
-          version: v3.19.0
+          version: latest
 
       - name: Cache Helm dependencies
         uses: actions/cache@v4
         with:
           path: |
-            charts/${{ matrix.chart }}/charts
-            charts/${{ matrix.chart }}/Chart.lock
+            ${{ matrix.chart }}/charts
+            ${{ matrix.chart }}/Chart.lock
           key: ${{ runner.os }}-helm-${{ matrix.chart }}-${{ hashFiles(format('charts/{0}/Chart.yaml', matrix.chart)) }}
           restore-keys: |
             ${{ runner.os }}-helm-${{ matrix.chart }}-
@@ -77,12 +69,12 @@ jobs:
       - name: Build Helm Dependencies
         run: |
           echo "Building dependencies for ${{ matrix.chart }}..."
-          helm dependency update charts/${{ matrix.chart }}
+          helm dependency update ${{ matrix.chart }}
 
       - name: Run Helm Unit Tests
         run: |
           echo "Running tests for ${{ matrix.chart }} chart..."
-          helm unittest --color --output-type JUnit --output-file test-results-${{ matrix.chart }}.xml "charts/${{ matrix.chart }}"
+          helm unittest --color --output-type JUnit --output-file test-results-${{ matrix.chart }}.xml "${{ matrix.chart }}"
 
       - name: Publish Test Results
         if: always()
