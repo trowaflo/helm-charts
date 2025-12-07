@@ -33,7 +33,7 @@ helm repo update
 
 ```bash
 helm install my-guacamole guacamole/guacamole \
-  --namespace default \
+  --namespace guacamole \
   --create-namespace
 ```
 
@@ -41,14 +41,14 @@ helm install my-guacamole guacamole/guacamole \
 
 ```bash
 helm upgrade my-guacamole guacamole/guacamole \
-  --namespace default \
+  --namespace guacamole \
   --install
 ```
 
 ### Uninstall
 
 ```bash
-helm uninstall my-guacamole --namespace default
+helm uninstall my-guacamole --namespace guacamole
 ```
 
 ## Values

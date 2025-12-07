@@ -40,7 +40,7 @@ helm repo update
 
 ```bash
 helm install my-grafana grafana/grafana \
-  --namespace default \
+  --namespace grafana \
   --create-namespace
 ```
 
@@ -48,14 +48,14 @@ helm install my-grafana grafana/grafana \
 
 ```bash
 helm upgrade my-grafana grafana/grafana \
-  --namespace default \
+  --namespace grafana \
   --install
 ```
 
 ### Uninstall
 
 ```bash
-helm uninstall my-grafana --namespace default
+helm uninstall my-grafana --namespace grafana
 ```
 
 ## Values

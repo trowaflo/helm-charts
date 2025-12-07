@@ -40,7 +40,7 @@ helm repo update
 
 ```bash
 helm install my-portainer portainer/portainer \
-  --namespace default \
+  --namespace portainer \
   --create-namespace
 ```
 
@@ -48,14 +48,14 @@ helm install my-portainer portainer/portainer \
 
 ```bash
 helm upgrade my-portainer portainer/portainer \
-  --namespace default \
+  --namespace portainer \
   --install
 ```
 
 ### Uninstall
 
 ```bash
-helm uninstall my-portainer --namespace default
+helm uninstall my-portainer --namespace portainer
 ```
 
 ## Values

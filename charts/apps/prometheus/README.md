@@ -40,7 +40,7 @@ helm repo update
 
 ```bash
 helm install my-prometheus prometheus/prometheus \
-  --namespace default \
+  --namespace prometheus \
   --create-namespace
 ```
 
@@ -48,14 +48,14 @@ helm install my-prometheus prometheus/prometheus \
 
 ```bash
 helm upgrade my-prometheus prometheus/prometheus \
-  --namespace default \
+  --namespace prometheus \
   --install
 ```
 
 ### Uninstall
 
 ```bash
-helm uninstall my-prometheus --namespace default
+helm uninstall my-prometheus --namespace prometheus
 ```
 
 ## Values

@@ -23,7 +23,7 @@ in Prometheus-compatible format for integration with monitoring stacks.
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../../library/common | common | 0.1.0 |
+| https://trowaflo.github.io/helm-charts | common | 0.1.0 |
 
 - Helm: v3+
 
@@ -40,7 +40,7 @@ helm repo update
 
 ```bash
 helm install my-frigate-exporter frigate-exporter/frigate-exporter \
-  --namespace default \
+  --namespace frigate-exporter \
   --create-namespace
 ```
 
@@ -48,14 +48,14 @@ helm install my-frigate-exporter frigate-exporter/frigate-exporter \
 
 ```bash
 helm upgrade my-frigate-exporter frigate-exporter/frigate-exporter \
-  --namespace default \
+  --namespace frigate-exporter \
   --install
 ```
 
 ### Uninstall
 
 ```bash
-helm uninstall my-frigate-exporter --namespace default
+helm uninstall my-frigate-exporter --namespace frigate-exporter
 ```
 
 ## Values

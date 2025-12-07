@@ -23,7 +23,7 @@ Enables Prometheus to scrape metrics from legacy Graphite systems and sources
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../../library/common | common | 0.1.0 |
+| https://trowaflo.github.io/helm-charts | common | 0.1.0 |
 
 - Helm: v3+
 
@@ -40,7 +40,7 @@ helm repo update
 
 ```bash
 helm install my-graphite-exporter graphite-exporter/graphite-exporter \
-  --namespace default \
+  --namespace graphite-exporter \
   --create-namespace
 ```
 
@@ -48,14 +48,14 @@ helm install my-graphite-exporter graphite-exporter/graphite-exporter \
 
 ```bash
 helm upgrade my-graphite-exporter graphite-exporter/graphite-exporter \
-  --namespace default \
+  --namespace graphite-exporter \
   --install
 ```
 
 ### Uninstall
 
 ```bash
-helm uninstall my-graphite-exporter --namespace default
+helm uninstall my-graphite-exporter --namespace graphite-exporter
 ```
 
 ## Values
