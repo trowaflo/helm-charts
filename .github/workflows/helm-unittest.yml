@@ -64,7 +64,7 @@ jobs:
 
       - name: Install Helm Unittest Plugin
         run: |
-          helm plugin install https://github.com/helm-unittest/helm-unittest.git --version v0.6.3
+          helm plugin install https://github.com/helm-unittest/helm-unittest.git --version v1.0.3
 
       - name: Build Helm Dependencies
         run: |
