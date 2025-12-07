@@ -23,7 +23,7 @@ stack including Prometheus, Grafana, Alertmanager, and node exporters.
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://prometheus-community.github.io/helm-charts | prometheus | 27.8.0 |
+| https://prometheus-community.github.io/helm-charts | prometheus | 27.50.0 |
 
 - Helm: v3+
 
