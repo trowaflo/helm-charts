@@ -2,6 +2,25 @@ apiVersion: v1
 entries:
   common:
   - apiVersion: v2
+    created: "2025-12-07T15:01:59.665097546Z"
+    description: Common library chart providing reusable Helm templates and default
+      configurations. Standardizes Kubernetes resource deployment (Deployments, Services,
+      Ingress, ServiceMonitor) across the chart repository with consistent security,
+      observability, and best practices.  Used by all application charts in this repository
+      for consistency.
+    digest: 877f0642cf85d05979e51a968002050b1bebb8daa394f852958bed5bb711865a
+    home: https://github.com/trowaflo/helm-charts
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: common
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    type: library
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/common-1.0.0/common-1.0.0.tgz
+    version: 1.0.0
+  - apiVersion: v2
     created: "2025-04-20T05:39:11.866989393Z"
     description: A Helm chart for Kubernetes to deploy common resources
     digest: 0eaa336a115be6f42b57eb87a4845f37ef0df88256b66410c42671ebdbbb6cc8
@@ -28,6 +47,29 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/common-0.0.1/common-0.0.1.tgz
     version: 0.0.1
+  common-test:
+  - apiVersion: v2
+    created: "2025-12-07T15:01:59.836662348Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 1.0.0
+    description: Test application chart demonstrating and validating the common library
+      chart functionality. Provides unit test scenarios covering common chart features
+      including deployments, services, ingress, security contexts, and Prometheus
+      integration.  This chart is NOT intended for production use. It serves as a
+      reference implementation and testing vehicle for the common library.
+    digest: c82127597b2ee81496dc53f8f3e950c49665e0fc513fdbaa57d6b9cc17b9d6fe
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: common-test
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/common-test-0.1.0/common-test-0.1.0.tgz
+    version: 0.1.0
   frigate:
   - apiVersion: v2
     appVersion: 0.12.0
@@ -646,4 +688,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2025-06-27T15:09:11.219749562Z"
+generated: "2025-12-07T15:01:59.83675533Z"
