@@ -341,7 +341,7 @@ pveExporter:
 
   image:
     repository: prompve/prometheus-pve-exporter
-    tag: "3.5.2"
+    tag: "3.6.0"
 
   replicaCount: 1
 
