@@ -2367,7 +2367,7 @@ false
 			<td>pveExporter.image.tag</td>
 			<td>string</td>
 			<td><pre lang="json">
-"3.5.2"
+"3.6.0"
 </pre>
 </td>
 			<td></td>
