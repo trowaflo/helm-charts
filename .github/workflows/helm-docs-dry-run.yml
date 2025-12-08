@@ -1,7 +1,7 @@
-name: Helm Docs (Post-Merge)
+name: Helm Docs (PR)
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
@@ -51,17 +51,25 @@ jobs:
         id: git-check
         run: |
           git add .
+
           if git diff --cached --quiet; then
             echo "changed=false" >> $GITHUB_OUTPUT
+            echo "Documentation already up-to-date."
           else
             echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Documentation needs update. Diff:"
+            # Affiche la différence directement dans le log de l'action
+            git diff --cached
           fi
 
       - name: Commit and push changes
         if: steps.git-check.outputs.changed == 'true'
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Le [skip ci] est crucial pour ne pas créer de boucle infinie
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git commit -m "chore: update Helm chart documentation [skip ci]"
-          git push
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            git push origin HEAD:${{ github.head_ref }}
+          else
+            git push
+          fi
