@@ -1,6 +1,6 @@
 apiVersion: v2
 name: guacamole
-version: 0.3.3
+version: 0.3.4
 type: application
 description: |-
   Apache Guacamole HTML5 remote desktop gateway for secure access to virtual machines and servers.
