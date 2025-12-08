@@ -24,6 +24,7 @@ providing integrated dashboard provisioning and Traefik IngressRoute support.
 | Repository | Name | Version |
 |------------|------|---------|
 | https://grafana.github.io/helm-charts | grafana | 10.3.0 |
+| https://grafana.github.io/helm-charts | grafanas | 10.3.0 |
 
 - Helm: v3+
 
