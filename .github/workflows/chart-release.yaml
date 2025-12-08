@@ -70,9 +70,35 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v4
 
-      - name: Add Helm repository
+      - name: Install yq
         run: |
-          helm repo add helm-charts https://trowaflo.github.io/helm-charts || true
+          YQ_VERSION="v4.44.2"
+          wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64 -O /usr/local/bin/yq
+          chmod +x /usr/local/bin/yq
+
+
+      - name: Add All Required Helm Repositories Dynamically
+        run: |
+          echo "Dynamically detecting and adding external Helm dependencies..."
+
+          for chart_dir in charts/apps/*; do
+            chart_file="$chart_dir/Chart.yaml"
+            if [ -f "$chart_file" ]; then
+              echo "Processing $chart_file for external repositories..."
+              yq '.dependencies[] | select(.repository | test("^https?://")) | [.repository, .name] | @tsv' "$chart_file" | \
+              while IFS=$'\t' read -r repo_url repo_name; do
+
+                repo_url=$(echo "$repo_url" | sed 's/^- //; s/"//g')
+                repo_name=$(echo "$repo_name" | sed 's/"//g')
+                echo "Found dependency - Name: $repo_name, URL: $repo_url"
+                if [ -n "$repo_url" ] && [ "$repo_url" != "null" ]; then
+                  echo "  -> Found repo for '$repo_name': $repo_url"
+                  helm repo add "$repo_name" "$repo_url" || true
+                fi
+              done
+            fi
+          done
+
           helm repo update
 
       - name: Build chart dependencies
