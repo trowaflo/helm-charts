@@ -1,7 +1,7 @@
-name: Helm Docs
+name: Helm Docs - Dry Run
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
@@ -51,17 +51,13 @@ jobs:
         id: git-check
         run: |
           git add .
+
           if git diff --cached --quiet; then
             echo "changed=false" >> $GITHUB_OUTPUT
+            echo "Documentation already up-to-date."
           else
             echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Documentation needs update. Diff:"
+            # Affiche la différence directement dans le log de l'action
+            git diff --cached
           fi
-
-      - name: Commit and push changes
-        if: steps.git-check.outputs.changed == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Le [skip ci] est crucial pour ne pas créer de boucle infinie
-          git commit -m "chore: update Helm chart documentation [skip ci]"
-          git push

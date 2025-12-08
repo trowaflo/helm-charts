@@ -1,6 +1,6 @@
 apiVersion: v2
 name: graphite-exporter
-version: 0.0.1
+version: 1.0.0
 type: application
 description: |-
   Prometheus exporter for converting Graphite plaintext protocol metrics to Prometheus format.

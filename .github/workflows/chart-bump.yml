@@ -1,9 +1,7 @@
 name: Helm Chart Version Bump (PR)
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
     paths:
       - "charts/**"
 
@@ -60,6 +58,18 @@ jobs:
           for chart in ${{ steps.detect_charts.outputs.charts_to_bump }}; do
             chart_dir=$(dirname "$chart")
 
+            BASE_VERSION=$(git show origin/$BASE_BRANCH:$chart | grep '^version:' | awk '{print $2}')
+            CURRENT_VERSION=$(grep '^version:' "$chart" | awk '{print $2}')
+
+            echo "Chart: $chart"
+            echo "Base version ($BASE_BRANCH): $BASE_VERSION"
+            echo "Current version (PR HEAD): $CURRENT_VERSION"
+
+            if [ "$BASE_VERSION" != "$CURRENT_VERSION" ]; then
+              echo "Version already bumped for $chart, skipping."
+              continue
+            fi
+
             # Commits affectant uniquement ce chart
             COMMITS=$(git log --pretty=%s --no-merges origin/$BASE_BRANCH..HEAD -- "$chart_dir")
             echo "Commits affecting $chart:"
@@ -82,10 +92,9 @@ jobs:
             echo "Bump for $chart: $bump"
 
             if [ "$bump" != "none" ]; then
-              current=$(grep '^version:' "$chart" | awk '{print $2}')
-              new=$(npx semver $current -i $bump)
+              new=$(npx semver $CURRENT_VERSION -i $bump)
               sed -i "s/^version:.*/version: $new/" "$chart"
-              echo "Updated $chart from $current to $new"
+              echo "Updated $chart from $CURRENT_VERSION to $new"
             fi
           done
 
