@@ -10,8 +10,9 @@
       "matchUpdateTypes": ["patch"],
       "labels": ["helm", "automerge"],
       "groupName": "AUTOMERGE - Helm Patch Updates",
-      "commitMessageAction": "chore(helm):",
-      "commitMessageTopic": "{{depName}}",
+      "commitMessagePrefix": "chore(helm):",
+      "commitMessageAction": "action",
+      "commitMessageTopic": "z{{depName}}z",
       "bumpVersion": "patch",
       "automerge": false
     },
@@ -21,8 +22,9 @@
       "matchUpdateTypes": ["minor"],
       "labels": ["helm", "automerge"],
       "groupName": "AUTOMERGE - Helm Minor Updates",
-      "commitMessageAction": "chore(helm):",
-      "commitMessageTopic": "{{depName}}",
+      "commitMessagePrefix": "chore(helm):",
+      "commitMessageAction": "action",
+      "commitMessageTopic": "z{{depName}}z",
       "bumpVersion": "minor",
       "automerge": false
     },
@@ -32,8 +34,9 @@
       "matchUpdateTypes": ["major"],
       "labels": ["helm", "breaking"],
       "groupName": "BREAKING - helm chart Major Updates",
-      "commitMessageAction": "chore(helm)!:",
-      "commitMessageTopic": "{{depName}}",
+      "commitMessagePrefix": "chore(helm)!:",
+      "commitMessageAction": "action",
+      "commitMessageTopic": "z{{depName}}z",
       "bumpVersion": "major",
       "automerge": false
     }
