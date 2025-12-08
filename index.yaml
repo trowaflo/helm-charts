@@ -393,6 +393,34 @@ entries:
     version: 0.1.0
   guacamole:
   - apiVersion: v2
+    created: "2025-12-08T22:49:25.956440897Z"
+    description: Apache Guacamole HTML5 remote desktop gateway for secure access to
+      virtual machines and servers. Provides browser-based RDP, SSH, and VNC access
+      without requiring client-side installations.
+    digest: 078991c41c1fadc0d641976420fa7281eb18e092e43c40946305ef710f4810a3
+    home: https://guacamole.apache.org
+    icon: https://guacamole.apache.org/images/logo.png
+    keywords:
+    - guacamole
+    - remote-desktop
+    - rdp
+    - ssh
+    - vnc
+    - gateway
+    - access
+    - html5
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: guacamole
+    sources:
+    - https://github.com/apache/guacamole-server
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/guacamole-0.3.4/guacamole-0.3.4.tgz
+    version: 0.3.4
+  - apiVersion: v2
     created: "2025-01-26T20:36:42.648095143Z"
     description: Chart for guacamole
     digest: adc9fec1edbed606ed2efaf1914ad5d568a4bb585faf02d2f89d4c417e2672cf
@@ -707,4 +735,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2025-12-07T22:44:57.300639496Z"
+generated: "2025-12-08T22:49:25.956550655Z"
