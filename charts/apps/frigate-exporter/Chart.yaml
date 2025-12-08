@@ -1,6 +1,7 @@
 apiVersion: v2
 name: frigate-exporter
 version: 0.0.14
+
 type: application
 description: |-
   Prometheus exporter for Frigate NVR (Network Video Recorder) system.
