@@ -58,7 +58,7 @@ jobs:
           for chart in ${{ steps.detect_charts.outputs.charts_to_bump }}; do
             chart_dir=$(dirname "$chart")
 
-            BASE_VERSION=$(git show $BASE_BRANCH:$chart | grep '^version:' | awk '{print $2}')
+            BASE_VERSION=$(git show origin/$BASE_BRANCH:$chart | grep '^version:' | awk '{print $2}')
             CURRENT_VERSION=$(grep '^version:' "$chart" | awk '{print $2}')
 
             echo "Chart: $chart"
