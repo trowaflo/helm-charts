@@ -8,7 +8,7 @@ in Prometheus-compatible format for integration with monitoring stacks.
 
 ---
 
-![Version: 0.0.14](https://img.shields.io/badge/Version-0.0.14-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
+![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
 
 **Homepage:** <https://github.com/bairhys/prometheus-frigate-exporter>
 
@@ -23,7 +23,7 @@ in Prometheus-compatible format for integration with monitoring stacks.
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://trowaflo.github.io/helm-charts | common | 1.0.0 |
+| https://trowaflo.github.io/helm-charts | common | 2.0.0 |
 
 - Helm: v3+
 
