@@ -6,7 +6,7 @@
   packageRules: [
     // Helm Patch and Minor Updates
     {
-      "matchManagers": ["helm"],
+      "matchManagers": ["helmv3"],
       "matchUpdateTypes": ["patch", "minor"],
       "labels": ["helm", "automerge"],
       "groupName": "AUTOMERGE - Helm Patch and Minor Updates",
@@ -16,7 +16,7 @@
     },
     // Helm Major Updates
     {
-      "matchManagers": ["helm"],
+      "matchManagers": ["helmv3"],
       "matchUpdateTypes": ["major"],
       "labels": ["helm", "breaking"],
       "groupName": "BREAKING - helm chart Major Updates",
