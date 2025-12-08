@@ -1,6 +1,6 @@
 apiVersion: v2
 name: grafana
-version: 0.1.7
+version: 0.1.8
 type: application
 description: |-
   Grafana visualization and dashboarding platform with custom extensions.
