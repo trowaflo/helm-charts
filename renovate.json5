@@ -2,5 +2,28 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>trowaflo/renovate-config"
+  ],
+  packageRules: [
+    // Helm Patch and Minor Updates
+    {
+      "matchManagers": ["helm"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "labels": ["helm", "automerge"],
+      "groupName": "AUTOMERGE - Helm Patch and Minor Updates",
+      "commitMessageAction": "chore(helm):",
+      "commitMessageTopic": "{{depName}}",
+      "automerge": false
+    },
+    // Helm Major Updates
+    {
+      "matchManagers": ["helm"],
+      "matchUpdateTypes": ["major"],
+      "labels": ["helm", "breaking"],
+      "groupName": "BREAKING - helm chart Major Updates",
+      "commitMessageAction": "chore(helm)!:",
+      "commitMessageTopic": "{{depName}}",
+      "automerge": false
+    }
   ]
+
 }
