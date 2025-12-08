@@ -1,4 +1,4 @@
-name: Helm Docs (PR)
+name: Helm Docs - Dry Run
 
 on:
   pull_request:
