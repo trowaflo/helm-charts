@@ -49,11 +49,14 @@ jobs:
           echo "Charts to bump: ${charts_to_bump[*]}"
 
       # Step 2 – Bump chart versions + commit
-      - name: Bump chart versions
+      - id: bump
+        name: Bump chart versions
         if: steps.detect_charts.outputs.charts_to_bump != ''
         run: |
           BASE_BRANCH=${{ github.event.pull_request.base.ref }}
           git fetch origin $BASE_BRANCH
+
+          bumped_any=false
 
           for chart in ${{ steps.detect_charts.outputs.charts_to_bump }}; do
             chart_dir=$(dirname "$chart")
@@ -95,10 +98,18 @@ jobs:
               new=$(npx semver $CURRENT_VERSION -i $bump)
               sed -i "s/^version:.*/version: $new/" "$chart"
               echo "Updated $chart from $CURRENT_VERSION to $new"
+              bumped_any=true
             fi
           done
 
-      - name: Commit bump
+          if [ "$bumped_any" = true ]; then
+            echo "bump=changed" >> $GITHUB_OUTPUT
+          else
+            echo "bump=none" >> $GITHUB_OUTPUT
+          fi
+
+      - id: commit
+        name: Commit bump
         if: steps.bump.outputs.bump != 'none'
         run: |
           set -x
