@@ -13,7 +13,7 @@
       "commitMessagePrefix": "chore(helm):",
       "commitMessageTopic": "{{depName}}",
       "bumpVersion": "patch",
-      "automerge": false
+      "automerge": true
     },
     // Helm Minor Updates
     {
@@ -24,7 +24,7 @@
       "commitMessagePrefix": "chore(helm):",
       "commitMessageTopic": "{{depName}}",
       "bumpVersion": "minor",
-      "automerge": false
+      "automerge": true
     },
     // Helm Major Updates
     {
