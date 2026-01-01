@@ -7,7 +7,7 @@ stack including Prometheus, Grafana, Alertmanager, and node exporters.
 
 ---
 
-![Version: 2.4.5](https://img.shields.io/badge/Version-2.4.5-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
+![Version: 2.5.0](https://img.shields.io/badge/Version-2.5.0-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
 
 **Homepage:** <https://prometheus.io>
 
@@ -23,7 +23,7 @@ stack including Prometheus, Grafana, Alertmanager, and node exporters.
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://prometheus-community.github.io/helm-charts | prometheus | 27.50.0 |
+| https://prometheus-community.github.io/helm-charts | prometheus | 27.52.0 |
 
 - Helm: v3+
 
@@ -2367,7 +2367,7 @@ false
 			<td>pveExporter.image.tag</td>
 			<td>string</td>
 			<td><pre lang="json">
-"3.6.0"
+"3.8.0"
 </pre>
 </td>
 			<td></td>
