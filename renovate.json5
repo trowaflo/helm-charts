@@ -6,7 +6,7 @@
   packageRules: [
     // Helm Patch Updates
     {
-      "matchManagers": ["helmv3"],
+      "matchManagers": ["helmv3", "helm-values"],
       "matchUpdateTypes": ["patch"],
       "labels": ["helm", "automerge"],
       "groupName": "AUTOMERGE - Helm Patch Updates",
@@ -17,7 +17,7 @@
     },
     // Helm Minor Updates
     {
-      "matchManagers": ["helmv3"],
+      "matchManagers": ["helmv3", "helm-values"],
       "matchUpdateTypes": ["minor"],
       "labels": ["helm", "automerge"],
       "groupName": "AUTOMERGE - Helm Minor Updates",
@@ -28,7 +28,7 @@
     },
     // Helm Major Updates
     {
-      "matchManagers": ["helmv3"],
+      "matchManagers": ["helmv3", "helm-values"],
       "matchUpdateTypes": ["major"],
       "labels": ["helm", "breaking"],
       "groupName": "BREAKING - helm chart Major Updates",
