@@ -3,6 +3,11 @@
 ## ⚠️ MANDATORY: Review These Instructions
 **ALWAYS read and review this entire file at the start of ANY task or PR.** These instructions are your source of truth for architecture, conventions, and best practices. Update this file when you identify improvements or discover new patterns.
 
+## Communication Guidelines
+- **ALWAYS respond in English**, even if the user writes in French or another language
+- Be concise and technical
+- Focus on actionable information
+
 ## Scope
 Repo-wide guidance for GitHub Copilot (PR descriptions/reviews/fixes) for all charts.
 
@@ -83,7 +88,7 @@ tests:
 ## Chart-specific notes
 Keep this section minimal. Add only truly exceptional cases:
 
-- **cert-manager**: Validates `cert-manager-webhook-ovh.configVersion` must equal "0.0.2" when webhook enabled. See [upstream docs](https://github.com/aureq/cert-manager-webhook-ovh) for configVersion purpose.
+- **cert-manager**: Validates `cert-manager-webhook-ovh.configVersion` when webhook enabled. The required version is tied to the dependency version in Chart.yaml (current: v0.8.0 requires "0.0.2"). This value changes with breaking updates from upstream. When upgrading the cert-manager-webhook-ovh dependency, update the `$requiredVersion` in `templates/_helpers.tpl` and the comment in `values.yaml`. See [upstream docs](https://github.com/aureq/cert-manager-webhook-ovh) for configVersion purpose.
 
 ## CI awareness
 - Workflows in `.github/workflows/` cover lint, helm-docs, helm-unittest, security scans
