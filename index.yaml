@@ -614,6 +614,38 @@ entries:
     version: 0.1.0
   portainer:
   - apiVersion: v2
+    created: "2026-01-01T16:23:42.209380968Z"
+    dependencies:
+    - name: portainer
+      repository: https://portainer.github.io/k8s
+      version: 2.33.6
+    description: Portainer Community Edition - container and Kubernetes environment
+      management platform. Provides intuitive UI for managing Docker containers, Kubernetes
+      clusters, and registries. Wraps the official Portainer Helm chart with custom
+      persistence and networking configuration.
+    digest: c9fc573be402ee79d7f150562156bac9bab39063d5b3f8388bcbd1cf1a7c1e3c
+    home: https://www.portainer.io
+    icon: https://raw.githubusercontent.com/portainer/portainer/develop/app/assets/images/logo.png
+    keywords:
+    - portainer
+    - container-management
+    - kubernetes
+    - docker
+    - orchestration
+    - gui
+    - devops
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: portainer
+    sources:
+    - https://github.com/portainer/k8s
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/portainer-0.0.8/portainer-0.0.8.tgz
+    version: 0.0.8
+  - apiVersion: v2
     created: "2025-04-13T07:02:23.435084861Z"
     dependencies:
     - name: portainer
@@ -839,4 +871,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2026-01-01T14:37:09.605604757Z"
+generated: "2026-01-01T16:23:42.209774359Z"
