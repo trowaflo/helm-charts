@@ -1,17 +1,27 @@
 apiVersion: v2
 name: cert-manager
-version: 0.0.0 # @copilot could you say me which version to put here for the first time?
+version: 1.0.0
 type: application
-description: |- # @copilot, to complete
-  to complete
+description: |-
+  Wrapper chart for cert-manager and cert-manager-webhook-ovh.
+  Provides X.509 certificate management for Kubernetes with OVH DNS-01 challenge support.
+  Includes validation for breaking changes and simplified configuration.
 keywords:
-  - to complete
-home: to complete
+  - cert-manager
+  - certificates
+  - tls
+  - ssl
+  - letsencrypt
+  - ovh
+  - dns
+  - acme
+home: https://cert-manager.io
 maintainers:
   - name: trowaflo
     email: trowa.flo@gmail.com
 sources:
-  - to complete
+  - https://github.com/cert-manager/cert-manager
+  - https://github.com/aureq/cert-manager-webhook-ovh
   - https://github.com/trowaflo/helm-charts
 dependencies:
   - name: cert-manager
