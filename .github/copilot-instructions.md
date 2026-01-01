@@ -3,6 +3,11 @@
 ## ⚠️ MANDATORY: Review These Instructions
 **ALWAYS read and review this entire file at the start of ANY task or PR.** These instructions are your source of truth for architecture, conventions, and best practices. Update this file when you identify improvements or discover new patterns.
 
+## Communication Guidelines
+- **ALWAYS respond in English**, even if the user writes in French or another language
+- Be concise and technical
+- Focus on actionable information
+
 ## Scope
 Repo-wide guidance for GitHub Copilot (PR descriptions/reviews/fixes) for all charts.
 
@@ -20,14 +25,72 @@ When working on ANY task:
 - Bump chart version when rendered manifests change.
 - Prefer succinct, actionable PR descriptions and reviews.
 
-## Required local checks (mandatory for any changed chart)
-- Render sanity: `helm template <release> <chart-path>` with any required values for that chart.
-- Unit tests: `helm unittest <chart-path>` (plugin: https://github.com/helm-unittest/helm-unittest). Add/adjust tests and snapshots when you change templates or values.
-- Other validation tests: run any chart-specific validation present in `tests/` or workflows; update snapshots/fixtures as needed.
-- Docs: run `helm-docs` when values/README change.
+## Testing Philosophy
+**Charts in this repo typically wrap public upstream charts.** We assume upstream charts are tested. Our tests focus on:
+1. **Regression detection**: Verify that upstream chart updates don't break our usage
+2. **Enablement flags**: Verify that `.enabled` flags work as expected (resources rendered when true, not rendered when false)
+3. **Value pass-through**: Verify that our values are correctly passed to subcharts
+4. **Custom templates**: If we add our own templates, test them thoroughly
 
-## Chart-specific notes (keep this section short; add only when truly chart-specific)
-- cert-manager: dependency `cert-manager-webhook-ovh` requires `.Values.cert-manager-webhook-ovh.configVersion=0.0.2`; missing or wrong value fails templating. Tests: see `charts/apps/cert-manager/tests/` (enablement + configVersion cases).
+**DO NOT test upstream chart internals** (e.g., specific deployment fields, subchart template logic). Test the integration points only.
+
+## Required local checks (MANDATORY for any changed chart)
+All checks below are **mandatory** before committing:
+
+1. **Helm unittest**: `helm unittest <chart-path>` 
+   - Plugin: https://github.com/helm-unittest/helm-unittest
+   - Install: `helm plugin install https://github.com/helm-unittest/helm-unittest`
+   - Every chart MUST have tests covering:
+     - Enablement flags (enabled=true renders resources, enabled=false doesn't)
+     - Custom templates and helpers
+     - Configuration validation (e.g., required values, version checks)
+   - Add/adjust tests when you change templates or values
+   - Update test expectations/snapshots as needed
+
+2. **Render sanity**: `helm template <release> <chart-path>` with appropriate values
+   - Requires `helm dependency update` first if chart has dependencies
+   - Verify templates render without errors
+   - Spot-check output for correctness
+
+3. **Documentation**: `helm-docs` when values.yaml or templates change
+   - Regenerate README.md to reflect current values
+
+4. **Validation tests**: Run any chart-specific validation in `tests/` or workflows
+
+## Test Writing Guidelines
+
+### For umbrella/wrapper charts (charts that only include dependencies):
+- Create minimal templates (e.g., NOTES.txt, _helpers.tpl) for validation logic
+- Test that enablement flags control subchart rendering
+- Test configuration validation (required values, version constraints)
+- DO NOT test subchart template internals
+
+Example test structure:
+```yaml
+suite: test enablement flags
+templates:
+  - templates/NOTES.txt  # or any minimal template
+tests:
+  - it: should render when component enabled
+    set:
+      component.enabled: true
+    asserts:
+      - matchRegex:
+          path: raw
+          pattern: "component: true"
+```
+
+### For charts with custom templates:
+- Test your templates directly
+- Use snapshots for complex outputs
+- Test edge cases and error conditions
+
+## Chart-specific notes
+Keep this section minimal. Add only truly exceptional cases:
+
+- **cert-manager**: Validates `cert-manager-webhook-ovh.configVersion` when webhook enabled. The required version is tied to the dependency version in Chart.yaml (current: v0.8.0 requires "0.0.2"). This value changes with breaking updates from upstream. When upgrading the cert-manager-webhook-ovh dependency, update the `$requiredVersion` in `templates/_helpers.tpl` and the comment in `values.yaml`. See [upstream docs](https://github.com/aureq/cert-manager-webhook-ovh) for configVersion purpose.
 
 ## CI awareness
-- Workflows in `.github/workflows/` cover lint, helm-docs, helm-unittest, security scans. Make sure changes won’t break them; mention executed commands in PRs.
+- Workflows in `.github/workflows/` cover lint, helm-docs, helm-unittest, security scans
+- All checks must pass before merge
+- Mention executed commands in PRs

@@ -5,4 +5,4 @@ cert-manager:
 
 cert-manager-webhook-ovh:
   enabled: true
-  # configVersion intentionally omitted
+  configVersion: ""  # Empty string to test validation failure

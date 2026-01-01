@@ -7,7 +7,7 @@ should match snapshot with default values:
         app.kubernetes.io/instance: frigate-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: frigate-exporter-0.0.14
+        helm.sh/chart: frigate-exporter-1.0.0
       name: frigate-exporter-testing-name-override-test-main
       namespace: frigate-exporter-testing-namespace-override-test
     spec:
@@ -28,7 +28,7 @@ should match snapshot with default values:
         app.kubernetes.io/instance: frigate-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: frigate-exporter-0.0.14
+        helm.sh/chart: frigate-exporter-1.0.0
       name: frigate-exporter-testing-name-override-test
       namespace: frigate-exporter-testing-namespace-override-test
     spec:

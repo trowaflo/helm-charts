@@ -7,7 +7,7 @@ should match Service with correct ports:
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: graphite-exporter-0.0.1
+        helm.sh/chart: graphite-exporter-1.0.0
       name: RELEASE-NAME-name-override-test-graphite
       namespace: RELEASE-NAME-namespace-override-test
     spec:

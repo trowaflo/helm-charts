@@ -5,5 +5,10 @@
 .env
 
 # Helm chart artifacts
-charts/**/charts/*.tgz
+charts/**/charts/
 Chart.lock
+
+# Generated/rendered templates
+**/manualGeneratedTemplate.yaml
+**/renderedTemplate.yaml
+**/output.yaml
