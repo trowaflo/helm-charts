@@ -5,8 +5,7 @@
 .env
 
 # Helm chart artifacts
-**/charts/
-!charts/
+charts/**/charts/
 Chart.lock
 
 # Generated/rendered templates
