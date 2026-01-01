@@ -373,6 +373,36 @@ entries:
     version: 0.0.1
   grafana:
   - apiVersion: v2
+    created: "2026-01-01T16:26:48.637803548Z"
+    dependencies:
+    - name: grafana
+      repository: https://grafana.github.io/helm-charts
+      version: 10.4.3
+    description: Grafana visualization and dashboarding platform with custom extensions.
+      Wraps the official Grafana Helm chart with domain-specific customizations, providing
+      integrated dashboard provisioning and Traefik IngressRoute support.
+    digest: fca4bd3cdeec8688295c6893ceeb6ae9735069fc7c56d4198182e8ed6934726c
+    home: https://grafana.com
+    icon: https://grafana.com/docs/grafana/latest/img/grafana_icon.svg
+    keywords:
+    - grafana
+    - visualization
+    - dashboards
+    - monitoring
+    - metrics
+    - prometheus
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: grafana
+    sources:
+    - https://github.com/grafana/grafana
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/grafana-0.2.0/grafana-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     created: "2025-04-12T15:48:17.132061199Z"
     dependencies:
     - name: grafana
@@ -722,6 +752,37 @@ entries:
     version: 0.0.3
   prometheus:
   - apiVersion: v2
+    created: "2026-01-01T16:26:48.947752097Z"
+    dependencies:
+    - name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 27.52.0
+    description: Wraps the official kube-prometheus-stack Helm chart providing production-ready
+      monitoring stack including Prometheus, Grafana, Alertmanager, and node exporters.
+    digest: 9ce6da66da4286bd57d27b516264905801641849e4dda0593da217ee25ee09d1
+    home: https://prometheus.io
+    keywords:
+    - prometheus
+    - monitoring
+    - alerting
+    - metrics
+    - kubernetes
+    - operator
+    - grafana
+    - observability
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: prometheus
+    sources:
+    - https://github.com/prometheus/prometheus
+    - https://github.com/prometheus-operator/prometheus-operator
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/prometheus-2.5.0/prometheus-2.5.0.tgz
+    version: 2.5.0
+  - apiVersion: v2
     created: "2025-04-12T15:48:17.285070464Z"
     dependencies:
     - name: prometheus
@@ -871,4 +932,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2026-01-01T16:23:42.209774359Z"
+generated: "2026-01-01T16:26:48.947867803Z"
