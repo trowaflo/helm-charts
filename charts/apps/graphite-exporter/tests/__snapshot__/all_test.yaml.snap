@@ -7,7 +7,7 @@ should match snapshot with default values:
         app.kubernetes.io/instance: graphite-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: graphite-exporter-0.0.1
+        helm.sh/chart: graphite-exporter-1.0.0
       name: graphite-exporter-testing-name-override-test-graphite
       namespace: graphite-exporter-testing-namespace-override-test
     spec:
@@ -32,7 +32,7 @@ should match snapshot with default values:
         app.kubernetes.io/instance: graphite-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: graphite-exporter-0.0.1
+        helm.sh/chart: graphite-exporter-1.0.0
       name: graphite-exporter-testing-name-override-test-main
       namespace: graphite-exporter-testing-namespace-override-test
     spec:
@@ -53,7 +53,7 @@ should match snapshot with default values:
         app.kubernetes.io/instance: graphite-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: graphite-exporter-0.0.1
+        helm.sh/chart: graphite-exporter-1.0.0
         test: true
       name: graphite-exporter-testing-name-override-test
       namespace: graphite-exporter-testing-namespace-override-test
@@ -78,7 +78,7 @@ should match snapshot with default values:
         app.kubernetes.io/instance: graphite-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: graphite-exporter-0.0.1
+        helm.sh/chart: graphite-exporter-1.0.0
       name: graphite-exporter-testing-name-override-test
       namespace: graphite-exporter-testing-namespace-override-test
     spec:
@@ -103,16 +103,6 @@ should match snapshot with default values:
                 - --graphite.listen-address=:9109
               image: prom/graphite-exporter:v0.16.0@sha256:e54bca6645ea8a9e8c52312a8540de98ad08819d38476c021d77a0eae75bc797
               imagePullPolicy: IfNotPresent
-              livenessProbe:
-                failureThreshold: 3
-                httpGet:
-                  path: /metrics
-                  port: main
-                  scheme: HTTP
-                initialDelaySeconds: 30
-                periodSeconds: 10
-                successThreshold: 1
-                timeoutSeconds: 5
               name: main
               ports:
                 - containerPort: 9109
@@ -124,16 +114,6 @@ should match snapshot with default values:
                 - containerPort: 9108
                   name: main
                   protocol: TCP
-              readinessProbe:
-                failureThreshold: 3
-                httpGet:
-                  path: /metrics
-                  port: main
-                  scheme: HTTP
-                initialDelaySeconds: 30
-                periodSeconds: 10
-                successThreshold: 1
-                timeoutSeconds: 5
               resources:
                 limits:
                   cpu: 2
@@ -151,16 +131,6 @@ should match snapshot with default values:
                 runAsUser: 65534
                 seccompProfile:
                   type: RuntimeDefault
-              startupProbe:
-                failureThreshold: 3
-                httpGet:
-                  path: /metrics
-                  port: main
-                  scheme: HTTP
-                initialDelaySeconds: 60
-                periodSeconds: 10
-                successThreshold: 1
-                timeoutSeconds: 5
   5: |
     apiVersion: monitoring.coreos.com/v1
     kind: ServiceMonitor

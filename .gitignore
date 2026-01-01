@@ -6,4 +6,5 @@
 
 # Helm chart artifacts
 charts/**/charts/*.tgz
+charts/**/charts/
 Chart.lock
