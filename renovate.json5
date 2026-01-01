@@ -28,7 +28,7 @@
     },
     // Helm Major Updates
     {
-      "matchManagers": ["helmv3","helm-values"],
+      "matchManagers": ["helmv3", "helm-values"],
       "matchUpdateTypes": ["major"],
       "labels": ["helm", "breaking"],
       "groupName": "BREAKING - helm chart Major Updates",
