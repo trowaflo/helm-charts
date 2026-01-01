@@ -9,4 +9,4 @@ cert-manager-webhook-ovh:
   # This value is tied to the chart dependency version (see Chart.yaml).
   # Current: cert-manager-webhook-ovh v0.8.0 requires "0.0.2".
   # Update this when upgrading the dependency - check the upstream changelog for the new value.
-  # configVersion: "0.0.2"
+  configVersion: "0.0.2"
