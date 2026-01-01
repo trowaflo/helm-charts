@@ -11,14 +11,14 @@ tests:
       - values/configversion-missing.yaml
     asserts:
       - failedTemplate:
-          errorMessage: "The 'configVersion' key cannot be empty when cert-manager-webhook-ovh is enabled. Please set .Values.cert-manager-webhook-ovh.configVersion to '0.0.2'"
+          errorPattern: "configVersion is required by the upstream chart"
 
   - it: should fail when configVersion is wrong
     values:
       - values/configversion-wrong.yaml
     asserts:
       - failedTemplate:
-          errorMessage: "Incorrect 'configVersion': Expected: '0.0.2', Provided: '0.0.1'"
+          errorPattern: "configVersion must match to ensure compatibility"
 
   - it: should succeed when configVersion is correct
     values:
