@@ -1,0 +1,30 @@
+suite: test cert-manager chart - webhook configVersion validation
+templates:
+  - ../charts/cert-manager-webhook-ovh/templates/version.yaml
+release:
+  name: cert-manager-testing
+  namespace: cert-manager
+
+values:
+  - values/default.yaml
+
+tests:
+  - it: should fail when configVersion is missing
+    values:
+      - values/configversion-missing.yaml
+    asserts:
+      - failedTemplate:
+          matchRegex:
+            pattern: "The 'configVersion' key cannot be empty"
+
+  - it: should fail when configVersion is wrong
+    values:
+      - values/configversion-wrong.yaml
+    asserts:
+      - failedTemplate:
+          matchRegex:
+            pattern: "Incorrect 'configVersion': Expected: '0.0.2', Provided: '0.0.1'"
+
+  - it: should succeed when configVersion is correct
+    asserts:
+      - notFailedTemplate: {}

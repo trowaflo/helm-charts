@@ -1,0 +1,26 @@
+apiVersion: v2
+name: cert-manager
+version: 0.0.0 # @copilot could you say me which version to put here for the first time?
+type: application
+description: |- # @copilot, to complete
+  to complete
+keywords:
+  - to complete
+home: to complete
+maintainers:
+  - name: trowaflo
+    email: trowa.flo@gmail.com
+sources:
+  - to complete
+  - https://github.com/trowaflo/helm-charts
+dependencies:
+  - name: cert-manager
+    version: v1.19.2
+    repository: oci://quay.io/jetstack/charts
+    alias: cert-manager
+    condition: cert-manager.enabled
+  - name: cert-manager-webhook-ovh
+    version: 0.8.0
+    repository: https://aureq.github.io/cert-manager-webhook-ovh/
+    alias: cert-manager-webhook-ovh
+    condition: cert-manager-webhook-ovh.enabled
