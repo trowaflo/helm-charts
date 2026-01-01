@@ -5,6 +5,6 @@
 .env
 
 # Helm chart artifacts
-charts/**/charts/*.tgz
-charts/**/charts/
+**/charts/
+!charts/
 Chart.lock
