@@ -17,7 +17,7 @@
     },
     // Helm Minor Updates
     {
-      "matchManagers": ["helmv3","helm-values"],
+      "matchManagers": ["helmv3", "helm-values"],
       "matchUpdateTypes": ["minor"],
       "labels": ["helm", "automerge"],
       "groupName": "AUTOMERGE - Helm Minor Updates",
