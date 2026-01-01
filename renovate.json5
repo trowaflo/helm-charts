@@ -6,7 +6,7 @@
   packageRules: [
     // Helm Patch Updates
     {
-      "matchManagers": ["helmv3","helm-values"],
+      "matchManagers": ["helmv3", "helm-values"],
       "matchUpdateTypes": ["patch"],
       "labels": ["helm", "automerge"],
       "groupName": "AUTOMERGE - Helm Patch Updates",
