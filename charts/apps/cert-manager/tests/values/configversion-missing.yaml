@@ -1,0 +1,8 @@
+cert-manager:
+  enabled: true
+  crds:
+    enabled: true
+
+cert-manager-webhook-ovh:
+  enabled: true
+  configVersion: ""  # Empty string to test validation failure

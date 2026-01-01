@@ -1,0 +1,31 @@
+suite: test cert-manager chart - webhook configVersion validation
+templates:
+  - templates/NOTES.txt
+release:
+  name: cert-manager-testing
+  namespace: cert-manager
+
+tests:
+  - it: should fail when configVersion is missing
+    values:
+      - values/configversion-missing.yaml
+    asserts:
+      - failedTemplate:
+          errorPattern: "configVersion is required by the upstream chart"
+
+  - it: should fail when configVersion is wrong
+    values:
+      - values/configversion-wrong.yaml
+    asserts:
+      - failedTemplate:
+          errorPattern: "configVersion must match to ensure compatibility"
+
+  - it: should succeed when configVersion is correct
+    values:
+      - values/default.yaml
+    asserts:
+      - isNotNull:
+          path: raw
+      - matchRegex:
+          path: raw
+          pattern: "cert-manager has been installed successfully"
