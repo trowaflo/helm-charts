@@ -1,5 +1,45 @@
 apiVersion: v1
 entries:
+  cert-manager:
+  - apiVersion: v2
+    created: "2026-01-01T14:37:08.948681952Z"
+    dependencies:
+    - alias: cert-manager
+      condition: cert-manager.enabled
+      name: cert-manager
+      repository: oci://quay.io/jetstack/charts
+      version: v1.19.2
+    - alias: cert-manager-webhook-ovh
+      condition: cert-manager-webhook-ovh.enabled
+      name: cert-manager-webhook-ovh
+      repository: https://aureq.github.io/cert-manager-webhook-ovh/
+      version: 0.8.0
+    description: Wrapper chart for cert-manager and cert-manager-webhook-ovh. Provides
+      X.509 certificate management for Kubernetes with OVH DNS-01 challenge support.
+      Includes validation for breaking changes and simplified configuration.
+    digest: 9c3dae71aaedf38b0ed7f0a761b1a9ba1a6861a38ab3abeffb8cdc6851f54903
+    home: https://cert-manager.io
+    keywords:
+    - cert-manager
+    - certificates
+    - tls
+    - ssl
+    - letsencrypt
+    - ovh
+    - dns
+    - acme
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: cert-manager
+    sources:
+    - https://github.com/cert-manager/cert-manager
+    - https://github.com/aureq/cert-manager-webhook-ovh
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/cert-manager-1.0.0/cert-manager-1.0.0.tgz
+    version: 1.0.0
   common:
   - apiVersion: v2
     created: "2025-12-07T22:44:57.300545379Z"
@@ -133,6 +173,37 @@ entries:
     - https://github.com/trowaflo/helm-charts/releases/download/frigate-0.0.1/frigate-0.0.1.tgz
     version: 0.0.1
   frigate-exporter:
+  - apiVersion: v2
+    created: "2026-01-01T14:37:09.159544817Z"
+    dependencies:
+    - name: common
+      repository: https://trowaflo.github.io/helm-charts
+      version: 2.0.0
+    description: Prometheus exporter for Frigate NVR (Network Video Recorder) system.
+      Exports metrics from Frigate cameras, detections, and recording statistics in
+      Prometheus-compatible format for integration with monitoring stacks.
+    digest: b9b759caf100eee9b74a071726ca04ebfed08bc86151878a5e5e97e63678ec49
+    home: https://github.com/bairhys/prometheus-frigate-exporter
+    icon: https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/images/prometheus-logo.svg
+    keywords:
+    - prometheus
+    - exporter
+    - frigate
+    - nvr
+    - video
+    - monitoring
+    - metrics
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: frigate-exporter
+    sources:
+    - https://github.com/bairhys/prometheus-frigate-exporter
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/frigate-exporter-1.0.0/frigate-exporter-1.0.0.tgz
+    version: 1.0.0
   - apiVersion: v2
     created: "2025-06-27T15:09:11.219655176Z"
     dependencies:
@@ -391,6 +462,39 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/grafana-0.1.0/grafana-0.1.0.tgz
     version: 0.1.0
+  graphite-exporter:
+  - apiVersion: v2
+    created: "2026-01-01T14:37:09.422411654Z"
+    dependencies:
+    - name: common
+      repository: https://trowaflo.github.io/helm-charts
+      version: 2.0.0
+    description: Prometheus exporter for converting Graphite plaintext protocol metrics
+      to Prometheus format. Enables Prometheus to scrape metrics from legacy Graphite
+      systems and sources (e.g., TrueNAS, custom monitoring systems) that emit Graphite-formatted
+      metrics.
+    digest: 5d60a591cbb4f1d0edeefb4924054363bb1afcb3fef80804ff1e7677a3f864ff
+    home: https://github.com/prometheus/graphite_exporter
+    icon: https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/images/prometheus-logo.svg
+    keywords:
+    - prometheus
+    - exporter
+    - graphite
+    - monitoring
+    - metrics
+    - truenas
+    - plaintext
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: graphite-exporter
+    sources:
+    - https://github.com/prometheus/graphite_exporter
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/graphite-exporter-1.0.0/graphite-exporter-1.0.0.tgz
+    version: 1.0.0
   guacamole:
   - apiVersion: v2
     created: "2025-12-08T22:49:25.956440897Z"
@@ -735,4 +839,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2025-12-08T22:49:25.956550655Z"
+generated: "2026-01-01T14:37:09.605604757Z"
