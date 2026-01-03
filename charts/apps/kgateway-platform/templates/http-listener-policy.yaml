@@ -1,19 +1,19 @@
 {{- $namespace := include "kgateway-platform.namespace" . -}}
 {{- $fullname := include "kgateway-platform.fullname" . -}}
 {{- range $policyKey, $policy := .Values.httpListenerPolicies }}
-{{- if $policy.enabled }}
-{{- $targetGateway := $policy.targetGateway -}}
-{{- if not $targetGateway }}
-{{- fail (printf "httpListenerPolicies.%s.targetGateway is required" $policyKey) }}
-{{- end }}
-{{- $gatewayCfg := index $.Values.gateways $targetGateway -}}
-{{- if not $gatewayCfg }}
-{{- fail (printf "httpListenerPolicies.%s.targetGateway '%s' does not exist in gateways map" $policyKey $targetGateway) }}
-{{- end }}
-{{- if $gatewayCfg.enabled }}
-{{- $gatewayName := default (printf "%s-%s" $fullname $targetGateway) $gatewayCfg.name -}}
-{{- $defaultUpgrades := list "websocket" -}}
-{{- $upgrades := default $defaultUpgrades $policy.enabledUpgrades }}
+  {{- if $policy.enabled }}
+    {{- $targetGateway := $policy.targetGateway -}}
+    {{- if not $targetGateway }}
+      {{- fail (printf "httpListenerPolicies.%s.targetGateway is required" $policyKey) }}
+    {{- end }}
+    {{- $gatewayCfg := index $.Values.gateways $targetGateway -}}
+    {{- if not $gatewayCfg }}
+      {{- fail (printf "httpListenerPolicies.%s.targetGateway '%s' does not exist in gateways map" $policyKey $targetGateway) }}
+    {{- end }}
+    {{- if $gatewayCfg.enabled }}
+      {{- $gatewayName := default (printf "%s-%s" $fullname $targetGateway) $gatewayCfg.name -}}
+      {{- $defaultUpgrades := list "websocket" -}}
+      {{- $upgrades := default $defaultUpgrades $policy.enabledUpgrades }}
 ---
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: HTTPListenerPolicy
@@ -28,9 +28,9 @@ spec:
       namespace: {{ $namespace }}
   upgradeConfig:
     enabledUpgrades:
-{{- range $upgrade := $upgrades }}
+      {{- range $upgrade := $upgrades }}
       - {{ $upgrade | quote }}
-{{- end }}
-{{- end }}
-{{- end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
