@@ -11,12 +11,21 @@ cert-manager-webhook-ovh:
   # Update this when upgrading the dependency - check upstream changelog for new value
   # configVersion: "0.0.2"
 
+# Gateway API support configuration
+# ReferenceGrants are Gateway API resources that require Gateway API CRDs to be installed.
+# Only enable this if you're using Gateway API (e.g., kgateway-platform) instead of traditional Ingress.
+gatewayApi:
+  # -- Enable Gateway API support (creates ReferenceGrant resources)
+  enabled: false
+
 # ReferenceGrants allow Gateway API resources in other namespaces to reference
 # secrets in the cert-manager-platform namespace (where certificates are stored).
+# Only used when gatewayApi.enabled is true.
 # Configure this when using Gateway API gateways that need to reference TLS secrets.
-referenceGrants: []
+# Define multiple grants using map keys (e.g., allow-kgateway-platform, allow-dmz-gateway)
+referenceGrants: {}
   # Example: Allow kgateway-platform namespace to reference secrets
-  # - name: allow-kgateway-platform
+  # allow-kgateway-platform:
   #   enabled: true
   #   from:
   #     - kind: Gateway

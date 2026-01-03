@@ -6,18 +6,37 @@ templates:
   - templates/referencegrant.yaml
 tests:
   # Test with no ReferenceGrants configured (default)
-  - it: should not render ReferenceGrants when list is empty
+  - it: should not render ReferenceGrants when map is empty
     values:
       - values/default.yaml
     asserts:
       - hasDocuments:
           count: 0
 
-  # Test with ReferenceGrant enabled
-  - it: should render ReferenceGrant when configured
+  # Test with Gateway API disabled (default)
+  - it: should not render ReferenceGrants when Gateway API is disabled
     set:
+      gatewayApi:
+        enabled: false
       referenceGrants:
-        - name: allow-kgateway-platform
+        allow-kgateway-platform:
+          enabled: true
+          from:
+            - kind: Gateway
+              namespace: kgateway-platform
+          to:
+            - kind: Secret
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # Test with ReferenceGrant enabled and Gateway API enabled
+  - it: should render ReferenceGrant when Gateway API is enabled and grant is configured
+    set:
+      gatewayApi:
+        enabled: true
+      referenceGrants:
+        allow-kgateway-platform:
           enabled: true
           from:
             - kind: Gateway
@@ -52,10 +71,12 @@ tests:
           value: Secret
 
   # Test with ReferenceGrant disabled
-  - it: should not render ReferenceGrant when disabled
+  - it: should not render ReferenceGrant when grant is disabled
     set:
+      gatewayApi:
+        enabled: true
       referenceGrants:
-        - name: allow-kgateway-platform
+        allow-kgateway-platform:
           enabled: false
           from:
             - kind: Gateway
@@ -67,17 +88,19 @@ tests:
           count: 0
 
   # Test with multiple ReferenceGrants
-  - it: should render multiple ReferenceGrants when configured
+  - it: should render multiple ReferenceGrants when Gateway API is enabled
     set:
+      gatewayApi:
+        enabled: true
       referenceGrants:
-        - name: allow-kgateway-platform
+        allow-kgateway-platform:
           enabled: true
           from:
             - kind: Gateway
               namespace: kgateway-platform
           to:
             - kind: Secret
-        - name: allow-another-namespace
+        allow-another-namespace:
           enabled: true
           from:
             - kind: HTTPRoute
@@ -92,12 +115,12 @@ tests:
         documentIndex: 0
       - equal:
           path: metadata.name
-          value: allow-kgateway-platform
+          value: allow-another-namespace
         documentIndex: 0
       - isKind:
           of: ReferenceGrant
         documentIndex: 1
       - equal:
           path: metadata.name
-          value: allow-another-namespace
+          value: allow-kgateway-platform
         documentIndex: 1

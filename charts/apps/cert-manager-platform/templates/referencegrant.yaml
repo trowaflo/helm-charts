@@ -1,10 +1,11 @@
-{{- range $grant := .Values.referenceGrants }}
+{{- if .Values.gatewayApi.enabled }}
+{{- range $name, $grant := .Values.referenceGrants }}
 {{- if $grant.enabled }}
 ---
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: ReferenceGrant
 metadata:
-  name: {{ $grant.name | required "referenceGrants[].name is required" }}
+  name: {{ $name }}
   namespace: {{ $.Release.Namespace }}
   {{- with $grant.labels }}
   labels:
@@ -33,5 +34,6 @@ spec:
       name: {{ . }}
       {{- end }}
     {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}
