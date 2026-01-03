@@ -11,7 +11,7 @@
       {{- fail (printf "httpListenerPolicies.%s.targetGateway '%s' does not exist in gateways map" $policyKey $targetGateway) }}
     {{- end }}
     {{- if $gatewayCfg.enabled }}
-      {{- $gatewayName := default (printf "%s-%s" $fullname $targetGateway) $gatewayCfg.name -}}
+      {{- $gatewayName := include "kgateway-platform.gatewayName" (dict "root" $ "key" $targetGateway "config" $gatewayCfg) -}}
       {{- $defaultUpgrades := list "websocket" -}}
       {{- $upgrades := default $defaultUpgrades $policy.enabledUpgrades }}
 ---
