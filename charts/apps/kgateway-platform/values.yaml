@@ -27,7 +27,7 @@ gateways:
 tlsSecret:
   # -- Name of the TLS secret to use for gateways. MUST be set by the chart consumer.
   name: ""
-  # -- Namespace where the TLS secret is located. If set and different from the chart namespace, a ReferenceGrant will be created. Leave empty to use the same namespace as the chart.
+  # -- Namespace where the TLS secret is located. Leave empty to use the same namespace as the chart. Note: Cross-namespace secret references require a ReferenceGrant in the secret's namespace (managed by cert-manager chart, not this chart).
   namespace: ""
 
 # HTTP listener policy configuration (WebSocket upgrade support)
