@@ -1,8 +1,10 @@
-{{- if and .Values.httpListenerPolicy.enabled .Values.gateways.public.enabled }}
+{{- if .Values.httpListenerPolicy.enabled }}
 {{- $namespace := include "kgateway-platform.namespace" . -}}
 {{- $fullname := include "kgateway-platform.fullname" . -}}
-{{- $cfg := .Values.gateways.public -}}
-{{- $name := default (printf "%s-public" $fullname) $cfg.name -}}
+{{- $targetGateway := .Values.httpListenerPolicy.targetGateway | default "public" -}}
+{{- $cfg := index .Values.gateways $targetGateway -}}
+{{- if and $cfg $cfg.enabled }}
+{{- $name := default (printf "%s-%s" $fullname $targetGateway) $cfg.name -}}
 ---
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: HTTPListenerPolicy
@@ -19,5 +21,6 @@ spec:
     enabledUpgrades:
 {{- range $upgrade := .Values.httpListenerPolicy.enabledUpgrades }}
       - {{ $upgrade | quote }}
+{{- end }}
 {{- end }}
 {{- end }}

@@ -1,24 +1,26 @@
 # Gateway configuration
+# Define multiple gateways by adding entries with any key name
+# @default -- See values.yaml for examples
 gateways:
-  # Public gateway configuration
+  # Example: Public gateway configuration
   public:
-    # -- Enable the public gateway
+    # -- Enable this gateway
     enabled: true
-    # -- Custom name for the public gateway (defaults to "<release-name>-public")
+    # -- Custom name for the gateway (defaults to "<release-name>-<key>")
     name: ""
-    # -- IP slot label for the public gateway service
+    # -- IP slot label for the gateway service
     ipSlot: public
-    # -- IP address of the public gateway. MUST be set by the chart consumer.
+    # -- IP address of the gateway. MUST be set by the chart consumer.
     address: ""
-  # Private gateway configuration
+  # Example: Private gateway configuration
   private:
-    # -- Enable the private gateway
+    # -- Enable this gateway
     enabled: true
-    # -- Custom name for the private gateway (defaults to "<release-name>-private")
+    # -- Custom name for the gateway (defaults to "<release-name>-<key>")
     name: ""
-    # -- IP slot label for the private gateway service
+    # -- IP slot label for the gateway service
     ipSlot: private
-    # -- IP address of the private gateway. MUST be set by the chart consumer.
+    # -- IP address of the gateway. MUST be set by the chart consumer.
     address: ""
 
 # TLS secret configuration for gateway HTTPS listeners
@@ -30,9 +32,11 @@ tlsSecret:
 
 # HTTP listener policy configuration (WebSocket upgrade support)
 httpListenerPolicy:
-  # -- Enable HTTPListenerPolicy for the public gateway
+  # -- Enable HTTPListenerPolicy
   enabled: true
-  # -- Custom name for the HTTPListenerPolicy (defaults to "<public-gateway-name>-websocket-upgrade")
+  # -- Target gateway key from gateways map (defaults to "public")
+  targetGateway: "public"
+  # -- Custom name for the HTTPListenerPolicy (defaults to "<target-gateway-name>-websocket-upgrade")
   name: ""
   # -- List of enabled protocol upgrades (e.g., websocket)
   enabledUpgrades:

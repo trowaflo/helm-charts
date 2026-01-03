@@ -1,8 +1,8 @@
 {{- $namespace := include "kgateway-platform.namespace" . -}}
 {{- $fullname := include "kgateway-platform.fullname" . -}}
-{{- if .Values.gateways.public.enabled -}}
-{{- $cfg := .Values.gateways.public -}}
-{{- $name := default (printf "%s-public" $fullname) $cfg.name }}
+{{- range $key, $cfg := .Values.gateways }}
+{{- if $cfg.enabled }}
+{{- $name := default (printf "%s-%s" $fullname $key) $cfg.name }}
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
@@ -18,7 +18,7 @@ spec:
       name: {{ printf "%s-params" $name }}
   addresses:
     - type: IPAddress
-      value: {{ required "gateways.public.address is required" $cfg.address | quote }}
+      value: {{ required (printf "gateways.%s.address is required" $key) $cfg.address | quote }}
   listeners:
     - name: http
       port: 80
@@ -39,44 +39,5 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
-{{- end -}}
-{{- if .Values.gateways.private.enabled -}}
-{{- $cfg := .Values.gateways.private -}}
-{{- $name := default (printf "%s-private" $fullname) $cfg.name }}
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: {{ $name }}
-  namespace: {{ $namespace }}
-spec:
-  gatewayClassName: kgateway
-  infrastructure:
-    parametersRef:
-      group: gateway.kgateway.dev
-      kind: GatewayParameters
-      name: {{ printf "%s-params" $name }}
-  addresses:
-    - type: IPAddress
-      value: {{ required "gateways.private.address is required" $cfg.address | quote }}
-  listeners:
-    - name: http
-      port: 80
-      protocol: HTTP
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: https
-      port: 443
-      protocol: HTTPS
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - group: ''
-            kind: Secret
-            name: {{ required "tlsSecret.name is required" $.Values.tlsSecret.name }}
-            namespace: {{ default $namespace $.Values.tlsSecret.namespace }}
-      allowedRoutes:
-        namespaces:
-          from: All
+{{- end }}
 {{- end }}
