@@ -13,28 +13,9 @@ tests:
       - hasDocuments:
           count: 0
 
-  # Test with Gateway API disabled (default)
-  - it: should not render ReferenceGrants when Gateway API is disabled
+  # Test with ReferenceGrant enabled
+  - it: should render ReferenceGrant when grant is configured and enabled
     set:
-      gatewayApi:
-        enabled: false
-      referenceGrants:
-        allow-kgateway-platform:
-          enabled: true
-          from:
-            - kind: Gateway
-              namespace: kgateway-platform
-          to:
-            - kind: Secret
-    asserts:
-      - hasDocuments:
-          count: 0
-
-  # Test with ReferenceGrant enabled and Gateway API enabled
-  - it: should render ReferenceGrant when Gateway API is enabled and grant is configured
-    set:
-      gatewayApi:
-        enabled: true
       referenceGrants:
         allow-kgateway-platform:
           enabled: true
@@ -73,8 +54,6 @@ tests:
   # Test with ReferenceGrant disabled
   - it: should not render ReferenceGrant when grant is disabled
     set:
-      gatewayApi:
-        enabled: true
       referenceGrants:
         allow-kgateway-platform:
           enabled: false
@@ -88,10 +67,8 @@ tests:
           count: 0
 
   # Test with multiple ReferenceGrants
-  - it: should render multiple ReferenceGrants when Gateway API is enabled
+  - it: should render multiple ReferenceGrants when multiple are configured
     set:
-      gatewayApi:
-        enabled: true
       referenceGrants:
         allow-kgateway-platform:
           enabled: true

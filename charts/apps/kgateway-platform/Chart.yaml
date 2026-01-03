@@ -1,9 +1,9 @@
 apiVersion: v2
 name: kgateway-platform
-version: 0.1.1
+version: 1.0.0
 type: application
 description: |-
-  Helm chart for configuring the kgateway platform using the Kubernetes Gateway API, including public/private gateways, HTTP(S) routing, and TLS certificate integration.
+  Helm chart for configuring the kgateway platform using the Kubernetes Gateway API with support for multiple gateways, HTTP(S) routing, and TLS certificate integration.
 keywords:
   - kubernetes
   - gateway

@@ -1,27 +1,20 @@
 # Gateway configuration
 # Define multiple gateways by adding entries with any key name
-# @default -- See values.yaml for examples
-gateways:
-  # Example: Public gateway configuration
-  public:
-    # -- Enable this gateway
-    enabled: true
-    # -- Custom name for the gateway (defaults to "<release-name>-<key>")
-    name: ""
-    # -- IP slot label for the gateway service
-    ipSlot: public
-    # -- IP address of the gateway. MUST be set by the chart consumer.
-    address: ""
-  # Example: Private gateway configuration
-  private:
-    # -- Enable this gateway
-    enabled: true
-    # -- Custom name for the gateway (defaults to "<release-name>-<key>")
-    name: ""
-    # -- IP slot label for the gateway service
-    ipSlot: private
-    # -- IP address of the gateway. MUST be set by the chart consumer.
-    address: ""
+# Each gateway entry should have: enabled, name (optional), ipSlot, and address
+# See tests/ directory for configuration examples
+# @default -- {} (empty, user must configure gateways)
+gateways: {}
+  # Example configurations (uncomment and modify as needed):
+  # public:
+  #   enabled: true
+  #   name: ""  # defaults to "<release-name>-public"
+  #   ipSlot: public  # Used for Cilium LoadBalancerIPPool selector
+  #   address: "192.168.1.1"  # REQUIRED: Gateway IP address
+  # private:
+  #   enabled: true
+  #   name: ""  # defaults to "<release-name>-private"
+  #   ipSlot: private
+  #   address: "192.168.1.2"
 
 # TLS secret configuration for gateway HTTPS listeners
 tlsSecret:
@@ -44,10 +37,10 @@ httpListenerPolicy:
 
 # kgateway-crds subchart configuration
 kgateway-crds:
-  # -- Enable installation of kgateway CRDs
-  enabled: false
+  # -- Enable installation of kgateway CRDs (required for Gateway API resources)
+  enabled: true
 
 # kgateway subchart configuration
 kgateway:
-  # -- Enable installation of kgateway controller
-  enabled: false
+  # -- Enable installation of kgateway controller (required for Gateway functionality)
+  enabled: true
