@@ -36,8 +36,8 @@ spec:
         certificateRefs:
           - group: ''
             kind: Secret
-            name: {{ required "tlsSecret.name is required" $.Values.tlsSecret.name }}
-            namespace: {{ default $namespace $.Values.tlsSecret.namespace }}
+            name: {{ required "tlsSecret.name is required" (index $.Values.tlsSecret "name") }}
+            namespace: {{ default $namespace (index $.Values.tlsSecret "namespace") }}
       allowedRoutes:
         namespaces:
           from: All

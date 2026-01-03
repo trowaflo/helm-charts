@@ -1,37 +1,17 @@
-# Gateway configuration
-# Define multiple gateways by adding entries with any key name
-# Each gateway entry should have: enabled, name (optional), ipSlot, and address
-# See tests/ directory for configuration examples
+# -- Gateway configuration. Define multiple gateways by adding entries with any key name. Each gateway requires: enabled (bool), address (string, REQUIRED), name (string, optional, defaults to "<release-name>-<key>"), ipSlot (string, optional, defaults to key name, used for Cilium LoadBalancerIPPool selector). Example: `gateways: { public: { enabled: true, address: "192.168.1.1", ipSlot: public }, private: { enabled: true, address: "192.168.1.2", ipSlot: private } }`
 # @default -- {} (empty, user must configure gateways)
 gateways: {}
-  # Example configurations (uncomment and modify as needed):
-  # public:
-  #   enabled: true
-  #   name: ""  # defaults to "<release-name>-public"
-  #   ipSlot: public  # Used for Cilium LoadBalancerIPPool selector
-  #   address: "192.168.1.1"  # REQUIRED: Gateway IP address
-  # private:
-  #   enabled: true
-  #   name: ""  # defaults to "<release-name>-private"
-  #   ipSlot: private
-  #   address: "192.168.1.2"
 
-# TLS secret configuration for gateway HTTPS listeners
-tlsSecret:
-  # -- Name of the TLS secret to use for gateways. MUST be set by the chart consumer.
-  name: ""
-  # -- Namespace where the TLS secret is located. Leave empty to use the same namespace as the chart. Note: Cross-namespace secret references require a ReferenceGrant in the secret's namespace (managed by cert-manager chart, not this chart).
-  namespace: ""
+# -- TLS secret configuration for gateway HTTPS listeners. Specify the secret name and optional namespace. Example: `tlsSecret: { name: "wildcard-tls", namespace: "cert-manager" }`. Note: Cross-namespace secret references require a ReferenceGrant in the secret's namespace (managed by cert-manager chart, not this chart).
+# @default -- {} (empty map, user must configure)
+tlsSecret: {}
 
-# HTTP listener policy configuration (WebSocket upgrade support)
+# -- HTTP listener policy configuration for WebSocket upgrade support. Specify target gateway key from gateways map and list of enabled upgrades. Example: `httpListenerPolicy: { enabled: true, targetGateway: "public", enabledUpgrades: ["websocket"] }`
+# @default -- { enabled: true, targetGateway: "public", enabledUpgrades: ["websocket"] }
 httpListenerPolicy:
-  # -- Enable HTTPListenerPolicy
   enabled: true
-  # -- Target gateway key from gateways map (defaults to "public")
   targetGateway: "public"
-  # -- Custom name for the HTTPListenerPolicy (defaults to "<target-gateway-name>-websocket-upgrade")
   name: ""
-  # -- List of enabled protocol upgrades (e.g., websocket)
   enabledUpgrades:
     - websocket
 
