@@ -19,7 +19,7 @@ jobs:
 
       - name: Install helm-docs
         run: |
-          # Détection et normalisation de l'architecture
+          # Detect and normalize the architecture
           case "$(uname -m)" in
             x86_64)
               ARCH="x86_64"
@@ -28,7 +28,7 @@ jobs:
               ARCH="arm64"
               ;;
             *)
-              echo "Architecture non supportée: $(uname -m)"
+              echo "Unsupported architecture: $(uname -m)"
               exit 1
               ;;
           esac
@@ -64,6 +64,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Le [skip ci] est crucial pour ne pas créer de boucle infinie
+          # The [skip ci] tag is crucial to avoid infinite loops
           git commit -m "chore: update Helm chart documentation [skip ci]"
           git push
