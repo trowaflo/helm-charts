@@ -1,12 +1,14 @@
-
-
 # kgateway-platform
+
+![Version: 1.0.2](https://img.shields.io/badge/Version-1.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Helm chart for configuring the kgateway platform using the Kubernetes Gateway API with support for multiple gateways, HTTP(S) routing, and TLS certificate integration.
 
----
+## Maintainers
 
-![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
+| Name | Email | Url |
+| ---- | ------ | --- |
+| trowaflo | <trowa.flo@gmail.com> |  |
 
 ## Source Code
 
@@ -16,109 +18,20 @@ Helm chart for configuring the kgateway platform using the Kubernetes Gateway AP
 
 ## Requirements
 
-## Requirements
-
 | Repository | Name | Version |
 |------------|------|---------|
 | oci://cr.kgateway.dev/kgateway-dev/charts | kgateway(kgateway) | v2.1.2 |
 | oci://cr.kgateway.dev/kgateway-dev/charts | kgateway-crds(kgateway-crds) | v2.1.2 |
 
-- Helm: v3+
-
-## Getting Started
-
-### Add repository
-
-```bash
-helm repo add kgateway-platform https://example.com/helm-charts
-helm repo update
-```
-
-### Install
-
-```bash
-helm install my-kgateway-platform kgateway-platform/kgateway-platform \
-  --namespace kgateway-platform \
-  --create-namespace
-```
-
-### Upgrade
-
-```bash
-helm upgrade my-kgateway-platform kgateway-platform/kgateway-platform \
-  --namespace kgateway-platform \
-  --install
-```
-
-### Uninstall
-
-```bash
-helm uninstall my-kgateway-platform --namespace kgateway-platform
-```
-
 ## Values
 
-<table>
-	<thead>
-		<th>Key</th>
-		<th>Type</th>
-		<th>Default</th>
-		<th>Description</th>
-	</thead>
-	<tbody>
-		<tr>
-			<td>gateways</td>
-			<td>object</td>
-			<td><pre lang="">
-{} (empty, user must configure gateways)
-</pre>
-</td>
-			<td>Gateway configuration. Define multiple gateways by adding entries with any key name. Each gateway requires: - enabled: bool - address: string (REQUIRED) - IP address for the gateway - name: string (optional) - defaults to "<release-name>-<key>" - ipSlot: string (optional) - defaults to key name, used for Cilium LoadBalancerIPPool selector  Example:   gateways:     public:       enabled: true       address: "192.168.1.1"       ipSlot: public     private:       enabled: true       address: "192.168.1.2"       ipSlot: private </td>
-		</tr>
-		<tr>
-			<td>httpListenerPolicies</td>
-			<td>object</td>
-			<td><pre lang="">
-{} (empty, user must configure policies)
-</pre>
-</td>
-			<td>HTTP listener policies for WebSocket upgrade support. Map structure where keys reference gateway keys from the gateways map. Each policy requires: - enabled: bool - targetGateway: string (REQUIRED) - must match a gateway key - name: string (optional) - defaults to policy key - enabledUpgrades: list of strings (optional) - defaults to ["websocket"]  Example:   httpListenerPolicies:     public-ws:       enabled: true       targetGateway: "public"       enabledUpgrades: ["websocket"]     private-ws:       enabled: true       targetGateway: "private"       enabledUpgrades: ["websocket"] </td>
-		</tr>
-		<tr>
-			<td>kgateway-crds.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td>Enable installation of kgateway CRDs (required for Gateway API resources)</td>
-		</tr>
-		<tr>
-			<td>kgateway.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td>Enable installation of kgateway controller (required for Gateway functionality)</td>
-		</tr>
-		<tr>
-			<td>tlsSecret</td>
-			<td>object</td>
-			<td><pre lang="">
-{} (empty map, user must configure)
-</pre>
-</td>
-			<td>TLS secret configuration for gateway HTTPS listeners. Specify the secret name and optional namespace.  Example:   tlsSecret:     name: "wildcard-tls"     namespace: "cert-manager"  Note: Cross-namespace secret references require a ReferenceGrant in the secret's namespace (managed by cert-manager-platform chart, not this chart). </td>
-		</tr>
-	</tbody>
-</table>
-
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| trowaflo | <trowa.flo@gmail.com> |  |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| gateways | object | {} (empty, user must configure gateways) | Gateway configuration. Define multiple gateways by adding entries with any key name. Each gateway requires: - enabled: bool - address: string (REQUIRED) - IP address for the gateway - name: string (optional) - defaults to "<release-name>-<key>" - ipSlot: string (optional) - defaults to key name, used for Cilium LoadBalancerIPPool selector  Example:   gateways:     public:       enabled: true       address: "192.168.1.1"       ipSlot: public     private:       enabled: true       address: "192.168.1.2"       ipSlot: private  |
+| httpListenerPolicies | object | {} (empty, user must configure policies) | HTTP listener policies for WebSocket upgrade support. Map structure where keys reference gateway keys from the gateways map. Each policy requires: - enabled: bool - targetGateway: string (REQUIRED) - must match a gateway key - name: string (optional) - defaults to policy key - enabledUpgrades: list of strings (optional) - defaults to ["websocket"]  Example:   httpListenerPolicies:     public-ws:       enabled: true       targetGateway: "public"       enabledUpgrades: ["websocket"]     private-ws:       enabled: true       targetGateway: "private"       enabledUpgrades: ["websocket"]  |
+| kgateway-crds.enabled | bool | `true` | Enable installation of kgateway CRDs (required for Gateway API resources) |
+| kgateway.enabled | bool | `true` | Enable installation of kgateway controller (required for Gateway functionality) |
+| tlsSecret | object | {} (empty map, user must configure) | TLS secret configuration for gateway HTTPS listeners. Specify the secret name and optional namespace.  Example:   tlsSecret:     name: "wildcard-tls"     namespace: "cert-manager"  Note: Cross-namespace secret references require a ReferenceGrant in the secret's namespace (managed by cert-manager-platform chart, not this chart).  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

@@ -16,7 +16,7 @@ tests:
           of: HTTPListenerPolicy
       - equal:
           path: metadata.name
-          value: kgateway-platform-test-public-ws-websocket-upgrade
+          value: kgateway-platform-test-public-ws
       - equal:
           path: spec.targetRefs[0].name
           value: kgateway-platform-test-public
