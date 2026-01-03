@@ -1,16 +1,22 @@
 apiVersion: v2
 name: kgateway-plateform
-version: 0.0.0 # TODO: @copilot Add the right version
+version: 0.1.0
 type: application
 description: |-
-  TODO: @copilot Add a description for the kgateway-plateform chart
+  Helm chart for configuring the kgateway platform using the Kubernetes Gateway API, including public/private gateways, HTTP(S) routing, and TLS certificate integration.
 keywords:
-  - blabla # TODO: @copilot Add relevant keywords
-home: https://example.com # TODO: @copilot Add the chart home URL
+  - kubernetes
+  - gateway
+  - kgateway
+  - networking
+  - tls
+
 maintainers:
   - name: trowaflo
     email: trowa.flo@gmail.com
-sources: # TODO: @copilot Add relevant sources
+sources:
+  - https://github.com/kgateway-dev/kgateway
+  - https://docs.kgateway.dev/
   - https://github.com/trowaflo/helm-charts
 dependencies:
   - name: common
