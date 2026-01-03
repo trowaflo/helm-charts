@@ -1,14 +1,36 @@
-{{- $gateways := include "kgateway-platform.gateways" . | fromYaml -}}
-{{- range $gw := $gateways }}
+{{- $namespace := include "kgateway-platform.namespace" . -}}
+{{- $fullname := include "kgateway-platform.fullname" . -}}
+
+{{- if .Values.gateways.public.enabled }}
+{{- $cfg := .Values.gateways.public -}}
+{{- $name := default (printf "%s-public" $fullname) $cfg.name -}}
+{{- $ipSlot := default "public" $cfg.ipSlot -}}
 ---
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: GatewayParameters
 metadata:
-  name: {{ $gw.paramsName }}
-  namespace: {{ $gw.namespace }}
+  name: {{ printf "%s-params" $name }}
+  namespace: {{ $namespace }}
 spec:
   kube:
     service:
       extraLabels:
-        ip-slot: {{ $gw.ipSlot | quote }}
+        ip-slot: {{ $ipSlot | quote }}
+{{- end }}
+
+{{- if .Values.gateways.private.enabled }}
+{{- $cfg := .Values.gateways.private -}}
+{{- $name := default (printf "%s-private" $fullname) $cfg.name -}}
+{{- $ipSlot := default "private" $cfg.ipSlot -}}
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayParameters
+metadata:
+  name: {{ printf "%s-params" $name }}
+  namespace: {{ $namespace }}
+spec:
+  kube:
+    service:
+      extraLabels:
+        ip-slot: {{ $ipSlot | quote }}
 {{- end }}

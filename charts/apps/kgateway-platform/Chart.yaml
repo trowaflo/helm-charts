@@ -19,9 +19,6 @@ sources:
   - https://docs.kgateway.dev/
   - https://github.com/trowaflo/helm-charts
 dependencies:
-  - name: common
-    version: 2.0.0
-    repository: https://trowaflo.github.io/helm-charts
   - name: kgateway-crds
     version: v2.1.1
     repository: oci://cr.kgateway.dev/kgateway-dev/charts

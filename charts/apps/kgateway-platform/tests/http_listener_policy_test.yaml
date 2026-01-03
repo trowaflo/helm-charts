@@ -1,0 +1,38 @@
+suite: test kgateway-platform chart - HTTP listener policy
+release:
+  name: kgateway-platform-test
+  namespace: kgateway-test
+templates:
+  - templates/http-listener-policy.yaml
+tests:
+  # Test with HTTP listener policy enabled and public gateway enabled
+  - it: should render HTTPListenerPolicy when enabled with public gateway
+    values:
+      - values/default.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: HTTPListenerPolicy
+      - equal:
+          path: metadata.name
+          value: kgateway-platform-test-public-websocket-upgrade
+      - equal:
+          path: spec.targetRefs[0].name
+          value: kgateway-platform-test-public
+
+  # Test with HTTP listener policy disabled
+  - it: should not render HTTPListenerPolicy when disabled
+    values:
+      - values/disable-http-listener.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # Test with public gateway disabled
+  - it: should not render HTTPListenerPolicy when public gateway is disabled
+    values:
+      - values/disable-public.yaml
+    asserts:
+      - hasDocuments:
+          count: 0

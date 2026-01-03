@@ -1,24 +1,23 @@
 {{- if and .Values.httpListenerPolicy.enabled .Values.gateways.public.enabled }}
-{{- $gateways := include "kgateway-platform.gateways" . | fromYaml -}}
-{{- $namespace := include "common.helpers.namespace" . -}}
-{{- $public := (first (where $gateways "key" "public")) -}}
-{{- if $public }}
+{{- $namespace := include "kgateway-platform.namespace" . -}}
+{{- $fullname := include "kgateway-platform.fullname" . -}}
+{{- $cfg := .Values.gateways.public -}}
+{{- $name := default (printf "%s-public" $fullname) $cfg.name -}}
 ---
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: HTTPListenerPolicy
 metadata:
-  name: {{ default (printf "%s-websocket-upgrade" $public.name) .Values.httpListenerPolicy.name }}
+  name: {{ default (printf "%s-websocket-upgrade" $name) .Values.httpListenerPolicy.name }}
   namespace: {{ $namespace }}
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
       kind: Gateway
-      name: {{ $public.name }}
+      name: {{ $name }}
       namespace: {{ $namespace }}
   upgradeConfig:
     enabledUpgrades:
 {{- range $upgrade := .Values.httpListenerPolicy.enabledUpgrades }}
       - {{ $upgrade | quote }}
-{{- end }}
 {{- end }}
 {{- end }}
