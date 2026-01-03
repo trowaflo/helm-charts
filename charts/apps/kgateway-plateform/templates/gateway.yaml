@@ -1,0 +1,83 @@
+{{- $namespace := include "common.helpers.namespace" . -}}
+{{- $fullname := include "common.helpers.fullname" . -}}
+
+{{- $gateways := list -}}
+{{- if .Values.gateways.public.enabled }}
+  {{- $gateways = append $gateways (dict "key" "public" "cfg" .Values.gateways.public) }}
+{{- end -}}
+{{- if .Values.gateways.private.enabled }}
+  {{- $gateways = append $gateways (dict "key" "private" "cfg" .Values.gateways.private) }}
+{{- end -}}
+
+{{- range $gw := $gateways }}
+  {{- $name := default (printf "%s-%s" $fullname $gw.key) $gw.cfg.name }}
+  {{- $paramsName := printf "%s-params" $name }}
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayParameters
+metadata:
+  name: {{ $paramsName }}
+  namespace: {{ $namespace }}
+spec:
+  kube:
+    service:
+      extraLabels:
+        ip-slot: {{ default $gw.key $gw.cfg.ipSlot | quote }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: {{ $name }}
+  namespace: {{ $namespace }}
+spec:
+  gatewayClassName: kgateway
+  infrastructure:
+    parametersRef:
+      group: gateway.kgateway.dev
+      kind: GatewayParameters
+      name: {{ $paramsName }}
+  addresses:
+    - type: IPAddress
+      value: {{ required (printf "gateways.%s.address is required" $gw.key) $gw.cfg.address | quote }}
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https
+      port: 443
+      protocol: HTTPS
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ''
+            kind: Secret
+            name: {{ required "tlsSecret.name is required" .Values.tlsSecret.name }}
+            namespace: {{ default $namespace .Values.tlsSecret.namespace }}
+      allowedRoutes:
+        namespaces:
+          from: All
+{{- end }}
+
+{{- if and .Values.httpListenerPolicy.enabled .Values.gateways.public.enabled }}
+{{- $publicName := default (printf "%s-public" $fullname) .Values.gateways.public.name -}}
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: HTTPListenerPolicy
+metadata:
+  name: {{ default (printf "%s-websocket-upgrade" $publicName) .Values.httpListenerPolicy.name }}
+  namespace: {{ $namespace }}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: {{ $publicName }}
+      namespace: {{ $namespace }}
+  upgradeConfig:
+    enabledUpgrades:
+{{- range $upgrade := .Values.httpListenerPolicy.enabledUpgrades }}
+      - {{ $upgrade | quote }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,14 @@
+{{- $gateways := include "kgateway-plateform.gateways" . | fromYaml -}}
+{{- range $gw := $gateways }}
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayParameters
+metadata:
+  name: {{ $gw.paramsName }}
+  namespace: {{ $gw.namespace }}
+spec:
+  kube:
+    service:
+      extraLabels:
+        ip-slot: {{ $gw.ipSlot | quote }}
+{{- end }}

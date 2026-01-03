@@ -1,0 +1,28 @@
+apiVersion: v2
+name: kgateway-plateform
+version: 0.0.0 # TODO: @copilot Add the right version
+type: application
+description: |-
+  TODO: @copilot Add a description for the kgateway-plateform chart
+keywords:
+  - blabla # TODO: @copilot Add relevant keywords
+home: https://example.com # TODO: @copilot Add the chart home URL
+maintainers:
+  - name: trowaflo
+    email: trowa.flo@gmail.com
+sources: # TODO: @copilot Add relevant sources
+  - https://github.com/trowaflo/helm-charts
+dependencies:
+  - name: common
+    version: 2.0.0
+    repository: https://trowaflo.github.io/helm-charts
+  - name: kgateway-crds
+    version: v2.1.1
+    repository: oci://cr.kgateway.dev/kgateway-dev/charts
+    alias: kgateway-crds
+    condition: kgateway-crds.enabled
+  - name: kgateway
+    version: v2.1.1
+    repository: oci://cr.kgateway.dev/kgateway-dev/charts
+    alias: kgateway
+    condition: kgateway.enabled

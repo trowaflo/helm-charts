@@ -1,0 +1,39 @@
+{{- $gateways := include "kgateway-plateform.gateways" . | fromYaml -}}
+{{- range $gw := $gateways }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: {{ $gw.name }}
+  namespace: {{ $gw.namespace }}
+spec:
+  gatewayClassName: kgateway
+  infrastructure:
+    parametersRef:
+      group: gateway.kgateway.dev
+      kind: GatewayParameters
+      name: {{ $gw.paramsName }}
+  addresses:
+    - type: IPAddress
+      value: {{ required (printf "gateways.%s.address is required" $gw.key) $gw.address | quote }}
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https
+      port: 443
+      protocol: HTTPS
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ''
+            kind: Secret
+            name: {{ required "tlsSecret.name is required" .Values.tlsSecret.name }}
+            namespace: {{ default $gw.namespace .Values.tlsSecret.namespace }}
+      allowedRoutes:
+        namespaces:
+          from: All
+{{- end }}
