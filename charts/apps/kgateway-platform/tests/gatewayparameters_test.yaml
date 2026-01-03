@@ -1,0 +1,67 @@
+suite: test kgateway-platform chart - gateway parameters
+release:
+  name: kgateway-platform-test
+  namespace: kgateway-test
+templates:
+  - templates/gatewayparameters.yaml
+tests:
+  # Test with default values (both gateways enabled)
+  # Note: Gateway parameters are rendered in alphabetical order (private, then public)
+  - it: should render both gateway parameters when enabled
+    values:
+      - values/default.yaml
+    asserts:
+      - hasDocuments:
+          count: 2  # 2 gateway parameters
+      - isKind:
+          of: GatewayParameters
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: kgateway-platform-test-private-params
+        documentIndex: 0
+      - equal:
+          path: spec.kube.service.extraLabels.ip-slot
+          value: private
+        documentIndex: 0
+      - isKind:
+          of: GatewayParameters
+        documentIndex: 1
+      - equal:
+          path: metadata.name
+          value: kgateway-platform-test-public-params
+        documentIndex: 1
+      - equal:
+          path: spec.kube.service.extraLabels.ip-slot
+          value: public
+        documentIndex: 1
+
+  # Test with public gateway disabled
+  - it: should only render private gateway parameters when public is disabled
+    values:
+      - values/disable-public.yaml
+    asserts:
+      - hasDocuments:
+          count: 1  # 1 gateway parameters
+      - isKind:
+          of: GatewayParameters
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: kgateway-platform-test-private-params
+        documentIndex: 0
+
+  # Test with private gateway disabled
+  - it: should only render public gateway parameters when private is disabled
+    values:
+      - values/disable-private.yaml
+    asserts:
+      - hasDocuments:
+          count: 1  # 1 gateway parameters
+      - isKind:
+          of: GatewayParameters
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: kgateway-platform-test-public-params
+        documentIndex: 0

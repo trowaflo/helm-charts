@@ -1,21 +1,26 @@
-{{- $gateways := include "kgateway-plateform.gateways" . | fromYaml -}}
-{{- range $gw := $gateways }}
+{{- $namespace := include "kgateway-platform.namespace" . -}}
+{{- $fullname := include "kgateway-platform.fullname" . -}}
+{{- $keys := keys .Values.gateways | sortAlpha -}}
+{{- range $key := $keys }}
+  {{- $cfg := index $.Values.gateways $key }}
+  {{- if $cfg.enabled }}
+    {{- $name := default (printf "%s-%s" $fullname $key) $cfg.name }}
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: {{ $gw.name }}
-  namespace: {{ $gw.namespace }}
+  name: {{ $name }}
+  namespace: {{ $namespace }}
 spec:
   gatewayClassName: kgateway
   infrastructure:
     parametersRef:
       group: gateway.kgateway.dev
       kind: GatewayParameters
-      name: {{ $gw.paramsName }}
+      name: {{ printf "%s-params" $name }}
   addresses:
     - type: IPAddress
-      value: {{ required (printf "gateways.%s.address is required" $gw.key) $gw.address | quote }}
+      value: {{ required (printf "gateways.%s.address is required" $key) $cfg.address | quote }}
   listeners:
     - name: http
       port: 80
@@ -31,9 +36,10 @@ spec:
         certificateRefs:
           - group: ''
             kind: Secret
-            name: {{ required "tlsSecret.name is required" .Values.tlsSecret.name }}
-            namespace: {{ default $gw.namespace .Values.tlsSecret.namespace }}
+            name: {{ required "tlsSecret.name is required" (index $.Values.tlsSecret "name") }}
+            namespace: {{ default $namespace (index $.Values.tlsSecret "namespace") }}
       allowedRoutes:
         namespaces:
           from: All
+  {{- end }}
 {{- end }}

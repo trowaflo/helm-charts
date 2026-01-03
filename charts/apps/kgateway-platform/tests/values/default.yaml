@@ -1,0 +1,16 @@
+gateways:
+  public:
+    enabled: true
+    address: "192.168.1.1"
+  private:
+    enabled: true
+    address: "192.168.1.2"
+
+tlsSecret:
+  name: "test-tls-secret"
+  namespace: "cert-namespace"
+
+httpListenerPolicies:
+  public-ws:
+    enabled: true
+    targetGateway: "public"

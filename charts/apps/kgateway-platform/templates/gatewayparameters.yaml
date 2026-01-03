@@ -1,14 +1,21 @@
-{{- $gateways := include "kgateway-plateform.gateways" . | fromYaml -}}
-{{- range $gw := $gateways }}
+{{- $namespace := include "kgateway-platform.namespace" . -}}
+{{- $fullname := include "kgateway-platform.fullname" . -}}
+{{- $keys := keys .Values.gateways | sortAlpha -}}
+{{- range $key := $keys }}
+  {{- $cfg := index $.Values.gateways $key }}
+  {{- if $cfg.enabled }}
+    {{- $name := default (printf "%s-%s" $fullname $key) $cfg.name -}}
+    {{- $ipSlot := default $key $cfg.ipSlot }}
 ---
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: GatewayParameters
 metadata:
-  name: {{ $gw.paramsName }}
-  namespace: {{ $gw.namespace }}
+  name: {{ printf "%s-params" $name }}
+  namespace: {{ $namespace }}
 spec:
   kube:
     service:
       extraLabels:
-        ip-slot: {{ $gw.ipSlot | quote }}
+        ip-slot: {{ $ipSlot | quote }}
+  {{- end }}
 {{- end }}

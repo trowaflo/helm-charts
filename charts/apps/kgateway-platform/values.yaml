@@ -1,25 +1,66 @@
-gateways:
-  public:
-    enabled: true
-    name: ""
-    ipSlot: public
-    # address of the public gateway. MUST be set by the chart consumer.
-    address: ""
-  private:
-    enabled: true
-    name: ""
-    ipSlot: private
-    # address of the private gateway. MUST be set by the chart consumer.
-    address: ""
+# -- Gateway configuration. Define multiple gateways by adding entries with any key name.
+# Each gateway requires:
+# - enabled: bool
+# - address: string (REQUIRED) - IP address for the gateway
+# - name: string (optional) - defaults to "<release-name>-<key>"
+# - ipSlot: string (optional) - defaults to key name, used for Cilium LoadBalancerIPPool selector
+#
+# Example:
+#   gateways:
+#     public:
+#       enabled: true
+#       address: "192.168.1.1"
+#       ipSlot: public
+#     private:
+#       enabled: true
+#       address: "192.168.1.2"
+#       ipSlot: private
+#
+# @default -- {} (empty, user must configure gateways)
+gateways: {}
 
-tlsSecret:
-  # Name of the TLS secret to use for gateways. MUST be set by the chart consumer.
-  name: ""
-  # Namespace where the TLS secret is located. MUST be set by the chart consumer.
-  namespace: ""
+# -- TLS secret configuration for gateway HTTPS listeners.
+# Specify the secret name and optional namespace.
+#
+# Example:
+#   tlsSecret:
+#     name: "wildcard-tls"
+#     namespace: "cert-manager"
+#
+# Note: Cross-namespace secret references require a ReferenceGrant in the secret's
+# namespace (managed by cert-manager-platform chart, not this chart).
+#
+# @default -- {} (empty map, user must configure)
+tlsSecret: {}
 
-httpListenerPolicy:
+# -- HTTP listener policies for WebSocket upgrade support.
+# Map structure where keys reference gateway keys from the gateways map.
+# Each policy requires:
+# - enabled: bool
+# - targetGateway: string (REQUIRED) - must match a gateway key
+# - name: string (optional) - defaults to policy key
+# - enabledUpgrades: list of strings (optional) - defaults to ["websocket"]
+#
+# Example:
+#   httpListenerPolicies:
+#     public-ws:
+#       enabled: true
+#       targetGateway: "public"
+#       enabledUpgrades: ["websocket"]
+#     private-ws:
+#       enabled: true
+#       targetGateway: "private"
+#       enabledUpgrades: ["websocket"]
+#
+# @default -- {} (empty, user must configure policies)
+httpListenerPolicies: {}
+
+# kgateway-crds subchart configuration
+kgateway-crds:
+  # -- Enable installation of kgateway CRDs (required for Gateway API resources)
   enabled: true
-  name: ""
-  enabledUpgrades:
-    - websocket
+
+# kgateway subchart configuration
+kgateway:
+  # -- Enable installation of kgateway controller (required for Gateway functionality)
+  enabled: true
