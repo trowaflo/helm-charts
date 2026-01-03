@@ -42,6 +42,46 @@ entries:
     version: 1.0.0
   cert-manager-platform:
   - apiVersion: v2
+    created: "2026-01-03T21:17:59.709601501Z"
+    dependencies:
+    - alias: cert-manager
+      condition: cert-manager.enabled
+      name: cert-manager
+      repository: oci://quay.io/jetstack/charts
+      version: v1.19.2
+    - alias: cert-manager-webhook-ovh
+      condition: cert-manager-webhook-ovh.enabled
+      name: cert-manager-webhook-ovh
+      repository: https://aureq.github.io/cert-manager-webhook-ovh/
+      version: 0.8.0
+    description: Wraps cert-manager and cert-manager-webhook-ovh to provide automated
+      X.509 certificate management for Kubernetes with OVH DNS-01 challenge support.
+      Includes configuration validation for breaking changes and streamlined setup
+      for Let's Encrypt certificates.
+    digest: 1b218f5396e315bc0cd8d9746d83b02081eeb7e51ee40b7b4096efe9c83c0ce0
+    home: https://cert-manager.io
+    keywords:
+    - cert-manager
+    - certificates
+    - tls
+    - ssl
+    - letsencrypt
+    - ovh
+    - dns
+    - acme
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: cert-manager-platform
+    sources:
+    - https://github.com/cert-manager/cert-manager
+    - https://github.com/aureq/cert-manager-webhook-ovh
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/cert-manager-platform-1.1.0/cert-manager-platform-1.1.0.tgz
+    version: 1.1.0
+  - apiVersion: v2
     created: "2026-01-03T11:38:37.155726069Z"
     dependencies:
     - alias: cert-manager
@@ -683,6 +723,42 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/guacamole-0.1.0/guacamole-0.1.0.tgz
     version: 0.1.0
+  kgateway-platform:
+  - apiVersion: v2
+    created: "2026-01-03T21:17:59.866723007Z"
+    dependencies:
+    - alias: kgateway-crds
+      condition: kgateway-crds.enabled
+      name: kgateway-crds
+      repository: oci://cr.kgateway.dev/kgateway-dev/charts
+      version: v2.1.1
+    - alias: kgateway
+      condition: kgateway.enabled
+      name: kgateway
+      repository: oci://cr.kgateway.dev/kgateway-dev/charts
+      version: v2.1.1
+    description: Helm chart for configuring the kgateway platform using the Kubernetes
+      Gateway API with support for multiple gateways, HTTP(S) routing, and TLS certificate
+      integration.
+    digest: 965b0941b09c8ced8193b7dfac490539754516f94c71ada8e5b1cd92c5b269eb
+    keywords:
+    - kubernetes
+    - gateway
+    - kgateway
+    - networking
+    - tls
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: kgateway-platform
+    sources:
+    - https://github.com/kgateway-dev/kgateway
+    - https://docs.kgateway.dev/
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/kgateway-platform-1.0.0/kgateway-platform-1.0.0.tgz
+    version: 1.0.0
   portainer:
   - apiVersion: v2
     created: "2026-01-01T16:23:42.209380968Z"
@@ -1004,4 +1080,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2026-01-03T11:38:37.406283045Z"
+generated: "2026-01-03T21:17:59.866827468Z"
