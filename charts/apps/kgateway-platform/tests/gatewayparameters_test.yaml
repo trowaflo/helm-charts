@@ -6,6 +6,7 @@ templates:
   - templates/gatewayparameters.yaml
 tests:
   # Test with default values (both gateways enabled)
+  # Note: Gateway parameters are rendered in alphabetical order (private, then public)
   - it: should render both gateway parameters when enabled
     values:
       - values/default.yaml
@@ -17,22 +18,22 @@ tests:
         documentIndex: 0
       - equal:
           path: metadata.name
-          value: kgateway-platform-test-public-params
+          value: kgateway-platform-test-private-params
         documentIndex: 0
       - equal:
           path: spec.kube.service.extraLabels.ip-slot
-          value: public
+          value: private
         documentIndex: 0
       - isKind:
           of: GatewayParameters
         documentIndex: 1
       - equal:
           path: metadata.name
-          value: kgateway-platform-test-private-params
+          value: kgateway-platform-test-public-params
         documentIndex: 1
       - equal:
           path: spec.kube.service.extraLabels.ip-slot
-          value: private
+          value: public
         documentIndex: 1
 
   # Test with public gateway disabled

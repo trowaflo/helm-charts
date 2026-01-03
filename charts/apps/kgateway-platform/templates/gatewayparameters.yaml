@@ -1,6 +1,8 @@
 {{- $namespace := include "kgateway-platform.namespace" . -}}
 {{- $fullname := include "kgateway-platform.fullname" . -}}
-{{- range $key, $cfg := .Values.gateways }}
+{{- $keys := keys .Values.gateways | sortAlpha -}}
+{{- range $key := $keys }}
+{{- $cfg := index $.Values.gateways $key }}
 {{- if $cfg.enabled }}
 {{- $name := default (printf "%s-%s" $fullname $key) $cfg.name -}}
 {{- $ipSlot := default $key $cfg.ipSlot }}
