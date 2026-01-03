@@ -10,7 +10,7 @@
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: GatewayParameters
 metadata:
-  name: {{ printf "%s-params" $name }}
+  name: {{ printf "%s" $name }}
   namespace: {{ $namespace }}
 spec:
   kube:

@@ -18,14 +18,13 @@
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: HTTPListenerPolicy
 metadata:
-  name: {{ default (printf "%s-%s-websocket-upgrade" $fullname $policyKey) $policy.name }}
+  name: {{ default (printf "%s-%s" $fullname $policyKey) $policy.name }}
   namespace: {{ $namespace }}
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
       kind: Gateway
       name: {{ $gatewayName }}
-      namespace: {{ $namespace }}
   upgradeConfig:
     enabledUpgrades:
       {{- range $upgrade := $upgrades }}
