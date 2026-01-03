@@ -41,9 +41,9 @@ tests:
     asserts:
       - equal:
           path: spec.infrastructure.parametersRef.name
-          value: kgateway-platform-test-private
+          value: kgateway-platform-test-private-params
         documentIndex: 0
       - equal:
           path: spec.infrastructure.parametersRef.name
-          value: kgateway-platform-test-public
+          value: kgateway-platform-test-public-params
         documentIndex: 1

@@ -16,7 +16,7 @@ spec:
     parametersRef:
       group: gateway.kgateway.dev
       kind: GatewayParameters
-      name: {{ $name }}
+      name: {{ include "kgateway-platform.gatewayParametersName" (dict "root" $ "key" $key "config" $cfg) }}
   addresses:
     - type: IPAddress
       value: {{ required (printf "gateways.%s.address is required" $key) $cfg.address | quote }}

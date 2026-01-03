@@ -3,7 +3,7 @@
 {{- range $key := $keys }}
   {{- $cfg := index $.Values.gateways $key }}
   {{- if $cfg.enabled }}
-    {{- $name := include "kgateway-platform.gatewayName" (dict "root" $ "key" $key "config" $cfg) -}}
+    {{- $name := include "kgateway-platform.gatewayParametersName" (dict "root" $ "key" $key "config" $cfg) -}}
     {{- $ipSlot := default $key $cfg.ipSlot }}
 ---
 apiVersion: gateway.kgateway.dev/v1alpha1

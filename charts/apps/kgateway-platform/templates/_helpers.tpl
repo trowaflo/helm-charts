@@ -37,3 +37,12 @@ Takes a dict with keys: root (.), key (gateway key), config (gateway config)
   {{- $fullname := include "kgateway-platform.fullname" .root -}}
   {{- default (printf "%s-%s" $fullname .key) .config.name -}}
 {{- end -}}
+
+{{/*
+Generate the name for a GatewayParameters resource.
+Takes a dict with keys: root (.), key (gateway key), config (gateway config)
+*/}}
+{{- define "kgateway-platform.gatewayParametersName" -}}
+  {{- $gatewayName := include "kgateway-platform.gatewayName" . -}}
+  {{- printf "%s-params" $gatewayName -}}
+{{- end -}}
