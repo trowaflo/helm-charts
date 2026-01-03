@@ -1,4 +1,4 @@
-{{- $gateways := include "kgateway-plateform.gateways" . | fromYaml -}}
+{{- $gateways := include "kgateway-platform.gateways" . | fromYaml -}}
 {{- range $gw := $gateways }}
 ---
 apiVersion: gateway.kgateway.dev/v1alpha1

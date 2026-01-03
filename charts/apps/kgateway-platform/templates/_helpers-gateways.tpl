@@ -1,4 +1,4 @@
-{{- define "kgateway-plateform.gateways" -}}
+{{- define "kgateway-platform.gateways" -}}
 {{- $namespace := include "common.helpers.namespace" . -}}
 {{- $fullname := include "common.helpers.fullname" . -}}
 {{- $items := list -}}

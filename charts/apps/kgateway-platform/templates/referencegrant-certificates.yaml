@@ -1,11 +1,12 @@
 {{- $namespace := include "common.helpers.namespace" . -}}
 {{- $fullname := include "common.helpers.fullname" . -}}
-
+{{- if and .Values.tlsSecret.namespace (ne .Values.tlsSecret.namespace $namespace) }}
+---
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: ReferenceGrant
 metadata:
   name: {{ printf "%s-allow-tls" $fullname }}
-  namespace: {{ default $namespace .Values.tlsSecret.namespace }}
+  namespace: {{ .Values.tlsSecret.namespace }}
 spec:
   from:
     - group: gateway.networking.k8s.io
@@ -15,3 +16,4 @@ spec:
     - group: ""
       kind: Secret
       name: {{ required "tlsSecret.name is required" .Values.tlsSecret.name }}
+{{- end }}

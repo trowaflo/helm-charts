@@ -23,3 +23,9 @@ httpListenerPolicy:
   name: ""
   enabledUpgrades:
     - websocket
+
+kgateway-crds:
+  enabled: false
+
+kgateway:
+  enabled: false
