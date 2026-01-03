@@ -28,3 +28,12 @@ Uses Release.Namespace by default, but can be overridden.
 {{- define "kgateway-platform.namespace" -}}
   {{- default .Release.Namespace .Values.namespaceOverride -}}
 {{- end -}}
+
+{{/*
+Generate the name for a gateway resource.
+Takes a dict with keys: root (.), key (gateway key), config (gateway config)
+*/}}
+{{- define "kgateway-platform.gatewayName" -}}
+  {{- $fullname := include "kgateway-platform.fullname" .root -}}
+  {{- default (printf "%s-%s" $fullname .key) .config.name -}}
+{{- end -}}
