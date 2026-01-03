@@ -16,16 +16,20 @@ gateways:
     enabled: true
     name: ""
     ipSlot: public
-    address: "192.168.2.211"
+    # address of the public gateway. MUST be set by the chart consumer.
+    address: ""
   private:
     enabled: true
     name: ""
     ipSlot: private
-    address: "192.168.2.212"
+    # address of the private gateway. MUST be set by the chart consumer.
+    address: ""
 
 tlsSecret:
-  name: trowa-family-wildcard-tls
-  namespace: kube-system
+  # Name of the TLS secret to use for gateways. MUST be set by the chart consumer.
+  name: ""
+  # Namespace where the TLS secret is located. MUST be set by the chart consumer.
+  namespace: ""
 
 httpListenerPolicy:
   enabled: true
