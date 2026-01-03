@@ -13,9 +13,15 @@ cert-manager-webhook-ovh:
 
 # ReferenceGrants allow Gateway API resources in other namespaces to reference
 # secrets in the cert-manager-platform namespace (where certificates are stored).
-# ReferenceGrants are Gateway API resources that require Gateway API CRDs to be installed.
-# Only configure this when using Gateway API (requires Gateway API CRDs installed).
-# Define multiple grants using map keys (e.g., allow-kgateway-platform, allow-dmz-gateway)
+# 
+# ⚠️ IMPORTANT: ReferenceGrants are Gateway API resources (gateway.networking.k8s.io/v1beta1)
+# that require Gateway API CRDs to be installed cluster-wide. Enabling ReferenceGrants
+# without Gateway API CRDs installed will cause deployment failures.
+# Only configure this section when using Gateway API (e.g., with kgateway-platform chart).
+# 
+# Define multiple grants using map keys (e.g., allow-kgateway-platform, allow-dmz-gateway).
+# Each grant must have 'enabled: true' and 'from'/'to' configuration.
+# See README.md for configuration examples.
 # @default -- {} (empty, configure only when using Gateway API)
 referenceGrants: {}
   # Example: Allow kgateway-platform namespace to reference secrets

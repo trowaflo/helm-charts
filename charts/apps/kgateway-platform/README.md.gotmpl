@@ -1,0 +1,146 @@
+{{ template "chart.header" . }}
+
+{{ template "chart.description" . }}
+
+---
+
+{{ template "chart.versionBadge" . }} {{ template "chart.typeBadge" . }} {{ template "chart.appVersionBadge" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+## Requirements
+
+{{ template "chart.requirementsSection" . }}
+
+- Helm: v3+
+- Gateway API CRDs installed cluster-wide
+
+## Getting Started
+
+### Add repository
+
+```bash
+helm repo add {{ template "chart.name" . }} https://example.com/helm-charts
+helm repo update
+```
+
+### Install
+
+```bash
+helm install my-{{ template "chart.name" . }} {{ template "chart.name" . }}/{{ template "chart.name" . }} \
+  --namespace {{ template "chart.name" . }} \
+  --create-namespace \
+  -f values.yaml
+```
+
+### Upgrade
+
+```bash
+helm upgrade my-{{ template "chart.name" . }} {{ template "chart.name" . }}/{{ template "chart.name" . }} \
+  --namespace {{ template "chart.name" . }} \
+  --install \
+  -f values.yaml
+```
+
+### Uninstall
+
+```bash
+helm uninstall my-{{ template "chart.name" . }} --namespace {{ template "chart.name" . }}
+```
+
+## Configuration Examples
+
+### Basic Configuration with Public and Private Gateways
+
+```yaml
+gateways:
+  public:
+    enabled: true
+    address: "192.168.1.1"
+    ipSlot: public  # Used by Cilium LoadBalancerIPPool selector
+  private:
+    enabled: true
+    address: "192.168.1.2"
+    ipSlot: private
+
+tlsSecret:
+  name: "wildcard-tls"
+  namespace: "cert-manager-platform"
+
+httpListenerPolicy:
+  enabled: true
+  targetGateway: "public"
+  enabledUpgrades:
+    - websocket
+
+kgateway-crds:
+  enabled: true
+
+kgateway:
+  enabled: true
+```
+
+### Multiple Gateways Configuration
+
+You can define as many gateways as needed:
+
+```yaml
+gateways:
+  public:
+    enabled: true
+    address: "192.168.1.1"
+    ipSlot: public
+  private:
+    enabled: true
+    address: "192.168.1.2"
+    ipSlot: private
+  dmz:
+    enabled: true
+    address: "192.168.1.3"
+    ipSlot: dmz
+  staging:
+    enabled: true
+    address: "192.168.1.4"
+    ipSlot: staging
+
+tlsSecret:
+  name: "wildcard-tls"
+  namespace: "cert-manager-platform"
+```
+
+### Cilium LoadBalancer Integration
+
+The `ipSlot` label in GatewayParameters enables Cilium's CiliumLoadBalancerIPPool to match services to specific IP pools:
+
+```yaml
+# kgateway-platform chart configuration
+gateways:
+  public:
+    enabled: true
+    address: "192.168.1.1"
+    ipSlot: public  # This label is used by Cilium
+
+# Corresponding Cilium configuration (deployed separately)
+---
+apiVersion: cilium.io/v2alpha1
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: pool-public-strict
+  namespace: kube-system
+spec:
+  cidrs:
+    - cidr: "192.168.1.1/32"
+  serviceSelector:
+    matchLabels:
+      ip-slot: public  # Matches the ipSlot from GatewayParameters
+```
+
+{{ template "chart.valuesSectionHtml" . }}
+
+## Maintainers
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}

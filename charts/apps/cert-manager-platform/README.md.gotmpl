@@ -1,0 +1,135 @@
+{{ template "chart.header" . }}
+
+{{ template "chart.description" . }}
+
+---
+
+{{ template "chart.versionBadge" . }} {{ template "chart.typeBadge" . }} {{ template "chart.appVersionBadge" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+## Requirements
+
+{{ template "chart.requirementsSection" . }}
+
+- Helm: v3+
+
+## Getting Started
+
+### Add repository
+
+```bash
+helm repo add {{ template "chart.name" . }} https://example.com/helm-charts
+helm repo update
+```
+
+### Install
+
+```bash
+helm install my-{{ template "chart.name" . }} {{ template "chart.name" . }}/{{ template "chart.name" . }} \
+  --namespace {{ template "chart.name" . }} \
+  --create-namespace
+```
+
+### Upgrade
+
+```bash
+helm upgrade my-{{ template "chart.name" . }} {{ template "chart.name" . }}/{{ template "chart.name" . }} \
+  --namespace {{ template "chart.name" . }} \
+  --install
+```
+
+### Uninstall
+
+```bash
+helm uninstall my-{{ template "chart.name" . }} --namespace {{ template "chart.name" . }}
+```
+
+## Configuration Examples
+
+### Basic Configuration
+
+```yaml
+cert-manager:
+  enabled: true
+  crds:
+    enabled: true
+
+cert-manager-webhook-ovh:
+  enabled: true
+  configVersion: "0.0.2"
+```
+
+### With Gateway API ReferenceGrants
+
+**⚠️ Important:** ReferenceGrants are Gateway API resources that require Gateway API CRDs to be installed cluster-wide. Only configure this section if you are using Gateway API (e.g., with kgateway-platform chart).
+
+```yaml
+# Allow Gateway API resources in other namespaces to reference TLS secrets
+referenceGrants:
+  allow-kgateway-platform:
+    enabled: true
+    from:
+      - kind: Gateway
+        namespace: kgateway-platform
+    to:
+      - kind: Secret
+```
+
+### Multiple ReferenceGrants
+
+```yaml
+referenceGrants:
+  allow-kgateway-platform:
+    enabled: true
+    from:
+      - kind: Gateway
+        namespace: kgateway-platform
+    to:
+      - kind: Secret
+  
+  allow-dmz-gateway:
+    enabled: true
+    from:
+      - kind: Gateway
+        namespace: kgateway-dmz
+    to:
+      - kind: Secret
+  
+  allow-httproutes:
+    enabled: true
+    from:
+      - kind: HTTPRoute
+        namespace: app-namespace
+    to:
+      - kind: Secret
+        name: specific-secret-name  # Optional: restrict to specific secret
+```
+
+### Custom Labels and Annotations
+
+```yaml
+referenceGrants:
+  allow-kgateway-platform:
+    enabled: true
+    labels:
+      environment: production
+      team: platform
+    annotations:
+      description: "Allow kgateway-platform to access TLS secrets"
+    from:
+      - kind: Gateway
+        namespace: kgateway-platform
+    to:
+      - kind: Secret
+```
+
+{{ template "chart.valuesSectionHtml" . }}
+
+## Maintainers
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}
