@@ -2,10 +2,9 @@
 
 # cert-manager-platform
 
-Wrapper chart for cert-manager and cert-manager-webhook-ovh.
-Provides X.509 certificate management for Kubernetes with OVH DNS-01 challenge support.
-Includes validation for breaking changes and simplified configuration.
-This chart is NOT a drop-in replacement for the upstream cert-manager chart.
+Wraps cert-manager and cert-manager-webhook-ovh to provide automated X.509 certificate
+management for Kubernetes with OVH DNS-01 challenge support. Includes configuration
+validation for breaking changes and streamlined setup for Let's Encrypt certificates.
 
 ---
 
