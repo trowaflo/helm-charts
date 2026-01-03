@@ -1,0 +1,37 @@
+{{- range $name, $grant := .Values.referenceGrants }}
+  {{- if $grant.enabled }}
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Release.Namespace }}
+    {{- with $grant.labels }}
+  labels:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with $grant.annotations }}
+  annotations:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  from:
+    {{- range $from := $grant.from }}
+    - group: {{ $from.group | default "gateway.networking.k8s.io" }}
+      kind: {{ $from.kind | required "referenceGrants[].from[].kind is required" }}
+      namespace: {{ $from.namespace | required "referenceGrants[].from[].namespace is required" }}
+    {{- end }}
+  to:
+    {{- range $to := $grant.to }}
+    - {{- if $to.group }}
+      group: {{ $to.group }}
+      {{- else }}
+      group: ""
+      {{- end }}
+      kind: {{ $to.kind | required "referenceGrants[].to[].kind is required" }}
+      {{- with $to.name }}
+      name: {{ . }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,21 @@
+{{- $namespace := include "kgateway-platform.namespace" . -}}
+{{- $fullname := include "kgateway-platform.fullname" . -}}
+{{- $keys := keys .Values.gateways | sortAlpha -}}
+{{- range $key := $keys }}
+  {{- $cfg := index $.Values.gateways $key }}
+  {{- if $cfg.enabled }}
+    {{- $name := default (printf "%s-%s" $fullname $key) $cfg.name -}}
+    {{- $ipSlot := default $key $cfg.ipSlot }}
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayParameters
+metadata:
+  name: {{ printf "%s-params" $name }}
+  namespace: {{ $namespace }}
+spec:
+  kube:
+    service:
+      extraLabels:
+        ip-slot: {{ $ipSlot | quote }}
+  {{- end }}
+{{- end }}
