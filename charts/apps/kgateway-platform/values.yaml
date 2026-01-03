@@ -6,14 +6,9 @@ gateways: {}
 # @default -- {} (empty map, user must configure)
 tlsSecret: {}
 
-# -- HTTP listener policy configuration for WebSocket upgrade support. Specify target gateway key from gateways map and list of enabled upgrades. Example: `httpListenerPolicy: { enabled: true, targetGateway: "public", enabledUpgrades: ["websocket"] }`
-# @default -- { enabled: true, targetGateway: "public", enabledUpgrades: ["websocket"] }
-httpListenerPolicy:
-  enabled: true
-  targetGateway: "public"
-  name: ""
-  enabledUpgrades:
-    - websocket
+# -- HTTP listener policies for WebSocket upgrade support. Map structure where keys reference gateway keys from the gateways map. Each policy requires: enabled (bool), targetGateway (string, REQUIRED, must match a gateway key), name (string, optional), enabledUpgrades (list of strings, optional, defaults to ["websocket"]). Example: `httpListenerPolicies: { public-ws: { enabled: true, targetGateway: "public", enabledUpgrades: ["websocket"] }, private-ws: { enabled: true, targetGateway: "private", enabledUpgrades: ["websocket"] } }`
+# @default -- {} (empty, user must configure policies)
+httpListenerPolicies: {}
 
 # kgateway-crds subchart configuration
 kgateway-crds:

@@ -9,5 +9,7 @@ tlsSecret:
   name: "test-tls-secret"
   namespace: "cert-namespace"
 
-httpListenerPolicy:
-  enabled: true
+httpListenerPolicies:
+  public-ws:
+    enabled: true
+    targetGateway: "public"

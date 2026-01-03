@@ -10,5 +10,4 @@ tlsSecret:
   name: "test-tls-secret"
   namespace: "cert-namespace"
 
-httpListenerPolicy:
-  enabled: false
+httpListenerPolicies: {}

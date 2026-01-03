@@ -1,26 +1,36 @@
-{{- if .Values.httpListenerPolicy.enabled }}
 {{- $namespace := include "kgateway-platform.namespace" . -}}
 {{- $fullname := include "kgateway-platform.fullname" . -}}
-{{- $targetGateway := .Values.httpListenerPolicy.targetGateway | default "public" -}}
-{{- $cfg := index .Values.gateways $targetGateway -}}
-{{- if and $cfg $cfg.enabled }}
-{{- $name := default (printf "%s-%s" $fullname $targetGateway) $cfg.name -}}
+{{- range $policyKey, $policy := .Values.httpListenerPolicies }}
+{{- if $policy.enabled }}
+{{- $targetGateway := $policy.targetGateway -}}
+{{- if not $targetGateway }}
+{{- fail (printf "httpListenerPolicies.%s.targetGateway is required" $policyKey) }}
+{{- end }}
+{{- $gatewayCfg := index $.Values.gateways $targetGateway -}}
+{{- if not $gatewayCfg }}
+{{- fail (printf "httpListenerPolicies.%s.targetGateway '%s' does not exist in gateways map" $policyKey $targetGateway) }}
+{{- end }}
+{{- if $gatewayCfg.enabled }}
+{{- $gatewayName := default (printf "%s-%s" $fullname $targetGateway) $gatewayCfg.name -}}
+{{- $defaultUpgrades := list "websocket" -}}
+{{- $upgrades := default $defaultUpgrades $policy.enabledUpgrades }}
 ---
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: HTTPListenerPolicy
 metadata:
-  name: {{ default (printf "%s-websocket-upgrade" $name) .Values.httpListenerPolicy.name }}
+  name: {{ default (printf "%s-%s-websocket-upgrade" $fullname $policyKey) $policy.name }}
   namespace: {{ $namespace }}
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
       kind: Gateway
-      name: {{ $name }}
+      name: {{ $gatewayName }}
       namespace: {{ $namespace }}
   upgradeConfig:
     enabledUpgrades:
-{{- range $upgrade := .Values.httpListenerPolicy.enabledUpgrades }}
+{{- range $upgrade := $upgrades }}
       - {{ $upgrade | quote }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

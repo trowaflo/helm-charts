@@ -1,4 +1,4 @@
-suite: test kgateway-platform chart - HTTP listener policy
+suite: test kgateway-platform chart - HTTP listener policies
 release:
   name: kgateway-platform-test
   namespace: kgateway-test
@@ -16,12 +16,12 @@ tests:
           of: HTTPListenerPolicy
       - equal:
           path: metadata.name
-          value: kgateway-platform-test-public-websocket-upgrade
+          value: kgateway-platform-test-public-ws-websocket-upgrade
       - equal:
           path: spec.targetRefs[0].name
           value: kgateway-platform-test-public
 
-  # Test with HTTP listener policy disabled
+  # Test with HTTP listener policies disabled (empty map)
   - it: should not render HTTPListenerPolicy when disabled
     values:
       - values/disable-http-listener.yaml
@@ -36,3 +36,18 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
+  
+  # Test with multiple HTTP listener policies
+  - it: should render multiple HTTPListenerPolicies when configured
+    set:
+      gateways.public.enabled: true
+      gateways.public.address: "192.168.1.1"
+      gateways.private.enabled: true
+      gateways.private.address: "192.168.1.2"
+      httpListenerPolicies.public-ws.enabled: true
+      httpListenerPolicies.public-ws.targetGateway: "public"
+      httpListenerPolicies.private-ws.enabled: true
+      httpListenerPolicies.private-ws.targetGateway: "private"
+    asserts:
+      - hasDocuments:
+          count: 2

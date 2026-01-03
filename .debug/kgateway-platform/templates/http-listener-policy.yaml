@@ -1,0 +1,29 @@
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: HTTPListenerPolicy
+metadata:
+  name: kgateway-platform-test-private-ws-websocket-upgrade
+  namespace: kgateway-test
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: kgateway-platform-test-private
+      namespace: kgateway-test
+  upgradeConfig:
+    enabledUpgrades:
+      - "websocket"---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: HTTPListenerPolicy
+metadata:
+  name: kgateway-platform-test-public-ws-websocket-upgrade
+  namespace: kgateway-test
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: kgateway-platform-test-public
+      namespace: kgateway-test
+  upgradeConfig:
+    enabledUpgrades:
+      - "websocket"
