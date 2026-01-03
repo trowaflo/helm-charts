@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
-          # récupère toutes les branches pour que git log fonctionne correctement
+          # Fetch all branches so git log works correctly
           ref: ${{ github.head_ref }}
 
       - name: Setup Node.js
@@ -78,7 +78,7 @@ jobs:
             echo "Commits affecting $chart:"
             echo "$COMMITS"
 
-            # Déterminer bump pour ce chart
+            # Determine the bump for this chart
             bump="patch"
             if echo "$COMMITS" | grep -q "BREAKING CHANGE"; then
               bump="major"
