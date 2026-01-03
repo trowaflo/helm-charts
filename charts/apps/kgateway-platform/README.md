@@ -1,12 +1,14 @@
-
-
 # kgateway-platform
 
-Helm chart for configuring the kgateway platform using the Kubernetes Gateway API, including public/private gateways, HTTP(S) routing, and TLS certificate integration.
+![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
----
+Helm chart for configuring the kgateway platform using the Kubernetes Gateway API with support for multiple gateways, HTTP(S) routing, and TLS certificate integration.
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| trowaflo | <trowa.flo@gmail.com> |  |
 
 ## Source Code
 
@@ -16,210 +18,20 @@ Helm chart for configuring the kgateway platform using the Kubernetes Gateway AP
 
 ## Requirements
 
-## Requirements
-
 | Repository | Name | Version |
 |------------|------|---------|
 | oci://cr.kgateway.dev/kgateway-dev/charts | kgateway(kgateway) | v2.1.1 |
 | oci://cr.kgateway.dev/kgateway-dev/charts | kgateway-crds(kgateway-crds) | v2.1.1 |
 
-- Helm: v3+
-
-## Getting Started
-
-### Add repository
-
-```bash
-helm repo add kgateway-platform https://example.com/helm-charts
-helm repo update
-```
-
-### Install
-
-```bash
-helm install my-kgateway-platform kgateway-platform/kgateway-platform \
-  --namespace kgateway-platform \
-  --create-namespace
-```
-
-### Upgrade
-
-```bash
-helm upgrade my-kgateway-platform kgateway-platform/kgateway-platform \
-  --namespace kgateway-platform \
-  --install
-```
-
-### Uninstall
-
-```bash
-helm uninstall my-kgateway-platform --namespace kgateway-platform
-```
-
 ## Values
 
-<table>
-	<thead>
-		<th>Key</th>
-		<th>Type</th>
-		<th>Default</th>
-		<th>Description</th>
-	</thead>
-	<tbody>
-		<tr>
-			<td>gateways.private.address</td>
-			<td>string</td>
-			<td><pre lang="json">
-""
-</pre>
-</td>
-			<td>IP address of the gateway. MUST be set by the chart consumer.</td>
-		</tr>
-		<tr>
-			<td>gateways.private.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td>Enable this gateway</td>
-		</tr>
-		<tr>
-			<td>gateways.private.ipSlot</td>
-			<td>string</td>
-			<td><pre lang="json">
-"private"
-</pre>
-</td>
-			<td>IP slot label for the gateway service</td>
-		</tr>
-		<tr>
-			<td>gateways.private.name</td>
-			<td>string</td>
-			<td><pre lang="json">
-""
-</pre>
-</td>
-			<td>Custom name for the gateway (defaults to "<release-name>-<key>")</td>
-		</tr>
-		<tr>
-			<td>gateways.public.address</td>
-			<td>string</td>
-			<td><pre lang="json">
-""
-</pre>
-</td>
-			<td>IP address of the gateway. MUST be set by the chart consumer.</td>
-		</tr>
-		<tr>
-			<td>gateways.public.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td>Enable this gateway</td>
-		</tr>
-		<tr>
-			<td>gateways.public.ipSlot</td>
-			<td>string</td>
-			<td><pre lang="json">
-"public"
-</pre>
-</td>
-			<td>IP slot label for the gateway service</td>
-		</tr>
-		<tr>
-			<td>gateways.public.name</td>
-			<td>string</td>
-			<td><pre lang="json">
-""
-</pre>
-</td>
-			<td>Custom name for the gateway (defaults to "<release-name>-<key>")</td>
-		</tr>
-		<tr>
-			<td>httpListenerPolicy.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td>Enable HTTPListenerPolicy</td>
-		</tr>
-		<tr>
-			<td>httpListenerPolicy.enabledUpgrades</td>
-			<td>list</td>
-			<td><pre lang="json">
-[
-  "websocket"
-]
-</pre>
-</td>
-			<td>List of enabled protocol upgrades (e.g., websocket)</td>
-		</tr>
-		<tr>
-			<td>httpListenerPolicy.name</td>
-			<td>string</td>
-			<td><pre lang="json">
-""
-</pre>
-</td>
-			<td>Custom name for the HTTPListenerPolicy (defaults to "<target-gateway-name>-websocket-upgrade")</td>
-		</tr>
-		<tr>
-			<td>httpListenerPolicy.targetGateway</td>
-			<td>string</td>
-			<td><pre lang="json">
-"public"
-</pre>
-</td>
-			<td>Target gateway key from gateways map (defaults to "public")</td>
-		</tr>
-		<tr>
-			<td>kgateway-crds.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-false
-</pre>
-</td>
-			<td>Enable installation of kgateway CRDs</td>
-		</tr>
-		<tr>
-			<td>kgateway.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-false
-</pre>
-</td>
-			<td>Enable installation of kgateway controller</td>
-		</tr>
-		<tr>
-			<td>tlsSecret.name</td>
-			<td>string</td>
-			<td><pre lang="json">
-""
-</pre>
-</td>
-			<td>Name of the TLS secret to use for gateways. MUST be set by the chart consumer.</td>
-		</tr>
-		<tr>
-			<td>tlsSecret.namespace</td>
-			<td>string</td>
-			<td><pre lang="json">
-""
-</pre>
-</td>
-			<td>Namespace where the TLS secret is located. If set and different from the chart namespace, a ReferenceGrant will be created. Leave empty to use the same namespace as the chart.</td>
-		</tr>
-	</tbody>
-</table>
-
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| trowaflo | <trowa.flo@gmail.com> |  |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| gateways | object | {} (empty, user must configure gateways) | Gateway configuration. Define multiple gateways by adding entries with any key name. Each gateway requires: - enabled: bool - address: string (REQUIRED) - IP address for the gateway - name: string (optional) - defaults to "<release-name>-<key>" - ipSlot: string (optional) - defaults to key name, used for Cilium LoadBalancerIPPool selector  Example:   gateways:     public:       enabled: true       address: "192.168.1.1"       ipSlot: public     private:       enabled: true       address: "192.168.1.2"       ipSlot: private  |
+| httpListenerPolicies | object | {} (empty, user must configure policies) | HTTP listener policies for WebSocket upgrade support. Map structure where keys reference gateway keys from the gateways map. Each policy requires: - enabled: bool - targetGateway: string (REQUIRED) - must match a gateway key - name: string (optional) - defaults to policy key - enabledUpgrades: list of strings (optional) - defaults to ["websocket"]  Example:   httpListenerPolicies:     public-ws:       enabled: true       targetGateway: "public"       enabledUpgrades: ["websocket"]     private-ws:       enabled: true       targetGateway: "private"       enabledUpgrades: ["websocket"]  |
+| kgateway-crds.enabled | bool | `true` | Enable installation of kgateway CRDs (required for Gateway API resources) |
+| kgateway.enabled | bool | `true` | Enable installation of kgateway controller (required for Gateway functionality) |
+| tlsSecret | object | {} (empty map, user must configure) | TLS secret configuration for gateway HTTPS listeners. Specify the secret name and optional namespace.  Example:   tlsSecret:     name: "wildcard-tls"     namespace: "cert-manager"  Note: Cross-namespace secret references require a ReferenceGrant in the secret's namespace (managed by cert-manager-platform chart, not this chart).  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
