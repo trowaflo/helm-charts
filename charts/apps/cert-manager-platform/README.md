@@ -1,10 +1,10 @@
 
 
-# cert-manager
+# cert-manager-platform
 
-Wrapper chart for cert-manager and cert-manager-webhook-ovh.
-Provides X.509 certificate management for Kubernetes with OVH DNS-01 challenge support.
-Includes validation for breaking changes and simplified configuration.
+Wraps cert-manager and cert-manager-webhook-ovh to provide automated X.509 certificate
+management for Kubernetes with OVH DNS-01 challenge support. Includes configuration
+validation for breaking changes and streamlined setup for Let's Encrypt certificates.
 
 ---
 
@@ -34,30 +34,30 @@ Includes validation for breaking changes and simplified configuration.
 ### Add repository
 
 ```bash
-helm repo add cert-manager https://example.com/helm-charts
+helm repo add cert-manager-platform https://example.com/helm-charts
 helm repo update
 ```
 
 ### Install
 
 ```bash
-helm install my-cert-manager cert-manager/cert-manager \
-  --namespace cert-manager \
+helm install my-cert-manager-platform cert-manager-platform/cert-manager-platform \
+  --namespace cert-manager-platform \
   --create-namespace
 ```
 
 ### Upgrade
 
 ```bash
-helm upgrade my-cert-manager cert-manager/cert-manager \
-  --namespace cert-manager \
+helm upgrade my-cert-manager-platform cert-manager-platform/cert-manager-platform \
+  --namespace cert-manager-platform \
   --install
 ```
 
 ### Uninstall
 
 ```bash
-helm uninstall my-cert-manager --namespace cert-manager
+helm uninstall my-cert-manager-platform --namespace cert-manager-platform
 ```
 
 ## Values
