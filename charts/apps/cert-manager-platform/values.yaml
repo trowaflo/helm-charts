@@ -10,3 +10,16 @@ cert-manager-webhook-ovh:
   # Current: cert-manager-webhook-ovh v0.8.0 requires "0.0.2"
   # Update this when upgrading the dependency - check upstream changelog for new value
   # configVersion: "0.0.2"
+
+# ReferenceGrants allow Gateway API resources in other namespaces to reference
+# secrets in the cert-manager-platform namespace (where certificates are stored).
+# Configure this when using Gateway API gateways that need to reference TLS secrets.
+referenceGrants: []
+  # Example: Allow kgateway-platform namespace to reference secrets
+  # - name: allow-kgateway-platform
+  #   enabled: true
+  #   from:
+  #     - kind: Gateway
+  #       namespace: kgateway-platform
+  #   to:
+  #     - kind: Secret
