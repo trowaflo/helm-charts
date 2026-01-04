@@ -17,7 +17,7 @@ metadata:
 spec:
   secretName: {{ required (printf "certificates.%s.secretName is required" $name) $cert.secretName }}
   issuerRef:
-      {{- toYaml (required (printf "certificates.%s.issuerRef is required" $name) $cert.issuerRef) | nindent 4 }}
+    {{- toYaml (required (printf "certificates.%s.issuerRef is required" $name) $cert.issuerRef) | nindent 4 }}
     {{- if $cert.dnsNames }}
   dnsNames:
       {{- toYaml $cert.dnsNames | nindent 4 }}
