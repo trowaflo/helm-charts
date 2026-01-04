@@ -1,17 +1,7 @@
 {{- $namespace := include "kgateway-routing.namespace" . -}}
 {{- $generatedBackends := dict -}}
 
-{{- /* Collect inline backends from routes.backend field (backwards compatibility) */ -}}
-{{- range $routeKey, $routeCfg := .Values.routes }}
-  {{- if $routeCfg.enabled }}
-    {{- if $routeCfg.backend }}
-      {{- $backendName := default (printf "%s-backend" $routeKey) $routeCfg.backend.name }}
-      {{- $_ := set $generatedBackends $backendName $routeCfg.backend }}
-    {{- end }}
-  {{- end }}
-{{- end }}
-
-{{- /* Collect backends from routes.outCluster (simplified syntax) */ -}}
+{{- /* Generate backends from routes.outCluster */ -}}
 {{- range $routeKey, $routeCfg := .Values.routes }}
   {{- if $routeCfg.enabled }}
     {{- if $routeCfg.outCluster }}
@@ -31,59 +21,7 @@
   {{- end }}
 {{- end }}
 
-{{- /* Render backends from separate backends: section (backwards compatibility) */ -}}
-{{- $keys := keys .Values.backends | sortAlpha -}}
-{{- range $key := $keys }}
-  {{- $cfg := index $.Values.backends $key }}
-  {{- if $cfg.enabled }}
-    {{- $name := include "kgateway-routing.backendName" (dict "root" $ "key" $key "config" $cfg) }}
-    {{- $backendNamespace := default $namespace $cfg.namespace }}
----
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: Backend
-metadata:
-  name: {{ $name }}
-  namespace: {{ $backendNamespace }}
-  {{- with $cfg.labels }}
-  labels:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  {{- with $cfg.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-spec:
-  type: {{ required (printf "backends.%s.type is required" $key) $cfg.type }}
-  {{- if eq $cfg.type "Static" }}
-    {{- if $cfg.static }}
-  static:
-      {{- if $cfg.static.hosts }}
-    hosts:
-        {{- range $cfg.static.hosts }}
-      - host: {{ required "backend static host is required" .host }}
-        port: {{ required "backend static port is required" .port }}
-        {{- end }}
-      {{- end }}
-    {{- end }}
-  {{- end }}
-  {{- if eq $cfg.type "Kube" }}
-    {{- if $cfg.kube }}
-  kube:
-      {{- if $cfg.kube.serviceName }}
-    serviceName: {{ $cfg.kube.serviceName }}
-      {{- end }}
-      {{- if $cfg.kube.serviceNamespace }}
-    serviceNamespace: {{ $cfg.kube.serviceNamespace }}
-      {{- end }}
-      {{- if $cfg.kube.port }}
-    port: {{ $cfg.kube.port }}
-      {{- end }}
-    {{- end }}
-  {{- end }}
-  {{- end }}
-{{- end }}
-
-{{- /* Render generated backends from routes */ -}}
+{{- /* Render generated backends from routes.outCluster */ -}}
 {{- $backendKeys := keys $generatedBackends | sortAlpha -}}
 {{- range $backendName := $backendKeys }}
   {{- $cfg := index $generatedBackends $backendName }}

@@ -47,7 +47,3 @@
 #
 # @default -- {} (empty, user must configure routes)
 routes: {}
-
-# -- Separate backend configurations (backwards compatibility only)
-# @default -- {} (empty, use `outCluster:` in routes instead)
-backends: {}
