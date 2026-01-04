@@ -1,4 +1,4 @@
-name: Publish PR Charts to Branch
+name: Package and Publish PR Charts
 
 on:
   pull_request:
@@ -16,7 +16,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  publish-pr-charts:
+  package-and-publish:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout PR branch
@@ -87,7 +87,7 @@ jobs:
         if: steps.detect_charts.outputs.changed_charts != ''
         id: package
         run: |
-          mkdir -p /tmp/pr-charts
+          mkdir -p /tmp/pr-charts /tmp/pr-artifacts
           PR_NUM=${{ steps.pr_number.outputs.pr_number }}
           
           packaged_charts=""
@@ -99,28 +99,42 @@ jobs:
               
               echo "Packaging $chart as ${chart_name}-${pr_version}"
               
-              # Temporarily modify version
-              yq eval ".version = \"${pr_version}\"" -i "$chart/Chart.yaml"
+              # Create a copy for pr-charts branch (with modified version)
+              cp -r "$chart" /tmp/chart-copy
+              yq eval ".version = \"${pr_version}\"" -i /tmp/chart-copy/Chart.yaml
+              helm package /tmp/chart-copy -d /tmp/pr-charts
+              rm -rf /tmp/chart-copy
               
-              # Package chart
-              helm package "$chart" -d /tmp/pr-charts
-              
-              # Restore original version
-              git checkout "$chart/Chart.yaml"
+              # Package original version for artifacts
+              helm package "$chart" -d /tmp/pr-artifacts
               
               packaged_charts="$packaged_charts ${chart_name}:${pr_version}"
             fi
           done
 
           echo "packaged_charts=$packaged_charts" >> $GITHUB_OUTPUT
+          echo "PR Charts:"
           ls -lh /tmp/pr-charts/
+          echo "Artifacts:"
+          ls -lh /tmp/pr-artifacts/
 
-      - name: Checkout pr-charts branch
+      - name: Upload artifacts
+        if: steps.package.outputs.packaged_charts != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-charts
+          path: /tmp/pr-artifacts/*.tgz
+          retention-days: 30
+
+      - name: Configure Git
         if: steps.package.outputs.packaged_charts != ''
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
+
+      - name: Checkout pr-charts branch
+        if: steps.package.outputs.packaged_charts != ''
+        run: |
           # Try to checkout pr-charts branch, create if doesn't exist
           git fetch origin pr-charts || true
           if git show-ref --verify --quiet refs/remotes/origin/pr-charts; then
@@ -172,15 +186,15 @@ jobs:
               }
             });
 
-            const comment = `## 📦 PR Charts Published to \`pr-charts\` Branch
+            const comment = `## 📦 PR Charts Available for Testing
 
-            The following charts from this PR are now available for testing:
+            The following charts from this PR have been packaged:
 
             ${chartsList}
 
-            ### How to Use with ArgoCD
+            ### Testing Options
 
-            **Option 1: Using your \`description.yaml\` pattern:**
+            **Option 1: pr-charts branch (for ArgoCD description.yaml pattern)**
             \`\`\`yaml
             ccm:
               repoURL: https://raw.githubusercontent.com/${{ github.repository }}/pr-charts
@@ -189,14 +203,12 @@ jobs:
               type: helm
             \`\`\`
 
-            **Option 2: Add as Helm repository:**
-            \`\`\`bash
-            helm repo add pr-charts https://raw.githubusercontent.com/${{ github.repository }}/pr-charts
-            helm repo update
-            helm search repo pr-charts
-            \`\`\`
+            **Option 2: Download artifacts**
+            - Go to [Actions tab](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - Download the \`pr-charts\` artifact
+            - Extract and test locally: \`helm install test-release ./chart-name.tgz\`
 
-            **Option 3: Direct Git source (if your pattern supports it):**
+            **Option 3: Direct Git source**
             \`\`\`yaml
             apiVersion: argoproj.io/v1alpha1
             kind: Application
@@ -207,14 +219,11 @@ jobs:
                 path: charts/apps/<chart-name>
             \`\`\`
 
-            ### Notes
-            - Charts are versioned with \`-pr${prNum}\` suffix to avoid conflicts
-            - These charts are for testing only and will be cleaned up when the PR is merged or closed
-            - The \`pr-charts\` branch is separate from \`gh-pages\` to keep production releases clean
-
-            ### Repository URL
-            \`\`\`
-            https://raw.githubusercontent.com/${{ github.repository }}/pr-charts
+            ### Repository URL for Helm
+            \`\`\`bash
+            helm repo add pr-charts https://raw.githubusercontent.com/${{ github.repository }}/pr-charts
+            helm repo update
+            helm search repo pr-charts
             \`\`\`
             `;
 
