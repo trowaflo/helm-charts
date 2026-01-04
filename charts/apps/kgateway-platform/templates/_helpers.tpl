@@ -46,3 +46,12 @@ Takes a dict with keys: root (.), key (gateway key), config (gateway config)
   {{- $gatewayName := include "kgateway-platform.gatewayName" . -}}
   {{- printf "%s-params" $gatewayName -}}
 {{- end -}}
+
+{{/*
+Generate the name for an HTTPListenerPolicy resource.
+Takes a dict with keys: root (.), key (policy key), config (policy config)
+*/}}
+{{- define "kgateway-platform.httpListenerPolicyName" -}}
+  {{- $fullname := include "kgateway-platform.fullname" .root -}}
+  {{- default (printf "%s-%s" $fullname .key) .config.name -}}
+{{- end -}}

@@ -1,5 +1,4 @@
 {{- $namespace := include "kgateway-platform.namespace" . -}}
-{{- $fullname := include "kgateway-platform.fullname" . -}}
 {{- range $policyKey, $policy := .Values.httpListenerPolicies }}
   {{- if $policy.enabled }}
     {{- $targetGateway := $policy.targetGateway -}}
@@ -12,13 +11,14 @@
     {{- end }}
     {{- if $gatewayCfg.enabled }}
       {{- $gatewayName := include "kgateway-platform.gatewayName" (dict "root" $ "key" $targetGateway "config" $gatewayCfg) -}}
+      {{- $policyName := include "kgateway-platform.httpListenerPolicyName" (dict "root" $ "key" $policyKey "config" $policy) -}}
       {{- $defaultUpgrades := list "websocket" -}}
       {{- $upgrades := default $defaultUpgrades $policy.enabledUpgrades }}
 ---
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: HTTPListenerPolicy
 metadata:
-  name: {{ default (printf "%s-%s" $fullname $policyKey) $policy.name }}
+  name: {{ $policyName }}
   namespace: {{ $namespace }}
 spec:
   targetRefs:

@@ -1,18 +1,16 @@
-# frigate-exporter
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+
+# frigate-exporter
 
 Prometheus exporter for Frigate NVR (Network Video Recorder) system.
 Exports metrics from Frigate cameras, detections, and recording statistics
 in Prometheus-compatible format for integration with monitoring stacks.
 
+---
+
+![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
+
 **Homepage:** <https://github.com/bairhys/prometheus-frigate-exporter>
-
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| trowaflo | <trowa.flo@gmail.com> |  |
 
 ## Source Code
 
@@ -21,34 +19,243 @@ in Prometheus-compatible format for integration with monitoring stacks.
 
 ## Requirements
 
+## Requirements
+
 | Repository | Name | Version |
 |------------|------|---------|
 | https://trowaflo.github.io/helm-charts | common | 2.0.0 |
 
+- Helm: v3+
+
+## Getting Started
+
+### Add repository
+
+```bash
+helm repo add frigate-exporter https://example.com/helm-charts
+helm repo update
+```
+
+### Install
+
+```bash
+helm install my-frigate-exporter frigate-exporter/frigate-exporter \
+  --namespace frigate-exporter \
+  --create-namespace
+```
+
+### Upgrade
+
+```bash
+helm upgrade my-frigate-exporter frigate-exporter/frigate-exporter \
+  --namespace frigate-exporter \
+  --install
+```
+
+### Uninstall
+
+```bash
+helm uninstall my-frigate-exporter --namespace frigate-exporter
+```
+
 ## Values
 
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| containers.main.env | list | `[]` |  |
-| containers.main.image.pullPolicy | string | `"IfNotPresent"` |  |
-| containers.main.image.repository | string | `"rhysbailey/prometheus-frigate-exporter"` |  |
-| containers.main.image.tag | string | `"0.1.1@sha256:6df30ca30c5a69df4f3b21c06a93043a52baf523f808de56f4a40982393b8aff"` |  |
-| containers.main.probes.enabled | bool | `true` |  |
-| containers.main.probes.liveness.httpGet.path | string | `"/metrics"` |  |
-| containers.main.probes.readiness.httpGet.path | string | `"/metrics"` |  |
-| containers.main.probes.startup.httpGet.path | string | `"/metrics"` |  |
-| containers.main.resources.limits.cpu | string | `"100m"` |  |
-| containers.main.resources.limits.memory | string | `"64Mi"` |  |
-| containers.main.resources.requests.cpu | string | `"1m"` |  |
-| containers.main.resources.requests.memory | string | `"32Mi"` |  |
-| podSecurityContext.runAsUser | int | `1000` |  |
-| serviceMonitor.enabled | bool | `true` |  |
-| serviceMonitor.endpoints[0].port | string | `"main"` |  |
-| services.main.annotations | object | `{}` |  |
-| services.main.enabled | bool | `true` |  |
-| services.main.labels | object | `{}` |  |
-| services.main.ports.main.port | int | `9100` |  |
-| services.main.ports.main.protocol | string | `"TCP"` |  |
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>containers.main.env</td>
+			<td>list</td>
+			<td><pre lang="json">
+[]
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.image.pullPolicy</td>
+			<td>string</td>
+			<td><pre lang="json">
+"IfNotPresent"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.image.repository</td>
+			<td>string</td>
+			<td><pre lang="json">
+"rhysbailey/prometheus-frigate-exporter"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.image.tag</td>
+			<td>string</td>
+			<td><pre lang="json">
+"0.1.1@sha256:6df30ca30c5a69df4f3b21c06a93043a52baf523f808de56f4a40982393b8aff"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.liveness.httpGet.path</td>
+			<td>string</td>
+			<td><pre lang="json">
+"/metrics"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.readiness.httpGet.path</td>
+			<td>string</td>
+			<td><pre lang="json">
+"/metrics"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.probes.startup.httpGet.path</td>
+			<td>string</td>
+			<td><pre lang="json">
+"/metrics"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.resources.limits.cpu</td>
+			<td>string</td>
+			<td><pre lang="json">
+"100m"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.resources.limits.memory</td>
+			<td>string</td>
+			<td><pre lang="json">
+"64Mi"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.resources.requests.cpu</td>
+			<td>string</td>
+			<td><pre lang="json">
+"1m"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>containers.main.resources.requests.memory</td>
+			<td>string</td>
+			<td><pre lang="json">
+"32Mi"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>podSecurityContext.runAsUser</td>
+			<td>int</td>
+			<td><pre lang="json">
+1000
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>serviceMonitor.endpoints[0].port</td>
+			<td>string</td>
+			<td><pre lang="json">
+"main"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.main.annotations</td>
+			<td>object</td>
+			<td><pre lang="json">
+{}
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.main.enabled</td>
+			<td>bool</td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.main.labels</td>
+			<td>object</td>
+			<td><pre lang="json">
+{}
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.main.ports.main.port</td>
+			<td>int</td>
+			<td><pre lang="json">
+9100
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>services.main.ports.main.protocol</td>
+			<td>string</td>
+			<td><pre lang="json">
+"TCP"
+</pre>
+</td>
+			<td></td>
+		</tr>
+	</tbody>
+</table>
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| trowaflo | <trowa.flo@gmail.com> |  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
