@@ -1,0 +1,14 @@
+certificates:
+  labeled-tls:
+    enabled: true
+    secretName: labeled-tls
+    issuerRef:
+      name: letsencrypt-prod
+      kind: ClusterIssuer
+    dnsNames:
+      - "example.com"
+    labels:
+      app: my-app
+      environment: production
+    annotations:
+      description: "Production TLS certificate"

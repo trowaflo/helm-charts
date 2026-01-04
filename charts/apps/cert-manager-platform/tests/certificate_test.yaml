@@ -1,0 +1,118 @@
+suite: test cert-manager-platform chart - Certificate
+release:
+  name: cert-manager-platform-test
+  namespace: cert-manager-platform
+templates:
+  - templates/certificate.yaml
+tests:
+  # Test with no Certificates configured (default)
+  - it: should not render Certificates when map is empty
+    values:
+      - values/default.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # Test with Certificate enabled
+  - it: should render Certificate when certificate is configured and enabled
+    values:
+      - values/with-simple-certificate.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Certificate
+      - equal:
+          path: metadata.name
+          value: wildcard-tls
+      - equal:
+          path: metadata.namespace
+          value: cert-manager-platform
+      - equal:
+          path: spec.secretName
+          value: wildcard-tls
+      - equal:
+          path: spec.issuerRef.name
+          value: letsencrypt-prod
+      - equal:
+          path: spec.issuerRef.kind
+          value: ClusterIssuer
+      - equal:
+          path: spec.dnsNames[0]
+          value: "www.example.com"
+      - equal:
+          path: spec.dnsNames[1]
+          value: "example.com"
+      - equal:
+          path: spec.commonName
+          value: "example.com"
+
+  # Test with Certificate disabled
+  - it: should not render Certificate when certificate is disabled
+    values:
+      - values/with-disabled-certificate.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # Test with multiple Certificates
+  - it: should render multiple Certificates when multiple are configured
+    values:
+      - values/with-multiple-certificates.yaml
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: Certificate
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: api-tls
+        documentIndex: 0
+      - isKind:
+          of: Certificate
+        documentIndex: 1
+      - equal:
+          path: metadata.name
+          value: wildcard-tls
+        documentIndex: 1
+
+  # Test with optional fields
+  - it: should render Certificate with optional fields when provided
+    values:
+      - values/with-advanced-certificate.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.duration
+          value: "2160h"
+      - equal:
+          path: spec.renewBefore
+          value: "360h"
+      - equal:
+          path: spec.privateKey.algorithm
+          value: RSA
+      - equal:
+          path: spec.privateKey.size
+          value: 2048
+      - equal:
+          path: spec.usages[0]
+          value: digital signature
+
+  # Test with labels and annotations
+  - it: should render Certificate with labels and annotations when provided
+    values:
+      - values/with-labeled-certificate.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.labels.app
+          value: my-app
+      - equal:
+          path: metadata.labels.environment
+          value: production
+      - equal:
+          path: metadata.annotations.description
+          value: "Production TLS certificate"
