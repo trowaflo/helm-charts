@@ -1,0 +1,17 @@
+certificates:
+  wildcard-tls:
+    enabled: true
+    secretName: wildcard-tls
+    issuerRef:
+      name: letsencrypt-prod
+      kind: ClusterIssuer
+    dnsNames:
+      - "www.example.com"
+  api-tls:
+    enabled: true
+    secretName: api-tls
+    issuerRef:
+      name: letsencrypt-staging
+      kind: ClusterIssuer
+    dnsNames:
+      - "api.example.com"

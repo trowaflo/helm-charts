@@ -1,0 +1,68 @@
+{{- range $name, $cert := .Values.certificates }}
+  {{- if $cert.enabled }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Release.Namespace }}
+    {{- with $cert.labels }}
+  labels:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with $cert.annotations }}
+  annotations:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  secretName: {{ required (printf "certificates.%s.secretName is required" $name) $cert.secretName }}
+    {{- if $cert.issuerRef }}
+  issuerRef:
+      {{- toYaml $cert.issuerRef | nindent 4 }}
+    {{- end }}
+    {{- if $cert.dnsNames }}
+  dnsNames:
+      {{- toYaml $cert.dnsNames | nindent 4 }}
+    {{- end }}
+    {{- if $cert.commonName }}
+  commonName: {{ $cert.commonName | quote }}
+    {{- end }}
+    {{- if $cert.duration }}
+  duration: {{ $cert.duration | quote }}
+    {{- end }}
+    {{- if $cert.renewBefore }}
+  renewBefore: {{ $cert.renewBefore | quote }}
+    {{- end }}
+    {{- with $cert.privateKey }}
+  privateKey:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with $cert.usages }}
+  usages:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with $cert.subject }}
+  subject:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- if $cert.isCA }}
+  isCA: {{ $cert.isCA }}
+    {{- end }}
+    {{- with $cert.emailAddresses }}
+  emailAddresses:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with $cert.ipAddresses }}
+  ipAddresses:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with $cert.uris }}
+  uris:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with $cert.secretTemplate }}
+  secretTemplate:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end }}
