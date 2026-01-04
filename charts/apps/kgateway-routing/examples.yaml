@@ -1,0 +1,163 @@
+# Example values file showing all features of kgateway-routing chart
+# This is a comprehensive example - adjust to your needs
+
+# Configure HTTP routes for both in-cluster and out-of-cluster services
+routes:
+  # Example 1: In-cluster Service routing (internal Kubernetes service)
+  # This routes traffic to a service running inside the cluster
+  argocd:
+    enabled: true
+    namespace: argocd  # Optional: route's namespace, defaults to release namespace
+    hostnames:
+      - "argocd.example.com"
+    parentRefs:
+      - group: gateway.networking.k8s.io
+        kind: Gateway
+        name: private-gateway
+        namespace: kgateway-system
+    rules:
+      - matches:
+          - path:
+              type: PathPrefix  # PathPrefix, PathExact, or Regular Expression
+              value: /
+        backendRefs:
+          - group: ''  # Empty string for core API group
+            kind: Service
+            name: argocd-server
+            port: 80
+            weight: 1
+
+  # Example 2: Out-of-cluster Backend with header filters
+  # This routes traffic to an external service with header modifications
+  homeassistant:
+    enabled: true
+    hostnames:
+      - "hass.example.com"
+    parentRefs:
+      - name: public-gateway
+        namespace: kgateway-system
+    rules:
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /
+        backendRefs:
+          - kind: Backend
+            group: gateway.kgateway.dev
+            name: homeassistant-backend
+            weight: 1
+        filters:
+          # Add/modify request headers before sending to backend
+          - type: RequestHeaderModifier
+            requestHeaderModifier:
+              set:
+                - name: X-Forwarded-Proto
+                  value: https
+                - name: X-Forwarded-Port
+                  value: "443"
+                - name: X-Forwarded-Host
+                  value: hass.example.com
+          # Add/modify response headers before returning to client
+          - type: ResponseHeaderModifier
+            responseHeaderModifier:
+              set:
+                - name: Content-Security-Policy
+                  value: "upgrade-insecure-requests"
+                - name: Strict-Transport-Security
+                  value: "max-age=31536000; includeSubDomains"
+
+  # Example 3: Multiple path matches and multiple backends
+  api:
+    enabled: true
+    hostnames:
+      - "api.example.com"
+    parentRefs:
+      - name: public-gateway
+        namespace: kgateway-system
+    rules:
+      # Rule 1: Route /v1/* to v1 service
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /v1
+        backendRefs:
+          - kind: Service
+            name: api-v1
+            port: 8080
+      # Rule 2: Route /v2/* to v2 service
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /v2
+        backendRefs:
+          - kind: Service
+            name: api-v2
+            port: 8080
+
+  # Example 4: Multiple hostnames with filters
+  proxmox:
+    enabled: false  # Set to true to enable
+    hostnames:
+      - "pve.example.com"
+      - "proxmox.example.com"
+    parentRefs:
+      - name: private-gateway
+        namespace: kgateway-system
+    rules:
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /
+        backendRefs:
+          - kind: Backend
+            group: gateway.kgateway.dev
+            name: proxmox-backend
+        filters:
+          - type: RequestHeaderModifier
+            requestHeaderModifier:
+              set:
+                - name: X-Forwarded-Proto
+                  value: https
+
+# Configure Backends for out-of-cluster services
+backends:
+  # Example 1: Static backend (external host)
+  homeassistant:
+    enabled: true
+    type: Static
+    static:
+      hosts:
+        - host: homeassistant.local
+          port: 8123
+
+  # Example 2: Multiple hosts for load balancing
+  proxmox:
+    enabled: false  # Set to true to enable
+    type: Static
+    static:
+      hosts:
+        - host: proxmox1.example.com
+          port: 8006
+        - host: proxmox2.example.com
+          port: 8006
+
+  # Example 3: Backend with custom name and namespace
+  external-api:
+    enabled: false
+    name: my-external-api  # Optional: custom name, defaults to key-backend
+    namespace: custom-ns   # Optional: custom namespace, defaults to release namespace
+    type: Static
+    static:
+      hosts:
+        - host: api.external.com
+          port: 443
+
+  # Example 4: Kube backend (for advanced in-cluster scenarios)
+  # Note: For standard in-cluster routing, use Service backendRefs in routes
+  internal-service:
+    enabled: false
+    type: Kube
+    kube:
+      serviceName: my-service
+      serviceNamespace: default
+      port: 8080
