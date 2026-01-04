@@ -4,11 +4,12 @@
 
 Wraps cert-manager and cert-manager-webhook-ovh to provide automated X.509 certificate
 management for Kubernetes with OVH DNS-01 challenge support. Includes configuration
-validation for breaking changes and streamlined setup for Let's Encrypt certificates.
+validation for breaking changes, Certificate resource management, and streamlined setup
+for Let's Encrypt certificates.
 
 ---
 
-![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
+![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
 
 **Homepage:** <https://cert-manager.io>
 
@@ -96,6 +97,15 @@ true
 </pre>
 </td>
 			<td></td>
+		</tr>
+		<tr>
+			<td>certificates</td>
+			<td>object</td>
+			<td><pre lang="">
+{} (empty, no certificates managed by default)
+</pre>
+</td>
+			<td>Certificate resources to manage TLS certificates via cert-manager. Define multiple certificates using map keys (e.g., wildcard-tls, api-tls). Each certificate requires: - enabled: bool - whether to create the certificate - secretName: string (REQUIRED) - name of the secret that will store the certificate - issuerRef: object (REQUIRED) - reference to the cert-manager Issuer or ClusterIssuer - dnsNames: list of strings - DNS names for the certificate - commonName: string (optional) - common name for the certificate - duration: string (optional) - certificate lifetime (e.g., "2160h" for 90 days) - renewBefore: string (optional) - when to renew before expiry (e.g., "360h" for 15 days)  ℹ️ NOTE: For Let's Encrypt certificates, cert-manager automatically detects the certificate expiry from the issued certificate and handles renewal. The duration/renewBefore fields are OPTIONAL - if not specified, cert-manager uses sensible defaults (90 days duration, renew 30 days before expiry for Let's Encrypt). Only set these if you need custom values.  Example:   certificates:     wildcard-tls:       enabled: true       secretName: wildcard-tls       issuerRef:         name: letsencrypt-prod         kind: ClusterIssuer       dnsNames:         - "*.example.com"         - "example.com"       commonName: "*.example.com"       # duration and renewBefore are optional - cert-manager auto-detects from Let's Encrypt </td>
 		</tr>
 		<tr>
 			<td>referenceGrants</td>
