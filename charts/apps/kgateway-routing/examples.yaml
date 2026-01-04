@@ -40,18 +40,23 @@ routes:
         port: 8123
         # Optional: Custom path matching (defaults to / with PathPrefix)
         # matches:
-        #   - path: {type: PathPrefix, value: /admin}
+        #   - path:
+        #       type: PathPrefix
+        #       value: /admin
         # Optional: Request/response filters
         filters:
           - type: RequestHeaderModifier
             requestHeaderModifier:
               set:
-                - {name: X-Forwarded-Proto, value: https}
-                - {name: X-Forwarded-Port, value: "443"}
+                - name: X-Forwarded-Proto
+                  value: https
+                - name: X-Forwarded-Port
+                  value: "443"
           - type: ResponseHeaderModifier
             responseHeaderModifier:
               set:
-                - {name: Content-Security-Policy, value: upgrade-insecure-requests}
+                - name: Content-Security-Policy
+                  value: upgrade-insecure-requests
 
   # Example 3: Multiple backends in one route (Simplified)
   multi-backend:
@@ -73,7 +78,8 @@ routes:
           - type: RequestHeaderModifier
             requestHeaderModifier:
               add:
-                - {name: X-API-Source, value: gateway}
+                - name: X-API-Source
+                  value: gateway
 
   # Example 4: Backend with TLS (for HTTPS backends with self-signed certs)
   # Proxmox example - TLS enabled directly on backend
