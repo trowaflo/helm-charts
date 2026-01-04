@@ -22,9 +22,30 @@ When working on ANY task:
 ## General expectations
 - Branch from `main`; keep changes small and focused.
 - Run `helm dependency update` in any chart you touch.
-- Bump chart version when rendered manifests change.
+- Chart versions are automatically bumped by CI based on conventional commits (see Versioning section below).
 - Prefer succinct, actionable PR descriptions and reviews.
 - Check PR title and propose improvements.
+
+## Repository structure
+- `charts/apps/` - Application charts (wrapper charts that deploy third-party applications)
+- `charts/library/` - Library charts (shared templates and helpers for reuse)
+- `.github/workflows/` - CI/CD workflows for testing, linting, docs generation, and security scans
+- `tests/` - Integration tests and test fixtures
+
+## Versioning
+Chart versions are **automatically managed** by the `chart-bump.yml` workflow:
+- Uses **conventional commits** to determine version bumps
+- `feat:` commits trigger a **minor** version bump
+- `fix:` commits trigger a **patch** version bump  
+- `BREAKING CHANGE:` or `!:` commits trigger a **major** version bump
+- The workflow runs on PRs and automatically updates Chart.yaml versions
+- Manual version changes are not needed (workflow handles it)
+
+## Dependency management
+- Renovate bot automatically creates PRs for dependency updates
+- **Patch/minor updates**: Auto-merged if tests pass
+- **Major updates**: Require manual review (may have breaking changes)
+- Always run `helm dependency update` after modifying Chart.yaml dependencies
 
 ## Testing Philosophy
 **Charts in this repo typically wrap public upstream charts.** We assume upstream charts are tested. Our tests focus on:
@@ -86,12 +107,28 @@ tests:
 - Use snapshots for complex outputs
 - Test edge cases and error conditions
 
+## Security requirements
+- **NEVER commit secrets** to the repository
+- **KICS security scanning** runs automatically on all PRs and main branch
+  - Scans for Infrastructure-as-Code security issues
+  - Must pass before merge
+- **Gitleaks scanning** detects hardcoded secrets in commits
+  - Configured via `.gitleaks.toml`
+- When adding new dependencies, verify they come from trusted sources
+- Review security scan results and address issues before merging
+
 ## Chart-specific notes
 Keep this section minimal. Add only truly exceptional cases:
 
 - **cert-manager**: Validates `cert-manager-webhook-ovh.configVersion` when webhook enabled. The required version is tied to the dependency version in Chart.yaml (current: v0.8.0 requires "0.0.2"). This value changes with breaking updates from upstream. When upgrading the cert-manager-webhook-ovh dependency, update the `$requiredVersion` in `templates/_helpers.tpl` and the comment in `values.yaml`. See [upstream docs](https://github.com/aureq/cert-manager-webhook-ovh) for configVersion purpose.
 
 ## CI awareness
-- Workflows in `.github/workflows/` cover lint, helm-docs, helm-unittest, security scans
+Workflows in `.github/workflows/` provide comprehensive automation:
+- **lint-test.yml** - Lints charts with chart-testing (ct)
+- **helm-unittest.yml** - Runs helm-unittest tests for all charts
+- **helm-docs.yml** - Auto-generates README.md files (runs on merge to main)
+- **chart-bump.yml** - Auto-bumps chart versions based on conventional commits
+- **kics.yml** - Security scanning for IaC vulnerabilities
+- **gitleaks.yml** - Detects hardcoded secrets
 - All checks must pass before merge
-- Mention executed commands in PRs
+- Mention executed commands in PRs for transparency
