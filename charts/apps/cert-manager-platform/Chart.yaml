@@ -1,11 +1,12 @@
 apiVersion: v2
 name: cert-manager-platform
-version: 1.1.0
+version: 1.2.0
 type: application
 description: |-
   Wraps cert-manager and cert-manager-webhook-ovh to provide automated X.509 certificate
   management for Kubernetes with OVH DNS-01 challenge support. Includes configuration
-  validation for breaking changes and streamlined setup for Let's Encrypt certificates.
+  validation for breaking changes, Certificate resource management, and streamlined setup
+  for Let's Encrypt certificates.
 keywords:
   - cert-manager
   - certificates
