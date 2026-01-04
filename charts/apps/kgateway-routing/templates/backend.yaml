@@ -1,7 +1,7 @@
 {{- $namespace := include "kgateway-routing.namespace" . -}}
 {{- $generatedBackends := dict -}}
 
-{{- /* First pass: collect inline backends from routes.backend field (legacy) */ -}}
+{{- /* Collect inline backends from routes.backend field (backwards compatibility) */ -}}
 {{- range $routeKey, $routeCfg := .Values.routes }}
   {{- if $routeCfg.enabled }}
     {{- if $routeCfg.backend }}
@@ -11,7 +11,7 @@
   {{- end }}
 {{- end }}
 
-{{- /* Second pass: collect backends from routes.outCluster (new simplified syntax) */ -}}
+{{- /* Collect backends from routes.outCluster (simplified syntax) */ -}}
 {{- range $routeKey, $routeCfg := .Values.routes }}
   {{- if $routeCfg.enabled }}
     {{- if $routeCfg.outCluster }}
@@ -31,7 +31,7 @@
   {{- end }}
 {{- end }}
 
-{{- /* Third pass: render backends from backends: section (legacy) */ -}}
+{{- /* Render backends from separate backends: section (backwards compatibility) */ -}}
 {{- $keys := keys .Values.backends | sortAlpha -}}
 {{- range $key := $keys }}
   {{- $cfg := index $.Values.backends $key }}
@@ -83,7 +83,7 @@ spec:
   {{- end }}
 {{- end }}
 
-{{- /* Fourth pass: render inline backends from routes (both legacy .backend and new .outCluster) */ -}}
+{{- /* Render generated backends from routes */ -}}
 {{- $backendKeys := keys $generatedBackends | sortAlpha -}}
 {{- range $backendName := $backendKeys }}
   {{- $cfg := index $generatedBackends $backendName }}

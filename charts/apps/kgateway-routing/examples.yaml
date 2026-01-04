@@ -1,5 +1,5 @@
 # Example values file showing kgateway-routing chart features
-# This demonstrates the SIMPLIFIED SYNTAX (recommended) and legacy approaches
+# This demonstrates the SIMPLIFIED SYNTAX for routing configuration
 
 # ============================================================================
 # SIMPLIFIED SYNTAX (RECOMMENDED) - Use inCluster / outCluster shortcuts
@@ -98,59 +98,3 @@ routes:
       tls:
         sni: proxmox1.example.com
         insecureSkipVerify: true  # For self-signed certificates
-
-# ============================================================================
-# LEGACY SYNTAX (Still supported for advanced use cases)
-# ============================================================================
-
-  # Legacy example: Full explicit Gateway API syntax
-  # Use this when you need features not covered by simplified syntax
-  legacy-explicit:
-    enabled: false
-    hostnames:
-      - legacy.example.com
-    parentRefs:
-      - name: gateway
-        namespace: kgateway-system
-    # Explicit rules with full Gateway API control
-    rules:
-      - matches:
-          - path:
-              type: PathPrefix
-              value: /
-        backendRefs:
-          - group: ''
-            kind: Service
-            name: my-service
-            port: 80
-            weight: 1
-        filters:
-          - type: RequestHeaderModifier
-            requestHeaderModifier:
-              set:
-                - name: X-Custom-Header
-                  value: custom-value
-
-  # Legacy example: Inline backend definition (pre-simplified syntax)
-  legacy-inline-backend:
-    enabled: false
-    hostnames:
-      - legacy-backend.example.com
-    parentRefs:
-      - name: gateway
-        namespace: kgateway-system
-    rules:
-      - backendRefs:
-          - kind: Backend
-            group: gateway.kgateway.dev
-            name: my-backend
-    # Inline backend definition (deprecated - use outCluster instead)
-    backend:
-      type: Static
-      static:
-        hosts:
-          - host: external.example.com
-            port: 8123
-
-# Legacy: Separate backends section (deprecated - use outCluster instead)
-backends: {}

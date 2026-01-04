@@ -45,12 +45,9 @@
 #       tls: {sni: proxmox1.example.com, insecureSkipVerify: true}
 # ```
 #
-# **Legacy syntax** (still supported for advanced use cases):
-# Use explicit `rules:` and `backend:` fields for full Gateway API control.
-#
 # @default -- {} (empty, user must configure routes)
 routes: {}
 
-# -- (LEGACY) Separate backend configurations. Use `outCluster:` in routes instead.
-# @default -- {} (empty, backwards compatibility only)
+# -- Separate backend configurations (backwards compatibility only)
+# @default -- {} (empty, use `outCluster:` in routes instead)
 backends: {}
