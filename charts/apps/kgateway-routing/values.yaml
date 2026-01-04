@@ -31,6 +31,20 @@
 #               set: [{name: X-Forwarded-Proto, value: https}]
 # ```
 #
+# **Backend with TLS policy (for HTTPS backends):**
+# ```yaml
+# routes:
+#   pmxx:
+#     enabled: true
+#     hostnames: ["pmxx.example.com"]
+#     parentRefs:
+#       - {name: gateway, namespace: kgateway-system}
+#     outCluster:
+#       - {name: pmxx, host: proxmox1.example.com, port: 8006}
+#     backendPolicy:
+#       tls: {sni: proxmox1.example.com, insecureSkipVerify: true}
+# ```
+#
 # **Legacy syntax** (still supported for advanced use cases):
 # Use explicit `rules:` and `backend:` fields for full Gateway API control.
 #

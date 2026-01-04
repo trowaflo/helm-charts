@@ -110,7 +110,7 @@ tests:
 ## Code style and formatting
 - **Helm templates**: Use 2-space indentation within template definitions for readability
 - **values.yaml**: Keep examples concise - use inline YAML format where possible to avoid verbosity
-- **_helpers.tpl**: Indent template bodies for clarity (see kgateway-routing chart as example)
+- **_helpers.tpl**: Indent template bodies for clarity
 
 ## Security requirements
 - **NEVER commit secrets** to the repository

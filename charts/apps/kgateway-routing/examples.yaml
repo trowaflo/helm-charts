@@ -75,7 +75,8 @@ routes:
               add:
                 - {name: X-API-Source, value: gateway}
 
-  # Example 4: Custom path matching with simplified syntax
+  # Example 4: Backend with TLS policy (for HTTPS backends)
+  # Proxmox example with custom TLS settings
   proxmox:
     enabled: true
     hostnames:
@@ -91,10 +92,12 @@ routes:
         matches:
           - path:
               type: PathPrefix
-              value: /admin
-            # Optional: additional match criteria
-            # headers: [{type: Exact, name: X-Admin, value: "true"}]
-            # method: GET
+              value: /
+    # BackendConfigPolicy for TLS configuration
+    backendPolicy:
+      tls:
+        sni: proxmox1.example.com
+        insecureSkipVerify: true  # For self-signed certificates
 
 # ============================================================================
 # LEGACY SYNTAX (Still supported for advanced use cases)

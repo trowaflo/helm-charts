@@ -1,0 +1,35 @@
+{{- range $routeKey, $route := .Values.routes }}
+{{- if and $route.enabled $route.backendPolicy }}
+{{- $routeNamespace := default $.Release.Namespace $route.namespace }}
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: {{ default (printf "%s-%s-policy" $.Release.Name $routeKey) $route.backendPolicy.name }}
+  namespace: {{ $routeNamespace }}
+  labels:
+    {{- include "kgateway-routing.labels" $ | nindent 4 }}
+spec:
+  targetRefs:
+    {{- if $route.outCluster }}
+    {{- range $backend := $route.outCluster }}
+    - group: gateway.kgateway.dev
+      kind: Backend
+      name: {{ printf "%s-%s-backend" $routeKey $backend.name }}
+    {{- end }}
+    {{- else if $route.backend }}
+    - group: gateway.kgateway.dev
+      kind: Backend
+      name: {{ default (printf "%s-backend" $routeKey) $route.backend.name }}
+    {{- end }}
+  {{- if $route.backendPolicy.tls }}
+  tls:
+    {{- if $route.backendPolicy.tls.sni }}
+    sni: {{ $route.backendPolicy.tls.sni }}
+    {{- end }}
+    {{- if hasKey $route.backendPolicy.tls "insecureSkipVerify" }}
+    insecureSkipVerify: {{ $route.backendPolicy.tls.insecureSkipVerify }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
