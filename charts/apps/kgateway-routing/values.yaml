@@ -8,37 +8,27 @@
 #     enabled: true
 #     hostnames: ["argocd.example.com"]
 #     parentRefs:
-#       - name: private-gateway
-#         namespace: kgateway-system
+#       - {name: private-gateway, namespace: kgateway-system}
 #     rules:
-#       - backendRefs:
-#           - {kind: Service, name: argocd-server, port: 80}
+#       - backendRefs: [{kind: Service, name: argocd-server, port: 80}]
 # ```
 #
-# **Out-of-cluster Backend routing with inline backend (recommended):**
+# **Out-of-cluster Backend routing (inline backend - recommended):**
 # ```yaml
 # routes:
 #   homeassistant:
 #     enabled: true
 #     hostnames: ["hass.example.com"]
 #     parentRefs:
-#       - name: public-gateway
-#         namespace: kgateway-system
+#       - {name: public-gateway, namespace: kgateway-system}
 #     rules:
-#       - backendRefs:
-#           - {kind: Backend, group: gateway.kgateway.dev, name: homeassistant-backend}
-#     backend:
-#       type: Static
-#       static:
-#         hosts:
-#           - {host: homeassistant.local, port: 8123}
+#       - backendRefs: [{kind: Backend, group: gateway.kgateway.dev, name: homeassistant-backend}]
+#     backend: {type: Static, static: {hosts: [{host: homeassistant.local, port: 8123}]}}
 # ```
 #
 # @default -- {} (empty, user must configure routes)
 routes: {}
 
-# -- Backend configurations for out-of-cluster services (LEGACY).
-# For new configurations, prefer using the inline `backend:` field within routes.
-#
+# -- (LEGACY) Separate backend configurations. Use inline `backend:` field in routes instead.
 # @default -- {} (empty, backwards compatibility only)
 backends: {}
