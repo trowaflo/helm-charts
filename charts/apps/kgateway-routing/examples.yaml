@@ -75,8 +75,8 @@ routes:
               add:
                 - {name: X-API-Source, value: gateway}
 
-  # Example 4: Backend with TLS policy (for HTTPS backends)
-  # Proxmox example with custom TLS settings
+  # Example 4: Backend with TLS (for HTTPS backends with self-signed certs)
+  # Proxmox example - TLS enabled directly on backend
   proxmox:
     enabled: true
     hostnames:
@@ -88,13 +88,5 @@ routes:
       - name: proxmox
         host: proxmox1.example.com
         port: 8006
-        # Override default path matching
-        matches:
-          - path:
-              type: PathPrefix
-              value: /
-    # BackendConfigPolicy for TLS configuration
-    backendPolicy:
-      tls:
-        sni: proxmox1.example.com
-        insecureSkipVerify: true  # For self-signed certificates
+        tls: true       # Enable TLS (SNI auto-derived from host)
+        insecure: true  # Allow self-signed certificates

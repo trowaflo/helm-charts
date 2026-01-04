@@ -7,14 +7,16 @@ tests:
       routes:
         test:
           enabled: false
-          backendPolicy:
-            tls:
-              sni: test.com
+          outCluster:
+            - name: test
+              host: test.com
+              port: 80
+              tls: true
     asserts:
       - hasDocuments:
           count: 0
 
-  - it: should not render when no backendPolicy defined
+  - it: should not render when no TLS enabled on backends
     set:
       routes:
         test:
@@ -31,7 +33,7 @@ tests:
       - hasDocuments:
           count: 0
 
-  - it: should render backendconfigpolicy with TLS settings
+  - it: should render backendconfigpolicy with TLS enabled on backend
     set:
       routes:
         pmxx:
@@ -44,10 +46,8 @@ tests:
             - name: pmxx
               host: proxmox1.example.com
               port: 8006
-          backendPolicy:
-            tls:
-              sni: proxmox1.example.com
-              insecureSkipVerify: true
+              tls: true
+              insecure: true
     asserts:
       - hasDocuments:
           count: 1
@@ -75,7 +75,7 @@ tests:
           path: spec.tls.insecureSkipVerify
           value: true
 
-  - it: should support SNI only
+  - it: should auto-derive SNI from host
     set:
       routes:
         test:
@@ -88,9 +88,7 @@ tests:
             - name: test
               host: test.local
               port: 443
-          backendPolicy:
-            tls:
-              sni: test.local
+              tls: true
     asserts:
       - hasDocuments:
           count: 1
@@ -100,7 +98,7 @@ tests:
       - isNull:
           path: spec.tls.insecureSkipVerify
 
-  - it: should support insecureSkipVerify only
+  - it: should support insecure flag
     set:
       routes:
         test:
@@ -113,19 +111,18 @@ tests:
             - name: test
               host: test.local
               port: 443
-          backendPolicy:
-            tls:
-              insecureSkipVerify: false
+              tls: true
+              insecure: false
     asserts:
       - hasDocuments:
           count: 1
       - equal:
-          path: spec.tls.insecureSkipVerify
-          value: false
-      - isNull:
           path: spec.tls.sni
+          value: test.local
+      - isNull:
+          path: spec.tls.insecureSkipVerify
 
-  - it: should link to multiple backends when multiple outCluster entries
+  - it: should only create policy for backends with TLS enabled
     set:
       routes:
         multi:
@@ -138,18 +135,15 @@ tests:
             - name: backend1
               host: host1.local
               port: 8080
+              tls: true
             - name: backend2
               host: host2.local
               port: 8080
-          backendPolicy:
-            tls:
-              insecureSkipVerify: true
     asserts:
       - hasDocuments:
           count: 1
       - equal:
           path: spec.targetRefs[0].name
           value: multi-backend1-backend
-      - equal:
-          path: spec.targetRefs[1].name
-          value: multi-backend2-backend
+      - isNull:
+          path: spec.targetRefs[1]

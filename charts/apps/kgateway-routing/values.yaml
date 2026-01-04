@@ -31,7 +31,7 @@
 #               set: [{name: X-Forwarded-Proto, value: https}]
 # ```
 #
-# **Backend with TLS policy (for HTTPS backends):**
+# **Backend with TLS policy (for HTTPS backends with self-signed certs):**
 # ```yaml
 # routes:
 #   pmxx:
@@ -40,10 +40,10 @@
 #     parentRefs:
 #       - {name: gateway, namespace: kgateway-system}
 #     outCluster:
-#       - {name: pmxx, host: proxmox1.example.com, port: 8006}
-#     backendPolicy:
-#       tls: {sni: proxmox1.example.com, insecureSkipVerify: true}
+#       - {name: pmxx, host: proxmox1.example.com, port: 8006, tls: true, insecure: true}
 # ```
+# Note: `tls: true` enables TLS with SNI auto-derived from host.
+#       `insecure: true` allows self-signed certificates.
 #
 # @default -- {} (empty, user must configure routes)
 routes: {}
