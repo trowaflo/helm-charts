@@ -1,0 +1,11 @@
+certificates:
+  wildcard-tls:
+    enabled: true
+    secretName: wildcard-tls
+    issuerRef:
+      name: letsencrypt-prod
+      kind: ClusterIssuer
+    dnsNames:
+      - "www.example.com"
+      - "example.com"
+    commonName: "example.com"
