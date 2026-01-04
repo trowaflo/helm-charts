@@ -1,0 +1,6 @@
+certificates:
+  test-cert:
+    enabled: true
+    secretName: test-cert-secret
+    dnsNames:
+      - "example.com"

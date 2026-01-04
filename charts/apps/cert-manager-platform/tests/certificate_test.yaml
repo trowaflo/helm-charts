@@ -116,3 +116,18 @@ tests:
       - equal:
           path: metadata.annotations.description
           value: "Production TLS certificate"
+
+  # Validation tests for required fields
+  - it: should fail when secretName is missing
+    values:
+      - values/certificate-missing-secretName.yaml
+    asserts:
+      - failedTemplate:
+          errorPattern: "certificates.test-cert.secretName is required"
+
+  - it: should fail when issuerRef is missing
+    values:
+      - values/certificate-missing-issuerRef.yaml
+    asserts:
+      - failedTemplate:
+          errorPattern: "certificates.test-cert.issuerRef is required"
