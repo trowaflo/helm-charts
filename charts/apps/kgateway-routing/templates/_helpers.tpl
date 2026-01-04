@@ -82,3 +82,13 @@ Generate backend name from key and config
 {{- printf "%s-backend" $key }}
 {{- end }}
 {{- end }}
+
+{{/*
+Indent helper - indents the input by the specified number of spaces
+Usage: {{ include "kgateway-routing.indent" (dict "content" .someContent "spaces" 4) }}
+*/}}
+{{- define "kgateway-routing.indent" -}}
+{{- $content := .content -}}
+{{- $spaces := .spaces | int -}}
+{{- $content | nindent $spaces }}
+{{- end }}
