@@ -75,26 +75,35 @@ jobs:
         if: steps.detect_charts.outputs.changed_charts != ''
         run: |
           echo "Dynamically detecting and adding external Helm dependencies..."
-
+          
+          repos_added=0
           for chart in ${{ steps.detect_charts.outputs.changed_charts }}; do
             chart_file="$chart/Chart.yaml"
             if [ -f "$chart_file" ]; then
               echo "Processing $chart_file for external repositories..."
-              yq '.dependencies[] | select(.repository | test("^https?://")) | [.repository, .name] | @tsv' "$chart_file" | \
-              while IFS=$'\t' read -r repo_url repo_name; do
-
-                repo_url=$(echo "$repo_url" | sed 's/^- //; s/"//g')
-                repo_name=$(echo "$repo_name" | sed 's/"//g')
-                echo "Found dependency - Name: $repo_name, URL: $repo_url"
-                if [ -n "$repo_url" ] && [ "$repo_url" != "null" ]; then
-                  echo "  -> Found repo for '$repo_name': $repo_url"
-                  helm repo add "$repo_name" "$repo_url" || true
-                fi
-              done
+              
+              # Check if dependencies exist
+              if yq eval '.dependencies' "$chart_file" | grep -q '^-'; then
+                yq eval '.dependencies[] | select(.repository | test("^https?://")) | [.name, .repository] | @tsv' "$chart_file" | \
+                while IFS=$'\t' read -r repo_name repo_url; do
+                  if [ -n "$repo_name" ] && [ -n "$repo_url" ] && [ "$repo_url" != "null" ]; then
+                    echo "  -> Found dependency '$repo_name' from $repo_url"
+                    helm repo add "$repo_name" "$repo_url" || true
+                    repos_added=$((repos_added + 1))
+                  fi
+                done
+              else
+                echo "  -> No dependencies found"
+              fi
             fi
           done
-
-          helm repo update
+          
+          if [ "$repos_added" -gt 0 ]; then
+            echo "Updating Helm repositories..."
+            helm repo update
+          else
+            echo "No Helm repositories to update"
+          fi
 
       - name: Build chart dependencies
         if: steps.detect_charts.outputs.changed_charts != ''

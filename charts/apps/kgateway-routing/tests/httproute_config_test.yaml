@@ -65,7 +65,7 @@ tests:
           value: gateway.kgateway.dev
       - equal:
           path: spec.rules[0].backendRefs[0].name
-          value: homeassistant-backend
+          value: homeassistant-homeassistant-backend
 
   # Test filters are rendered correctly
   - it: should render request and response header filters correctly

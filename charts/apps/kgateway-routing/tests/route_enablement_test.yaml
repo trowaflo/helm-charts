@@ -39,7 +39,7 @@ tests:
         documentIndex: 0
       - equal:
           path: metadata.name
-          value: homeassistant-backend
+          value: homeassistant-homeassistant-backend
         documentIndex: 0
 
   # Test with only in-cluster route enabled
@@ -96,7 +96,7 @@ tests:
         documentIndex: 0
       - equal:
           path: metadata.name
-          value: homeassistant-backend
+          value: homeassistant-homeassistant-backend
         documentIndex: 0
 
   # Test with no routes enabled
@@ -108,11 +108,11 @@ tests:
       - hasDocuments:
           count: 0
 
-  # Test with no backends enabled
-  - it: should not render any Backends when all disabled
+  # Test with no backends enabled (all routes disabled = no backends)
+  - it: should not render any Backends when all routes disabled
     template: templates/backend.yaml
     set:
-      backends: {}
+      routes: {}
     asserts:
       - hasDocuments:
           count: 0
