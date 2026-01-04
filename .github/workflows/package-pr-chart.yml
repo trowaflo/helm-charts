@@ -1,0 +1,170 @@
+name: Package PR Chart for Testing
+
+on:
+  pull_request:
+    paths:
+      - "charts/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  package-chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Install Helm
+        uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 #v4.3.1
+        with:
+          version: v3.17.0
+
+      - name: Install yq
+        run: |
+          YQ_VERSION="v4.44.2"
+          wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64 -O /tmp/yq
+          chmod +x /tmp/yq
+          sudo mv /tmp/yq /usr/local/bin/yq
+
+      - name: Detect changed charts
+        id: detect_charts
+        run: |
+          BASE_BRANCH=${{ github.event.pull_request.base.ref || 'main' }}
+          git fetch origin $BASE_BRANCH || true
+
+          changed_charts=""
+          for file in $(git diff --name-only origin/$BASE_BRANCH..HEAD 2>/dev/null | grep '^charts/' || true); do
+            chart_dir=$(dirname "$file")
+            while [ ! -f "$chart_dir/Chart.yaml" ] && [ "$chart_dir" != "." ]; do
+              chart_dir=$(dirname "$chart_dir")
+            done
+            if [ -f "$chart_dir/Chart.yaml" ]; then
+              chart_path=$(dirname "$chart_dir/Chart.yaml")
+              if [[ ! "$changed_charts" =~ "$chart_path" ]]; then
+                changed_charts="$changed_charts $chart_path"
+              fi
+            fi
+          done
+
+          changed_charts=$(echo "$changed_charts" | xargs)
+          echo "changed_charts=$changed_charts" >> $GITHUB_OUTPUT
+          echo "Changed charts: $changed_charts"
+
+      - name: Add Helm repositories and build dependencies
+        if: steps.detect_charts.outputs.changed_charts != ''
+        run: |
+          # Add common repository for dependencies
+          helm repo add helm-charts https://trowaflo.github.io/helm-charts || true
+          helm repo update
+
+          # Build dependencies for changed charts
+          for chart in ${{ steps.detect_charts.outputs.changed_charts }}; do
+            if [ -f "$chart/Chart.yaml" ]; then
+              echo "Building dependencies for $chart"
+              helm dependency build "$chart" || echo "No dependencies or build failed for $chart"
+            fi
+          done
+
+      - name: Package charts
+        if: steps.detect_charts.outputs.changed_charts != ''
+        id: package
+        run: |
+          mkdir -p /tmp/chart-packages
+          packaged_files=""
+
+          for chart in ${{ steps.detect_charts.outputs.changed_charts }}; do
+            if [ -f "$chart/Chart.yaml" ]; then
+              echo "Packaging $chart..."
+              helm package "$chart" -d /tmp/chart-packages
+              
+              chart_name=$(yq eval '.name' "$chart/Chart.yaml")
+              chart_version=$(yq eval '.version' "$chart/Chart.yaml")
+              package_file="$chart_name-$chart_version.tgz"
+              
+              if [ -f "/tmp/chart-packages/$package_file" ]; then
+                packaged_files="$packaged_files /tmp/chart-packages/$package_file"
+              fi
+            fi
+          done
+
+          echo "packaged_files=$packaged_files" >> $GITHUB_OUTPUT
+          ls -lh /tmp/chart-packages/
+
+      - name: Upload chart packages as artifacts
+        if: steps.package.outputs.packaged_files != ''
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
+        with:
+          name: helm-charts-pr-${{ github.event.pull_request.number }}
+          path: /tmp/chart-packages/*.tgz
+          retention-days: 30
+
+      - name: Comment on PR with usage instructions
+        if: steps.package.outputs.packaged_files != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            const packagesDir = '/tmp/chart-packages';
+            const files = fs.readdirSync(packagesDir);
+            
+            let chartsList = '';
+            files.forEach(file => {
+              if (file.endsWith('.tgz')) {
+                chartsList += `- \`${file}\`\n`;
+              }
+            });
+
+            const comment = `## 📦 Chart Packages Available for Testing
+
+            The following chart packages have been built from this PR and are available as workflow artifacts:
+
+            ${chartsList}
+
+            ### Testing Options:
+
+            **Option 1: Direct Git Source (Recommended)**
+            \`\`\`yaml
+            apiVersion: argoproj.io/v1alpha1
+            kind: Application
+            metadata:
+              name: test-chart
+            spec:
+              source:
+                repoURL: https://github.com/${{ github.repository }}
+                targetRevision: ${{ github.head_ref }}
+                path: charts/apps/[CHART_NAME]
+                helm:
+                  values: |
+                    # Your values here
+            \`\`\`
+
+            **Option 2: Download Artifact and Test Locally**
+            1. Download the artifact from the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            2. Extract and test:
+               \`\`\`bash
+               helm install test-release ./[CHART_NAME]-[VERSION].tgz --dry-run --debug
+               \`\`\`
+
+            **Option 3: Use OCI Registry (if configured)**
+            If you have access to push to an OCI registry, you can push the downloaded chart:
+            \`\`\`bash
+            helm push [CHART_NAME]-[VERSION].tgz oci://your-registry.io/helm-charts
+            \`\`\`
+
+            ---
+            *Artifacts are retained for 30 days and will not be published to gh-pages or released.*
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
