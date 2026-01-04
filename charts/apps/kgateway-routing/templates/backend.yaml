@@ -1,7 +1,7 @@
 {{- $namespace := include "kgateway-routing.namespace" . -}}
 {{- $generatedBackends := dict -}}
 
-{{- /* First pass: collect inline backends from routes */ -}}
+{{- /* First pass: collect inline backends from routes.backend field (legacy) */ -}}
 {{- range $routeKey, $routeCfg := .Values.routes }}
   {{- if $routeCfg.enabled }}
     {{- if $routeCfg.backend }}
@@ -11,7 +11,27 @@
   {{- end }}
 {{- end }}
 
-{{- /* Second pass: render backends from backends: section */ -}}
+{{- /* Second pass: collect backends from routes.outCluster (new simplified syntax) */ -}}
+{{- range $routeKey, $routeCfg := .Values.routes }}
+  {{- if $routeCfg.enabled }}
+    {{- if $routeCfg.outCluster }}
+      {{- range $backend := $routeCfg.outCluster }}
+        {{- $backendName := printf "%s-%s-backend" $routeKey $backend.name }}
+        {{- $backendNamespace := default $namespace (default $routeCfg.namespace $backend.namespace) }}
+        {{- $backendSpec := dict "type" "Static" "namespace" $backendNamespace "static" (dict "hosts" (list (dict "host" $backend.host "port" $backend.port))) }}
+        {{- if $backend.labels }}
+          {{- $_ := set $backendSpec "labels" $backend.labels }}
+        {{- end }}
+        {{- if $backend.annotations }}
+          {{- $_ := set $backendSpec "annotations" $backend.annotations }}
+        {{- end }}
+        {{- $_ := set $generatedBackends $backendName $backendSpec }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
+{{- /* Third pass: render backends from backends: section (legacy) */ -}}
 {{- $keys := keys .Values.backends | sortAlpha -}}
 {{- range $key := $keys }}
   {{- $cfg := index $.Values.backends $key }}
@@ -63,7 +83,7 @@ spec:
   {{- end }}
 {{- end }}
 
-{{- /* Third pass: render inline backends from routes */ -}}
+{{- /* Fourth pass: render inline backends from routes (both legacy .backend and new .outCluster) */ -}}
 {{- $backendKeys := keys $generatedBackends | sortAlpha -}}
 {{- range $backendName := $backendKeys }}
   {{- $cfg := index $generatedBackends $backendName }}

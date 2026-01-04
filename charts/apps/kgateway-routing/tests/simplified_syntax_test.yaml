@@ -1,0 +1,112 @@
+suite: test kgateway-routing chart - simplified inCluster/outCluster syntax
+templates:
+  - httproute.yaml
+  - backend.yaml
+values:
+  - values/simplified-syntax.yaml
+tests:
+  - it: should render HTTPRoute for inCluster route
+    template: httproute.yaml
+    documentIndex: 0
+    asserts:
+      - isKind:
+          of: HTTPRoute
+      - equal:
+          path: metadata.name
+          value: argocd
+      - equal:
+          path: spec.hostnames[0]
+          value: argocd.example.com
+      - equal:
+          path: spec.rules[0].backendRefs[0].kind
+          value: Service
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: argocd-server
+      - equal:
+          path: spec.rules[0].backendRefs[0].port
+          value: 80
+      - equal:
+          path: spec.rules[0].matches[0].path.type
+          value: PathPrefix
+      - equal:
+          path: spec.rules[0].matches[0].path.value
+          value: /
+
+  - it: should render HTTPRoute for outCluster route
+    template: httproute.yaml
+    documentIndex: 1
+    asserts:
+      - isKind:
+          of: HTTPRoute
+      - equal:
+          path: metadata.name
+          value: homeassistant
+      - equal:
+          path: spec.hostnames[0]
+          value: hass.example.com
+      - equal:
+          path: spec.rules[0].backendRefs[0].kind
+          value: Backend
+      - equal:
+          path: spec.rules[0].backendRefs[0].group
+          value: gateway.kgateway.dev
+      - matchRegex:
+          path: spec.rules[0].backendRefs[0].name
+          pattern: homeassistant-homeassistant-backend
+
+  - it: should render filters for outCluster route
+    template: httproute.yaml
+    documentIndex: 1
+    asserts:
+      - isNotEmpty:
+          path: spec.rules[0].filters
+      - equal:
+          path: spec.rules[0].filters[0].type
+          value: RequestHeaderModifier
+      - equal:
+          path: spec.rules[0].filters[0].requestHeaderModifier.set[0].name
+          value: X-Forwarded-Proto
+      - equal:
+          path: spec.rules[0].filters[1].type
+          value: ResponseHeaderModifier
+
+  - it: should render Backend for outCluster
+    template: backend.yaml
+    asserts:
+      - isKind:
+          of: Backend
+      - matchRegex:
+          path: metadata.name
+          pattern: homeassistant-homeassistant-backend
+      - equal:
+          path: spec.type
+          value: Static
+      - equal:
+          path: spec.static.hosts[0].host
+          value: homeassistant.local
+      - equal:
+          path: spec.static.hosts[0].port
+          value: 8123
+
+  - it: should generate default path matching for inCluster
+    template: httproute.yaml
+    documentIndex: 0
+    asserts:
+      - equal:
+          path: spec.rules[0].matches[0].path.type
+          value: PathPrefix
+      - equal:
+          path: spec.rules[0].matches[0].path.value
+          value: /
+
+  - it: should generate default path matching for outCluster
+    template: httproute.yaml
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.rules[0].matches[0].path.type
+          value: PathPrefix
+      - equal:
+          path: spec.rules[0].matches[0].path.value
+          value: /

@@ -38,7 +38,187 @@ spec:
   hostnames:
     {{- toYaml $cfg.hostnames | nindent 4 }}
   {{- end }}
-  {{- if $cfg.rules }}
+  {{- if or $cfg.inCluster $cfg.outCluster }}
+  rules:
+    
+    {{- if $cfg.inCluster }}
+      {{- range $backend := $cfg.inCluster }}
+    - 
+      {{- if $backend.matches }}
+      matches:
+        {{- toYaml $backend.matches | nindent 8 }}
+      {{- else }}
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
+      {{- end }}
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: {{ required (printf "routes.%s.inCluster[].name is required" $key) $backend.name }}
+          port: {{ required (printf "routes.%s.inCluster[].port is required" $key) $backend.port }}
+          {{- if $backend.namespace }}
+          namespace: {{ $backend.namespace }}
+          {{- end }}
+          {{- if $backend.weight }}
+          weight: {{ $backend.weight }}
+          {{- end }}
+      {{- if $backend.filters }}
+      filters:
+        {{- range $backend.filters }}
+        - type: {{ required "filter type is required" .type }}
+          {{- if .requestHeaderModifier }}
+          requestHeaderModifier:
+            {{- if .requestHeaderModifier.set }}
+            set:
+              {{- range .requestHeaderModifier.set }}
+              - name: {{ required "header name is required" .name }}
+                value: {{ required "header value is required" .value | quote }}
+              {{- end }}
+            {{- end }}
+            {{- if .requestHeaderModifier.add }}
+            add:
+              {{- range .requestHeaderModifier.add }}
+              - name: {{ required "header name is required" .name }}
+                value: {{ required "header value is required" .value | quote }}
+              {{- end }}
+            {{- end }}
+            {{- if .requestHeaderModifier.remove }}
+            remove:
+              {{- toYaml .requestHeaderModifier.remove | nindent 14 }}
+            {{- end }}
+          {{- end }}
+          {{- if .responseHeaderModifier }}
+          responseHeaderModifier:
+            {{- if .responseHeaderModifier.set }}
+            set:
+              {{- range .responseHeaderModifier.set }}
+              - name: {{ required "header name is required" .name }}
+                value: {{ required "header value is required" .value | quote }}
+              {{- end }}
+            {{- end }}
+            {{- if .responseHeaderModifier.add }}
+            add:
+              {{- range .responseHeaderModifier.add }}
+              - name: {{ required "header name is required" .name }}
+                value: {{ required "header value is required" .value | quote }}
+              {{- end }}
+            {{- end }}
+            {{- if .responseHeaderModifier.remove }}
+            remove:
+              {{- toYaml .responseHeaderModifier.remove | nindent 14 }}
+            {{- end }}
+          {{- end }}
+          {{- if .requestRedirect }}
+          requestRedirect:
+            {{- toYaml .requestRedirect | nindent 12 }}
+          {{- end }}
+          {{- if .requestMirror }}
+          requestMirror:
+            {{- toYaml .requestMirror | nindent 12 }}
+          {{- end }}
+          {{- if .urlRewrite }}
+          urlRewrite:
+            {{- toYaml .urlRewrite | nindent 12 }}
+          {{- end }}
+          {{- if .extensionRef }}
+          extensionRef:
+            {{- toYaml .extensionRef | nindent 12 }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- end }}
+    {{- end }}
+    
+    {{- if $cfg.outCluster }}
+      {{- range $idx, $backend := $cfg.outCluster }}
+        {{- $backendName := printf "%s-%s-backend" $key $backend.name }}
+    - 
+      {{- if $backend.matches }}
+      matches:
+        {{- toYaml $backend.matches | nindent 8 }}
+      {{- else }}
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
+      {{- end }}
+      backendRefs:
+        - group: gateway.kgateway.dev
+          kind: Backend
+          name: {{ $backendName }}
+          {{- if $backend.weight }}
+          weight: {{ $backend.weight }}
+          {{- end }}
+      {{- if $backend.filters }}
+      filters:
+        {{- range $backend.filters }}
+        - type: {{ required "filter type is required" .type }}
+          {{- if .requestHeaderModifier }}
+          requestHeaderModifier:
+            {{- if .requestHeaderModifier.set }}
+            set:
+              {{- range .requestHeaderModifier.set }}
+              - name: {{ required "header name is required" .name }}
+                value: {{ required "header value is required" .value | quote }}
+              {{- end }}
+            {{- end }}
+            {{- if .requestHeaderModifier.add }}
+            add:
+              {{- range .requestHeaderModifier.add }}
+              - name: {{ required "header name is required" .name }}
+                value: {{ required "header value is required" .value | quote }}
+              {{- end }}
+            {{- end }}
+            {{- if .requestHeaderModifier.remove }}
+            remove:
+              {{- toYaml .requestHeaderModifier.remove | nindent 14 }}
+            {{- end }}
+          {{- end }}
+          {{- if .responseHeaderModifier }}
+          responseHeaderModifier:
+            {{- if .responseHeaderModifier.set }}
+            set:
+              {{- range .responseHeaderModifier.set }}
+              - name: {{ required "header name is required" .name }}
+                value: {{ required "header value is required" .value | quote }}
+              {{- end }}
+            {{- end }}
+            {{- if .responseHeaderModifier.add }}
+            add:
+              {{- range .responseHeaderModifier.add }}
+              - name: {{ required "header name is required" .name }}
+                value: {{ required "header value is required" .value | quote }}
+              {{- end }}
+            {{- end }}
+            {{- if .responseHeaderModifier.remove }}
+            remove:
+              {{- toYaml .responseHeaderModifier.remove | nindent 14 }}
+            {{- end }}
+          {{- end }}
+          {{- if .requestRedirect }}
+          requestRedirect:
+            {{- toYaml .requestRedirect | nindent 12 }}
+          {{- end }}
+          {{- if .requestMirror }}
+          requestMirror:
+            {{- toYaml .requestMirror | nindent 12 }}
+          {{- end }}
+          {{- if .urlRewrite }}
+          urlRewrite:
+            {{- toYaml .urlRewrite | nindent 12 }}
+          {{- end }}
+          {{- if .extensionRef }}
+          extensionRef:
+            {{- toYaml .extensionRef | nindent 12 }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- end }}
+    {{- end }}
+  {{- else if $cfg.rules }}
+    
   rules:
     {{- range $cfg.rules }}
     - {{- if .matches }}
