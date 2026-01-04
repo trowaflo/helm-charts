@@ -27,8 +27,9 @@ routes:
             port: 80
             weight: 1
 
-  # Example 2: Out-of-cluster Backend with header filters
+  # Example 2: Out-of-cluster Backend with inline configuration (RECOMMENDED)
   # This routes traffic to an external service with header modifications
+  # The backend is defined inline, simplifying the configuration
   homeassistant:
     enabled: true
     hostnames:
@@ -65,6 +66,13 @@ routes:
                   value: "upgrade-insecure-requests"
                 - name: Strict-Transport-Security
                   value: "max-age=31536000; includeSubDomains"
+    # Backend configuration inline with the route (NEW PATTERN)
+    backend:
+      type: Static
+      static:
+        hosts:
+          - host: homeassistant.local
+            port: 8123
 
   # Example 3: Multiple path matches and multiple backends
   api:
@@ -94,7 +102,7 @@ routes:
             name: api-v2
             port: 8080
 
-  # Example 4: Multiple hostnames with filters
+  # Example 4: Out-of-cluster with custom backend name and inline config
   proxmox:
     enabled: false  # Set to true to enable
     hostnames:
@@ -118,30 +126,20 @@ routes:
               set:
                 - name: X-Forwarded-Proto
                   value: https
+    # Inline backend with custom name
+    backend:
+      name: proxmox-backend  # Optional: custom name, defaults to {route-key}-backend
+      type: Static
+      static:
+        hosts:
+          - host: proxmox1.example.com
+            port: 8006
 
-# Configure Backends for out-of-cluster services
+# Configure Backends for out-of-cluster services (LEGACY - backwards compatibility)
+# For new configurations, prefer using the inline `backend:` field within routes above.
 backends:
-  # Example 1: Static backend (external host)
-  homeassistant:
-    enabled: true
-    type: Static
-    static:
-      hosts:
-        - host: homeassistant.local
-          port: 8123
-
-  # Example 2: Multiple hosts for load balancing
-  proxmox:
-    enabled: false  # Set to true to enable
-    type: Static
-    static:
-      hosts:
-        - host: proxmox1.example.com
-          port: 8006
-        - host: proxmox2.example.com
-          port: 8006
-
-  # Example 3: Backend with custom name and namespace
+  # Example 1: Static backend (external host) - LEGACY pattern
+  # Prefer using inline backend configuration in routes instead
   external-api:
     enabled: false
     name: my-external-api  # Optional: custom name, defaults to key-backend
@@ -152,7 +150,7 @@ backends:
         - host: api.external.com
           port: 443
 
-  # Example 4: Kube backend (for advanced in-cluster scenarios)
+  # Example 2: Kube backend (for advanced in-cluster scenarios)
   # Note: For standard in-cluster routing, use Service backendRefs in routes
   internal-service:
     enabled: false

@@ -1,0 +1,76 @@
+suite: test kgateway-routing chart - inline backend configuration
+release:
+  name: kgateway-routing-test
+  namespace: kgateway-test
+tests:
+  # Test inline backend renders HTTPRoute
+  - it: should render HTTPRoute with inline backend
+    template: templates/httproute.yaml
+    values:
+      - values/inline-backend.yaml
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: HTTPRoute
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: homeassistant
+        documentIndex: 0
+      - equal:
+          path: spec.rules[0].backendRefs[0].kind
+          value: Backend
+        documentIndex: 0
+
+  # Test inline backend renders Backend resource
+  - it: should render Backend from inline configuration
+    template: templates/backend.yaml
+    values:
+      - values/inline-backend.yaml
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: Backend
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: homeassistant-backend
+        documentIndex: 0
+      - equal:
+          path: spec.type
+          value: Static
+        documentIndex: 0
+      - equal:
+          path: spec.static.hosts[0].host
+          value: homeassistant.local
+        documentIndex: 0
+      - equal:
+          path: spec.static.hosts[0].port
+          value: 8123
+        documentIndex: 0
+
+  # Test custom backend name
+  - it: should use custom backend name when specified
+    template: templates/backend.yaml
+    values:
+      - values/inline-backend.yaml
+    asserts:
+      - equal:
+          path: metadata.name
+          value: proxmox-backend
+        documentIndex: 1
+
+  # Test backwards compatibility with separate backends section
+  - it: should still work with separate backends section
+    template: templates/backend.yaml
+    values:
+      - values/default.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: homeassistant-backend
+        documentIndex: 0

@@ -22,7 +22,7 @@
 #             port: 80
 # ```
 #
-# **Out-of-cluster Backend routing example:**
+# **Out-of-cluster Backend routing with inline backend (NEW - recommended):**
 # ```yaml
 # routes:
 #   homeassistant:
@@ -33,26 +33,44 @@
 #       - name: public-gateway
 #         namespace: kgateway-system
 #     rules:
-#       - matches:
-#           - path:
-#               type: PathPrefix
-#               value: /
-#         backendRefs:
+#       - backendRefs:
+#           - kind: Backend
+#             group: gateway.kgateway.dev
+#             name: homeassistant-backend  # auto-generated if not specified
+#     # Backend configuration inline with the route
+#     backend:
+#       type: Static
+#       static:
+#         hosts:
+#           - host: homeassistant.local
+#             port: 8123
+# ```
+#
+# **Out-of-cluster Backend routing with separate backends section (legacy):**
+# ```yaml
+# routes:
+#   homeassistant:
+#     enabled: true
+#     hostnames:
+#       - "hass.example.com"
+#     parentRefs:
+#       - name: public-gateway
+#         namespace: kgateway-system
+#     rules:
+#       - backendRefs:
 #           - kind: Backend
 #             group: gateway.kgateway.dev
 #             name: homeassistant-backend
-#         filters:
-#           - type: RequestHeaderModifier
-#             requestHeaderModifier:
-#               set:
-#                 - name: X-Forwarded-Proto
-#                   value: https
+# # Define backend separately in backends: section (see below)
 # ```
 #
 # @default -- {} (empty, user must configure routes)
 routes: {}
 
-# -- Backend configurations for out-of-cluster services.
+# -- Backend configurations for out-of-cluster services (LEGACY).
+# This section is maintained for backwards compatibility.
+# For new configurations, prefer using the inline `backend:` field within routes.
+#
 # Backends define external endpoints that routes can reference.
 #
 # **Example:**
