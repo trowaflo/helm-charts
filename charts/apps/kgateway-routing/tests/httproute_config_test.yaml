@@ -1,0 +1,108 @@
+suite: test kgateway-routing chart - HTTPRoute configuration
+release:
+  name: kgateway-routing-test
+  namespace: kgateway-test
+templates:
+  - templates/httproute.yaml
+tests:
+  # Test in-cluster Service routing
+  - it: should render correct HTTPRoute for in-cluster Service
+    values:
+      - values/only-incluster.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: HTTPRoute
+      - equal:
+          path: metadata.name
+          value: argocd
+      - equal:
+          path: metadata.namespace
+          value: kgateway-test
+      - equal:
+          path: spec.hostnames[0]
+          value: argocd.example.com
+      - equal:
+          path: spec.parentRefs[0].name
+          value: private-gateway
+      - equal:
+          path: spec.parentRefs[0].namespace
+          value: kgateway-preview
+      - equal:
+          path: spec.rules[0].backendRefs[0].kind
+          value: Service
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: argocd-server
+      - equal:
+          path: spec.rules[0].backendRefs[0].port
+          value: 80
+
+  # Test out-cluster Backend routing with filters
+  - it: should render correct HTTPRoute with Backend and filters
+    values:
+      - values/only-outcluster.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: HTTPRoute
+      - equal:
+          path: metadata.name
+          value: homeassistant
+      - equal:
+          path: spec.hostnames[0]
+          value: hass.example.com
+      - equal:
+          path: spec.parentRefs[0].name
+          value: public-gateway
+      - equal:
+          path: spec.rules[0].backendRefs[0].kind
+          value: Backend
+      - equal:
+          path: spec.rules[0].backendRefs[0].group
+          value: gateway.kgateway.dev
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: homeassistant-backend
+
+  # Test filters are rendered correctly
+  - it: should render request and response header filters correctly
+    values:
+      - values/default.yaml
+    asserts:
+      - equal:
+          path: spec.rules[0].filters[0].type
+          value: RequestHeaderModifier
+        documentIndex: 1
+      - equal:
+          path: spec.rules[0].filters[0].requestHeaderModifier.set[0].name
+          value: X-Forwarded-Proto
+        documentIndex: 1
+      - equal:
+          path: spec.rules[0].filters[0].requestHeaderModifier.set[0].value
+          value: https
+        documentIndex: 1
+      - equal:
+          path: spec.rules[0].filters[1].type
+          value: ResponseHeaderModifier
+        documentIndex: 1
+      - equal:
+          path: spec.rules[0].filters[1].responseHeaderModifier.set[0].name
+          value: Content-Security-Policy
+        documentIndex: 1
+
+  # Test path matching configuration
+  - it: should render path matching correctly
+    values:
+      - values/default.yaml
+    asserts:
+      - equal:
+          path: spec.rules[0].matches[0].path.type
+          value: PathPrefix
+        documentIndex: 0
+      - equal:
+          path: spec.rules[0].matches[0].path.value
+          value: /
+        documentIndex: 0

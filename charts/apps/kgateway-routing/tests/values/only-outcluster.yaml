@@ -1,0 +1,45 @@
+# Only out-cluster routes enabled
+routes:
+  argocd:
+    enabled: false
+    hostnames:
+      - "argocd.example.com"
+    parentRefs:
+      - name: private-gateway
+        namespace: kgateway-preview
+    rules:
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /
+        backendRefs:
+          - group: ''
+            kind: Service
+            name: argocd-server
+            port: 80
+
+  homeassistant:
+    enabled: true
+    hostnames:
+      - "hass.example.com"
+    parentRefs:
+      - name: public-gateway
+        namespace: kgateway-preview
+    rules:
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /
+        backendRefs:
+          - name: homeassistant-backend
+            kind: Backend
+            group: gateway.kgateway.dev
+
+backends:
+  homeassistant:
+    enabled: true
+    type: Static
+    static:
+      hosts:
+        - host: homeassistant.local
+          port: 8123
