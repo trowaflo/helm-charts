@@ -22,6 +22,11 @@ cert-manager-webhook-ovh:
 # - duration: string (optional) - certificate lifetime (e.g., "2160h" for 90 days)
 # - renewBefore: string (optional) - when to renew before expiry (e.g., "360h" for 15 days)
 #
+# ℹ️ NOTE: For Let's Encrypt certificates, cert-manager automatically detects the certificate
+# expiry from the issued certificate and handles renewal. The duration/renewBefore fields are
+# OPTIONAL - if not specified, cert-manager uses sensible defaults (90 days duration, renew
+# 30 days before expiry for Let's Encrypt). Only set these if you need custom values.
+#
 # Example:
 #   certificates:
 #     wildcard-tls:
@@ -34,6 +39,7 @@ cert-manager-webhook-ovh:
 #         - "*.example.com"
 #         - "example.com"
 #       commonName: "*.example.com"
+#       # duration and renewBefore are optional - cert-manager auto-detects from Let's Encrypt
 #
 # @default -- {} (empty, no certificates managed by default)
 certificates: {}
