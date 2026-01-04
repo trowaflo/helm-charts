@@ -11,31 +11,32 @@ on:
         required: true
         type: number
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
   package-and-publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
-      - name: Checkout PR branch
+      - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.ref || github.ref }}
 
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
       - name: Install Helm
         uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 #v4.3.1
-        with:
-          version: v3.17.0
 
       - name: Install yq
         run: |
           YQ_VERSION="v4.44.2"
-          wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64 -O /tmp/yq
-          chmod +x /tmp/yq
-          sudo mv /tmp/yq /usr/local/bin/yq
+          wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64 -O /usr/local/bin/yq
+          chmod +x /usr/local/bin/yq
 
       - name: Get PR number
         id: pr_number
@@ -70,16 +71,38 @@ jobs:
           echo "changed_charts=$changed_charts" >> $GITHUB_OUTPUT
           echo "Changed charts: $changed_charts"
 
-      - name: Add Helm repositories and build dependencies
+      - name: Add All Required Helm Repositories Dynamically
         if: steps.detect_charts.outputs.changed_charts != ''
         run: |
-          helm repo add helm-charts https://trowaflo.github.io/helm-charts || true
+          echo "Dynamically detecting and adding external Helm dependencies..."
+
+          for chart in ${{ steps.detect_charts.outputs.changed_charts }}; do
+            chart_file="$chart/Chart.yaml"
+            if [ -f "$chart_file" ]; then
+              echo "Processing $chart_file for external repositories..."
+              yq '.dependencies[] | select(.repository | test("^https?://")) | [.repository, .name] | @tsv' "$chart_file" | \
+              while IFS=$'\t' read -r repo_url repo_name; do
+
+                repo_url=$(echo "$repo_url" | sed 's/^- //; s/"//g')
+                repo_name=$(echo "$repo_name" | sed 's/"//g')
+                echo "Found dependency - Name: $repo_name, URL: $repo_url"
+                if [ -n "$repo_url" ] && [ "$repo_url" != "null" ]; then
+                  echo "  -> Found repo for '$repo_name': $repo_url"
+                  helm repo add "$repo_name" "$repo_url" || true
+                fi
+              done
+            fi
+          done
+
           helm repo update
 
+      - name: Build chart dependencies
+        if: steps.detect_charts.outputs.changed_charts != ''
+        run: |
           for chart in ${{ steps.detect_charts.outputs.changed_charts }}; do
             if [ -f "$chart/Chart.yaml" ]; then
               echo "Building dependencies for $chart"
-              helm dependency build "$chart" || echo "No dependencies or build failed for $chart"
+              helm dependency build "$chart" || true
             fi
           done
 
@@ -125,12 +148,6 @@ jobs:
           name: pr-charts
           path: /tmp/pr-artifacts/*.tgz
           retention-days: 30
-
-      - name: Configure Git
-        if: steps.package.outputs.packaged_charts != ''
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Checkout pr-charts branch
         if: steps.package.outputs.packaged_charts != ''
