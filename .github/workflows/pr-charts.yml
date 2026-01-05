@@ -219,39 +219,13 @@ jobs:
 
             ${chartsList}
 
-            ### Testing Options
+            ### Testing with Helm
 
-            **Option 1: Helm repository (recommended)**
             \`\`\`bash
             helm repo add pr-charts https://raw.githubusercontent.com/${{ github.repository }}/pr-charts
             helm repo update
             helm search repo pr-charts
             helm install test-release pr-charts/<chart-name> --version <version-from-above>
-            \`\`\`
-
-            **Option 2: ArgoCD Helm chart**
-            \`\`\`yaml
-            apiVersion: argoproj.io/v1alpha1
-            kind: Application
-            spec:
-              source:
-                repoURL: https://raw.githubusercontent.com/${{ github.repository }}/pr-charts
-                targetRevision: <chart-version-from-above>
-                chart: <chart-name>
-            \`\`\`
-
-            **Option 3: Download artifacts**
-            Go to [Actions → Artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) and download \`pr-charts\` to test locally.
-
-            **Option 4: Direct Git source**
-            \`\`\`yaml
-            apiVersion: argoproj.io/v1alpha1
-            kind: Application
-            spec:
-              source:
-                repoURL: https://github.com/${{ github.repository }}
-                targetRevision: ${{ github.head_ref }}
-                path: charts/apps/<chart-name>
             \`\`\`
 
             ---
