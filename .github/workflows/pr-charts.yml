@@ -77,24 +77,34 @@ jobs:
           echo "Dynamically detecting and adding external Helm dependencies..."
           
           repos_added=0
+          repo_list=""
+          
           for chart in ${{ steps.detect_charts.outputs.changed_charts }}; do
             chart_file="$chart/Chart.yaml"
             if [ -f "$chart_file" ]; then
               echo "Processing $chart_file for external repositories..."
               
-              # Check if dependencies exist and add HTTP(S) repositories
+              # Check if dependencies exist and collect HTTP(S) repositories
               if yq eval '.dependencies' "$chart_file" | grep -q '^-'; then
-                yq eval '.dependencies[] | select(.repository | test("^https?://")) | [.name, .repository] | @tsv' "$chart_file" | \
                 while IFS=$'\t' read -r repo_name repo_url; do
                   if [ -n "$repo_name" ] && [ -n "$repo_url" ] && [ "$repo_url" != "null" ]; then
-                    echo "  -> Adding repository '$repo_name' from $repo_url"
-                    helm repo add "$repo_name" "$repo_url" || true
-                    repos_added=$((repos_added + 1))
+                    repo_list="${repo_list}${repo_name}|${repo_url}"$'\n'
                   fi
-                done
+                done < <(yq eval '.dependencies[] | select(.repository | test("^https?://")) | [.name, .repository] | @tsv' "$chart_file")
               fi
             fi
           done
+          
+          # Add repositories from collected list
+          if [ -n "$repo_list" ]; then
+            while IFS='|' read -r repo_name repo_url; do
+              if [ -n "$repo_name" ]; then
+                echo "  -> Adding repository '$repo_name' from $repo_url"
+                helm repo add "$repo_name" "$repo_url" || true
+                repos_added=$((repos_added + 1))
+              fi
+            done <<< "$repo_list"
+          fi
           
           if [ "$repos_added" -gt 0 ]; then
             echo "Updating $repos_added Helm repositories..."

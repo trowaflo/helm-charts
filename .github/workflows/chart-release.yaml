@@ -80,24 +80,33 @@ jobs:
           echo "Dynamically detecting and adding external Helm dependencies..."
 
           repos_added=0
+          repo_list=""
+          
           for chart_dir in charts/apps/*; do
             chart_file="$chart_dir/Chart.yaml"
             if [ -f "$chart_file" ]; then
               echo "Processing $chart_file for external repositories..."
-              yq '.dependencies[] | select(.repository | test("^https?://")) | [.repository, .name] | @tsv' "$chart_file" | \
               while IFS=$'\t' read -r repo_url repo_name; do
-
                 repo_url=$(echo "$repo_url" | sed 's/^- //; s/"//g')
                 repo_name=$(echo "$repo_name" | sed 's/"//g')
-                echo "Found dependency - Name: $repo_name, URL: $repo_url"
                 if [ -n "$repo_url" ] && [ "$repo_url" != "null" ]; then
-                  echo "  -> Found repo for '$repo_name': $repo_url"
-                  helm repo add "$repo_name" "$repo_url" || true
-                  repos_added=$((repos_added + 1))
+                  repo_list="${repo_list}${repo_name}|${repo_url}"$'\n'
                 fi
-              done
+              done < <(yq '.dependencies[] | select(.repository | test("^https?://")) | [.repository, .name] | @tsv' "$chart_file")
             fi
           done
+
+          # Add repositories from collected list
+          if [ -n "$repo_list" ]; then
+            while IFS='|' read -r repo_name repo_url; do
+              if [ -n "$repo_name" ]; then
+                echo "Found dependency - Name: $repo_name, URL: $repo_url"
+                echo "  -> Found repo for '$repo_name': $repo_url"
+                helm repo add "$repo_name" "$repo_url" || true
+                repos_added=$((repos_added + 1))
+              fi
+            done <<< "$repo_list"
+          fi
 
           if [ "$repos_added" -gt 0 ]; then
             echo "Updating $repos_added Helm repositories..."

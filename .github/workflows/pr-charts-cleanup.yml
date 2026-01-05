@@ -3,8 +3,6 @@ name: Cleanup PR Charts
 on:
   pull_request:
     types: [closed]
-    paths:
-      - "charts/**"
 
 jobs:
   cleanup:
