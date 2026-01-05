@@ -10,21 +10,41 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Check if pr-charts branch exists
+        id: check_branch
+        run: |
+          if git ls-remote --heads origin pr-charts | grep -q pr-charts; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "pr-charts branch exists, proceeding with cleanup"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "pr-charts branch does not exist, skipping cleanup"
+          fi
+
       - name: Checkout pr-charts branch
+        if: steps.check_branch.outputs.exists == 'true'
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           ref: pr-charts
           fetch-depth: 0
 
       - name: Configure Git
+        if: steps.check_branch.outputs.exists == 'true'
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
       - name: Install Helm
+        if: steps.check_branch.outputs.exists == 'true'
         uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 #v4.3.1
 
       - name: Remove PR charts
+        if: steps.check_branch.outputs.exists == 'true'
         run: |
           PR_NUM=${{ github.event.pull_request.number }}
           
@@ -35,6 +55,7 @@ jobs:
           helm repo index . --url https://raw.githubusercontent.com/${{ github.repository }}/pr-charts
 
       - name: Commit and push changes
+        if: steps.check_branch.outputs.exists == 'true'
         run: |
           PR_NUM=${{ github.event.pull_request.number }}
           
@@ -43,7 +64,7 @@ jobs:
           git push origin pr-charts || echo "Nothing to push"
 
       - name: Comment on PR
-        if: github.event.pull_request.merged == true
+        if: steps.check_branch.outputs.exists == 'true' && github.event.pull_request.merged == true
         uses: actions/github-script@v7
         with:
           script: |
