@@ -76,25 +76,33 @@ jobs:
         run: |
           echo "Dynamically detecting and adding external Helm dependencies..."
           
+          repos_added=0
           for chart in ${{ steps.detect_charts.outputs.changed_charts }}; do
             chart_file="$chart/Chart.yaml"
             if [ -f "$chart_file" ]; then
               echo "Processing $chart_file for external repositories..."
               
-              # Check if dependencies exist and add repositories
+              # Check if dependencies exist and add HTTP(S) repositories
               if yq eval '.dependencies' "$chart_file" | grep -q '^-'; then
                 yq eval '.dependencies[] | select(.repository | test("^https?://")) | [.name, .repository] | @tsv' "$chart_file" | \
                 while IFS=$'\t' read -r repo_name repo_url; do
                   if [ -n "$repo_name" ] && [ -n "$repo_url" ] && [ "$repo_url" != "null" ]; then
                     echo "  -> Adding repository '$repo_name' from $repo_url"
                     helm repo add "$repo_name" "$repo_url" || true
+                    repos_added=$((repos_added + 1))
                   fi
                 done
               fi
             fi
           done
           
-          helm repo update
+          if [ "$repos_added" -gt 0 ]; then
+            echo "Updating $repos_added Helm repositories..."
+            helm repo update
+          else
+            echo "No HTTP(S) repositories to add. Skipping helm repo update."
+            echo "Note: OCI registries (oci://) don't require 'helm repo add'."
+          fi
 
       - name: Build chart dependencies
         if: steps.detect_charts.outputs.changed_charts != ''

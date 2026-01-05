@@ -79,6 +79,7 @@ jobs:
         run: |
           echo "Dynamically detecting and adding external Helm dependencies..."
 
+          repos_added=0
           for chart_dir in charts/apps/*; do
             chart_file="$chart_dir/Chart.yaml"
             if [ -f "$chart_file" ]; then
@@ -92,12 +93,19 @@ jobs:
                 if [ -n "$repo_url" ] && [ "$repo_url" != "null" ]; then
                   echo "  -> Found repo for '$repo_name': $repo_url"
                   helm repo add "$repo_name" "$repo_url" || true
+                  repos_added=$((repos_added + 1))
                 fi
               done
             fi
           done
 
-          helm repo update
+          if [ "$repos_added" -gt 0 ]; then
+            echo "Updating $repos_added Helm repositories..."
+            helm repo update
+          else
+            echo "No HTTP(S) repositories to add. Skipping helm repo update."
+            echo "Note: OCI registries (oci://) don't require 'helm repo add'."
+          fi
 
       - name: Build chart dependencies
         run: |
