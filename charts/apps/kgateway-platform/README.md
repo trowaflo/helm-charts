@@ -6,7 +6,7 @@ Helm chart for configuring the kgateway platform using the Kubernetes Gateway AP
 
 ---
 
-![Version: 1.0.2](https://img.shields.io/badge/Version-1.0.2-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
+![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
 
 ## Source Code
 
@@ -67,6 +67,15 @@ helm uninstall my-kgateway-platform --namespace kgateway-platform
 	</thead>
 	<tbody>
 		<tr>
+			<td>fullnameOverride</td>
+			<td>string</td>
+			<td><pre lang="">
+"" (unused by the current fullname helper)
+</pre>
+</td>
+			<td>Override the full name used in resource naming (reserved for helpers that support it). In this chart, the simplified kgateway-platform.fullname helper currently ignores fullnameOverride and always uses .Release.Name. This value is kept for compatibility/future use; setting it has no effect unless templates/helpers explicitly reference it. </td>
+		</tr>
+		<tr>
 			<td>gateways</td>
 			<td>object</td>
 			<td><pre lang="">
@@ -101,6 +110,15 @@ true
 </pre>
 </td>
 			<td>Enable installation of kgateway controller (required for Gateway functionality)</td>
+		</tr>
+		<tr>
+			<td>nameOverride</td>
+			<td>string</td>
+			<td><pre lang="">
+"" (uses the chart/release name via the name helper)
+</pre>
+</td>
+			<td>Override the base name used in resource naming. This chart uses a simplified naming convention where resources are named "<base-name>-<key>". By default, the base name comes from the chart/release name (for example, "kgateway": kgateway-public, kgateway-private, etc.).  nameOverride is only respected by the kgateway-platform.name helper and can change this base name where that helper is used. It does not affect the kgateway-platform.fullname helper, which currently always derives its value from .Release.Name. </td>
 		</tr>
 		<tr>
 			<td>tlsSecret</td>
