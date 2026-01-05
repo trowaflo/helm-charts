@@ -2,6 +2,10 @@ suite: test kgateway-platform chart - gateway configuration
 release:
   name: kgateway-platform-test
   namespace: kgateway-test
+capabilities:
+  apiVersions:
+    - gateway.networking.k8s.io/v1/Gateway
+    - gateway.kgateway.dev/v1alpha1/GatewayParameters
 templates:
   - templates/gateways.yaml
 tests:

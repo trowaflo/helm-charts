@@ -5,7 +5,7 @@
   {{- if $cfg.enabled }}
     {{- $name := include "kgateway-platform.gatewayParametersName" (dict "root" $ "key" $key "config" $cfg) -}}
     {{- $ipSlot := default $key $cfg.ipSlot }}
-{{- if .Capabilities.APIVersions.Has "gateway.kgateway.dev/v1alpha1/GatewayParameters" }}
+{{- if $.Capabilities.APIVersions.Has "gateway.kgateway.dev/v1alpha1/GatewayParameters" }}
 ---
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: GatewayParameters

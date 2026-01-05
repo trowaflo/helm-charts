@@ -14,7 +14,7 @@
       {{- $policyName := include "kgateway-platform.httpListenerPolicyName" (dict "root" $ "key" $policyKey "config" $policy) -}}
       {{- $defaultUpgrades := list "websocket" -}}
       {{- $upgrades := default $defaultUpgrades $policy.enabledUpgrades }}
-{{- if .Capabilities.APIVersions.Has "gateway.kgateway.dev/v1alpha1/HTTPListenerPolicy" }}
+{{- if $.Capabilities.APIVersions.Has "gateway.kgateway.dev/v1alpha1/HTTPListenerPolicy" }}
 ---
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: HTTPListenerPolicy
