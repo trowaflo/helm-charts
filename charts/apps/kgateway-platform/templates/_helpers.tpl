@@ -7,8 +7,9 @@ Expand the name of the chart.
 
 {{/*
 Create a default fully qualified app name.
-Uses just the release name for simpler resource names.
-This deviates from the standard Helm pattern to provide cleaner names by default.
+By default, uses just the release name for simpler resource names.
+Still supports .Values.fullnameOverride; the deviation from the standard Helm pattern
+is that the default does not include the chart name prefix to provide cleaner names.
 */}}
 {{- define "kgateway-platform.fullname" -}}
   {{- if .Values.fullnameOverride -}}
