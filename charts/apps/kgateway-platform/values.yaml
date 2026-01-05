@@ -1,3 +1,21 @@
+# -- Override the name used in resource naming.
+# By default, the chart uses the standard Helm naming convention:
+# - If the release name contains the chart name (e.g., release "kgateway-platform"), resources are named "<release>-<key>"
+# - Otherwise, resources are named "<release>-<chart>-<key>" (e.g., "kgateway-kgateway-platform-public")
+# 
+# To simplify resource naming when using a short release name like "kgateway", set this to a shorter value:
+# nameOverride: "kgateway"  # Results in: kgateway-public, kgateway-private, etc.
+#
+# @default -- "" (uses chart name)
+nameOverride: ""
+
+# -- Override the full name used in resource naming.
+# When set, this completely replaces the generated name prefix.
+# fullnameOverride: "my-gateway"  # Results in: my-gateway-public, my-gateway-private, etc.
+#
+# @default -- "" (uses standard naming convention)
+fullnameOverride: ""
+
 # -- Gateway configuration. Define multiple gateways by adding entries with any key name.
 # Each gateway requires:
 # - enabled: bool
