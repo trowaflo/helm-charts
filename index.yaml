@@ -795,6 +795,41 @@ entries:
     version: 0.1.0
   kgateway-platform:
   - apiVersion: v2
+    created: "2026-01-05T22:16:49.266028601Z"
+    dependencies:
+    - alias: kgateway-crds
+      condition: kgateway-crds.enabled
+      name: kgateway-crds
+      repository: oci://cr.kgateway.dev/kgateway-dev/charts
+      version: v2.1.2
+    - alias: kgateway
+      condition: kgateway.enabled
+      name: kgateway
+      repository: oci://cr.kgateway.dev/kgateway-dev/charts
+      version: v2.1.2
+    description: Helm chart for configuring the kgateway platform using the Kubernetes
+      Gateway API with support for multiple gateways, HTTP(S) routing, and TLS certificate
+      integration.
+    digest: beba776b589b71a9dcff867c568f04c04e9a3b23e73c601efb0db6111899f0e0
+    keywords:
+    - kubernetes
+    - gateway
+    - kgateway
+    - networking
+    - tls
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: kgateway-platform
+    sources:
+    - https://github.com/kgateway-dev/kgateway
+    - https://docs.kgateway.dev/
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/kgateway-platform-1.1.0/kgateway-platform-1.1.0.tgz
+    version: 1.1.0
+  - apiVersion: v2
     created: "2026-01-04T08:22:34.686956302Z"
     dependencies:
     - alias: kgateway-crds
@@ -1220,4 +1255,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2026-01-05T17:59:27.662939088Z"
+generated: "2026-01-05T22:16:49.266138606Z"
