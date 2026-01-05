@@ -7,18 +7,14 @@ Expand the name of the chart.
 
 {{/*
 Create a default fully qualified app name.
-Follows the common library chart pattern for consistency.
+Uses just the release name for simpler resource names.
+This deviates from the standard Helm pattern to provide cleaner names by default.
 */}}
 {{- define "kgateway-platform.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
-{{- if contains $name .Release.Name -}}
 {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
 {{- end -}}
 {{- end -}}
 
