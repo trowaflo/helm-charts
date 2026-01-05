@@ -1,11 +1,11 @@
 # -- Override the name used in resource naming.
-# This chart uses a simplified naming convention where resources are named "<release>-<key>".
-# For example, with release name "kgateway": kgateway-public, kgateway-private, etc.
-# 
-# Setting nameOverride has no effect on the default naming as the chart already uses simple names.
-# Use fullnameOverride if you need complete control over the name prefix.
+# This chart uses a simplified naming convention where resources are named "<base-name>-<key>".
+# By default, the base name comes from the chart/release name (for example, "kgateway": kgateway-public, kgateway-private, etc.).
 #
-# @default -- "" (not used in default naming)
+# nameOverride is respected by the kgateway-platform.name helper and can change this base name where that helper is used.
+# Use fullnameOverride if you need complete control over the full name prefix (overriding the default/generated base name).
+#
+# @default -- "" (uses the chart/release name via the name helper)
 nameOverride: ""
 
 # -- Override the full name used in resource naming.
