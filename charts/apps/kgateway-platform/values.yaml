@@ -81,12 +81,3 @@ kgateway-crds:
 kgateway:
   # -- Enable installation of kgateway controller (required for Gateway functionality)
   enabled: true
-  
-  # Override the subchart's fullname to produce clean resource names.
-  # Without this, using release name "kgateway" would create resources named "kgateway-kgateway".
-  # With this override, resources are simply named "kgateway" (ClusterRole, ClusterRoleBinding, etc.).
-  #
-  # You can customize this if needed, for example:
-  # - Set to "my-gateway" to name resources "my-gateway"
-  # - Set to "" to use default subchart naming (may result in "kgateway-kgateway")
-  fullnameOverride: "kgateway"
