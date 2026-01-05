@@ -2,6 +2,11 @@ suite: test kgateway-platform chart - HTTP listener policies
 release:
   name: kgateway-platform-test
   namespace: kgateway-test
+capabilities:
+  apiVersions:
+    - gateway.networking.k8s.io/v1/Gateway
+    - gateway.kgateway.dev/v1alpha1/GatewayParameters
+    - gateway.kgateway.dev/v1alpha1/HTTPListenerPolicy
 templates:
   - templates/http-listener-policy.yaml
 tests:
