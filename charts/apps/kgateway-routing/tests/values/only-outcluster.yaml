@@ -1,0 +1,14 @@
+# Only out-cluster routes enabled
+routes:
+  homeassistant:
+    enabled: true
+    hostnames:
+      - hass.example.com
+    parentRefs:
+      - name: public-gateway
+        namespace: kgateway-preview
+    outCluster:
+      - name: homeassistant
+        host: homeassistant.local
+        port: 8123
+

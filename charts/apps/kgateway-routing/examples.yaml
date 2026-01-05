@@ -1,0 +1,98 @@
+# Example values file showing kgateway-routing chart features
+# This demonstrates the SIMPLIFIED SYNTAX for routing configuration
+
+# ============================================================================
+# SIMPLIFIED SYNTAX (RECOMMENDED) - Use inCluster / outCluster shortcuts
+# ============================================================================
+
+routes:
+  # Example 1: In-cluster Service routing (Simplified)
+  # Routes traffic to a Kubernetes service with minimal configuration
+  argocd:
+    enabled: true
+    namespace: argocd  # Optional: defaults to release namespace
+    hostnames:
+      - argocd.example.com
+    parentRefs:
+      - name: private-gateway
+        namespace: kgateway-system
+    # inCluster: Array of Service backends (automatically sets kind=Service)
+    inCluster:
+      - name: argocd-server
+        port: 80
+        # Optional: weight: 1
+        # Optional: namespace: argocd
+        # Optional: filters: [...]
+
+  # Example 2: Out-of-cluster Backend routing (Simplified)
+  # Routes to external service - Backend resource auto-generated
+  homeassistant:
+    enabled: true
+    hostnames:
+      - hass.example.com
+    parentRefs:
+      - name: public-gateway
+        namespace: kgateway-system
+    # outCluster: Array of external backends (auto-creates Backend resources)
+    outCluster:
+      - name: homeassistant
+        host: homeassistant.local
+        port: 8123
+        # Optional: Custom path matching (defaults to / with PathPrefix)
+        # matches:
+        #   - path:
+        #       type: PathPrefix
+        #       value: /admin
+        # Optional: Request/response filters
+        filters:
+          - type: RequestHeaderModifier
+            requestHeaderModifier:
+              set:
+                - name: X-Forwarded-Proto
+                  value: https
+                - name: X-Forwarded-Port
+                  value: "443"
+          - type: ResponseHeaderModifier
+            responseHeaderModifier:
+              set:
+                - name: Content-Security-Policy
+                  value: upgrade-insecure-requests
+
+  # Example 3: Multiple backends in one route (Simplified)
+  multi-backend:
+    enabled: true
+    hostnames:
+      - multi.example.com
+    parentRefs:
+      - name: gateway
+        namespace: kgateway-system
+    # Mix in-cluster and out-cluster (creates multiple rules)
+    inCluster:
+      - name: internal-api
+        port: 8080
+    outCluster:
+      - name: external-api
+        host: external.example.com
+        port: 443
+        filters:
+          - type: RequestHeaderModifier
+            requestHeaderModifier:
+              add:
+                - name: X-API-Source
+                  value: gateway
+
+  # Example 4: Backend with TLS (for HTTPS backends with self-signed certs)
+  # Proxmox example - TLS enabled directly on backend
+  proxmox:
+    enabled: true
+    hostnames:
+      - pmxx.example.com
+    parentRefs:
+      - name: gateway
+        namespace: kgateway-system
+    outCluster:
+      - name: proxmox
+        host: proxmox1.example.com
+        port: 8006
+        tls: true       # Enable TLS (SNI auto-derived from host)
+        insecure: true  # Allow self-signed certificates

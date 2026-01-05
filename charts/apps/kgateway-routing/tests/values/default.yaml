@@ -1,0 +1,39 @@
+# Default test values for kgateway-routing chart
+routes:
+  argocd:
+    enabled: true
+    hostnames:
+      - argocd.example.com
+    parentRefs:
+      - name: private-gateway
+        namespace: kgateway-preview
+    inCluster:
+      - name: argocd-server
+        port: 80
+  
+  homeassistant:
+    enabled: true
+    hostnames:
+      - hass.example.com
+    parentRefs:
+      - name: public-gateway
+        namespace: kgateway-system
+    outCluster:
+      - name: homeassistant
+        host: homeassistant.local
+        port: 8123
+        filters:
+          - type: RequestHeaderModifier
+            requestHeaderModifier:
+              set:
+                - name: X-Forwarded-Proto
+                  value: https
+                - name: X-Forwarded-Port
+                  value: "443"
+                - name: X-Forwarded-Host
+                  value: hass.example.com
+          - type: ResponseHeaderModifier
+            responseHeaderModifier:
+              set:
+                - name: Content-Security-Policy
+                  value: upgrade-insecure-requests

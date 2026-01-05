@@ -1,0 +1,42 @@
+Thank you for installing {{ .Chart.Name }}!
+
+Your release is named {{ .Release.Name }}.
+Namespace: {{ include "kgateway-routing.namespace" . }}
+
+{{- $routeCount := 0 }}
+{{- $backendCount := 0 }}
+{{- range $key, $route := .Values.routes }}
+  {{- if $route.enabled }}
+    {{- $routeCount = add1 $routeCount }}
+  {{- end }}
+{{- end }}
+{{- range $key, $backend := .Values.backends }}
+  {{- if $backend.enabled }}
+    {{- $backendCount = add1 $backendCount }}
+  {{- end }}
+{{- end }}
+
+Resources created:
+  - HTTPRoutes: {{ $routeCount }}
+  - Backends: {{ $backendCount }}
+
+{{- if gt $routeCount 0 }}
+
+To view your HTTPRoutes:
+  kubectl get httproutes -n {{ include "kgateway-routing.namespace" . }}
+
+{{- end }}
+{{- if gt $backendCount 0 }}
+
+To view your Backends:
+  kubectl get backends.gateway.kgateway.dev -n {{ include "kgateway-routing.namespace" . }}
+
+{{- end }}
+{{- if eq $routeCount 0 }}
+
+WARNING: No routes are enabled. Configure routes in your values.yaml file.
+{{- end }}
+
+For more information, visit:
+  - Chart documentation: https://github.com/trowaflo/helm-charts
+  - kGateway docs: https://docs.kgateway.dev/
