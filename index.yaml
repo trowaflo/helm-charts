@@ -494,6 +494,36 @@ entries:
     version: 0.0.1
   grafana:
   - apiVersion: v2
+    created: "2026-01-05T17:59:27.662845573Z"
+    dependencies:
+    - name: grafana
+      repository: https://grafana.github.io/helm-charts
+      version: 10.5.1
+    description: Grafana visualization and dashboarding platform with custom extensions.
+      Wraps the official Grafana Helm chart with domain-specific customizations, providing
+      integrated dashboard provisioning and Traefik IngressRoute support.
+    digest: f62bbb3ccdfceb119b422202170ed805f20b427bc04fd2966d92cbc184971839
+    home: https://grafana.com
+    icon: https://grafana.com/docs/grafana/latest/img/grafana_icon.svg
+    keywords:
+    - grafana
+    - visualization
+    - dashboards
+    - monitoring
+    - metrics
+    - prometheus
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: grafana
+    sources:
+    - https://github.com/grafana/grafana
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/grafana-0.3.0/grafana-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
     created: "2026-01-01T16:26:48.637803548Z"
     dependencies:
     - name: grafana
@@ -1190,4 +1220,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2026-01-04T11:19:26.024613128Z"
+generated: "2026-01-05T17:59:27.662939088Z"
