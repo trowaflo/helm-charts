@@ -1,0 +1,261 @@
+name: Package and Publish PR Charts
+
+on:
+  pull_request:
+    paths:
+      - "charts/**"
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to publish charts for'
+        required: true
+        type: number
+
+jobs:
+  package-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Install Helm
+        uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 #v4.3.1
+
+      - name: Install yq
+        run: |
+          YQ_VERSION="v4.44.2"
+          wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64 -O /usr/local/bin/yq
+          chmod +x /usr/local/bin/yq
+
+      - name: Get PR number
+        id: pr_number
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "pr_number=${{ inputs.pr_number }}" >> $GITHUB_OUTPUT
+          else
+            echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Detect changed charts
+        id: detect_charts
+        run: |
+          BASE_BRANCH=${{ github.event.pull_request.base.ref || 'main' }}
+          git fetch origin $BASE_BRANCH || git fetch origin main
+
+          changed_charts=""
+          for file in $(git diff --name-only origin/$BASE_BRANCH..HEAD 2>/dev/null | grep '^charts/' || true); do
+            chart_dir=$(dirname "$file")
+            while [ ! -f "$chart_dir/Chart.yaml" ] && [ "$chart_dir" != "." ]; do
+              chart_dir=$(dirname "$chart_dir")
+            done
+            if [ -f "$chart_dir/Chart.yaml" ]; then
+              chart_path=$(dirname "$chart_dir/Chart.yaml")
+              if [[ ! "$changed_charts" =~ "$chart_path" ]]; then
+                changed_charts="$changed_charts $chart_path"
+              fi
+            fi
+          done
+
+          changed_charts=$(echo "$changed_charts" | xargs)
+          echo "changed_charts=$changed_charts" >> $GITHUB_OUTPUT
+          echo "Changed charts: $changed_charts"
+
+      - name: Add All Required Helm Repositories Dynamically
+        if: steps.detect_charts.outputs.changed_charts != ''
+        run: |
+          echo "Dynamically detecting and adding external Helm dependencies..."
+          
+          repos_added=0
+          for chart in ${{ steps.detect_charts.outputs.changed_charts }}; do
+            chart_file="$chart/Chart.yaml"
+            if [ -f "$chart_file" ]; then
+              echo "Processing $chart_file for external repositories..."
+              
+              # Check if dependencies exist
+              if yq eval '.dependencies' "$chart_file" | grep -q '^-'; then
+                yq eval '.dependencies[] | select(.repository | test("^https?://")) | [.name, .repository] | @tsv' "$chart_file" | \
+                while IFS=$'\t' read -r repo_name repo_url; do
+                  if [ -n "$repo_name" ] && [ -n "$repo_url" ] && [ "$repo_url" != "null" ]; then
+                    echo "  -> Found dependency '$repo_name' from $repo_url"
+                    helm repo add "$repo_name" "$repo_url" || true
+                    repos_added=$((repos_added + 1))
+                  fi
+                done
+              else
+                echo "  -> No dependencies found"
+              fi
+            fi
+          done
+          
+          if [ "$repos_added" -gt 0 ]; then
+            echo "Updating Helm repositories..."
+            helm repo update
+          else
+            echo "No Helm repositories to update"
+          fi
+
+      - name: Build chart dependencies
+        if: steps.detect_charts.outputs.changed_charts != ''
+        run: |
+          for chart in ${{ steps.detect_charts.outputs.changed_charts }}; do
+            if [ -f "$chart/Chart.yaml" ]; then
+              echo "Building dependencies for $chart"
+              helm dependency build "$chart" || true
+            fi
+          done
+
+      - name: Package charts with PR version suffix
+        if: steps.detect_charts.outputs.changed_charts != ''
+        id: package
+        run: |
+          mkdir -p /tmp/pr-charts /tmp/pr-artifacts
+          PR_NUM=${{ steps.pr_number.outputs.pr_number }}
+          
+          packaged_charts=""
+          for chart in ${{ steps.detect_charts.outputs.changed_charts }}; do
+            if [ -f "$chart/Chart.yaml" ]; then
+              chart_name=$(yq eval '.name' "$chart/Chart.yaml")
+              chart_version=$(yq eval '.version' "$chart/Chart.yaml")
+              pr_version="${chart_version}-pr${PR_NUM}"
+              
+              echo "Packaging $chart as ${chart_name}-${pr_version}"
+              
+              # Create a copy for pr-charts branch (with modified version)
+              cp -r "$chart" /tmp/chart-copy
+              yq eval ".version = \"${pr_version}\"" -i /tmp/chart-copy/Chart.yaml
+              helm package /tmp/chart-copy -d /tmp/pr-charts
+              rm -rf /tmp/chart-copy
+              
+              # Package original version for artifacts
+              helm package "$chart" -d /tmp/pr-artifacts
+              
+              packaged_charts="$packaged_charts ${chart_name}:${pr_version}"
+            fi
+          done
+
+          echo "packaged_charts=$packaged_charts" >> $GITHUB_OUTPUT
+          echo "PR Charts:"
+          ls -lh /tmp/pr-charts/
+          echo "Artifacts:"
+          ls -lh /tmp/pr-artifacts/
+
+      - name: Upload artifacts
+        if: steps.package.outputs.packaged_charts != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-charts
+          path: /tmp/pr-artifacts/*.tgz
+          retention-days: 30
+
+      - name: Checkout pr-charts branch
+        if: steps.package.outputs.packaged_charts != ''
+        run: |
+          # Try to checkout pr-charts branch, create if doesn't exist
+          git fetch origin pr-charts || true
+          if git show-ref --verify --quiet refs/remotes/origin/pr-charts; then
+            git checkout pr-charts
+          else
+            git checkout --orphan pr-charts
+            git rm -rf .
+            echo "# PR Charts Repository" > README.md
+            echo "This branch contains packaged Helm charts from PRs for testing purposes." >> README.md
+            echo "" >> README.md
+            echo "Charts are versioned with -prXXX suffix and are automatically cleaned up when PRs are merged or closed." >> README.md
+            git add README.md
+            git commit -m "Initialize pr-charts branch"
+          fi
+
+      - name: Update Helm repository index
+        if: steps.package.outputs.packaged_charts != ''
+        run: |
+          PR_NUM=${{ steps.pr_number.outputs.pr_number }}
+          
+          # Copy new charts
+          cp /tmp/pr-charts/*.tgz . || true
+          
+          # Generate/update index
+          helm repo index . --url https://raw.githubusercontent.com/${{ github.repository }}/pr-charts --merge index.yaml || helm repo index . --url https://raw.githubusercontent.com/${{ github.repository }}/pr-charts
+          
+          # Commit changes
+          git add *.tgz index.yaml
+          git commit -m "Add PR #${PR_NUM} charts for testing" || echo "No changes to commit"
+
+      - name: Push to pr-charts branch
+        if: steps.package.outputs.packaged_charts != ''
+        run: |
+          git push origin pr-charts
+
+      - name: Comment on PR with usage instructions
+        if: steps.package.outputs.packaged_charts != '' && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNum = ${{ steps.pr_number.outputs.pr_number }};
+            const packagedCharts = '${{ steps.package.outputs.packaged_charts }}'.trim().split(' ');
+            
+            let chartsList = '';
+            packagedCharts.forEach(item => {
+              if (item) {
+                const [name, version] = item.split(':');
+                chartsList += `- \`${name}\` version \`${version}\`\n`;
+              }
+            });
+
+            const comment = `## 📦 PR Charts Available for Testing
+
+            The following charts from this PR have been packaged:
+
+            ${chartsList}
+
+            ### Testing Options
+
+            **Option 1: pr-charts branch (for ArgoCD description.yaml pattern)**
+            \`\`\`yaml
+            ccm:
+              repoURL: https://raw.githubusercontent.com/${{ github.repository }}/pr-charts
+              targetRevision: <chart-version-from-above>
+              chart: <chart-name>
+              type: helm
+            \`\`\`
+
+            **Option 2: Download artifacts**
+            - Go to [Actions tab](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - Download the \`pr-charts\` artifact
+            - Extract and test locally: \`helm install test-release ./chart-name.tgz\`
+
+            **Option 3: Direct Git source**
+            \`\`\`yaml
+            apiVersion: argoproj.io/v1alpha1
+            kind: Application
+            spec:
+              source:
+                repoURL: https://github.com/${{ github.repository }}
+                targetRevision: ${{ github.head_ref }}
+                path: charts/apps/<chart-name>
+            \`\`\`
+
+            ### Repository URL for Helm
+            \`\`\`bash
+            helm repo add pr-charts https://raw.githubusercontent.com/${{ github.repository }}/pr-charts
+            helm repo update
+            helm search repo pr-charts
+            \`\`\`
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
