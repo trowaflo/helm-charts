@@ -14,6 +14,7 @@
       {{- $policyName := include "kgateway-platform.httpListenerPolicyName" (dict "root" $ "key" $policyKey "config" $policy) -}}
       {{- $defaultUpgrades := list "websocket" -}}
       {{- $upgrades := default $defaultUpgrades $policy.enabledUpgrades }}
+{{- if .Capabilities.APIVersions.Has "gateway.kgateway.dev/v1alpha1/HTTPListenerPolicy" }}
 ---
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: HTTPListenerPolicy
@@ -30,6 +31,9 @@ spec:
       {{- range $upgrade := $upgrades }}
       - {{ $upgrade | quote }}
       {{- end }}
+{{- else }}
+{{- fail "kgateway HTTPListenerPolicy CRD not available; install CRDs or disable httpListenerPolicies.*.enabled" }}
+{{- end }}
     {{- end }}
   {{- end }}
 {{- end }}

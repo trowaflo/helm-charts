@@ -4,6 +4,10 @@ on:
   pull_request:
     types: [closed]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   cleanup:
     runs-on: ubuntu-latest
@@ -47,10 +51,10 @@ jobs:
         if: steps.check_branch.outputs.exists == 'true'
         run: |
           PR_NUM=${{ github.event.pull_request.number }}
-          
+
           # Remove chart packages with this PR number
           rm -f *-pr${PR_NUM}.tgz || true
-          
+
           # Regenerate index without the removed charts
           helm repo index . --url https://raw.githubusercontent.com/${{ github.repository }}/pr-charts
 
@@ -58,7 +62,7 @@ jobs:
         if: steps.check_branch.outputs.exists == 'true'
         run: |
           PR_NUM=${{ github.event.pull_request.number }}
-          
+
           git add -A
           git commit -m "Remove PR #${PR_NUM} charts after merge/close" || echo "No charts to remove"
           git push origin pr-charts || echo "Nothing to push"
@@ -69,9 +73,9 @@ jobs:
         with:
           script: |
             const comment = `## 🧹 PR Charts Cleaned Up
-            
+
             The test charts for this PR have been removed from the \`pr-charts\` branch now that the PR is merged.`;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,

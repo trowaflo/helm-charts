@@ -5,6 +5,7 @@
   {{- if $cfg.enabled }}
     {{- $name := include "kgateway-platform.gatewayParametersName" (dict "root" $ "key" $key "config" $cfg) -}}
     {{- $ipSlot := default $key $cfg.ipSlot }}
+{{- if .Capabilities.APIVersions.Has "gateway.kgateway.dev/v1alpha1/GatewayParameters" }}
 ---
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: GatewayParameters
@@ -16,5 +17,8 @@ spec:
     service:
       extraLabels:
         ip-slot: {{ $ipSlot | quote }}
+{{- else }}
+{{- fail "kgateway GatewayParameters CRD not available; install CRDs or disable gateways.*.enabled" }}
+{{- end }}
   {{- end }}
 {{- end }}

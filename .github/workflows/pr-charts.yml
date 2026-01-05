@@ -11,6 +11,10 @@ on:
         required: true
         type: number
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   package-and-publish:
     runs-on: ubuntu-latest
@@ -22,7 +26,7 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Configure Git
         run: |
@@ -75,15 +79,15 @@ jobs:
         if: steps.detect_charts.outputs.changed_charts != ''
         run: |
           echo "Dynamically detecting and adding external Helm dependencies..."
-          
+
           repos_added=0
           repo_list=""
-          
+
           for chart in ${{ steps.detect_charts.outputs.changed_charts }}; do
             chart_file="$chart/Chart.yaml"
             if [ -f "$chart_file" ]; then
               echo "Processing $chart_file for external repositories..."
-              
+
               # Check if dependencies exist and collect HTTP(S) repositories
               if yq eval '.dependencies' "$chart_file" | grep -q '^-'; then
                 while IFS=$'\t' read -r repo_name repo_url; do
@@ -94,7 +98,7 @@ jobs:
               fi
             fi
           done
-          
+
           # Add repositories from collected list
           if [ -n "$repo_list" ]; then
             while IFS='|' read -r repo_name repo_url; do
@@ -105,7 +109,7 @@ jobs:
               fi
             done <<< "$repo_list"
           fi
-          
+
           if [ "$repos_added" -gt 0 ]; then
             echo "Updating $repos_added Helm repositories..."
             helm repo update
@@ -130,25 +134,25 @@ jobs:
         run: |
           mkdir -p /tmp/pr-charts /tmp/pr-artifacts
           PR_NUM=${{ steps.pr_number.outputs.pr_number }}
-          
+
           packaged_charts=""
           for chart in ${{ steps.detect_charts.outputs.changed_charts }}; do
             if [ -f "$chart/Chart.yaml" ]; then
               chart_name=$(yq eval '.name' "$chart/Chart.yaml")
               chart_version=$(yq eval '.version' "$chart/Chart.yaml")
               pr_version="${chart_version}-pr${PR_NUM}"
-              
+
               echo "Packaging $chart as ${chart_name}-${pr_version}"
-              
+
               # Create temporary copy with PR version for pr-charts branch
               cp -r "$chart" /tmp/chart-copy
               yq eval ".version = \"${pr_version}\"" -i /tmp/chart-copy/Chart.yaml
               helm package /tmp/chart-copy -d /tmp/pr-charts
               rm -rf /tmp/chart-copy
-              
+
               # Package original version for artifacts
               helm package "$chart" -d /tmp/pr-artifacts
-              
+
               packaged_charts="$packaged_charts ${chart_name}:${pr_version}"
             fi
           done
@@ -184,14 +188,14 @@ jobs:
         if: steps.package.outputs.packaged_charts != ''
         run: |
           PR_NUM=${{ steps.pr_number.outputs.pr_number }}
-          
+
           # Copy new charts
           cp /tmp/pr-charts/*.tgz .
-          
+
           # Generate/update index
           helm repo index . --url https://raw.githubusercontent.com/${{ github.repository }}/pr-charts --merge index.yaml || \
           helm repo index . --url https://raw.githubusercontent.com/${{ github.repository }}/pr-charts
-          
+
           # Commit changes
           git add *.tgz index.yaml
           git commit -m "Add PR #${PR_NUM} charts for testing" || echo "No changes to commit"
@@ -204,7 +208,7 @@ jobs:
           script: |
             const prNum = ${{ steps.pr_number.outputs.pr_number }};
             const packagedCharts = '${{ steps.package.outputs.packaged_charts }}'.trim().split(' ');
-            
+
             let chartsList = '';
             packagedCharts.forEach(item => {
               if (item) {

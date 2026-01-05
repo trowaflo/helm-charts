@@ -11,6 +11,10 @@ on:
       - 'charts/**'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   generate-matrix:
     runs-on: ubuntu-latest
