@@ -1,8 +1,39 @@
 apiVersion: v1
 entries:
+  grafana:
+  - apiVersion: v2
+    created: "2026-01-06T14:30:27.618889769Z"
+    dependencies:
+    - name: grafana
+      repository: https://grafana.github.io/helm-charts
+      version: 10.5.3
+    description: Grafana visualization and dashboarding platform with custom extensions.
+      Wraps the official Grafana Helm chart with domain-specific customizations, providing
+      integrated dashboard provisioning and Traefik IngressRoute support.
+    digest: b4e4f5138bc48f5cd12737d44a77faa60e85cad94699cf193fc871de20e9974e
+    home: https://grafana.com
+    icon: https://grafana.com/docs/grafana/latest/img/grafana_icon.svg
+    keywords:
+    - grafana
+    - visualization
+    - dashboards
+    - monitoring
+    - metrics
+    - prometheus
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: grafana
+    sources:
+    - https://github.com/grafana/grafana
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/grafana-0.3.1-pr174.tgz
+    version: 0.3.1-pr174
   kgateway-routing:
   - apiVersion: v2
-    created: "2026-01-05T22:16:10.794794644Z"
+    created: "2026-01-06T14:30:27.619274982Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -27,4 +58,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.1.0-pr169.tgz
     version: 0.1.0-pr169
-generated: "2026-01-05T22:16:10.794195108Z"
+generated: "2026-01-06T14:30:27.615440415Z"
