@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   kgateway-routing:
   - apiVersion: v2
-    created: "2026-01-07T18:27:59.106804751Z"
+    created: "2026-01-07T20:27:25.185167202Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -29,7 +29,7 @@ entries:
     version: 0.1.0-pr169
   prometheus:
   - apiVersion: v2
-    created: "2026-01-07T18:27:59.115786421Z"
+    created: "2026-01-07T20:27:25.194185662Z"
     dependencies:
     - name: prometheus
       repository: https://prometheus-community.github.io/helm-charts
@@ -59,4 +59,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/prometheus-3.1.1-pr176.tgz
     version: 3.1.1-pr176
-generated: "2026-01-07T18:27:59.106300568Z"
+generated: "2026-01-07T20:27:25.184659737Z"
