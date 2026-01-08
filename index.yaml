@@ -1,39 +1,8 @@
 apiVersion: v1
 entries:
-  grafana:
-  - apiVersion: v2
-    created: "2026-01-07T20:27:52.017899471Z"
-    dependencies:
-    - name: grafana
-      repository: https://grafana.github.io/helm-charts
-      version: 10.5.4
-    description: Grafana visualization and dashboarding platform with custom extensions.
-      Wraps the official Grafana Helm chart with domain-specific customizations, providing
-      integrated dashboard provisioning and Traefik IngressRoute support.
-    digest: d6f030b22360781fab890b5c835f6398ba3563056a28b3e984f69e9bd36098bd
-    home: https://grafana.com
-    icon: https://grafana.com/docs/grafana/latest/img/grafana_icon.svg
-    keywords:
-    - grafana
-    - visualization
-    - dashboards
-    - monitoring
-    - metrics
-    - prometheus
-    maintainers:
-    - email: trowa.flo@gmail.com
-      name: trowaflo
-    name: grafana
-    sources:
-    - https://github.com/grafana/grafana
-    - https://github.com/trowaflo/helm-charts
-    type: application
-    urls:
-    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/grafana-0.3.2-pr176.tgz
-    version: 0.3.2-pr176
   kgateway-routing:
   - apiVersion: v2
-    created: "2026-01-07T20:27:52.018395545Z"
+    created: "2026-01-08T00:58:36.202320609Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -58,36 +27,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.1.0-pr169.tgz
     version: 0.1.0-pr169
-  prometheus:
-  - apiVersion: v2
-    created: "2026-01-07T20:27:52.028195252Z"
-    dependencies:
-    - name: prometheus
-      repository: https://prometheus-community.github.io/helm-charts
-      version: 28.2.1
-    description: Wraps the official kube-prometheus-stack Helm chart providing production-ready
-      monitoring stack including Prometheus, Grafana, Alertmanager, and node exporters.
-    digest: 842524bd1f519293447e7512bdadfaf5244eb2f9b00c6cbeb90e7c98ade048ad
-    home: https://prometheus.io
-    keywords:
-    - prometheus
-    - monitoring
-    - alerting
-    - metrics
-    - kubernetes
-    - operator
-    - grafana
-    - observability
-    maintainers:
-    - email: trowa.flo@gmail.com
-      name: trowaflo
-    name: prometheus
-    sources:
-    - https://github.com/prometheus/prometheus
-    - https://github.com/prometheus-operator/prometheus-operator
-    - https://github.com/trowaflo/helm-charts
-    type: application
-    urls:
-    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/prometheus-3.1.1-pr176.tgz
-    version: 3.1.1-pr176
-generated: "2026-01-07T20:27:52.013021588Z"
+generated: "2026-01-08T00:58:36.201736043Z"
