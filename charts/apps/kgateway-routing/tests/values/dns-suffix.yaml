@@ -1,0 +1,36 @@
+dnsSuffix: example.com
+defaultParentRefs:
+  - name: default-gateway
+    namespace: kgateway-system
+
+routes:
+  argocd:
+    enabled: true
+    # hostname auto-generated as argocd.example.com
+    # parentRefs inherited from defaultParentRefs
+    inCluster:
+      - name: argocd-server
+        port: 80
+  
+  pmxx:
+    enabled: true
+    # hostname auto-generated as pmxx.example.com
+    outCluster:
+      - name: pmxx
+        host: proxmox1.internal
+        port: 8006
+        tls: true
+        insecure: true
+  
+  custom:
+    enabled: true
+    # explicit hostnames override auto-generation
+    hostnames:
+      - custom.domain.com
+    # explicit parentRefs override defaultParentRefs
+    parentRefs:
+      - name: custom-gateway
+        namespace: custom-ns
+    inCluster:
+      - name: custom-svc
+        port: 8080

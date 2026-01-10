@@ -1,16 +1,30 @@
+# -- Global DNS suffix for auto-generating hostnames.
+# When set and a route doesn't have explicit `hostnames`, the hostname will be auto-generated as: `{routeKey}.{dnsSuffix}`
+# Example: With `dnsSuffix: example.com`, route `argocd` gets hostname `argocd.example.com`
+# @default -- "" (empty, no auto-generation)
+dnsSuffix: ""
+
+# -- Default parent gateway references for all routes.
+# Applied to routes that don't specify their own `parentRefs`.
+# @default -- [] (empty, routes must specify their own parentRefs)
+defaultParentRefs: []
+  # - name: default-gateway
+  #   namespace: kgateway-system
+
 # -- HTTP routes configuration. Define multiple routes by adding entries with any key name.
 # Each route can target either in-cluster Services or out-of-cluster Backends.
 #
-# **Simplified in-cluster Service routing:**
+# **Simplified in-cluster Service routing with auto-generated hostname:**
 # ```yaml
+# dnsSuffix: example.com
+# defaultParentRefs:
+#   - name: private-gateway
+#     namespace: kgateway-system
 # routes:
 #   argocd:
 #     enabled: true
-#     hostnames:
-#       - argocd.example.com
-#     parentRefs:
-#       - name: private-gateway
-#         namespace: kgateway-system
+#     # hostname auto-generated as: argocd.example.com
+#     # parentRefs inherited from defaultParentRefs
 #     inCluster:
 #       - name: argocd-server
 #         port: 80

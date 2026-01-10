@@ -2,17 +2,40 @@
 # This demonstrates the SIMPLIFIED SYNTAX for routing configuration
 
 # ============================================================================
+# GLOBAL CONFIGURATION (OPTIONAL)
+# ============================================================================
+
+# Auto-generate hostnames from route name + dnsSuffix
+# Example: route "argocd" with dnsSuffix "example.com" → argocd.example.com
+dnsSuffix: example.com
+
+# Default gateway references for all routes (can be overridden per-route)
+defaultParentRefs:
+  - name: default-gateway
+    namespace: kgateway-system
+
+# ============================================================================
 # SIMPLIFIED SYNTAX (RECOMMENDED) - Use inCluster / outCluster shortcuts
 # ============================================================================
 
 routes:
-  # Example 1: In-cluster Service routing (Simplified)
-  # Routes traffic to a Kubernetes service with minimal configuration
+  # Example 1: Minimal configuration with auto-generated hostname
+  # Uses global dnsSuffix and defaultParentRefs
   argocd:
+    enabled: true
+    # hostname auto-generated as: argocd.example.com
+    # parentRefs inherited from defaultParentRefs
+    inCluster:
+      - name: argocd-server
+        port: 80
+
+  # Example 2: In-cluster Service routing with explicit config
+  # Routes traffic to a Kubernetes service with full configuration
+  argocd-explicit:
     enabled: true
     namespace: argocd  # Optional: defaults to release namespace
     hostnames:
-      - argocd.example.com
+      - argocd-explicit.example.com
     parentRefs:
       - name: private-gateway
         namespace: kgateway-system
@@ -24,15 +47,12 @@ routes:
         # Optional: namespace: argocd
         # Optional: filters: [...]
 
-  # Example 2: Out-of-cluster Backend routing (Simplified)
+  # Example 3: Out-of-cluster Backend routing with auto-generated hostname
   # Routes to external service - Backend resource auto-generated
   homeassistant:
     enabled: true
-    hostnames:
-      - hass.example.com
-    parentRefs:
-      - name: public-gateway
-        namespace: kgateway-system
+    # hostname auto-generated as: homeassistant.example.com
+    # parentRefs inherited from defaultParentRefs
     # outCluster: Array of external backends (auto-creates Backend resources)
     outCluster:
       - name: homeassistant
@@ -58,7 +78,7 @@ routes:
                 - name: Content-Security-Policy
                   value: upgrade-insecure-requests
 
-  # Example 3: Multiple backends in one route (Simplified)
+  # Example 4: Multiple backends in one route
   multi-backend:
     enabled: true
     hostnames:
@@ -81,7 +101,7 @@ routes:
                 - name: X-API-Source
                   value: gateway
 
-  # Example 4: Backend with TLS (for HTTPS backends with self-signed certs)
+  # Example 5: Backend with TLS (for HTTPS backends with self-signed certs)
   # Proxmox example - TLS enabled directly on backend
   proxmox:
     enabled: true

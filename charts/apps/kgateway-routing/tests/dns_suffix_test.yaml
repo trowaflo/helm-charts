@@ -1,0 +1,145 @@
+suite: test DNS suffix and default parentRefs
+templates:
+  - httproute.yaml
+tests:
+  - it: should auto-generate hostname from route name and dnsSuffix
+    template: httproute.yaml
+    set:
+      dnsSuffix: example.com
+      defaultParentRefs:
+        - name: default-gateway
+          namespace: kgateway-system
+      routes:
+        test:
+          enabled: true
+          inCluster:
+            - name: test-svc
+              port: 80
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: HTTPRoute
+      - equal:
+          path: spec.hostnames[0]
+          value: test.example.com
+      - equal:
+          path: spec.parentRefs[0].name
+          value: default-gateway
+      - equal:
+          path: spec.parentRefs[0].namespace
+          value: kgateway-system
+
+  - it: should use explicit hostnames when provided (overrides dnsSuffix)
+    template: httproute.yaml
+    set:
+      dnsSuffix: example.com
+      routes:
+        test:
+          enabled: true
+          hostnames:
+            - custom.domain.com
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: test-svc
+              port: 80
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.hostnames[0]
+          value: custom.domain.com
+
+  - it: should use explicit parentRefs when provided (overrides defaultParentRefs)
+    template: httproute.yaml
+    set:
+      defaultParentRefs:
+        - name: default-gateway
+          namespace: default-ns
+      routes:
+        test:
+          enabled: true
+          hostnames:
+            - test.example.com
+          parentRefs:
+            - name: custom-gateway
+              namespace: custom-ns
+          inCluster:
+            - name: test-svc
+              port: 80
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.parentRefs[0].name
+          value: custom-gateway
+      - equal:
+          path: spec.parentRefs[0].namespace
+          value: custom-ns
+
+  - it: should work with all three routes from dns-suffix values
+    template: httproute.yaml
+    values:
+      - ./values/dns-suffix.yaml
+    asserts:
+      - hasDocuments:
+          count: 3
+
+  - it: should work with argocd route (auto-generated hostname and default parentRefs)
+    template: httproute.yaml
+    values:
+      - ./values/dns-suffix.yaml
+    documentIndex: 0
+    asserts:
+      - isKind:
+          of: HTTPRoute
+      - equal:
+          path: metadata.name
+          value: argocd
+      - equal:
+          path: spec.hostnames[0]
+          value: argocd.example.com
+      - equal:
+          path: spec.parentRefs[0].name
+          value: default-gateway
+
+  - it: should work with custom route (explicit overrides)
+    template: httproute.yaml
+    values:
+      - ./values/dns-suffix.yaml
+    documentIndex: 1
+    asserts:
+      - isKind:
+          of: HTTPRoute
+      - equal:
+          path: metadata.name
+          value: custom
+      - equal:
+          path: spec.hostnames[0]
+          value: custom.domain.com
+      - equal:
+          path: spec.parentRefs[0].name
+          value: custom-gateway
+      - equal:
+          path: spec.parentRefs[0].namespace
+          value: custom-ns
+
+  - it: should work with pmxx route (auto-generated hostname)
+    template: httproute.yaml
+    values:
+      - ./values/dns-suffix.yaml
+    documentIndex: 2
+    asserts:
+      - isKind:
+          of: HTTPRoute
+      - equal:
+          path: metadata.name
+          value: pmxx
+      - equal:
+          path: spec.hostnames[0]
+          value: pmxx.example.com
+      - equal:
+          path: spec.parentRefs[0].name
+          value: default-gateway

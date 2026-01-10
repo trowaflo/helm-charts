@@ -5,6 +5,11 @@
   {{- if $cfg.enabled }}
     {{- $name := include "kgateway-routing.routeName" (dict "root" $ "key" $key "config" $cfg) }}
     {{- $routeNamespace := default $namespace $cfg.namespace }}
+    {{- $parentRefs := $cfg.parentRefs | default $.Values.defaultParentRefs }}
+    {{- $hostnames := $cfg.hostnames }}
+    {{- if and (not $hostnames) $.Values.dnsSuffix }}
+      {{- $hostnames = list (printf "%s.%s" $key $.Values.dnsSuffix) }}
+    {{- end }}
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -20,12 +25,12 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if $cfg.parentRefs }}
+  {{- if $parentRefs }}
   parentRefs:
-    {{- range $cfg.parentRefs }}
+    {{- range $parentRefs }}
     - group: {{ default "gateway.networking.k8s.io" .group }}
       kind: {{ default "Gateway" .kind }}
-      name: {{ required (printf "routes.%s.parentRefs[].name is required" $key) .name }}
+      name: {{ required (printf "routes.%s.parentRefs[].name is required (or set defaultParentRefs)" $key) .name }}
       {{- if .namespace }}
       namespace: {{ .namespace }}
       {{- end }}
@@ -34,9 +39,9 @@ spec:
       {{- end }}
     {{- end }}
   {{- end }}
-  {{- if $cfg.hostnames }}
+  {{- if $hostnames }}
   hostnames:
-    {{- toYaml $cfg.hostnames | nindent 4 }}
+    {{- toYaml $hostnames | nindent 4 }}
   {{- end }}
   {{- if or $cfg.inCluster $cfg.outCluster }}
   rules:
