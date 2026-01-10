@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   kgateway-routing:
   - apiVersion: v2
-    created: "2026-01-09T14:10:55.596424597Z"
+    created: "2026-01-10T00:41:55.351942268Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -27,4 +27,36 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.1.0-pr169.tgz
     version: 0.1.0-pr169
-generated: "2026-01-09T14:10:55.595641436Z"
+  prometheus:
+  - apiVersion: v2
+    created: "2026-01-10T00:41:55.361352261Z"
+    dependencies:
+    - name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 28.3.0
+    description: Wraps the official kube-prometheus-stack Helm chart providing production-ready
+      monitoring stack including Prometheus, Grafana, Alertmanager, and node exporters.
+    digest: 4326e70628885ca9e5805c6a951037226b7990f0c14b7f11d3adcafdda57b361
+    home: https://prometheus.io
+    keywords:
+    - prometheus
+    - monitoring
+    - alerting
+    - metrics
+    - kubernetes
+    - operator
+    - grafana
+    - observability
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: prometheus
+    sources:
+    - https://github.com/prometheus/prometheus
+    - https://github.com/prometheus-operator/prometheus-operator
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/prometheus-3.2.0-pr179.tgz
+    version: 3.2.0-pr179
+generated: "2026-01-10T00:41:55.351442695Z"
