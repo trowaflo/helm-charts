@@ -79,6 +79,24 @@ All checks below are **mandatory** before committing:
 
 4. **Validation tests**: Run any chart-specific validation in `tests/` or workflows
 
+## Code style conventions
+
+### Helm template indentation
+- **ALWAYS use 2-space indentation** inside template definitions (`{{- define ... -}}`)
+- This applies to all template logic lines starting with `{{-`
+- Improves readability and maintains consistency across the repository
+- Example:
+  ```yaml
+  {{- define "chart.fullname" -}}
+    {{- if .Values.fullnameOverride -}}
+      {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+    {{- else -}}
+      {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+    {{- end -}}
+  {{- end -}}
+  ```
+- Reference: See `charts/apps/cert-manager-platform/templates/_helpers.tpl` for examples
+
 ## Test Writing Guidelines
 
 ### For umbrella/wrapper charts (charts that only include dependencies):
@@ -135,6 +153,9 @@ Workflows in `.github/workflows/` provide comprehensive automation:
 - **helm-unittest.yml** - Runs helm-unittest tests for all charts
 - **helm-docs.yml** - Auto-generates README.md files (runs on merge to main)
 - **chart-bump.yml** - Auto-bumps chart versions based on conventional commits
+- **chart-release.yaml** - Releases charts to GitHub Pages (runs on main branch)
+- **pr-charts.yml** - Packages and publishes PR charts for testing (runs on PRs)
+- **pr-charts-cleanup.yml** - Removes PR charts when PRs are closed/merged
 - **kics.yml** - Security scanning for IaC vulnerabilities
 - **gitleaks.yml** - Detects hardcoded secrets
 - All checks must pass before merge

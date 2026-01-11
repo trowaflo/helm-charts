@@ -4,6 +4,7 @@
   {{- $cfg := index $.Values.gateways $key }}
   {{- if $cfg.enabled }}
     {{- $name := include "kgateway-platform.gatewayName" (dict "root" $ "key" $key "config" $cfg) }}
+{{- if $.Capabilities.APIVersions.Has "gateway.networking.k8s.io/v1/Gateway" }}
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
@@ -18,6 +19,9 @@ spec:
       kind: GatewayParameters
       name: {{ include "kgateway-platform.gatewayParametersName" (dict "root" $ "key" $key "config" $cfg) }}
   addresses:
+{{- else }}
+{{- fail "Gateway API v1 not available; install CRDs or disable gateways.*.enabled" }}
+{{- end }}
     - type: IPAddress
       value: {{ required (printf "gateways.%s.address is required" $key) $cfg.address | quote }}
   listeners:
