@@ -62,13 +62,22 @@ helm uninstall my-kgateway-routing --namespace kgateway-routing
 	</thead>
 	<tbody>
 		<tr>
-			<td>backends</td>
-			<td>object</td>
+			<td>defaultParentRefs</td>
+			<td>list</td>
 			<td><pre lang="">
-{} (empty, user must configure backends if routing to external services)
+[] (empty, routes must specify their own parentRefs)
 </pre>
 </td>
-			<td>Backend configurations for out-of-cluster services. Backends define external endpoints that routes can reference.  **Example:** ```yaml backends:   homeassistant:     enabled: true     type: Static     static:       hosts:         - host: homeassistant.local           port: 8123 ``` </td>
+			<td>Default parent gateway references for all routes. Applied to routes that don't specify their own `parentRefs`.</td>
+		</tr>
+		<tr>
+			<td>dnsSuffix</td>
+			<td>string</td>
+			<td><pre lang="">
+"" (empty, no auto-generation)
+</pre>
+</td>
+			<td>Global DNS suffix for auto-generating hostnames. When set and a route doesn't have explicit `hostnames`, the hostname will be auto-generated as: `{routeKey}.{dnsSuffix}` Example: With `dnsSuffix: example.com`, route `argocd` gets hostname `argocd.example.com`</td>
 		</tr>
 		<tr>
 			<td>routes</td>
@@ -77,7 +86,7 @@ helm uninstall my-kgateway-routing --namespace kgateway-routing
 {} (empty, user must configure routes)
 </pre>
 </td>
-			<td>HTTP routes configuration. Define multiple routes by adding entries with any key name. Each route can target either in-cluster Services or out-of-cluster Backends.  **In-cluster Service routing example:** ```yaml routes:   argocd:     enabled: true     hostnames:       - "argocd.example.com"     parentRefs:       - name: private-gateway         namespace: kgateway-system     rules:       - matches:           - path:               type: PathPrefix               value: /         backendRefs:           - kind: Service             name: argocd-server             port: 80 ```  **Out-of-cluster Backend routing example:** ```yaml routes:   homeassistant:     enabled: true     hostnames:       - "hass.example.com"     parentRefs:       - name: public-gateway         namespace: kgateway-system     rules:       - matches:           - path:               type: PathPrefix               value: /         backendRefs:           - kind: Backend             group: gateway.kgateway.dev             name: homeassistant-backend         filters:           - type: RequestHeaderModifier             requestHeaderModifier:               set:                 - name: X-Forwarded-Proto                   value: https ``` </td>
+			<td>HTTP routes configuration. Define multiple routes by adding entries with any key name. Each route can target either in-cluster Services or out-of-cluster Backends.  **Simplified in-cluster Service routing with auto-generated hostname:** ```yaml dnsSuffix: example.com defaultParentRefs:   - name: private-gateway     namespace: kgateway-system routes:   argocd:     enabled: true     # hostname auto-generated as: argocd.example.com     # parentRefs inherited from defaultParentRefs     inCluster:       - name: argocd-server         port: 80 ```  **Simplified out-of-cluster Backend routing:** ```yaml routes:   homeassistant:     enabled: true     hostnames:       - hass.example.com     parentRefs:       - name: public-gateway         namespace: kgateway-system     outCluster:       - name: homeassistant         host: homeassistant.local         port: 8123         filters:           - type: RequestHeaderModifier             requestHeaderModifier:               set:                 - name: X-Forwarded-Proto                   value: https ```  **Backend with TLS policy (for HTTPS backends with self-signed certs):** ```yaml routes:   pmxx:     enabled: true     hostnames:       - pmxx.example.com     parentRefs:       - name: gateway         namespace: kgateway-system     outCluster:       - name: pmxx         host: proxmox1.example.com         port: 8006         tls: true         insecure: true ``` Note: `tls: true` enables TLS with SNI auto-derived from host.       `insecure: true` allows self-signed certificates. </td>
 		</tr>
 	</tbody>
 </table>
