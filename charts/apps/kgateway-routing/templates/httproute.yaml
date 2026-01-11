@@ -20,10 +20,25 @@ metadata:
   labels:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- with $cfg.annotations }}
   annotations:
+    kgateway-routing.helm.sh/route-name: {{ $name | quote }}
+    kgateway-routing.helm.sh/route-namespace: {{ $routeNamespace | quote }}
+    kgateway-routing.helm.sh/route-key: {{ $key | quote }}
+    {{- if $parentRefs }}
+    kgateway-routing.helm.sh/parent-refs: {{ $parentRefs | toJson | quote }}
+    {{- end }}
+    {{- if $.Values.defaultParentRefs }}
+    kgateway-routing.helm.sh/default-parent-refs: {{ $.Values.defaultParentRefs | toJson | quote }}
+    {{- end }}
+    {{- if $hostnames }}
+    kgateway-routing.helm.sh/hostnames: {{ $hostnames | toJson | quote }}
+    {{- end }}
+    {{- if $.Values.dnsSuffix }}
+    kgateway-routing.helm.sh/dns-suffix: {{ $.Values.dnsSuffix | quote }}
+    {{- end }}
+    {{- with $cfg.annotations }}
     {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- end }}
 spec:
   {{- if $parentRefs }}
   parentRefs:
