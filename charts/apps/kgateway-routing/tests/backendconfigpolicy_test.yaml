@@ -1,0 +1,149 @@
+suite: test backendconfigpolicy
+templates:
+  - templates/backendconfigpolicy.yaml
+tests:
+  - it: should not render when route disabled
+    set:
+      routes:
+        test:
+          enabled: false
+          outCluster:
+            - name: test
+              host: test.com
+              port: 80
+              tls: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should not render when no TLS enabled on backends
+    set:
+      routes:
+        test:
+          enabled: true
+          hostnames: ["test.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          outCluster:
+            - name: test
+              host: test.local
+              port: 80
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render backendconfigpolicy with TLS enabled on backend
+    set:
+      routes:
+        pmxx:
+          enabled: true
+          hostnames: ["pmxx.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          outCluster:
+            - name: pmxx
+              host: proxmox1.example.com
+              port: 8006
+              tls: true
+              insecure: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: BackendConfigPolicy
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-pmxx-policy
+      - equal:
+          path: metadata.namespace
+          value: NAMESPACE
+      - equal:
+          path: spec.targetRefs[0].group
+          value: gateway.kgateway.dev
+      - equal:
+          path: spec.targetRefs[0].kind
+          value: Backend
+      - equal:
+          path: spec.targetRefs[0].name
+          value: pmxx-pmxx-backend
+      - equal:
+          path: spec.tls.sni
+          value: proxmox1.example.com
+      - equal:
+          path: spec.tls.insecureSkipVerify
+          value: true
+
+  - it: should auto-derive SNI from host
+    set:
+      routes:
+        test:
+          enabled: true
+          hostnames: ["test.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          outCluster:
+            - name: test
+              host: test.local
+              port: 443
+              tls: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.tls.sni
+          value: test.local
+      - isNull:
+          path: spec.tls.insecureSkipVerify
+
+  - it: should support insecure flag
+    set:
+      routes:
+        test:
+          enabled: true
+          hostnames: ["test.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          outCluster:
+            - name: test
+              host: test.local
+              port: 443
+              tls: true
+              insecure: false
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.tls.sni
+          value: test.local
+      - isNull:
+          path: spec.tls.insecureSkipVerify
+
+  - it: should only create policy for backends with TLS enabled
+    set:
+      routes:
+        multi:
+          enabled: true
+          hostnames: ["multi.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          outCluster:
+            - name: backend1
+              host: host1.local
+              port: 8080
+              tls: true
+            - name: backend2
+              host: host2.local
+              port: 8080
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.targetRefs[0].name
+          value: multi-backend1-backend
+      - isNull:
+          path: spec.targetRefs[1]

@@ -125,6 +125,11 @@ tests:
 - Use snapshots for complex outputs
 - Test edge cases and error conditions
 
+## Code style and formatting
+- **Helm templates**: Use 2-space indentation within template definitions for readability
+- **values.yaml**: Keep examples concise - use inline YAML format where possible to avoid verbosity
+- **_helpers.tpl**: Indent template bodies for clarity
+
 ## Security requirements
 - **NEVER commit secrets** to the repository
 - **KICS security scanning** runs automatically on all PRs and main branch
@@ -139,6 +144,8 @@ tests:
 Keep this section minimal. Add only truly exceptional cases:
 
 - **cert-manager**: Validates `cert-manager-webhook-ovh.configVersion` when webhook enabled. The required version is tied to the dependency version in Chart.yaml (current: v0.8.0 requires "0.0.2"). This value changes with breaking updates from upstream. When upgrading the cert-manager-webhook-ovh dependency, update the `$requiredVersion` in `templates/_helpers.tpl` and the comment in `values.yaml`. See [upstream docs](https://github.com/aureq/cert-manager-webhook-ovh) for configVersion purpose.
+
+- **kgateway-routing**: Pure configuration chart for Gateway API resources (HTTPRoute, Backend). Uses inline backend pattern where backends are defined within route configuration for simplicity. Legacy separate `backends:` section maintained for backwards compatibility only.
 
 ## CI awareness
 Workflows in `.github/workflows/` provide comprehensive automation:

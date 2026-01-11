@@ -1,0 +1,23 @@
+apiVersion: v2
+name: kgateway-routing
+version: 0.1.0
+type: application
+description: |-
+  Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend resources.
+  Supports both in-cluster (Service) and out-of-cluster (Backend) routing with
+  request/response filters, header modification, and flexible path matching.
+keywords:
+  - kubernetes
+  - gateway
+  - kgateway
+  - httproute
+  - backend
+  - routing
+  - networking
+maintainers:
+  - name: trowaflo
+    email: trowa.flo@gmail.com
+sources:
+  - https://github.com/kgateway-dev/kgateway
+  - https://docs.kgateway.dev/
+  - https://github.com/trowaflo/helm-charts

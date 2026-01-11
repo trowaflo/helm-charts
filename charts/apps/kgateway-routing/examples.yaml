@@ -1,0 +1,118 @@
+# Example values file showing kgateway-routing chart features
+# This demonstrates the SIMPLIFIED SYNTAX for routing configuration
+
+# ============================================================================
+# GLOBAL CONFIGURATION (OPTIONAL)
+# ============================================================================
+
+# Auto-generate hostnames from route name + dnsSuffix
+# Example: route "argocd" with dnsSuffix "example.com" → argocd.example.com
+dnsSuffix: example.com
+
+# Default gateway references for all routes (can be overridden per-route)
+defaultParentRefs:
+  - name: default-gateway
+    namespace: kgateway-system
+
+# ============================================================================
+# SIMPLIFIED SYNTAX (RECOMMENDED) - Use inCluster / outCluster shortcuts
+# ============================================================================
+
+routes:
+  # Example 1: Minimal configuration with auto-generated hostname
+  # Uses global dnsSuffix and defaultParentRefs
+  argocd:
+    enabled: true
+    # hostname auto-generated as: argocd.example.com
+    # parentRefs inherited from defaultParentRefs
+    inCluster:
+      - name: argocd-server
+        port: 80
+
+  # Example 2: In-cluster Service routing with explicit config
+  # Routes traffic to a Kubernetes service with full configuration
+  argocd-explicit:
+    enabled: true
+    namespace: argocd  # Optional: defaults to release namespace
+    hostnames:
+      - argocd-explicit.example.com
+    parentRefs:
+      - name: private-gateway
+        namespace: kgateway-system
+    # inCluster: Array of Service backends (automatically sets kind=Service)
+    inCluster:
+      - name: argocd-server
+        port: 80
+        # Optional: weight: 1
+        # Optional: namespace: argocd
+        # Optional: filters: [...]
+
+  # Example 3: Out-of-cluster Backend routing with auto-generated hostname
+  # Routes to external service - Backend resource auto-generated
+  homeassistant:
+    enabled: true
+    # hostname auto-generated as: homeassistant.example.com
+    # parentRefs inherited from defaultParentRefs
+    # outCluster: Array of external backends (auto-creates Backend resources)
+    outCluster:
+      - name: homeassistant
+        host: homeassistant.local
+        port: 8123
+        # Optional: Custom path matching (defaults to / with PathPrefix)
+        # matches:
+        #   - path:
+        #       type: PathPrefix
+        #       value: /admin
+        # Optional: Request/response filters
+        filters:
+          - type: RequestHeaderModifier
+            requestHeaderModifier:
+              set:
+                - name: X-Forwarded-Proto
+                  value: https
+                - name: X-Forwarded-Port
+                  value: "443"
+          - type: ResponseHeaderModifier
+            responseHeaderModifier:
+              set:
+                - name: Content-Security-Policy
+                  value: upgrade-insecure-requests
+
+  # Example 4: Multiple backends in one route
+  multi-backend:
+    enabled: true
+    hostnames:
+      - multi.example.com
+    parentRefs:
+      - name: gateway
+        namespace: kgateway-system
+    # Mix in-cluster and out-cluster (creates multiple rules)
+    inCluster:
+      - name: internal-api
+        port: 8080
+    outCluster:
+      - name: external-api
+        host: external.example.com
+        port: 443
+        filters:
+          - type: RequestHeaderModifier
+            requestHeaderModifier:
+              add:
+                - name: X-API-Source
+                  value: gateway
+
+  # Example 5: Backend with TLS (for HTTPS backends with self-signed certs)
+  # Proxmox example - TLS enabled directly on backend
+  proxmox:
+    enabled: true
+    hostnames:
+      - pmxx.example.com
+    parentRefs:
+      - name: gateway
+        namespace: kgateway-system
+    outCluster:
+      - name: proxmox
+        host: proxmox1.example.com
+        port: 8006
+        tls: true       # Enable TLS (SNI auto-derived from host)
+        insecure: true  # Allow self-signed certificates

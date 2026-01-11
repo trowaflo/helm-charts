@@ -1,0 +1,76 @@
+# -- Global DNS suffix for auto-generating hostnames.
+# When set and a route doesn't have explicit `hostnames`, the hostname will be auto-generated as: `{routeKey}.{dnsSuffix}`
+# Example: With `dnsSuffix: example.com`, route `argocd` gets hostname `argocd.example.com`
+# @default -- "" (empty, no auto-generation)
+dnsSuffix: ""
+
+# -- Default parent gateway references for all routes.
+# Applied to routes that don't specify their own `parentRefs`.
+# @default -- [] (empty, routes must specify their own parentRefs)
+defaultParentRefs: []
+  # - name: default-gateway
+  #   namespace: kgateway-system
+
+# -- HTTP routes configuration. Define multiple routes by adding entries with any key name.
+# Each route can target either in-cluster Services or out-of-cluster Backends.
+#
+# **Simplified in-cluster Service routing with auto-generated hostname:**
+# ```yaml
+# dnsSuffix: example.com
+# defaultParentRefs:
+#   - name: private-gateway
+#     namespace: kgateway-system
+# routes:
+#   argocd:
+#     enabled: true
+#     # hostname auto-generated as: argocd.example.com
+#     # parentRefs inherited from defaultParentRefs
+#     inCluster:
+#       - name: argocd-server
+#         port: 80
+# ```
+#
+# **Simplified out-of-cluster Backend routing:**
+# ```yaml
+# routes:
+#   homeassistant:
+#     enabled: true
+#     hostnames:
+#       - hass.example.com
+#     parentRefs:
+#       - name: public-gateway
+#         namespace: kgateway-system
+#     outCluster:
+#       - name: homeassistant
+#         host: homeassistant.local
+#         port: 8123
+#         filters:
+#           - type: RequestHeaderModifier
+#             requestHeaderModifier:
+#               set:
+#                 - name: X-Forwarded-Proto
+#                   value: https
+# ```
+#
+# **Backend with TLS policy (for HTTPS backends with self-signed certs):**
+# ```yaml
+# routes:
+#   pmxx:
+#     enabled: true
+#     hostnames:
+#       - pmxx.example.com
+#     parentRefs:
+#       - name: gateway
+#         namespace: kgateway-system
+#     outCluster:
+#       - name: pmxx
+#         host: proxmox1.example.com
+#         port: 8006
+#         tls: true
+#         insecure: true
+# ```
+# Note: `tls: true` enables TLS with SNI auto-derived from host.
+#       `insecure: true` allows self-signed certificates.
+#
+# @default -- {} (empty, user must configure routes)
+routes: {}

@@ -1,0 +1,103 @@
+# Values matching the exact examples from the issue
+
+# Example 1: In-cluster argocd routing
+routes:
+  argocd:
+    enabled: true
+    namespace: argocd
+    hostnames:
+      - "newargo.trowa-family.ovh"
+    parentRefs:
+      - group: gateway.networking.k8s.io
+        kind: Gateway
+        name: private-gateway
+        namespace: kgateway-preview
+    rules:
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /
+        backendRefs:
+          - group: ''
+            kind: Service
+            name: argocd-server
+            port: 80
+            weight: 1
+
+  # Example 2: Out-cluster homeassistant with filters
+  homeassistant:
+    enabled: true
+    namespace: default
+    hostnames:
+      - newhass.trowa-family.ovh
+    parentRefs:
+      - group: gateway.networking.k8s.io
+        kind: Gateway
+        name: public-gateway
+        namespace: kgateway-preview
+    rules:
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /
+        backendRefs:
+          - name: homeassistant-backend
+            kind: Backend
+            group: gateway.kgateway.dev
+            weight: 1
+        filters:
+          - type: RequestHeaderModifier
+            requestHeaderModifier:
+              set:
+                - name: X-Forwarded-Proto
+                  value: https
+                - name: X-Forwarded-Port
+                  value: "443"
+                - name: X-Forwarded-Host
+                  value: newhass.trowa-family.ovh
+          - type: ResponseHeaderModifier
+            responseHeaderModifier:
+              set:
+                - name: Content-Security-Policy
+                  value: "upgrade-insecure-requests"
+
+  # Example 3: Out-cluster pmxx (Proxmox)
+  pmxx:
+    enabled: true
+    namespace: default
+    hostnames:
+      - "pmxx.trowa-family.ovh"
+    parentRefs:
+      - group: gateway.networking.k8s.io
+        kind: Gateway
+        name: kgateway-preview-kgateway-platform-private
+        namespace: kgateway-preview
+    rules:
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /
+        backendRefs:
+          - name: pmxx-backend
+            kind: Backend
+            group: gateway.kgateway.dev
+            weight: 1
+
+backends:
+  homeassistant:
+    enabled: true
+    namespace: default
+    type: Static
+    static:
+      hosts:
+        - host: newhomeassistant.trowa-family.ovh
+          port: 8123
+
+  pmxx:
+    enabled: true
+    namespace: default
+    type: Static
+    static:
+      hosts:
+        - host: proxmox1.trowa-family.ovh
+          port: 8006
