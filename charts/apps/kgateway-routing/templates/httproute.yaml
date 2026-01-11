@@ -66,9 +66,7 @@ spec:
           {{- if $backend.namespace }}
           namespace: {{ $backend.namespace }}
           {{- end }}
-          {{- if $backend.weight }}
-          weight: {{ $backend.weight }}
-          {{- end }}
+          weight: {{ default 1 $backend.weight }}
       {{- if $backend.filters }}
       filters:
         {{- range $backend.filters }}
@@ -153,9 +151,7 @@ spec:
         - group: gateway.kgateway.dev
           kind: Backend
           name: {{ $backendName }}
-          {{- if $backend.weight }}
-          weight: {{ $backend.weight }}
-          {{- end }}
+          weight: {{ default 1 $backend.weight }}
       {{- if $backend.filters }}
       filters:
         {{- range $backend.filters }}
