@@ -255,9 +255,7 @@ spec:
           {{- if .port }}
           port: {{ .port }}
           {{- end }}
-          {{- if .weight }}
-          weight: {{ .weight }}
-          {{- end }}
+          weight: {{ default 1 .weight }}
         {{- end }}
       {{- end }}
       {{- if .filters }}
