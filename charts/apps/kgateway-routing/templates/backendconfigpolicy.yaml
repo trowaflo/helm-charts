@@ -9,6 +9,12 @@
     {{- $tlsBackends = append $tlsBackends $backend }}
   {{- end }}
 {{- end }}
+{{- range $backend := $route.inCluster }}
+  {{- if $backend.tls }}
+    {{- $hasTLS = true }}
+    {{- $tlsBackends = append $tlsBackends $backend }}
+  {{- end }}
+{{- end }}
 {{- if $hasTLS }}
 ---
 apiVersion: gateway.kgateway.dev/v1alpha1
@@ -27,7 +33,13 @@ spec:
     {{- end }}
   tls:
     {{- $firstBackend := index $tlsBackends 0 }}
+    {{- if $firstBackend.sni }}
+    sni: {{ $firstBackend.sni }}
+    {{- else if $firstBackend.host }}
     sni: {{ $firstBackend.host }}
+    {{- else }}
+    sni: {{ $firstBackend.name }}
+    {{- end }}
     {{- if $firstBackend.insecure }}
     insecureSkipVerify: true
     {{- end }}

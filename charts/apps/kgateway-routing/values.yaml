@@ -72,5 +72,25 @@ defaultParentRefs: []
 # Note: `tls: true` enables TLS with SNI auto-derived from host.
 #       `insecure: true` allows self-signed certificates.
 #
+# **In-cluster Service with TLS (for HTTPS services with self-signed certs):**
+# ```yaml
+# routes:
+#   internal-api:
+#     enabled: true
+#     hostnames:
+#       - api.example.com
+#     parentRefs:
+#       - name: gateway
+#         namespace: kgateway-system
+#     inCluster:
+#       - name: api-service
+#         port: 8443
+#         tls: true
+#         insecure: true
+#         sni: api-service.namespace.svc.cluster.local
+# ```
+# Note: For inCluster, `tls: true` creates a Backend CRD and applies BackendConfigPolicy.
+#       SNI defaults to service name but can be overridden with `sni` field.
+#
 # @default -- {} (empty, user must configure routes)
 routes: {}

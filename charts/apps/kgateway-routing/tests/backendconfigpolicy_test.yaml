@@ -147,3 +147,96 @@ tests:
           value: multi-backend1-backend
       - isNull:
           path: spec.targetRefs[1]
+
+  - it: should render backendconfigpolicy for inCluster with TLS enabled
+    set:
+      routes:
+        api:
+          enabled: true
+          hostnames: ["api.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: api-service
+              port: 8443
+              tls: true
+              insecure: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: BackendConfigPolicy
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-api-policy
+      - equal:
+          path: spec.targetRefs[0].group
+          value: gateway.kgateway.dev
+      - equal:
+          path: spec.targetRefs[0].kind
+          value: Backend
+      - equal:
+          path: spec.targetRefs[0].name
+          value: api-api-service-backend
+      - equal:
+          path: spec.tls.sni
+          value: api-service
+      - equal:
+          path: spec.tls.insecureSkipVerify
+          value: true
+
+  - it: should use custom SNI for inCluster when provided
+    set:
+      routes:
+        api:
+          enabled: true
+          hostnames: ["api.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: api-service
+              port: 8443
+              tls: true
+              sni: api-service.default.svc.cluster.local
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.tls.sni
+          value: api-service.default.svc.cluster.local
+      - isNull:
+          path: spec.tls.insecureSkipVerify
+
+  - it: should support mixed inCluster and outCluster with TLS
+    set:
+      routes:
+        mixed:
+          enabled: true
+          hostnames: ["mixed.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: internal-api
+              port: 8443
+              tls: true
+              insecure: true
+          outCluster:
+            - name: external-api
+              host: external.example.com
+              port: 443
+              tls: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.targetRefs[0].name
+          value: mixed-external-api-backend
+      - equal:
+          path: spec.targetRefs[1].name
+          value: mixed-internal-api-backend
+      - equal:
+          path: spec.tls.sni
+          value: external.example.com

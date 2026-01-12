@@ -18,6 +18,23 @@
         {{- $_ := set $generatedBackends $backendName $backendSpec }}
       {{- end }}
     {{- end }}
+    {{- /* Generate backends from routes.inCluster with TLS */ -}}
+    {{- if $routeCfg.inCluster }}
+      {{- range $backend := $routeCfg.inCluster }}
+        {{- if $backend.tls }}
+          {{- $backendName := printf "%s-%s-backend" $routeKey $backend.name }}
+          {{- $backendNamespace := default $namespace (default $routeCfg.namespace $backend.namespace) }}
+          {{- $backendSpec := dict "type" "Kube" "namespace" $backendNamespace "kube" (dict "serviceName" $backend.name "serviceNamespace" $backendNamespace "port" $backend.port) }}
+          {{- if $backend.labels }}
+            {{- $_ := set $backendSpec "labels" $backend.labels }}
+          {{- end }}
+          {{- if $backend.annotations }}
+            {{- $_ := set $backendSpec "annotations" $backend.annotations }}
+          {{- end }}
+          {{- $_ := set $generatedBackends $backendName $backendSpec }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
   {{- end }}
 {{- end }}
 
