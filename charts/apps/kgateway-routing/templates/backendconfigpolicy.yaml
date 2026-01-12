@@ -1,21 +1,16 @@
 {{- range $routeKey, $route := .Values.routes }}
 {{- if $route.enabled }}
 {{- $routeNamespace := default $.Release.Namespace $route.namespace }}
-{{- $hasTLS := false }}
 {{- $tlsBackends := list }}
-{{- range $backend := $route.outCluster }}
-  {{- if $backend.tls }}
-    {{- $hasTLS = true }}
-    {{- $tlsBackends = append $tlsBackends $backend }}
+{{- /* Collect TLS backends from both outCluster and inCluster */ -}}
+{{- range $backendList := list $route.outCluster $route.inCluster }}
+  {{- range $backend := $backendList }}
+    {{- if $backend.tls }}
+      {{- $tlsBackends = append $tlsBackends $backend }}
+    {{- end }}
   {{- end }}
 {{- end }}
-{{- range $backend := $route.inCluster }}
-  {{- if $backend.tls }}
-    {{- $hasTLS = true }}
-    {{- $tlsBackends = append $tlsBackends $backend }}
-  {{- end }}
-{{- end }}
-{{- if $hasTLS }}
+{{- if $tlsBackends }}
 ---
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: BackendConfigPolicy
