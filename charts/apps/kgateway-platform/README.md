@@ -6,7 +6,7 @@ Helm chart for configuring the kgateway platform using the Kubernetes Gateway AP
 
 ---
 
-![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
+![Version: 1.1.1](https://img.shields.io/badge/Version-1.1.1-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
 
 ## Source Code
 
@@ -21,7 +21,6 @@ Helm chart for configuring the kgateway platform using the Kubernetes Gateway AP
 | Repository | Name | Version |
 |------------|------|---------|
 | oci://cr.kgateway.dev/kgateway-dev/charts | kgateway(kgateway) | v2.1.2 |
-| oci://cr.kgateway.dev/kgateway-dev/charts | kgateway-crds(kgateway-crds) | v2.1.2 |
 
 - Helm: v3+
 
