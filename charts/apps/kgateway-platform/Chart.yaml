@@ -1,6 +1,6 @@
 apiVersion: v2
 name: kgateway-platform
-version: 1.1.0
+version: 1.1.1
 type: application
 description: |-
   Helm chart for configuring the kgateway platform using the Kubernetes Gateway API with support for multiple gateways, HTTP(S) routing, and TLS certificate integration.
@@ -18,11 +18,6 @@ sources:
   - https://docs.kgateway.dev/
   - https://github.com/trowaflo/helm-charts
 dependencies:
-  - name: kgateway-crds
-    version: v2.1.2
-    repository: oci://cr.kgateway.dev/kgateway-dev/charts
-    alias: kgateway-crds
-    condition: kgateway-crds.enabled
   - name: kgateway
     version: v2.1.2
     repository: oci://cr.kgateway.dev/kgateway-dev/charts
