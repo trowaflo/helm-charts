@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   grafana:
   - apiVersion: v2
-    created: "2026-01-14T16:42:55.5304688Z"
+    created: "2026-01-14T16:42:56.925714604Z"
     dependencies:
     - name: grafana
       repository: https://grafana.github.io/helm-charts
@@ -33,7 +33,7 @@ entries:
     version: 0.3.5-pr187
   kgateway-platform:
   - apiVersion: v2
-    created: "2026-01-14T16:42:55.531332257Z"
+    created: "2026-01-14T16:42:56.926713232Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -62,4 +62,36 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-platform-1.1.0-pr184.tgz
     version: 1.1.0-pr184
-generated: "2026-01-14T16:42:55.526923291Z"
+  prometheus:
+  - apiVersion: v2
+    created: "2026-01-14T16:42:56.936545152Z"
+    dependencies:
+    - name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 28.4.0
+    description: Wraps the official kube-prometheus-stack Helm chart providing production-ready
+      monitoring stack including Prometheus, Grafana, Alertmanager, and node exporters.
+    digest: 78d128b73f63c0091a90adb2ebed6b37b682fa1d05bdcb1c50fcd61b630acc42
+    home: https://prometheus.io
+    keywords:
+    - prometheus
+    - monitoring
+    - alerting
+    - metrics
+    - kubernetes
+    - operator
+    - grafana
+    - observability
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: prometheus
+    sources:
+    - https://github.com/prometheus/prometheus
+    - https://github.com/prometheus-operator/prometheus-operator
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/prometheus-3.3.0-pr188.tgz
+    version: 3.3.0-pr188
+generated: "2026-01-14T16:42:56.921891507Z"
