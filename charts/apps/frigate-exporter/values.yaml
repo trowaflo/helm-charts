@@ -32,6 +32,15 @@ containers:
 
     env: []
 
+# Configuration for the Frigate service to monitor
+frigate:
+  # Name of the Frigate service
+  serviceName: frigate
+  # Namespace where Frigate is deployed
+  namespace: frigate
+  # Port where Frigate API is exposed
+  port: 5000
+
 podSecurityContext:
   runAsUser: 1000
 

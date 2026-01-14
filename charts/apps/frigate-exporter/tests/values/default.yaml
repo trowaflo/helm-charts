@@ -1,2 +1,6 @@
 nameOverride: "name-override-test"
 namespaceOverride: "namespace-override-test"
+frigate:
+  serviceName: "frigate-exporter-testing-name-override-test"
+  namespace: "frigate-exporter-testing-namespace-override-test"
+  port: 5000
