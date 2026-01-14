@@ -1,8 +1,40 @@
 apiVersion: v1
 entries:
+  frigate-exporter:
+  - apiVersion: v2
+    created: "2026-01-14T07:06:54.827728373Z"
+    dependencies:
+    - name: common
+      repository: https://trowaflo.github.io/helm-charts
+      version: 2.0.0
+    description: Prometheus exporter for Frigate NVR (Network Video Recorder) system.
+      Exports metrics from Frigate cameras, detections, and recording statistics in
+      Prometheus-compatible format for integration with monitoring stacks.
+    digest: 9f47f89b1944d8d8af786f8437e26fe598340e17a1ac34be219ec18cb548362f
+    home: https://github.com/bairhys/prometheus-frigate-exporter
+    icon: https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/images/prometheus-logo.svg
+    keywords:
+    - prometheus
+    - exporter
+    - frigate
+    - nvr
+    - video
+    - monitoring
+    - metrics
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: frigate-exporter
+    sources:
+    - https://github.com/bairhys/prometheus-frigate-exporter
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/frigate-exporter-1.0.0-pr186.tgz
+    version: 1.0.0-pr186
   kgateway-platform:
   - apiVersion: v2
-    created: "2026-01-14T06:43:23.786309062Z"
+    created: "2026-01-14T07:06:54.828581689Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -31,4 +63,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-platform-1.1.0-pr184.tgz
     version: 1.1.0-pr184
-generated: "2026-01-14T06:43:23.785283115Z"
+generated: "2026-01-14T07:06:54.826563642Z"
