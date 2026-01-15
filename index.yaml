@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   grafana:
   - apiVersion: v2
-    created: "2026-01-14T21:15:18.906714173Z"
+    created: "2026-01-15T01:46:04.378105306Z"
     dependencies:
     - name: grafana
       repository: https://grafana.github.io/helm-charts
@@ -33,7 +33,7 @@ entries:
     version: 0.3.5-pr188
   kgateway-platform:
   - apiVersion: v2
-    created: "2026-01-14T21:15:18.90758827Z"
+    created: "2026-01-15T01:46:04.378910098Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -64,14 +64,14 @@ entries:
     version: 1.1.0-pr184
   prometheus:
   - apiVersion: v2
-    created: "2026-01-14T21:15:18.916453146Z"
+    created: "2026-01-15T01:46:04.388463337Z"
     dependencies:
     - name: prometheus
       repository: https://prometheus-community.github.io/helm-charts
       version: 28.4.0
     description: Wraps the official kube-prometheus-stack Helm chart providing production-ready
       monitoring stack including Prometheus, Grafana, Alertmanager, and node exporters.
-    digest: 2f8ddd1328195156ffa38b4cc05e620ba4e26bd4fd0af8947c447d0af2242164
+    digest: 7c7ac5dee64bb36c30a62e8df2e69bbc0639161d141b353b33dbe4319ec5efc6
     home: https://prometheus.io
     keywords:
     - prometheus
@@ -94,4 +94,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/prometheus-3.3.0-pr188.tgz
     version: 3.3.0-pr188
-generated: "2026-01-14T21:15:18.902233092Z"
+generated: "2026-01-15T01:46:04.374532489Z"
