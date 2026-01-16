@@ -1,14 +1,16 @@
-
-
 # kgateway-routing
+
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend resources.
 Supports both in-cluster (Service) and out-of-cluster (Backend) routing with
 request/response filters, header modification, and flexible path matching.
 
----
+## Maintainers
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
+| Name | Email | Url |
+| ---- | ------ | --- |
+| trowaflo | <trowa.flo@gmail.com> |  |
 
 ## Source Code
 
@@ -16,86 +18,13 @@ request/response filters, header modification, and flexible path matching.
 * <https://docs.kgateway.dev/>
 * <https://github.com/trowaflo/helm-charts>
 
-## Requirements
-
-- Helm: v3+
-
-## Getting Started
-
-### Add repository
-
-```bash
-helm repo add kgateway-routing https://example.com/helm-charts
-helm repo update
-```
-
-### Install
-
-```bash
-helm install my-kgateway-routing kgateway-routing/kgateway-routing \
-  --namespace kgateway-routing \
-  --create-namespace
-```
-
-### Upgrade
-
-```bash
-helm upgrade my-kgateway-routing kgateway-routing/kgateway-routing \
-  --namespace kgateway-routing \
-  --install
-```
-
-### Uninstall
-
-```bash
-helm uninstall my-kgateway-routing --namespace kgateway-routing
-```
-
 ## Values
 
-<table>
-	<thead>
-		<th>Key</th>
-		<th>Type</th>
-		<th>Default</th>
-		<th>Description</th>
-	</thead>
-	<tbody>
-		<tr>
-			<td>defaultParentRefs</td>
-			<td>list</td>
-			<td><pre lang="">
-[] (empty, routes must specify their own parentRefs)
-</pre>
-</td>
-			<td>Default parent gateway references for all routes. Applied to routes that don't specify their own `parentRefs`.</td>
-		</tr>
-		<tr>
-			<td>dnsSuffix</td>
-			<td>string</td>
-			<td><pre lang="">
-"" (empty, no auto-generation)
-</pre>
-</td>
-			<td>Global DNS suffix for auto-generating hostnames. When set and a route doesn't have explicit `hostnames`, the hostname will be auto-generated as: `{routeKey}.{dnsSuffix}` Example: With `dnsSuffix: example.com`, route `argocd` gets hostname `argocd.example.com`</td>
-		</tr>
-		<tr>
-			<td>routes</td>
-			<td>object</td>
-			<td><pre lang="">
-{} (empty, user must configure routes)
-</pre>
-</td>
-			<td>HTTP routes configuration. Define multiple routes by adding entries with any key name. Each route can target either in-cluster Services or out-of-cluster Backends.  **Simplified in-cluster Service routing with auto-generated hostname:** ```yaml dnsSuffix: example.com defaultParentRefs:   - name: private-gateway     namespace: kgateway-system routes:   argocd:     enabled: true     # hostname auto-generated as: argocd.example.com     # parentRefs inherited from defaultParentRefs     inCluster:       - name: argocd-server         port: 80 ```  **Simplified out-of-cluster Backend routing:** ```yaml routes:   homeassistant:     enabled: true     hostnames:       - hass.example.com     parentRefs:       - name: public-gateway         namespace: kgateway-system     outCluster:       - name: homeassistant         host: homeassistant.local         port: 8123         filters:           - type: RequestHeaderModifier             requestHeaderModifier:               set:                 - name: X-Forwarded-Proto                   value: https ```  **Backend with TLS policy (for HTTPS backends with self-signed certs):** ```yaml routes:   pmxx:     enabled: true     hostnames:       - pmxx.example.com     parentRefs:       - name: gateway         namespace: kgateway-system     outCluster:       - name: pmxx         host: proxmox1.example.com         port: 8006         tls: true         insecure: true ``` Note: `tls: true` enables TLS with SNI auto-derived from host.       `insecure: true` allows self-signed certificates. </td>
-		</tr>
-	</tbody>
-</table>
-
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| trowaflo | <trowa.flo@gmail.com> |  |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| defaultParentRefs | list | [] (empty, routes must specify their own parentRefs) | Default parent gateway references for all routes. Applied to routes that don't specify their own `parentRefs`. |
+| dnsSuffix | string | "" (empty, no auto-generation) | Global DNS suffix for auto-generating hostnames. When set and a route doesn't have explicit `hostnames`, the hostname will be auto-generated as: `{routeKey}.{dnsSuffix}` Example: With `dnsSuffix: example.com`, route `argocd` gets hostname `argocd.example.com` |
+| routes | object | {} (empty, user must configure routes) | HTTP routes configuration. Define multiple routes by adding entries with any key name. Each route can target either in-cluster Services or out-of-cluster Backends.  **Simplified in-cluster Service routing with auto-generated hostname:** ```yaml dnsSuffix: example.com defaultParentRefs:   - name: private-gateway     namespace: kgateway-system routes:   argocd:     enabled: true     # hostname auto-generated as: argocd.example.com     # parentRefs inherited from defaultParentRefs     inCluster:       - name: argocd-server         port: 80 ```  **Simplified out-of-cluster Backend routing:** ```yaml routes:   homeassistant:     enabled: true     hostnames:       - hass.example.com     parentRefs:       - name: public-gateway         namespace: kgateway-system     outCluster:       - name: homeassistant         host: homeassistant.local         port: 8123         filters:           - type: RequestHeaderModifier             requestHeaderModifier:               set:                 - name: X-Forwarded-Proto                   value: https ```  **Backend with TLS policy (for HTTPS backends with self-signed certs):** ```yaml routes:   pmxx:     enabled: true     hostnames:       - pmxx.example.com     parentRefs:       - name: gateway         namespace: kgateway-system     outCluster:       - name: pmxx         host: proxmox1.example.com         port: 8006         tls: true         insecure: true ``` Note: `tls: true` enables TLS with SNI auto-derived from host.       `insecure: true` allows self-signed certificates.  **In-cluster Service with TLS (for HTTPS services with self-signed certs):** ```yaml routes:   internal-api:     enabled: true     hostnames:       - api.example.com     parentRefs:       - name: gateway         namespace: kgateway-system     inCluster:       - name: api-service         port: 8443         tls: true         insecure: true         sni: api-service.namespace.svc.cluster.local ``` Note: For inCluster, `tls: true` creates a Backend CRD and applies BackendConfigPolicy.       SNI defaults to service name but can be overridden with `sni` field.  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

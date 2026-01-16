@@ -1,0 +1,190 @@
+suite: test inCluster with TLS
+templates:
+  - templates/httproute.yaml
+  - templates/backend.yaml
+  - templates/backendconfigpolicy.yaml
+tests:
+  - it: should create Backend CRD for inCluster service with TLS
+    template: templates/backend.yaml
+    set:
+      routes:
+        api:
+          enabled: true
+          hostnames: ["api.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: api-service
+              port: 8443
+              tls: true
+              insecure: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Backend
+      - equal:
+          path: metadata.name
+          value: api-api-service-backend
+      - equal:
+          path: spec.type
+          value: Kube
+      - equal:
+          path: spec.kube.serviceName
+          value: api-service
+      - equal:
+          path: spec.kube.port
+          value: 8443
+      - equal:
+          path: spec.kube.serviceNamespace
+          value: NAMESPACE
+
+  - it: should not create Backend CRD for inCluster service without TLS
+    template: templates/backend.yaml
+    set:
+      routes:
+        api:
+          enabled: true
+          hostnames: ["api.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: api-service
+              port: 80
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should reference Backend CRD in HTTPRoute when inCluster has TLS
+    template: templates/httproute.yaml
+    set:
+      routes:
+        api:
+          enabled: true
+          hostnames: ["api.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: api-service
+              port: 8443
+              tls: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: HTTPRoute
+      - equal:
+          path: spec.rules[0].backendRefs[0].group
+          value: gateway.kgateway.dev
+      - equal:
+          path: spec.rules[0].backendRefs[0].kind
+          value: Backend
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: api-api-service-backend
+      - isNull:
+          path: spec.rules[0].backendRefs[0].port
+
+  - it: should reference Service directly when inCluster has no TLS
+    template: templates/httproute.yaml
+    set:
+      routes:
+        api:
+          enabled: true
+          hostnames: ["api.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: api-service
+              port: 80
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: HTTPRoute
+      - equal:
+          path: spec.rules[0].backendRefs[0].group
+          value: ""
+      - equal:
+          path: spec.rules[0].backendRefs[0].kind
+          value: Service
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: api-service
+      - equal:
+          path: spec.rules[0].backendRefs[0].port
+          value: 80
+
+  - it: should create Backend CRDs for both inCluster and outCluster with TLS
+    template: templates/backend.yaml
+    set:
+      routes:
+        mixed:
+          enabled: true
+          hostnames: ["mixed.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: internal-api
+              port: 8443
+              tls: true
+          outCluster:
+            - name: external-api
+              host: external.example.com
+              port: 443
+              tls: true
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: Backend
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: mixed-external-api-backend
+        documentIndex: 0
+      - equal:
+          path: spec.type
+          value: Static
+        documentIndex: 0
+      - isKind:
+          of: Backend
+        documentIndex: 1
+      - equal:
+          path: metadata.name
+          value: mixed-internal-api-backend
+        documentIndex: 1
+      - equal:
+          path: spec.type
+          value: Kube
+        documentIndex: 1
+
+  - it: should handle custom namespace for inCluster Backend
+    template: templates/backend.yaml
+    set:
+      routes:
+        api:
+          enabled: true
+          namespace: custom-ns
+          hostnames: ["api.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: api-service
+              port: 8443
+              tls: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.namespace
+          value: custom-ns
+      - equal:
+          path: spec.kube.serviceNamespace
+          value: custom-ns
