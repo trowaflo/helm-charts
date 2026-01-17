@@ -1,39 +1,8 @@
 apiVersion: v1
 entries:
-  grafana:
-  - apiVersion: v2
-    created: "2026-01-16T21:45:55.919032544Z"
-    dependencies:
-    - name: grafana
-      repository: https://grafana.github.io/helm-charts
-      version: 10.5.8
-    description: Grafana visualization and dashboarding platform with custom extensions.
-      Wraps the official Grafana Helm chart with domain-specific customizations, providing
-      integrated dashboard provisioning and Traefik IngressRoute support.
-    digest: 1552bc3b66022e2b089836d4db7b790a69ec7148ba6a336da9116f7bbd639180
-    home: https://grafana.com
-    icon: https://grafana.com/docs/grafana/latest/img/grafana_icon.svg
-    keywords:
-    - grafana
-    - visualization
-    - dashboards
-    - monitoring
-    - metrics
-    - prometheus
-    maintainers:
-    - email: trowa.flo@gmail.com
-      name: trowaflo
-    name: grafana
-    sources:
-    - https://github.com/grafana/grafana
-    - https://github.com/trowaflo/helm-charts
-    type: application
-    urls:
-    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/grafana-0.3.6-pr190.tgz
-    version: 0.3.6-pr190
   kgateway-platform:
   - apiVersion: v2
-    created: "2026-01-16T21:45:55.919910691Z"
+    created: "2026-01-17T01:26:23.847633803Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -62,4 +31,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-platform-1.1.0-pr184.tgz
     version: 1.1.0-pr184
-generated: "2026-01-16T21:45:55.915500621Z"
+generated: "2026-01-17T01:26:23.846608673Z"
