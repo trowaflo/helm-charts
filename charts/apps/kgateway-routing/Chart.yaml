@@ -1,6 +1,6 @@
 apiVersion: v2
 name: kgateway-routing
-version: 0.1.0
+version: 0.2.0
 type: application
 description: |-
   Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend resources.
