@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   kgateway-platform:
   - apiVersion: v2
-    created: "2026-01-19T16:32:22.925083955Z"
+    created: "2026-01-19T19:38:49.484390427Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -31,4 +31,31 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-platform-1.1.0-pr184.tgz
     version: 1.1.0-pr184
-generated: "2026-01-19T16:32:22.924019349Z"
+  kgateway-routing:
+  - apiVersion: v2
+    created: "2026-01-19T19:38:49.485268046Z"
+    description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
+      resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
+      with request/response filters, header modification, and flexible path matching.
+    digest: bd58d6d56e6db5c34d6a295a27cfe771cc369874753b509087634f6109ee7649
+    keywords:
+    - kubernetes
+    - gateway
+    - kgateway
+    - httproute
+    - backend
+    - routing
+    - networking
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: kgateway-routing
+    sources:
+    - https://github.com/kgateway-dev/kgateway
+    - https://docs.kgateway.dev/
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.1.0-pr182.tgz
+    version: 0.1.0-pr182
+generated: "2026-01-19T19:38:49.483409475Z"
