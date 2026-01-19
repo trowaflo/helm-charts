@@ -4,7 +4,7 @@
     "github>trowaflo/renovate-config"
   ],
   "timezone": "UTC",
-  "schedule": ["before 3am on Monday"],
+  "schedule": ["before 3am on the first day of the month"],
   packageRules: [
     // Helm Patch Updates
     {
