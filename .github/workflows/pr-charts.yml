@@ -217,7 +217,7 @@ jobs:
               }
             });
 
-            const comment = `## 📦 PR Charts Available for Testing
+            const commentBody = `## 📦 PR Charts Available for Testing
 
             The following charts from this PR have been packaged and published:
 
@@ -236,9 +236,31 @@ jobs:
             💡 These charts will be automatically removed when this PR is merged or closed.
             `;
 
-            github.rest.issues.createComment({
+            // Check if comment already exists
+            const comments = await github.rest.issues.listComments({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: comment
             });
+
+            const existingComment = comments.data.find(comment => 
+              comment.body.includes('📦 PR Charts Available for Testing')
+            );
+
+            if (existingComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                comment_id: existingComment.id,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: commentBody
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: commentBody
+              });
+            }

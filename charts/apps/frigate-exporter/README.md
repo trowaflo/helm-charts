@@ -8,7 +8,7 @@ in Prometheus-compatible format for integration with monitoring stacks.
 
 ---
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
+![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
 
 **Homepage:** <https://github.com/bairhys/prometheus-frigate-exporter>
 
@@ -172,6 +172,33 @@ true
 			<td>string</td>
 			<td><pre lang="json">
 "32Mi"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>frigate.namespace</td>
+			<td>string</td>
+			<td><pre lang="json">
+"frigate"
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>frigate.port</td>
+			<td>int</td>
+			<td><pre lang="json">
+5000
+</pre>
+</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>frigate.serviceName</td>
+			<td>string</td>
+			<td><pre lang="json">
+"frigate"
 </pre>
 </td>
 			<td></td>

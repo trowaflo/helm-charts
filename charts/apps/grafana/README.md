@@ -8,7 +8,7 @@ providing integrated dashboard provisioning and Traefik IngressRoute support.
 
 ---
 
-![Version: 0.3.3](https://img.shields.io/badge/Version-0.3.3-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
+![Version: 0.3.6](https://img.shields.io/badge/Version-0.3.6-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
 
 **Homepage:** <https://grafana.com>
 
@@ -23,7 +23,7 @@ providing integrated dashboard provisioning and Traefik IngressRoute support.
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://grafana.github.io/helm-charts | grafana | 10.5.5 |
+| https://grafana.github.io/helm-charts | grafana | 10.5.8 |
 
 - Helm: v3+
 
