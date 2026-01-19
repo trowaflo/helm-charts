@@ -3,6 +3,8 @@
   "extends": [
     "github>trowaflo/renovate-config"
   ],
+  "timezone": "UTC",
+  "schedule": ["before 3am on Monday"],
   packageRules: [
     // Helm Patch Updates
     {
