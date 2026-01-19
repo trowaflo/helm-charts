@@ -59,6 +59,13 @@ spec:
             value: /
       {{- end }}
       backendRefs:
+        {{- if $backend.tls }}
+        {{- $backendName := printf "%s-%s-backend" $key $backend.name }}
+        - group: gateway.kgateway.dev
+          kind: Backend
+          name: {{ $backendName }}
+          weight: {{ default 1 $backend.weight }}
+        {{- else }}
         - group: ""
           kind: Service
           name: {{ required (printf "routes.%s.inCluster[].name is required" $key) $backend.name }}
@@ -67,6 +74,7 @@ spec:
           namespace: {{ $backend.namespace }}
           {{- end }}
           weight: {{ default 1 $backend.weight }}
+        {{- end }}
       {{- if $backend.filters }}
       filters:
         {{- range $backend.filters }}

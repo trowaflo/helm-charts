@@ -1,20 +1,36 @@
 {{- $namespace := include "kgateway-routing.namespace" . -}}
 {{- $generatedBackends := dict -}}
 
-{{- /* Generate backends from routes.outCluster */ -}}
+{{- /* Helper function to add metadata to backend spec */ -}}
+{{- define "kgateway-routing.addBackendMetadata" -}}
+  {{- $spec := index . 0 -}}
+  {{- $backend := index . 1 -}}
+  {{- if $backend.labels }}
+    {{- $_ := set $spec "labels" $backend.labels }}
+  {{- end }}
+  {{- if $backend.annotations }}
+    {{- $_ := set $spec "annotations" $backend.annotations }}
+  {{- end }}
+{{- end }}
+
+{{- /* Collect all backends from routes */ -}}
 {{- range $routeKey, $routeCfg := .Values.routes }}
   {{- if $routeCfg.enabled }}
-    {{- if $routeCfg.outCluster }}
-      {{- range $backend := $routeCfg.outCluster }}
+    {{- /* outCluster backends */ -}}
+    {{- range $backend := $routeCfg.outCluster }}
+      {{- $backendName := printf "%s-%s-backend" $routeKey $backend.name }}
+      {{- $backendNamespace := default $namespace (default $routeCfg.namespace $backend.namespace) }}
+      {{- $backendSpec := dict "type" "Static" "namespace" $backendNamespace "static" (dict "hosts" (list (dict "host" $backend.host "port" $backend.port))) }}
+      {{- template "kgateway-routing.addBackendMetadata" (list $backendSpec $backend) }}
+      {{- $_ := set $generatedBackends $backendName $backendSpec }}
+    {{- end }}
+    {{- /* inCluster backends with TLS */ -}}
+    {{- range $backend := $routeCfg.inCluster }}
+      {{- if $backend.tls }}
         {{- $backendName := printf "%s-%s-backend" $routeKey $backend.name }}
         {{- $backendNamespace := default $namespace (default $routeCfg.namespace $backend.namespace) }}
-        {{- $backendSpec := dict "type" "Static" "namespace" $backendNamespace "static" (dict "hosts" (list (dict "host" $backend.host "port" $backend.port))) }}
-        {{- if $backend.labels }}
-          {{- $_ := set $backendSpec "labels" $backend.labels }}
-        {{- end }}
-        {{- if $backend.annotations }}
-          {{- $_ := set $backendSpec "annotations" $backend.annotations }}
-        {{- end }}
+        {{- $backendSpec := dict "type" "Kube" "namespace" $backendNamespace "kube" (dict "serviceName" $backend.name "serviceNamespace" $backendNamespace "port" $backend.port) }}
+        {{- template "kgateway-routing.addBackendMetadata" (list $backendSpec $backend) }}
         {{- $_ := set $generatedBackends $backendName $backendSpec }}
       {{- end }}
     {{- end }}
