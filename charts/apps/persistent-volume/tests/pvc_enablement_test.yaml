@@ -90,5 +90,5 @@ tests:
     asserts:
       - equal:
           path: metadata.namespace
-          value: persistent-volume-test
+          value: storage-test
         documentIndex: 0
