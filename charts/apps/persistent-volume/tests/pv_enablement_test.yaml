@@ -5,12 +5,12 @@ release:
 tests:
   # Test PVs with default values (both PVs enabled)
   - it: should render both PersistentVolumes when enabled
-    template: templates/persistentvolume.yaml
+    template: templates/common.yaml
     values:
       - values/default.yaml
     asserts:
       - hasDocuments:
-          count: 2
+          count: 4  # 2 PVs + 2 PVCs
       - isKind:
           of: PersistentVolume
         documentIndex: 0
@@ -36,12 +36,12 @@ tests:
 
   # Test with only PVs enabled
   - it: should only render PersistentVolumes when PVCs disabled
-    template: templates/persistentvolume.yaml
+    template: templates/common.yaml
     values:
       - values/only-pv.yaml
     asserts:
       - hasDocuments:
-          count: 1
+          count: 1  # 1 PV only
       - isKind:
           of: PersistentVolume
         documentIndex: 0
@@ -52,16 +52,17 @@ tests:
 
   # Test with no PVs enabled
   - it: should not render any PersistentVolumes when disabled
-    template: templates/persistentvolume.yaml
+    template: templates/common.yaml
     set:
       persistentVolumes: {}
+      persistentVolumeClaims: {}
     asserts:
       - hasDocuments:
           count: 0
 
   # Test PV with hostPath
   - it: should configure hostPath correctly
-    template: templates/persistentvolume.yaml
+    template: templates/common.yaml
     values:
       - values/only-pv.yaml
     asserts:
@@ -76,7 +77,7 @@ tests:
 
   # Test PV with NFS
   - it: should configure NFS correctly
-    template: templates/persistentvolume.yaml
+    template: templates/common.yaml
     values:
       - values/default.yaml
     asserts:

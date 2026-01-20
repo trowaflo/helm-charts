@@ -1,17 +1,18 @@
-{{- $defaultNamespace := include "persistent-volume.namespace" . -}}
+{{- define "common.manifests.persistentVolumeClaim" -}}
+{{- if include "common.helpers.hasEnabled" .Values.persistentVolumeClaims -}}
 {{- range $key, $config := .Values.persistentVolumeClaims }}
 {{- if $config.enabled }}
 {{- /* Validate configuration */ -}}
-{{- include "persistent-volume.validatePVC" (dict "key" $key "config" $config) }}
-{{- $namespace := default $defaultNamespace $config.namespace }}
+{{- include "common.helpers.validatePVC" (dict "key" $key "config" $config) }}
+{{- $namespace := default $.Release.Namespace $config.namespace }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "persistent-volume.pvcName" (dict "key" $key "config" $config "root" $) }}
+  name: {{ include "common.helpers.pvcName" (dict "key" $key "config" $config "root" $) }}
   namespace: {{ $namespace }}
   labels:
-    {{- include "persistent-volume.labels" $ | nindent 4 }}
+    {{- include "common.helpers.labels" $ | nindent 4 }}
     {{- with $config.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -47,3 +48,5 @@ spec:
   {{- end }}
 {{- end }}
 {{- end }}
+{{- end }}
+{{- end -}}

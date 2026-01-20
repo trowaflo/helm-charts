@@ -1,14 +1,16 @@
+{{- define "common.manifests.persistentVolume" -}}
+{{- if include "common.helpers.hasEnabled" .Values.persistentVolumes -}}
 {{- range $key, $config := .Values.persistentVolumes }}
 {{- if $config.enabled }}
 {{- /* Validate configuration */ -}}
-{{- include "persistent-volume.validatePV" (dict "key" $key "config" $config) }}
+{{- include "common.helpers.validatePV" (dict "key" $key "config" $config) }}
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ include "persistent-volume.pvName" (dict "key" $key "config" $config "root" $) }}
+  name: {{ include "common.helpers.pvName" (dict "key" $key "config" $config "root" $) }}
   labels:
-    {{- include "persistent-volume.labels" $ | nindent 4 }}
+    {{- include "common.helpers.labels" $ | nindent 4 }}
     {{- with $config.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -93,3 +95,5 @@ spec:
   {{- end }}
 {{- end }}
 {{- end }}
+{{- end }}
+{{- end -}}

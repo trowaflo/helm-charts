@@ -5,7 +5,7 @@ release:
 tests:
   # Test PV with labels and annotations
   - it: should apply custom labels and annotations to PV
-    template: templates/persistentvolume.yaml
+    template: templates/common.yaml
     set:
       persistentVolumes:
         custom-volume:
@@ -35,7 +35,7 @@ tests:
 
   # Test PVC with labels and annotations
   - it: should apply custom labels and annotations to PVC
-    template: templates/persistentvolumeclaim.yaml
+    template: templates/common.yaml
     set:
       persistentVolumeClaims:
         custom-claim:
@@ -62,7 +62,7 @@ tests:
 
   # Test PV with node affinity
   - it: should configure node affinity for PV
-    template: templates/persistentvolume.yaml
+    template: templates/common.yaml
     set:
       persistentVolumes:
         node-local:
@@ -89,7 +89,7 @@ tests:
 
   # Test PVC with custom namespace
   - it: should use custom namespace for PVC
-    template: templates/persistentvolumeclaim.yaml
+    template: templates/common.yaml
     set:
       persistentVolumeClaims:
         namespaced-claim:
@@ -108,7 +108,7 @@ tests:
 
   # Test PV with mount options
   - it: should configure mount options for PV
-    template: templates/persistentvolume.yaml
+    template: templates/common.yaml
     set:
       persistentVolumes:
         nfs-with-options:
@@ -132,7 +132,7 @@ tests:
 
   # Test PV with reclaim policy
   - it: should configure reclaim policy for PV
-    template: templates/persistentvolume.yaml
+    template: templates/common.yaml
     set:
       persistentVolumes:
         retain-volume:
@@ -150,7 +150,7 @@ tests:
 
   # Test PVC with selector
   - it: should configure selector for PVC
-    template: templates/persistentvolumeclaim.yaml
+    template: templates/common.yaml
     set:
       persistentVolumeClaims:
         selective-claim:

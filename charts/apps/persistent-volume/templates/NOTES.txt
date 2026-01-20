@@ -23,7 +23,7 @@ Resources created:
 PersistentVolumes:
 {{- range $key, $config := .Values.persistentVolumes }}
 {{- if $config.enabled }}
-  - {{ include "persistent-volume.pvName" (dict "key" $key "config" $config "root" $) }}
+  - {{ include "common.helpers.pvName" (dict "key" $key "config" $config "root" $) }}
     {{- with $config.capacity }}
     Capacity: {{ . }}
     {{- end }}
@@ -43,7 +43,7 @@ PersistentVolumeClaims:
 {{- range $key, $config := .Values.persistentVolumeClaims }}
 {{- if $config.enabled }}
   {{- $namespace := default $.Release.Namespace $config.namespace }}
-  - {{ include "persistent-volume.pvcName" (dict "key" $key "config" $config "root" $) }} (namespace: {{ $namespace }})
+  - {{ include "common.helpers.pvcName" (dict "key" $key "config" $config "root" $) }} (namespace: {{ $namespace }})
     {{- with $config.resources.requests.storage }}
     Storage: {{ . }}
     {{- end }}

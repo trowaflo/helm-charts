@@ -20,3 +20,8 @@ maintainers:
 sources:
   - https://github.com/trowaflo/helm-charts
   - https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+
+dependencies:
+  - name: common
+    version: 2.0.0
+    repository: file://../../library/common
