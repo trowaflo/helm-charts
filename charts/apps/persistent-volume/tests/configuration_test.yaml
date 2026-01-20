@@ -1,0 +1,170 @@
+suite: test persistent-volume chart - configuration validation
+release:
+  name: persistent-volume-test
+  namespace: storage-test
+tests:
+  # Test PV with labels and annotations
+  - it: should apply custom labels and annotations to PV
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes:
+        custom-volume:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          labels:
+            app: test-app
+            tier: storage
+          annotations:
+            backup: "true"
+          hostPath:
+            path: /mnt/test
+    asserts:
+      - isKind:
+          of: PersistentVolume
+      - equal:
+          path: metadata.labels.app
+          value: test-app
+      - equal:
+          path: metadata.labels.tier
+          value: storage
+      - equal:
+          path: metadata.annotations.backup
+          value: "true"
+
+  # Test PVC with labels and annotations
+  - it: should apply custom labels and annotations to PVC
+    template: templates/persistentvolumeclaim.yaml
+    set:
+      persistentVolumeClaims:
+        custom-claim:
+          enabled: true
+          storageClassName: standard
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 5Gi
+          labels:
+            component: storage
+          annotations:
+            description: "test claim"
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - equal:
+          path: metadata.labels.component
+          value: storage
+      - equal:
+          path: metadata.annotations.description
+          value: "test claim"
+
+  # Test PV with node affinity
+  - it: should configure node affinity for PV
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes:
+        node-local:
+          enabled: true
+          capacity: 20Gi
+          accessModes:
+            - ReadWriteOnce
+          nodeAffinity:
+            required:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: kubernetes.io/hostname
+                      operator: In
+                      values:
+                        - node-01
+          hostPath:
+            path: /mnt/local
+    asserts:
+      - isKind:
+          of: PersistentVolume
+      - equal:
+          path: spec.nodeAffinity.required.nodeSelectorTerms[0].matchExpressions[0].key
+          value: kubernetes.io/hostname
+
+  # Test PVC with custom namespace
+  - it: should use custom namespace for PVC
+    template: templates/persistentvolumeclaim.yaml
+    set:
+      persistentVolumeClaims:
+        namespaced-claim:
+          enabled: true
+          namespace: custom-namespace
+          storageClassName: standard
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 5Gi
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: custom-namespace
+
+  # Test PV with mount options
+  - it: should configure mount options for PV
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes:
+        nfs-with-options:
+          enabled: true
+          capacity: 50Gi
+          accessModes:
+            - ReadWriteMany
+          mountOptions:
+            - hard
+            - nfsvers=4.1
+          nfs:
+            server: nfs.example.com
+            path: /data
+    asserts:
+      - contains:
+          path: spec.mountOptions
+          content: hard
+      - contains:
+          path: spec.mountOptions
+          content: nfsvers=4.1
+
+  # Test PV with reclaim policy
+  - it: should configure reclaim policy for PV
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes:
+        retain-volume:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          persistentVolumeReclaimPolicy: Retain
+          hostPath:
+            path: /mnt/retain
+    asserts:
+      - equal:
+          path: spec.persistentVolumeReclaimPolicy
+          value: Retain
+
+  # Test PVC with selector
+  - it: should configure selector for PVC
+    template: templates/persistentvolumeclaim.yaml
+    set:
+      persistentVolumeClaims:
+        selective-claim:
+          enabled: true
+          storageClassName: ""
+          accessModes:
+            - ReadWriteMany
+          resources:
+            requests:
+              storage: 100Gi
+          selector:
+            matchLabels:
+              app: media-server
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels.app
+          value: media-server

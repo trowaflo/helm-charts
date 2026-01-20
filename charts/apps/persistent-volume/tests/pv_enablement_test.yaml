@@ -1,0 +1,94 @@
+suite: test persistent-volume chart - PV enablement
+release:
+  name: persistent-volume-test
+  namespace: storage-test
+tests:
+  # Test PVs with default values (both PVs enabled)
+  - it: should render both PersistentVolumes when enabled
+    template: templates/persistentvolume.yaml
+    values:
+      - values/default.yaml
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: PersistentVolume
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: data-volume
+        documentIndex: 0
+      - equal:
+          path: spec.capacity.storage
+          value: 10Gi
+        documentIndex: 0
+      - isKind:
+          of: PersistentVolume
+        documentIndex: 1
+      - equal:
+          path: metadata.name
+          value: nfs-volume
+        documentIndex: 1
+      - equal:
+          path: spec.capacity.storage
+          value: 100Gi
+        documentIndex: 1
+
+  # Test with only PVs enabled
+  - it: should only render PersistentVolumes when PVCs disabled
+    template: templates/persistentvolume.yaml
+    values:
+      - values/only-pv.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: PersistentVolume
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: data-volume
+        documentIndex: 0
+
+  # Test with no PVs enabled
+  - it: should not render any PersistentVolumes when disabled
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes: {}
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # Test PV with hostPath
+  - it: should configure hostPath correctly
+    template: templates/persistentvolume.yaml
+    values:
+      - values/only-pv.yaml
+    asserts:
+      - equal:
+          path: spec.hostPath.path
+          value: /mnt/data
+        documentIndex: 0
+      - equal:
+          path: spec.hostPath.type
+          value: DirectoryOrCreate
+        documentIndex: 0
+
+  # Test PV with NFS
+  - it: should configure NFS correctly
+    template: templates/persistentvolume.yaml
+    values:
+      - values/default.yaml
+    asserts:
+      - equal:
+          path: spec.nfs.server
+          value: nfs-server.example.com
+        documentIndex: 1
+      - equal:
+          path: spec.nfs.path
+          value: /export/data
+        documentIndex: 1
+      - equal:
+          path: spec.storageClassName
+          value: nfs
+        documentIndex: 1

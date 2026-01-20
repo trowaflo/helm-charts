@@ -1,0 +1,49 @@
+{{- $defaultNamespace := include "persistent-volume.namespace" . -}}
+{{- range $key, $config := .Values.persistentVolumeClaims }}
+{{- if $config.enabled }}
+{{- /* Validate configuration */ -}}
+{{- include "persistent-volume.validatePVC" (dict "key" $key "config" $config) }}
+{{- $namespace := default $defaultNamespace $config.namespace }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "persistent-volume.pvcName" (dict "key" $key "config" $config "root" $) }}
+  namespace: {{ $namespace }}
+  labels:
+    {{- include "persistent-volume.labels" $ | nindent 4 }}
+    {{- with $config.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with $config.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+    {{- toYaml $config.accessModes | nindent 4 }}
+  {{- if hasKey $config "storageClassName" }}
+  storageClassName: {{ $config.storageClassName | quote }}
+  {{- end }}
+  {{- with $config.volumeMode }}
+  volumeMode: {{ . }}
+  {{- end }}
+  {{- with $config.volumeName }}
+  volumeName: {{ . }}
+  {{- end }}
+  resources:
+    {{- toYaml $config.resources | nindent 4 }}
+  {{- with $config.selector }}
+  selector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $config.dataSource }}
+  dataSource:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $config.dataSourceRef }}
+  dataSourceRef:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}

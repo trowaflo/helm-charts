@@ -1,0 +1,22 @@
+apiVersion: v2
+name: persistent-volume
+version: 0.1.0
+type: application
+description: |-
+  Helm chart for declarative creation and management of Kubernetes PersistentVolumes (PV)
+  and PersistentVolumeClaims (PVC). Supports multiple storage backends including hostPath,
+  NFS, and other volume types with flexible configuration for capacity, access modes, and
+  storage classes.
+keywords:
+  - kubernetes
+  - storage
+  - persistentvolume
+  - persistentvolumeclaim
+  - pv
+  - pvc
+maintainers:
+  - name: trowaflo
+    email: trowa.flo@gmail.com
+sources:
+  - https://github.com/trowaflo/helm-charts
+  - https://kubernetes.io/docs/concepts/storage/persistent-volumes/
