@@ -3,7 +3,7 @@ name: Bug Report
 about: Report a bug or unexpected behavior in a Helm chart
 title: "[BUG] "
 labels: ["bug"]
-assignees: []
+assignees: ["trowaflo"]
 ---
 
 ## Description

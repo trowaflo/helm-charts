@@ -3,7 +3,7 @@ name: Feature Request
 about: Suggest a new feature or enhancement for a Helm chart
 title: "[FEATURE] "
 labels: ["enhancement"]
-assignees: []
+assignees: ["trowaflo"]
 ---
 
 ## Description
