@@ -15,6 +15,7 @@
 {{- end -}}
 {{- end -}}
 
+
 {{- define "common.helpers.namespace" -}}
 {{- $namespace := default .Chart.Name .Values.namespaceOverride -}}
 {{- if contains $namespace .Release.Name -}}
