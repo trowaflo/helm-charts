@@ -77,22 +77,7 @@ spec:
   glusterfs:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- with $config.rbd }}
-  rbd:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  {{- with $config.awsElasticBlockStore }}
-  awsElasticBlockStore:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  {{- with $config.azureDisk }}
-  azureDisk:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  {{- with $config.gcePersistentDisk }}
-  gcePersistentDisk:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+
 {{- end }}
 {{- end }}
 {{- end }}
