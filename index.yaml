@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   common:
   - apiVersion: v2
-    created: "2026-01-21T19:43:21.852750821Z"
+    created: "2026-01-21T19:47:55.05399882Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, Services,
       Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims) across the
@@ -21,7 +21,26 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-2.1.0-pr201.tgz
     version: 2.1.0-pr201
   - apiVersion: v2
-    created: "2026-01-21T19:43:21.852124013Z"
+    created: "2026-01-21T19:47:55.053334323Z"
+    description: Common library chart providing reusable Helm templates and default
+      configurations. Standardizes Kubernetes resource deployment (Deployments, Services,
+      Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims) across the
+      chart repository with consistent security, observability, and best practices.  Used
+      by all application charts in this repository for consistency.
+    digest: 50e9366d137efeb68757181bd3775ab6a7bfc15b0bb86f9ae87117e263612de9
+    home: https://github.com/trowaflo/helm-charts
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: common
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    type: library
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-2.1.0-pr198.tgz
+    version: 2.1.0-pr198
+  - apiVersion: v2
+    created: "2026-01-21T19:47:55.051939879Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, Services,
       Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims) across the
@@ -41,7 +60,7 @@ entries:
     version: 2.0.0-pr201
   kgateway-platform:
   - apiVersion: v2
-    created: "2026-01-21T19:43:21.853600713Z"
+    created: "2026-01-21T19:47:55.054852588Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -72,7 +91,7 @@ entries:
     version: 1.1.0-pr184
   kgateway-routing:
   - apiVersion: v2
-    created: "2026-01-21T19:43:21.854072401Z"
+    created: "2026-01-21T19:47:55.055345314Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -97,4 +116,34 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.1.0-pr182.tgz
     version: 0.1.0-pr182
-generated: "2026-01-21T19:43:21.85127352Z"
+  persistent-volume:
+  - apiVersion: v2
+    created: "2026-01-21T19:47:55.056306442Z"
+    dependencies:
+    - name: common
+      repository: https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts
+      version: 2.0.0-pr201
+    description: Helm chart for declarative creation and management of Kubernetes
+      PersistentVolumes (PV) and PersistentVolumeClaims (PVC). Supports multiple storage
+      backends including hostPath, NFS, and other volume types with flexible configuration
+      for capacity, access modes, and storage classes.
+    digest: c770ba75f9871b2ea48a36ce89a59371d3e94b6c66deab02f434da5939bcba8a
+    keywords:
+    - kubernetes
+    - storage
+    - persistentvolume
+    - persistentvolumeclaim
+    - pv
+    - pvc
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: persistent-volume
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    - https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/persistent-volume-0.1.0-pr198.tgz
+    version: 0.1.0-pr198
+generated: "2026-01-21T19:47:55.050991505Z"
