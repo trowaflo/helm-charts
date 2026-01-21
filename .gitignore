@@ -6,6 +6,7 @@
 
 # Helm chart artifacts
 charts/**/charts/
+tests/**/charts/
 Chart.lock
 
 # Generated/rendered templates
