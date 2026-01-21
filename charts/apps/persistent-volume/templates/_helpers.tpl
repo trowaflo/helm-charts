@@ -49,9 +49,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Generate PV name from key and config
+Generate resource name from key and config (used for both PV and PVC)
 */}}
-{{- define "persistent-volume.pvName" -}}
+{{- define "persistent-volume.resourceName" -}}
   {{- $key := .key -}}
   {{- $config := .config -}}
   {{- if $config.name }}
@@ -62,16 +62,17 @@ Generate PV name from key and config
 {{- end }}
 
 {{/*
+Generate PV name from key and config
+*/}}
+{{- define "persistent-volume.pvName" -}}
+  {{- include "persistent-volume.resourceName" . }}
+{{- end }}
+
+{{/*
 Generate PVC name from key and config
 */}}
 {{- define "persistent-volume.pvcName" -}}
-  {{- $key := .key -}}
-  {{- $config := .config -}}
-  {{- if $config.name }}
-    {{- $config.name }}
-  {{- else }}
-    {{- $key }}
-  {{- end }}
+  {{- include "persistent-volume.resourceName" . }}
 {{- end }}
 
 {{/*

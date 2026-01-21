@@ -150,7 +150,6 @@ spec:
     readOnly: {{ $config.cephfs.readOnly }}
     {{- end }}
   {{- else }}
-  # ERROR: No volume source configured for {{ $key }}
   {{- fail (printf "persistentVolumes.%s must have at least one volume source configured (hostPath, nfs, local, csi, iscsi, fc, rbd, cephfs)" $key) }}
   {{- end }}
   {{- with $config.nodeAffinity }}
