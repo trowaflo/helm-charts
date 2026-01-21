@@ -1,0 +1,237 @@
+suite: test persistent-volume chart - PV configuration
+release:
+  name: persistent-volume-test
+  namespace: default
+tests:
+  # Test hostPath configuration
+  - it: should render hostPath PV correctly
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes:
+        test-hostpath:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          hostPath:
+            path: /mnt/data
+            type: DirectoryOrCreate
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.capacity.storage
+          value: 10Gi
+      - equal:
+          path: spec.accessModes[0]
+          value: ReadWriteOnce
+      - equal:
+          path: spec.hostPath.path
+          value: /mnt/data
+      - equal:
+          path: spec.hostPath.type
+          value: DirectoryOrCreate
+      - equal:
+          path: spec.persistentVolumeReclaimPolicy
+          value: Retain
+
+  # Test NFS configuration
+  - it: should render NFS PV correctly
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes:
+        test-nfs:
+          enabled: true
+          capacity: 100Gi
+          accessModes:
+            - ReadWriteMany
+          nfs:
+            server: nfs.example.com
+            path: /exports/data
+            readOnly: false
+          storageClassName: nfs
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.capacity.storage
+          value: 100Gi
+      - equal:
+          path: spec.accessModes[0]
+          value: ReadWriteMany
+      - equal:
+          path: spec.nfs.server
+          value: nfs.example.com
+      - equal:
+          path: spec.nfs.path
+          value: /exports/data
+      - equal:
+          path: spec.nfs.readOnly
+          value: false
+      - equal:
+          path: spec.storageClassName
+          value: nfs
+
+  # Test local volume with node affinity
+  - it: should render local PV with node affinity
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes:
+        test-local:
+          enabled: true
+          capacity: 500Gi
+          accessModes:
+            - ReadWriteOnce
+          local:
+            path: /mnt/disks/ssd1
+          storageClassName: local-storage
+          nodeAffinity:
+            required:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: kubernetes.io/hostname
+                      operator: In
+                      values:
+                        - node-1
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.local.path
+          value: /mnt/disks/ssd1
+      - equal:
+          path: spec.storageClassName
+          value: local-storage
+      - isNotNull:
+          path: spec.nodeAffinity
+      - equal:
+          path: spec.nodeAffinity.required.nodeSelectorTerms[0].matchExpressions[0].key
+          value: kubernetes.io/hostname
+
+  # Test CSI configuration
+  - it: should render CSI PV correctly
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes:
+        test-csi:
+          enabled: true
+          capacity: 200Gi
+          accessModes:
+            - ReadWriteOnce
+          csi:
+            driver: ebs.csi.aws.com
+            volumeHandle: vol-123456
+            fsType: ext4
+            volumeAttributes:
+              type: gp3
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.csi.driver
+          value: ebs.csi.aws.com
+      - equal:
+          path: spec.csi.volumeHandle
+          value: vol-123456
+      - equal:
+          path: spec.csi.fsType
+          value: ext4
+      - equal:
+          path: spec.csi.volumeAttributes.type
+          value: gp3
+
+  # Test custom labels and annotations
+  - it: should include custom labels and annotations
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes:
+        test-labels:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          hostPath:
+            path: /mnt/data
+          labels:
+            custom-label: test-value
+            environment: production
+          annotations:
+            custom-annotation: test-annotation
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.labels.custom-label
+          value: test-value
+      - equal:
+          path: metadata.labels.environment
+          value: production
+      - equal:
+          path: metadata.annotations.custom-annotation
+          value: test-annotation
+
+  # Test custom name override
+  - it: should use custom name when provided
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes:
+        test-key:
+          enabled: true
+          name: custom-pv-name
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          hostPath:
+            path: /mnt/data
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: custom-pv-name
+
+  # Test reclaim policy
+  - it: should set reclaim policy correctly
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes:
+        test-reclaim:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          hostPath:
+            path: /mnt/data
+          persistentVolumeReclaimPolicy: Delete
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.persistentVolumeReclaimPolicy
+          value: Delete
+
+  # Test mount options
+  - it: should include mount options when specified
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes:
+        test-mount:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteMany
+          nfs:
+            server: nfs.example.com
+            path: /exports/data
+          mountOptions:
+            - nfsvers=4.1
+            - hard
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.mountOptions[0]
+          value: nfsvers=4.1
+      - equal:
+          path: spec.mountOptions[1]
+          value: hard

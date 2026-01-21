@@ -1,0 +1,28 @@
+persistentVolumes:
+  hostpath-pv:
+    enabled: true
+    capacity: 10Gi
+    accessModes:
+      - ReadWriteOnce
+    hostPath:
+      path: /mnt/data
+
+  nfs-pv:
+    enabled: true
+    capacity: 100Gi
+    accessModes:
+      - ReadWriteMany
+    nfs:
+      server: nfs.example.com
+      path: /exports/data
+    storageClassName: nfs
+
+persistentVolumeClaims:
+  test-claim:
+    enabled: true
+    volumeName: hostpath-pv
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi

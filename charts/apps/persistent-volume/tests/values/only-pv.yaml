@@ -1,0 +1,8 @@
+persistentVolumes:
+  hostpath-pv:
+    enabled: true
+    capacity: 10Gi
+    accessModes:
+      - ReadWriteOnce
+    hostPath:
+      path: /mnt/data

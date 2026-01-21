@@ -1,0 +1,201 @@
+suite: test persistent-volume chart - PVC configuration
+release:
+  name: persistent-volume-test
+  namespace: default
+tests:
+  # Test basic PVC configuration
+  - it: should render PVC with basic configuration
+    template: templates/persistentvolumeclaim.yaml
+    set:
+      persistentVolumeClaims:
+        test-pvc:
+          enabled: true
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: PersistentVolumeClaim
+      - equal:
+          path: metadata.name
+          value: test-pvc
+      - equal:
+          path: metadata.namespace
+          value: default
+      - equal:
+          path: spec.accessModes[0]
+          value: ReadWriteOnce
+      - equal:
+          path: spec.resources.requests.storage
+          value: 10Gi
+
+  # Test PVC with volumeName binding
+  - it: should bind to specific PV when volumeName is set
+    template: templates/persistentvolumeclaim.yaml
+    set:
+      persistentVolumeClaims:
+        bound-pvc:
+          enabled: true
+          volumeName: my-pv
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.volumeName
+          value: my-pv
+
+  # Test PVC with storage class
+  - it: should use storage class when specified
+    template: templates/persistentvolumeclaim.yaml
+    set:
+      persistentVolumeClaims:
+        storage-class-pvc:
+          enabled: true
+          storageClassName: fast-ssd
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 50Gi
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.storageClassName
+          value: fast-ssd
+
+  # Test PVC with custom namespace
+  - it: should use custom namespace when specified
+    template: templates/persistentvolumeclaim.yaml
+    set:
+      persistentVolumeClaims:
+        namespaced-pvc:
+          enabled: true
+          namespace: custom-namespace
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.namespace
+          value: custom-namespace
+
+  # Test PVC with selector
+  - it: should include selector when specified
+    template: templates/persistentvolumeclaim.yaml
+    set:
+      persistentVolumeClaims:
+        selector-pvc:
+          enabled: true
+          accessModes:
+            - ReadWriteMany
+          resources:
+            requests:
+              storage: 100Gi
+          selector:
+            matchLabels:
+              type: nfs
+              environment: production
+            matchExpressions:
+              - key: speed
+                operator: In
+                values:
+                  - fast
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.selector.matchLabels.type
+          value: nfs
+      - equal:
+          path: spec.selector.matchLabels.environment
+          value: production
+      - equal:
+          path: spec.selector.matchExpressions[0].key
+          value: speed
+      - equal:
+          path: spec.selector.matchExpressions[0].operator
+          value: In
+
+  # Test PVC with custom name
+  - it: should use custom name when provided
+    template: templates/persistentvolumeclaim.yaml
+    set:
+      persistentVolumeClaims:
+        test-key:
+          enabled: true
+          name: custom-pvc-name
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: custom-pvc-name
+
+  # Test PVC with labels and annotations
+  - it: should include custom labels and annotations
+    template: templates/persistentvolumeclaim.yaml
+    set:
+      persistentVolumeClaims:
+        labeled-pvc:
+          enabled: true
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi
+          labels:
+            app: myapp
+            tier: storage
+          annotations:
+            description: "Storage for myapp"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.labels.app
+          value: myapp
+      - equal:
+          path: metadata.labels.tier
+          value: storage
+      - equal:
+          path: metadata.annotations.description
+          value: "Storage for myapp"
+
+  # Test PVC with volume mode
+  - it: should set volume mode when specified
+    template: templates/persistentvolumeclaim.yaml
+    set:
+      persistentVolumeClaims:
+        block-pvc:
+          enabled: true
+          volumeMode: Block
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 100Gi
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.volumeMode
+          value: Block

@@ -1,0 +1,37 @@
+{{- range $key, $config := .Values.persistentVolumeClaims }}
+{{- if $config.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "persistent-volume.pvcName" (dict "key" $key "config" $config) }}
+  namespace: {{ include "persistent-volume.pvcNamespace" (dict "config" $config "root" $) }}
+  labels:
+    {{- include "persistent-volume.labels" $ | nindent 4 }}
+    {{- with $config.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with $config.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+    {{- toYaml ($config.accessModes | required (printf "persistentVolumeClaims.%s.accessModes is required" $key)) | nindent 4 }}
+  {{- if hasKey $config "storageClassName" }}
+  storageClassName: {{ $config.storageClassName | quote }}
+  {{- end }}
+  {{- with $config.volumeName }}
+  volumeName: {{ . }}
+  {{- end }}
+  {{- with $config.volumeMode }}
+  volumeMode: {{ . }}
+  {{- end }}
+  resources:
+    {{- toYaml ($config.resources | required (printf "persistentVolumeClaims.%s.resources is required" $key)) | nindent 4 }}
+  {{- with $config.selector }}
+  selector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,111 @@
+suite: test persistent-volume chart - PV enablement
+release:
+  name: persistent-volume-test
+  namespace: default
+tests:
+  # Test PersistentVolumes with default values (both PVs enabled)
+  - it: should render both PersistentVolumes when enabled
+    template: templates/persistentvolume.yaml
+    values:
+      - values/default.yaml
+    asserts:
+      - hasDocuments:
+          count: 2  # 2 PVs
+      - isKind:
+          of: PersistentVolume
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: hostpath-pv
+        documentIndex: 0
+      - isKind:
+          of: PersistentVolume
+        documentIndex: 1
+      - equal:
+          path: metadata.name
+          value: nfs-pv
+        documentIndex: 1
+
+  # Test PVC with default values
+  - it: should render PersistentVolumeClaim when enabled
+    template: templates/persistentvolumeclaim.yaml
+    values:
+      - values/default.yaml
+    asserts:
+      - hasDocuments:
+          count: 1  # 1 PVC
+      - isKind:
+          of: PersistentVolumeClaim
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: test-claim
+        documentIndex: 0
+
+  # Test with only PVs enabled
+  - it: should only render PVs when PVCs disabled
+    template: templates/persistentvolume.yaml
+    values:
+      - values/only-pv.yaml
+    asserts:
+      - hasDocuments:
+          count: 1  # 1 PV only
+      - isKind:
+          of: PersistentVolume
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: hostpath-pv
+        documentIndex: 0
+
+  # Test no PVC when disabled
+  - it: should not render PVC when disabled
+    template: templates/persistentvolumeclaim.yaml
+    values:
+      - values/only-pv.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # Test with only PVC enabled
+  - it: should only render PVC when PVs disabled
+    template: templates/persistentvolumeclaim.yaml
+    values:
+      - values/only-pvc.yaml
+    asserts:
+      - hasDocuments:
+          count: 1  # 1 PVC
+      - isKind:
+          of: PersistentVolumeClaim
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: test-claim
+        documentIndex: 0
+
+  # Test no PV when disabled
+  - it: should not render PV when disabled
+    template: templates/persistentvolume.yaml
+    values:
+      - values/only-pvc.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # Test with no resources enabled
+  - it: should not render any PVs when all disabled
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes: {}
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # Test with no PVCs enabled
+  - it: should not render any PVCs when all disabled
+    template: templates/persistentvolumeclaim.yaml
+    set:
+      persistentVolumeClaims: {}
+    asserts:
+      - hasDocuments:
+          count: 0

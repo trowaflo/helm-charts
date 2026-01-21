@@ -1,0 +1,9 @@
+persistentVolumeClaims:
+  test-claim:
+    enabled: true
+    volumeName: some-pv
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi

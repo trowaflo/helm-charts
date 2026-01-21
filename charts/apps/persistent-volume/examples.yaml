@@ -1,0 +1,227 @@
+# Example values file showing persistent-volume chart features
+# This demonstrates various volume types and configurations
+
+# ============================================================================
+# EXAMPLE 1: Simple hostPath PersistentVolume (for development/testing)
+# ============================================================================
+# persistentVolumes:
+#   data-volume:
+#     enabled: true
+#     capacity: 10Gi
+#     accessModes:
+#       - ReadWriteOnce
+#     hostPath:
+#       path: /mnt/data
+#       type: DirectoryOrCreate
+
+# ============================================================================
+# EXAMPLE 2: NFS PersistentVolume with ReadWriteMany access
+# ============================================================================
+# persistentVolumes:
+#   nfs-share:
+#     enabled: true
+#     capacity: 100Gi
+#     accessModes:
+#       - ReadWriteMany
+#     nfs:
+#       server: nfs.example.com
+#       path: /exports/data
+#       readOnly: false
+#     storageClassName: nfs
+
+# ============================================================================
+# EXAMPLE 3: Local PersistentVolume with node affinity
+# ============================================================================
+# persistentVolumes:
+#   local-ssd:
+#     enabled: true
+#     capacity: 500Gi
+#     accessModes:
+#       - ReadWriteOnce
+#     storageClassName: local-storage
+#     persistentVolumeReclaimPolicy: Delete
+#     local:
+#       path: /mnt/disks/ssd1
+#     nodeAffinity:
+#       required:
+#         nodeSelectorTerms:
+#           - matchExpressions:
+#               - key: kubernetes.io/hostname
+#                 operator: In
+#                 values:
+#                   - node-1
+
+# ============================================================================
+# EXAMPLE 4: Multiple PersistentVolumes of different types
+# ============================================================================
+persistentVolumes:
+  # Database storage on local SSD
+  postgres-data:
+    enabled: true
+    capacity: 50Gi
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: local-storage
+    persistentVolumeReclaimPolicy: Retain
+    local:
+      path: /mnt/disks/postgres
+    nodeAffinity:
+      required:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                  - database-node-1
+    labels:
+      type: database
+      speed: fast
+    annotations:
+      description: "PostgreSQL database storage"
+
+  # Shared NFS storage for media files
+  media-share:
+    enabled: true
+    capacity: 1Ti
+    accessModes:
+      - ReadWriteMany
+    storageClassName: nfs
+    persistentVolumeReclaimPolicy: Retain
+    nfs:
+      server: 192.168.1.100
+      path: /mnt/storage/media
+      readOnly: false
+    mountOptions:
+      - nfsvers=4.1
+      - hard
+      - intr
+    labels:
+      type: media
+      shared: "true"
+
+  # CSI volume for cloud storage
+  cloud-backup:
+    enabled: true
+    capacity: 200Gi
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: cloud-ssd
+    csi:
+      driver: ebs.csi.aws.com
+      volumeHandle: vol-1234567890abcdef0
+      fsType: ext4
+      volumeAttributes:
+        type: gp3
+        iops: "3000"
+        throughput: "125"
+
+# ============================================================================
+# EXAMPLE 5: PersistentVolumeClaims binding to specific PVs
+# ============================================================================
+persistentVolumeClaims:
+  # Claim for PostgreSQL
+  postgres-claim:
+    enabled: true
+    volumeName: postgres-data  # Bind to specific PV
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: local-storage
+    resources:
+      requests:
+        storage: 50Gi
+
+  # Claim for media share (with selector)
+  media-claim:
+    enabled: true
+    namespace: media-server
+    accessModes:
+      - ReadWriteMany
+    storageClassName: nfs
+    resources:
+      requests:
+        storage: 1Ti
+    selector:
+      matchLabels:
+        type: media
+        shared: "true"
+
+# ============================================================================
+# EXAMPLE 6: Complete setup with PV and PVC for different scenarios
+# ============================================================================
+# persistentVolumes:
+#   # Development environment - hostPath
+#   dev-storage:
+#     enabled: true
+#     capacity: 20Gi
+#     accessModes:
+#       - ReadWriteOnce
+#     hostPath:
+#       path: /tmp/dev-storage
+#       type: DirectoryOrCreate
+#     storageClassName: ""
+#
+# persistentVolumeClaims:
+#   dev-claim:
+#     enabled: true
+#     volumeName: dev-storage
+#     accessModes:
+#       - ReadWriteOnce
+#     storageClassName: ""
+#     resources:
+#       requests:
+#         storage: 20Gi
+
+# ============================================================================
+# EXAMPLE 7: iSCSI storage
+# ============================================================================
+# persistentVolumes:
+#   iscsi-volume:
+#     enabled: true
+#     capacity: 100Gi
+#     accessModes:
+#       - ReadWriteOnce
+#     iscsi:
+#       targetPortal: 192.168.1.10:3260
+#       iqn: iqn.2001-04.com.example:storage.disk1
+#       lun: 0
+#       fsType: ext4
+#       readOnly: false
+
+# ============================================================================
+# EXAMPLE 8: Ceph RBD storage
+# ============================================================================
+# persistentVolumes:
+#   ceph-volume:
+#     enabled: true
+#     capacity: 50Gi
+#     accessModes:
+#       - ReadWriteOnce
+#     rbd:
+#       monitors:
+#         - 192.168.1.20:6789
+#         - 192.168.1.21:6789
+#         - 192.168.1.22:6789
+#       image: kube-vol-1
+#       pool: kube
+#       user: admin
+#       secretRef:
+#         name: ceph-secret
+#       fsType: ext4
+
+# ============================================================================
+# EXAMPLE 9: CephFS storage
+# ============================================================================
+# persistentVolumes:
+#   cephfs-volume:
+#     enabled: true
+#     capacity: 100Gi
+#     accessModes:
+#       - ReadWriteMany
+#     cephfs:
+#       monitors:
+#         - 192.168.1.20:6789
+#         - 192.168.1.21:6789
+#       path: /kubernetes/pv0001
+#       user: admin
+#       secretRef:
+#         name: ceph-secret

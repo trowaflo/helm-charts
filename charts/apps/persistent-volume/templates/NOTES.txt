@@ -1,0 +1,55 @@
+Thank you for installing {{ .Chart.Name }}!
+
+{{- $pvCount := 0 }}
+{{- $pvcCount := 0 }}
+{{- range $key, $config := .Values.persistentVolumes }}
+  {{- if $config.enabled }}
+    {{- $pvCount = add1 $pvCount }}
+  {{- end }}
+{{- end }}
+{{- range $key, $config := .Values.persistentVolumeClaims }}
+  {{- if $config.enabled }}
+    {{- $pvcCount = add1 $pvcCount }}
+  {{- end }}
+{{- end }}
+
+{{ if gt $pvCount 0 }}
+📦 PersistentVolumes created: {{ $pvCount }}
+
+To view your PersistentVolumes:
+  kubectl get pv -l app.kubernetes.io/instance={{ .Release.Name }}
+
+{{- range $key, $config := .Values.persistentVolumes }}
+{{- if $config.enabled }}
+  - {{ include "persistent-volume.pvName" (dict "key" $key "config" $config) }}
+    Capacity: {{ $config.capacity }}
+    Access Modes: {{ $config.accessModes | join ", " }}
+    {{- if $config.storageClassName }}
+    Storage Class: {{ $config.storageClassName }}
+    {{- end }}
+{{- end }}
+{{- end }}
+{{- else }}
+⚠️  No PersistentVolumes enabled.
+{{- end }}
+
+{{ if gt $pvcCount 0 }}
+
+📋 PersistentVolumeClaims created: {{ $pvcCount }}
+
+To view your PersistentVolumeClaims:
+  kubectl get pvc -l app.kubernetes.io/instance={{ .Release.Name }}
+
+{{- range $key, $config := .Values.persistentVolumeClaims }}
+{{- if $config.enabled }}
+  - {{ include "persistent-volume.pvcName" (dict "key" $key "config" $config) }}
+    Namespace: {{ include "persistent-volume.pvcNamespace" (dict "config" $config "root" $) }}
+    {{- if $config.volumeName }}
+    Bound to PV: {{ $config.volumeName }}
+    {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+For more information about PersistentVolumes and PersistentVolumeClaims:
+  https://kubernetes.io/docs/concepts/storage/persistent-volumes/

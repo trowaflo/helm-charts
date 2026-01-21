@@ -1,0 +1,189 @@
+suite: test persistent-volume chart - volume types
+release:
+  name: persistent-volume-test
+  namespace: default
+tests:
+  # Test iSCSI volume
+  - it: should render iSCSI PV correctly
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes:
+        iscsi-vol:
+          enabled: true
+          capacity: 100Gi
+          accessModes:
+            - ReadWriteOnce
+          iscsi:
+            targetPortal: 192.168.1.10:3260
+            iqn: iqn.2001-04.com.example:storage.disk1
+            lun: 0
+            fsType: ext4
+            readOnly: false
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.iscsi.targetPortal
+          value: "192.168.1.10:3260"
+      - equal:
+          path: spec.iscsi.iqn
+          value: "iqn.2001-04.com.example:storage.disk1"
+      - equal:
+          path: spec.iscsi.lun
+          value: 0
+      - equal:
+          path: spec.iscsi.fsType
+          value: ext4
+      - equal:
+          path: spec.iscsi.readOnly
+          value: false
+
+  # Test Fibre Channel volume
+  - it: should render FC PV correctly
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes:
+        fc-vol:
+          enabled: true
+          capacity: 200Gi
+          accessModes:
+            - ReadWriteOnce
+          fc:
+            targetWWNs:
+              - "50060e801049cfd1"
+              - "50060e801049cfd2"
+            lun: 1
+            fsType: ext4
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.fc.targetWWNs[0]
+          value: "50060e801049cfd1"
+      - equal:
+          path: spec.fc.targetWWNs[1]
+          value: "50060e801049cfd2"
+      - equal:
+          path: spec.fc.lun
+          value: 1
+      - equal:
+          path: spec.fc.fsType
+          value: ext4
+
+  # Test RBD volume
+  - it: should render RBD PV correctly
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes:
+        rbd-vol:
+          enabled: true
+          capacity: 50Gi
+          accessModes:
+            - ReadWriteOnce
+          rbd:
+            monitors:
+              - 192.168.1.20:6789
+              - 192.168.1.21:6789
+            image: kube-vol-1
+            pool: kube
+            user: admin
+            fsType: ext4
+            secretRef:
+              name: ceph-secret
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.rbd.monitors[0]
+          value: "192.168.1.20:6789"
+      - equal:
+          path: spec.rbd.image
+          value: kube-vol-1
+      - equal:
+          path: spec.rbd.pool
+          value: kube
+      - equal:
+          path: spec.rbd.user
+          value: admin
+      - equal:
+          path: spec.rbd.fsType
+          value: ext4
+      - equal:
+          path: spec.rbd.secretRef.name
+          value: ceph-secret
+
+  # Test CephFS volume
+  - it: should render CephFS PV correctly
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes:
+        cephfs-vol:
+          enabled: true
+          capacity: 100Gi
+          accessModes:
+            - ReadWriteMany
+          cephfs:
+            monitors:
+              - 192.168.1.20:6789
+              - 192.168.1.21:6789
+            path: /kubernetes/pv0001
+            user: admin
+            secretRef:
+              name: ceph-secret
+            readOnly: false
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.cephfs.monitors[0]
+          value: "192.168.1.20:6789"
+      - equal:
+          path: spec.cephfs.path
+          value: /kubernetes/pv0001
+      - equal:
+          path: spec.cephfs.user
+          value: admin
+      - equal:
+          path: spec.cephfs.secretRef.name
+          value: ceph-secret
+      - equal:
+          path: spec.cephfs.readOnly
+          value: false
+
+  # Test multiple volume types in single chart
+  - it: should render multiple volumes of different types
+    template: templates/persistentvolume.yaml
+    set:
+      persistentVolumes:
+        local-vol:
+          enabled: true
+          capacity: 50Gi
+          accessModes:
+            - ReadWriteOnce
+          local:
+            path: /mnt/ssd
+          nodeAffinity:
+            required:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: kubernetes.io/hostname
+                      operator: In
+                      values:
+                        - node-1
+        nfs-vol:
+          enabled: true
+          capacity: 100Gi
+          accessModes:
+            - ReadWriteMany
+          nfs:
+            server: nfs.example.com
+            path: /exports
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: PersistentVolume
+        documentIndex: 0
+      - isKind:
+          of: PersistentVolume
+        documentIndex: 1

@@ -1,0 +1,161 @@
+{{- range $key, $config := .Values.persistentVolumes }}
+{{- if $config.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "persistent-volume.pvName" (dict "key" $key "config" $config) }}
+  labels:
+    {{- include "persistent-volume.labels" $ | nindent 4 }}
+    {{- with $config.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with $config.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  capacity:
+    storage: {{ $config.capacity | required (printf "persistentVolumes.%s.capacity is required" $key) }}
+  accessModes:
+    {{- toYaml ($config.accessModes | required (printf "persistentVolumes.%s.accessModes is required" $key)) | nindent 4 }}
+  {{- if hasKey $config "storageClassName" }}
+  storageClassName: {{ $config.storageClassName | quote }}
+  {{- end }}
+  persistentVolumeReclaimPolicy: {{ $config.persistentVolumeReclaimPolicy | default "Retain" }}
+  {{- with $config.volumeMode }}
+  volumeMode: {{ . }}
+  {{- end }}
+  {{- with $config.mountOptions }}
+  mountOptions:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if $config.hostPath }}
+  hostPath:
+    path: {{ $config.hostPath.path | required (printf "persistentVolumes.%s.hostPath.path is required" $key) }}
+    {{- with $config.hostPath.type }}
+    type: {{ . }}
+    {{- end }}
+  {{- else if $config.nfs }}
+  nfs:
+    server: {{ $config.nfs.server | required (printf "persistentVolumes.%s.nfs.server is required" $key) }}
+    path: {{ $config.nfs.path | required (printf "persistentVolumes.%s.nfs.path is required" $key) }}
+    {{- if hasKey $config.nfs "readOnly" }}
+    readOnly: {{ $config.nfs.readOnly }}
+    {{- end }}
+  {{- else if $config.local }}
+  local:
+    path: {{ $config.local.path | required (printf "persistentVolumes.%s.local.path is required" $key) }}
+  {{- else if $config.csi }}
+  csi:
+    driver: {{ $config.csi.driver | required (printf "persistentVolumes.%s.csi.driver is required" $key) }}
+    volumeHandle: {{ $config.csi.volumeHandle | required (printf "persistentVolumes.%s.csi.volumeHandle is required" $key) }}
+    {{- if hasKey $config.csi "readOnly" }}
+    readOnly: {{ $config.csi.readOnly }}
+    {{- end }}
+    {{- with $config.csi.fsType }}
+    fsType: {{ . }}
+    {{- end }}
+    {{- with $config.csi.volumeAttributes }}
+    volumeAttributes:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- else if $config.iscsi }}
+  iscsi:
+    targetPortal: {{ $config.iscsi.targetPortal | required (printf "persistentVolumes.%s.iscsi.targetPortal is required" $key) }}
+    iqn: {{ $config.iscsi.iqn | required (printf "persistentVolumes.%s.iscsi.iqn is required" $key) }}
+    lun: {{ $config.iscsi.lun | required (printf "persistentVolumes.%s.iscsi.lun is required" $key) }}
+    {{- with $config.iscsi.fsType }}
+    fsType: {{ . }}
+    {{- end }}
+    {{- if hasKey $config.iscsi "readOnly" }}
+    readOnly: {{ $config.iscsi.readOnly }}
+    {{- end }}
+    {{- with $config.iscsi.portals }}
+    portals:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with $config.iscsi.chapAuthDiscovery }}
+    chapAuthDiscovery: {{ . }}
+    {{- end }}
+    {{- with $config.iscsi.chapAuthSession }}
+    chapAuthSession: {{ . }}
+    {{- end }}
+    {{- with $config.iscsi.secretRef }}
+    secretRef:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with $config.iscsi.initiatorName }}
+    initiatorName: {{ . }}
+    {{- end }}
+  {{- else if $config.fc }}
+  fc:
+    targetWWNs:
+      {{- toYaml ($config.fc.targetWWNs | required (printf "persistentVolumes.%s.fc.targetWWNs is required" $key)) | nindent 6 }}
+    {{- with $config.fc.lun }}
+    lun: {{ . }}
+    {{- end }}
+    {{- with $config.fc.fsType }}
+    fsType: {{ . }}
+    {{- end }}
+    {{- if hasKey $config.fc "readOnly" }}
+    readOnly: {{ $config.fc.readOnly }}
+    {{- end }}
+    {{- with $config.fc.wwids }}
+    wwids:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- else if $config.rbd }}
+  rbd:
+    monitors:
+      {{- toYaml ($config.rbd.monitors | required (printf "persistentVolumes.%s.rbd.monitors is required" $key)) | nindent 6 }}
+    image: {{ $config.rbd.image | required (printf "persistentVolumes.%s.rbd.image is required" $key) }}
+    {{- with $config.rbd.pool }}
+    pool: {{ . }}
+    {{- end }}
+    {{- with $config.rbd.user }}
+    user: {{ . }}
+    {{- end }}
+    {{- with $config.rbd.keyring }}
+    keyring: {{ . }}
+    {{- end }}
+    {{- with $config.rbd.secretRef }}
+    secretRef:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- if hasKey $config.rbd "readOnly" }}
+    readOnly: {{ $config.rbd.readOnly }}
+    {{- end }}
+    {{- with $config.rbd.fsType }}
+    fsType: {{ . }}
+    {{- end }}
+  {{- else if $config.cephfs }}
+  cephfs:
+    monitors:
+      {{- toYaml ($config.cephfs.monitors | required (printf "persistentVolumes.%s.cephfs.monitors is required" $key)) | nindent 6 }}
+    {{- with $config.cephfs.path }}
+    path: {{ . }}
+    {{- end }}
+    {{- with $config.cephfs.user }}
+    user: {{ . }}
+    {{- end }}
+    {{- with $config.cephfs.secretFile }}
+    secretFile: {{ . }}
+    {{- end }}
+    {{- with $config.cephfs.secretRef }}
+    secretRef:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- if hasKey $config.cephfs "readOnly" }}
+    readOnly: {{ $config.cephfs.readOnly }}
+    {{- end }}
+  {{- else }}
+  # ERROR: No volume source configured for {{ $key }}
+  {{- fail (printf "persistentVolumes.%s must have at least one volume source configured (hostPath, nfs, local, csi, iscsi, fc, rbd, cephfs)" $key) }}
+  {{- end }}
+  {{- with $config.nodeAffinity }}
+  nodeAffinity:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}

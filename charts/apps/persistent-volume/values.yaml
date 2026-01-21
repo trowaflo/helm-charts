@@ -1,0 +1,187 @@
+# -- PersistentVolumes configuration. Define multiple PVs by adding entries with any key name.
+# Each PV can be of different types (hostPath, nfs, local, csi, etc.) and configured independently.
+#
+# **Minimal hostPath PV example:**
+# ```yaml
+# persistentVolumes:
+#   data-volume:
+#     enabled: true
+#     capacity: 10Gi
+#     accessModes: [ReadWriteOnce]
+#     hostPath:
+#       path: /mnt/data
+# ```
+#
+# **NFS PV example:**
+# ```yaml
+# persistentVolumes:
+#   nfs-share:
+#     enabled: true
+#     capacity: 100Gi
+#     accessModes: [ReadWriteMany]
+#     nfs:
+#       server: nfs.example.com
+#       path: /exports/data
+# ```
+#
+# **Local PV with node affinity:**
+# ```yaml
+# persistentVolumes:
+#   local-ssd:
+#     enabled: true
+#     capacity: 500Gi
+#     accessModes: [ReadWriteOnce]
+#     storageClassName: local-storage
+#     local:
+#       path: /mnt/ssd
+#     nodeAffinity:
+#       required:
+#         nodeSelectorTerms:
+#           - matchExpressions:
+#               - key: kubernetes.io/hostname
+#                 operator: In
+#                 values: [node-1]
+# ```
+#
+# @default -- {} (empty, user must configure PVs)
+persistentVolumes: {}
+  # example-pv:
+  #   # -- Enable this PersistentVolume
+  #   enabled: true
+  #
+  #   # -- Override the PV name (defaults to the key name)
+  #   # name: custom-pv-name
+  #
+  #   # -- Storage capacity (required)
+  #   capacity: 10Gi
+  #
+  #   # -- Access modes (required). Options: ReadWriteOnce, ReadOnlyMany, ReadWriteMany, ReadWriteOncePod
+  #   accessModes:
+  #     - ReadWriteOnce
+  #
+  #   # -- Storage class name. Use "" for no storage class (manual binding)
+  #   # storageClassName: ""
+  #
+  #   # -- Reclaim policy. Options: Retain, Recycle, Delete
+  #   # @default -- Retain
+  #   persistentVolumeReclaimPolicy: Retain
+  #
+  #   # -- Volume mode. Options: Filesystem, Block
+  #   # @default -- Filesystem
+  #   # volumeMode: Filesystem
+  #
+  #   # -- Mount options for the volume
+  #   # mountOptions: []
+  #
+  #   # -- Additional labels for the PV
+  #   # labels: {}
+  #
+  #   # -- Additional annotations for the PV
+  #   # annotations: {}
+  #
+  #   # -- hostPath configuration (for development/testing)
+  #   # hostPath:
+  #   #   path: /mnt/data
+  #   #   type: "" # Optional: DirectoryOrCreate, Directory, FileOrCreate, File, Socket, CharDevice, BlockDevice
+  #
+  #   # -- NFS configuration
+  #   # nfs:
+  #   #   server: nfs.example.com
+  #   #   path: /exports/data
+  #   #   readOnly: false
+  #
+  #   # -- Local volume configuration
+  #   # local:
+  #   #   path: /mnt/local-storage
+  #
+  #   # -- CSI volume configuration
+  #   # csi:
+  #   #   driver: driver.csi.example.com
+  #   #   volumeHandle: unique-volume-id
+  #   #   readOnly: false
+  #   #   fsType: ext4
+  #   #   volumeAttributes: {}
+  #
+  #   # -- Node affinity (required for local volumes)
+  #   # nodeAffinity:
+  #   #   required:
+  #   #     nodeSelectorTerms:
+  #   #       - matchExpressions:
+  #   #           - key: kubernetes.io/hostname
+  #   #             operator: In
+  #   #             values:
+  #   #               - node-1
+
+# -- PersistentVolumeClaims configuration. Define PVCs to pre-bind to specific PVs.
+# Each PVC can reference a PV by name or use automatic binding via storage class.
+#
+# **Manual binding to specific PV:**
+# ```yaml
+# persistentVolumeClaims:
+#   data-claim:
+#     enabled: true
+#     volumeName: data-volume  # Bind to specific PV
+#     accessModes: [ReadWriteOnce]
+#     resources:
+#       requests:
+#         storage: 10Gi
+# ```
+#
+# **Dynamic binding via storage class:**
+# ```yaml
+# persistentVolumeClaims:
+#   dynamic-claim:
+#     enabled: true
+#     storageClassName: fast-ssd
+#     accessModes: [ReadWriteOnce]
+#     resources:
+#       requests:
+#         storage: 50Gi
+# ```
+#
+# @default -- {} (empty, PVCs are optional)
+persistentVolumeClaims: {}
+  # example-pvc:
+  #   # -- Enable this PersistentVolumeClaim
+  #   enabled: true
+  #
+  #   # -- Override the PVC name (defaults to the key name)
+  #   # name: custom-pvc-name
+  #
+  #   # -- Namespace for the PVC (defaults to release namespace)
+  #   # namespace: default
+  #
+  #   # -- Access modes (required). Must match the PV if binding to specific PV
+  #   accessModes:
+  #     - ReadWriteOnce
+  #
+  #   # -- Storage class name. Use "" for default storage class
+  #   # storageClassName: ""
+  #
+  #   # -- Volume name to bind to a specific PV
+  #   # volumeName: example-pv
+  #
+  #   # -- Volume mode. Options: Filesystem, Block
+  #   # @default -- Filesystem
+  #   # volumeMode: Filesystem
+  #
+  #   # -- Resource requirements
+  #   resources:
+  #     requests:
+  #       storage: 10Gi
+  #
+  #   # -- Additional labels for the PVC
+  #   # labels: {}
+  #
+  #   # -- Additional annotations for the PVC
+  #   # annotations: {}
+  #
+  #   # -- Selector to filter PVs by labels
+  #   # selector:
+  #   #   matchLabels:
+  #   #     type: ssd
+  #   #   matchExpressions:
+  #   #     - key: environment
+  #   #       operator: In
+  #   #       values:
+  #   #         - production
