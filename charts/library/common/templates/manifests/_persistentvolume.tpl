@@ -8,7 +8,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ include "common.helpers.pvName" (dict "key" $key "config" $config "root" $) }}
+  name: {{ include "common.helpers.fullname" $ }}-{{ include "common.helpers.pvName" (dict "key" $key "config" $config) }}
   labels:
     {{- include "common.helpers.labels" $ | nindent 4 }}
     {{- with $config.labels }}
@@ -53,10 +53,6 @@ spec:
   nfs:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- with $config.csi }}
-  csi:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
   {{- with $config.local }}
   local:
     {{- toYaml . | nindent 4 }}
@@ -65,32 +61,12 @@ spec:
   iscsi:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- with $config.fc }}
-  fc:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
   {{- with $config.cephfs }}
   cephfs:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- with $config.glusterfs }}
   glusterfs:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  {{- with $config.rbd }}
-  rbd:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  {{- with $config.awsElasticBlockStore }}
-  awsElasticBlockStore:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  {{- with $config.azureDisk }}
-  azureDisk:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  {{- with $config.gcePersistentDisk }}
-  gcePersistentDisk:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}

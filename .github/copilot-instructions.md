@@ -11,6 +11,15 @@
 ## Scope
 Repo-wide guidance for GitHub Copilot (PR descriptions/reviews/fixes) for all charts.
 
+## Tech Stack
+- **Helm 3** - Kubernetes package manager for chart templating and deployment
+- **Kubernetes** - Target platform for all charts (Gateway API, standard resources)
+- **helm-unittest** - Unit testing framework for Helm charts
+- **helm-docs** - Auto-generates documentation from Chart.yaml and values.yaml
+- **chart-testing (ct)** - Linting and validation tool for Helm charts
+- **KICS** - Infrastructure-as-Code security scanner
+- **Gitleaks** - Secret scanning tool
+
 ## Self-improvement mandate
 When working on ANY task:
 1. Read these instructions completely before starting
@@ -39,7 +48,9 @@ Chart versions are **automatically managed** by the `chart-bump.yml` workflow:
 - `fix:` commits trigger a **patch** version bump  
 - `BREAKING CHANGE:` or `!:` commits trigger a **major** version bump
 - The workflow runs on PRs and automatically updates Chart.yaml versions
-- Manual version changes are not needed (workflow handles it)
+- **Automatic versioning is preferred**: Let the workflow handle version bumps based on conventional commits
+- **Manual version changes are allowed**: If you manually bump the version in Chart.yaml, the workflow will detect this and skip automatic bumping for that chart
+- Use automatic versioning unless you have a specific reason to manually control the version
 
 ## Dependency management
 - Renovate bot automatically creates PRs for dependency updates
@@ -160,3 +171,36 @@ Workflows in `.github/workflows/` provide comprehensive automation:
 - **gitleaks.yml** - Detects hardcoded secrets
 - All checks must pass before merge
 - Mention executed commands in PRs for transparency
+
+## Key Commands Reference
+Quick reference for common tasks:
+
+**Testing and Validation:**
+```bash
+# Run unit tests for a chart
+helm unittest <chart-path>
+
+# Run all chart tests
+find charts -mindepth 2 -maxdepth 2 -type d -exec bash -c '[ -d "$0/tests" ] && helm unittest "$0"' {} \;
+
+# Render templates for validation
+helm template <release-name> <chart-path>
+```
+
+**Dependencies:**
+```bash
+# Update chart dependencies
+helm dependency update <chart-path>
+```
+
+**Documentation:**
+```bash
+# Generate/update README.md (done by CI, not manually)
+helm-docs <chart-path>
+```
+
+**Linting:**
+```bash
+# Lint charts with chart-testing
+ct lint --config .github/ct.yaml
+```

@@ -3,14 +3,15 @@
 # common
 
 Common library chart providing reusable Helm templates and default configurations.
-Standardizes Kubernetes resource deployment (Deployments, Services, Ingress, ServiceMonitor)
-across the chart repository with consistent security, observability, and best practices.
+Standardizes Kubernetes resource deployment (Deployments, Services, Ingress, ServiceMonitor,
+PersistentVolumes, PersistentVolumeClaims) across the chart repository with consistent
+security, observability, and best practices.
 
 Used by all application charts in this repository for consistency.
 
 ---
 
-![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square)  ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) 
+![Version: 2.1.1](https://img.shields.io/badge/Version-2.1.1-informational?style=flat-square)  ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) 
 
 ## Requirements
 
