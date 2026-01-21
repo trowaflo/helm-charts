@@ -70,3 +70,70 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 true
 {{- end -}}
 {{- end -}}
+
+{{/*
+Generate PV name from key and config
+*/}}
+{{- define "common.helpers.pvName" -}}
+  {{- $key := .key -}}
+  {{- $config := .config -}}
+  {{- if $config.name }}
+    {{- $config.name }}
+  {{- else }}
+    {{- $key }}
+  {{- end }}
+{{- end }}
+
+{{/*
+Generate PVC name from key and config
+*/}}
+{{- define "common.helpers.pvcName" -}}
+  {{- $key := .key -}}
+  {{- $config := .config -}}
+  {{- if $config.name }}
+    {{- $config.name }}
+  {{- else }}
+    {{- $key }}
+  {{- end }}
+{{- end }}
+
+{{/*
+Validate PV configuration - ensure required fields are present
+*/}}
+{{- define "common.helpers.validatePV" -}}
+  {{- $key := .key -}}
+  {{- $config := .config -}}
+  {{- if not $config.capacity }}
+    {{- fail (printf "persistentVolumes.%s: 'capacity' is required" $key) }}
+  {{- end }}
+  {{- if not $config.accessModes }}
+    {{- fail (printf "persistentVolumes.%s: 'accessModes' is required" $key) }}
+  {{- end }}
+  {{- $hasVolumeSource := false }}
+  {{- if or $config.hostPath $config.nfs $config.csi $config.local $config.iscsi $config.cephfs $config.glusterfs }}
+    {{- $hasVolumeSource = true }}
+  {{- end }}
+  {{- if not $hasVolumeSource }}
+    {{- fail (printf "persistentVolumes.%s: at least one volume source (hostPath, nfs, csi, local, etc.) is required" $key) }}
+  {{- end }}
+{{- end }}
+
+{{/*
+Validate PVC configuration - ensure required fields are present
+*/}}
+{{- define "common.helpers.validatePVC" -}}
+  {{- $key := .key -}}
+  {{- $config := .config -}}
+  {{- if not $config.accessModes }}
+    {{- fail (printf "persistentVolumeClaims.%s: 'accessModes' is required" $key) }}
+  {{- end }}
+  {{- if not $config.resources }}
+    {{- fail (printf "persistentVolumeClaims.%s: 'resources' is required" $key) }}
+  {{- end }}
+  {{- if not $config.resources.requests }}
+    {{- fail (printf "persistentVolumeClaims.%s: 'resources.requests' is required" $key) }}
+  {{- end }}
+  {{- if not $config.resources.requests.storage }}
+    {{- fail (printf "persistentVolumeClaims.%s: 'resources.requests.storage' is required" $key) }}
+  {{- end }}
+{{- end -}}

@@ -15,4 +15,10 @@
   {{/* Render service-monitor */}}
   {{- include "common.manifests.serviceMonitor" . | nindent 0 -}}
 
+  {{/* Render persistent volumes */}}
+  {{- include "common.manifests.persistentVolume" . | nindent 0 -}}
+
+  {{/* Render persistent volume claims */}}
+  {{- include "common.manifests.persistentVolumeClaim" . | nindent 0 -}}
+
 {{- end -}}
