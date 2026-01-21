@@ -110,7 +110,7 @@ Validate PV configuration - ensure required fields are present
     {{- fail (printf "persistentVolumes.%s: 'accessModes' is required" $key) }}
   {{- end }}
   {{- $hasVolumeSource := false }}
-  {{- if or $config.hostPath $config.nfs $config.csi $config.local $config.iscsi $config.fc $config.cephfs $config.glusterfs }}
+  {{- if or $config.hostPath $config.nfs $config.csi $config.local $config.iscsi $config.cephfs $config.glusterfs }}
     {{- $hasVolumeSource = true }}
   {{- end }}
   {{- if not $hasVolumeSource }}
