@@ -9,7 +9,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ printf "%s-%s" (include "common.helpers.fullname" $) (include "common.helpers.pvcName" (dict "key" $key "config" $config)) }}
+  name: {{ include "common.helpers.pvcName" (dict "key" $key "config" $config) }}
   namespace: {{ $namespace }}
   labels:
     {{- include "common.helpers.labels" $ | nindent 4 }}
