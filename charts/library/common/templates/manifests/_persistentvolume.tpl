@@ -8,7 +8,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ include "common.helpers.pvName" (dict "key" $key "config" $config "root" $) }}
+  name: {{ include "common.helpers.fullname" $ }}-{{ include "common.helpers.pvName" (dict "key" $key "config" $config "root" $) }}
   labels:
     {{- include "common.helpers.labels" $ | nindent 4 }}
     {{- with $config.labels }}
