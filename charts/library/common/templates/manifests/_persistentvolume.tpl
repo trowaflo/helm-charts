@@ -53,20 +53,12 @@ spec:
   nfs:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- with $config.csi }}
-  csi:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
   {{- with $config.local }}
   local:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- with $config.iscsi }}
   iscsi:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  {{- with $config.fc }}
-  fc:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- with $config.cephfs }}
@@ -77,7 +69,6 @@ spec:
   glusterfs:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-
 {{- end }}
 {{- end }}
 {{- end }}
