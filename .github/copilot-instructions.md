@@ -48,7 +48,9 @@ Chart versions are **automatically managed** by the `chart-bump.yml` workflow:
 - `fix:` commits trigger a **patch** version bump  
 - `BREAKING CHANGE:` or `!:` commits trigger a **major** version bump
 - The workflow runs on PRs and automatically updates Chart.yaml versions
-- Manual version changes are not needed (workflow handles it)
+- **Automatic versioning is preferred**: Let the workflow handle version bumps based on conventional commits
+- **Manual version changes are allowed**: If you manually bump the version in Chart.yaml, the workflow will detect this and skip automatic bumping for that chart
+- Use automatic versioning unless you have a specific reason to manually control the version
 
 ## Dependency management
 - Renovate bot automatically creates PRs for dependency updates
