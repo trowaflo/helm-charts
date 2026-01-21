@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   common:
   - apiVersion: v2
-    created: "2026-01-21T19:31:38.738889818Z"
+    created: "2026-01-21T19:43:21.852750821Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, Services,
       Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims) across the
@@ -20,9 +20,28 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-2.1.0-pr201.tgz
     version: 2.1.0-pr201
+  - apiVersion: v2
+    created: "2026-01-21T19:43:21.852124013Z"
+    description: Common library chart providing reusable Helm templates and default
+      configurations. Standardizes Kubernetes resource deployment (Deployments, Services,
+      Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims) across the
+      chart repository with consistent security, observability, and best practices.  Used
+      by all application charts in this repository for consistency.
+    digest: 251ccbd0c7b375ea7af165e3be03637e51fc55ea7d8f4ac928f414cad5cc9c50
+    home: https://github.com/trowaflo/helm-charts
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: common
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    type: library
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-2.0.0-pr201.tgz
+    version: 2.0.0-pr201
   kgateway-platform:
   - apiVersion: v2
-    created: "2026-01-21T19:31:38.740465372Z"
+    created: "2026-01-21T19:43:21.853600713Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -53,7 +72,7 @@ entries:
     version: 1.1.0-pr184
   kgateway-routing:
   - apiVersion: v2
-    created: "2026-01-21T19:31:38.740945824Z"
+    created: "2026-01-21T19:43:21.854072401Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -78,4 +97,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.1.0-pr182.tgz
     version: 0.1.0-pr182
-generated: "2026-01-21T19:31:38.73814265Z"
+generated: "2026-01-21T19:43:21.85127352Z"
