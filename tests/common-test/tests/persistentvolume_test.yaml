@@ -1,0 +1,479 @@
+suite: test common chart - PersistentVolume
+templates:
+  - templates/common.yaml
+values:
+  - values/default.yaml
+set:
+  serviceMonitor.enabled: false
+  ingress.main.enabled: false
+  services.main.enabled: false
+release:
+  name: pv-test
+  namespace: pv-namespace
+tests:
+  # Test enablement - PV should not render when disabled
+  - it: should not create PersistentVolume when disabled
+    set:
+      persistentVolumes:
+        data:
+          enabled: false
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  # Test enablement - PV should render when enabled with required fields
+  - it: should create PersistentVolume when enabled
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          hostPath:
+            path: /mnt/data
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: PersistentVolume
+        documentIndex: 1
+      - equal:
+          path: metadata.name
+          value: pv-test-common-test-data
+        documentIndex: 1
+
+  # Test multiple PVs can be created
+  - it: should create multiple PersistentVolumes when enabled
+    set:
+      persistentVolumes:
+        data1:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          hostPath:
+            path: /mnt/data1
+        data2:
+          enabled: true
+          capacity: 20Gi
+          accessModes:
+            - ReadWriteMany
+          nfs:
+            server: nfs.example.com
+            path: /exports/data2
+    asserts:
+      - hasDocuments:
+          count: 3
+
+  # Test PV name computation with custom name
+  - it: should use custom name when provided
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          name: custom-pv-name
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          hostPath:
+            path: /mnt/data
+    asserts:
+      - equal:
+          path: metadata.name
+          value: pv-test-common-test-custom-pv-name
+        documentIndex: 1
+
+  # Test fullnameOverride
+  - it: should compute fullnameOverride correctly
+    set:
+      fullnameOverride: "my-pv"
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          hostPath:
+            path: /mnt/data
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-pv-data
+        documentIndex: 1
+
+  # Test nameOverride
+  - it: should compute nameOverride correctly
+    set:
+      nameOverride: "custom-name"
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          hostPath:
+            path: /mnt/data
+    asserts:
+      - equal:
+          path: "metadata.labels[\"app.kubernetes.io/name\"]"
+          value: custom-name
+        documentIndex: 1
+
+  # Test capacity field
+  - it: should set capacity correctly
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 50Gi
+          accessModes:
+            - ReadWriteOnce
+          hostPath:
+            path: /mnt/data
+    asserts:
+      - equal:
+          path: spec.capacity.storage
+          value: 50Gi
+        documentIndex: 1
+
+  # Test accessModes
+  - it: should set multiple accessModes correctly
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+            - ReadOnlyMany
+          hostPath:
+            path: /mnt/data
+    asserts:
+      - equal:
+          path: spec.accessModes
+          value:
+            - ReadWriteOnce
+            - ReadOnlyMany
+        documentIndex: 1
+
+  # Test storageClassName
+  - it: should set storageClassName when provided
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          storageClassName: fast-storage
+          hostPath:
+            path: /mnt/data
+    asserts:
+      - equal:
+          path: spec.storageClassName
+          value: fast-storage
+        documentIndex: 1
+
+  # Test persistentVolumeReclaimPolicy
+  - it: should set persistentVolumeReclaimPolicy when provided
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          persistentVolumeReclaimPolicy: Retain
+          hostPath:
+            path: /mnt/data
+    asserts:
+      - equal:
+          path: spec.persistentVolumeReclaimPolicy
+          value: Retain
+        documentIndex: 1
+
+  # Test volumeMode
+  - it: should set volumeMode when provided
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          volumeMode: Block
+          hostPath:
+            path: /dev/sdb
+    asserts:
+      - equal:
+          path: spec.volumeMode
+          value: Block
+        documentIndex: 1
+
+  # Test mountOptions
+  - it: should set mountOptions when provided
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          mountOptions:
+            - hard
+            - nfsvers=4.1
+          nfs:
+            server: nfs.example.com
+            path: /exports/data
+    asserts:
+      - equal:
+          path: spec.mountOptions
+          value:
+            - hard
+            - nfsvers=4.1
+        documentIndex: 1
+
+  # Test nodeAffinity
+  - it: should set nodeAffinity when provided
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          nodeAffinity:
+            required:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: kubernetes.io/hostname
+                      operator: In
+                      values:
+                        - node1
+          hostPath:
+            path: /mnt/data
+    asserts:
+      - isNotNull:
+          path: spec.nodeAffinity
+        documentIndex: 1
+      - equal:
+          path: spec.nodeAffinity.required.nodeSelectorTerms[0].matchExpressions[0].key
+          value: kubernetes.io/hostname
+        documentIndex: 1
+
+  # Test claimRef
+  - it: should set claimRef when provided
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          claimRef:
+            namespace: app-namespace
+            name: app-pvc
+          hostPath:
+            path: /mnt/data
+    asserts:
+      - equal:
+          path: spec.claimRef.namespace
+          value: app-namespace
+        documentIndex: 1
+      - equal:
+          path: spec.claimRef.name
+          value: app-pvc
+        documentIndex: 1
+
+  # Test hostPath volume source
+  - it: should set hostPath volume source correctly
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          hostPath:
+            path: /mnt/data
+            type: DirectoryOrCreate
+    asserts:
+      - equal:
+          path: spec.hostPath.path
+          value: /mnt/data
+        documentIndex: 1
+      - equal:
+          path: spec.hostPath.type
+          value: DirectoryOrCreate
+        documentIndex: 1
+
+  # Test NFS volume source
+  - it: should set nfs volume source correctly
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteMany
+          nfs:
+            server: nfs.example.com
+            path: /exports/data
+            readOnly: false
+    asserts:
+      - equal:
+          path: spec.nfs.server
+          value: nfs.example.com
+        documentIndex: 1
+      - equal:
+          path: spec.nfs.path
+          value: /exports/data
+        documentIndex: 1
+      - equal:
+          path: spec.nfs.readOnly
+          value: false
+        documentIndex: 1
+
+  # Test local volume source
+  - it: should set local volume source correctly
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          local:
+            path: /mnt/disks/ssd1
+    asserts:
+      - equal:
+          path: spec.local.path
+          value: /mnt/disks/ssd1
+        documentIndex: 1
+
+  # Test iSCSI volume source
+  - it: should set iscsi volume source correctly
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          iscsi:
+            targetPortal: 10.0.0.1:3260
+            iqn: iqn.2001-04.com.example:storage.disk1
+            lun: 0
+            fsType: ext4
+    asserts:
+      - equal:
+          path: spec.iscsi.targetPortal
+          value: 10.0.0.1:3260
+        documentIndex: 1
+      - equal:
+          path: spec.iscsi.iqn
+          value: iqn.2001-04.com.example:storage.disk1
+        documentIndex: 1
+      - equal:
+          path: spec.iscsi.lun
+          value: 0
+        documentIndex: 1
+
+  # Test CephFS volume source
+  - it: should set cephfs volume source correctly
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteMany
+          cephfs:
+            monitors:
+              - 10.0.0.1:6789
+              - 10.0.0.2:6789
+            path: /
+            user: admin
+    asserts:
+      - equal:
+          path: spec.cephfs.monitors
+          value:
+            - 10.0.0.1:6789
+            - 10.0.0.2:6789
+        documentIndex: 1
+      - equal:
+          path: spec.cephfs.path
+          value: /
+        documentIndex: 1
+
+  # Test GlusterFS volume source
+  - it: should set glusterfs volume source correctly
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteMany
+          glusterfs:
+            endpoints: glusterfs-cluster
+            path: data-volume
+            readOnly: false
+    asserts:
+      - equal:
+          path: spec.glusterfs.endpoints
+          value: glusterfs-cluster
+        documentIndex: 1
+      - equal:
+          path: spec.glusterfs.path
+          value: data-volume
+        documentIndex: 1
+
+  # Test custom labels
+  - it: should add custom labels when provided
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          labels:
+            custom-label: custom-value
+            environment: production
+          hostPath:
+            path: /mnt/data
+    asserts:
+      - equal:
+          path: metadata.labels.custom-label
+          value: custom-value
+        documentIndex: 1
+      - equal:
+          path: metadata.labels.environment
+          value: production
+        documentIndex: 1
+
+  # Test custom annotations
+  - it: should add custom annotations when provided
+    set:
+      persistentVolumes:
+        data:
+          enabled: true
+          capacity: 10Gi
+          accessModes:
+            - ReadWriteOnce
+          annotations:
+            backup-policy: daily
+            description: Data volume for app
+          hostPath:
+            path: /mnt/data
+    asserts:
+      - equal:
+          path: metadata.annotations.backup-policy
+          value: daily
+        documentIndex: 1
+      - equal:
+          path: metadata.annotations.description
+          value: Data volume for app
+        documentIndex: 1
