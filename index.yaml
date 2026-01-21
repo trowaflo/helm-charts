@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   common:
   - apiVersion: v2
-    created: "2026-01-21T21:20:44.108845863Z"
+    created: "2026-01-21T21:25:29.684706505Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, Services,
       Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims) across the
@@ -21,7 +21,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-2.1.0-pr211.tgz
     version: 2.1.0-pr211
   - apiVersion: v2
-    created: "2026-01-21T21:20:44.108226228Z"
+    created: "2026-01-21T21:25:29.683095502Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, Services,
       Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims) across the
@@ -41,7 +41,7 @@ entries:
     version: 2.1.0-pr198
   kgateway-platform:
   - apiVersion: v2
-    created: "2026-01-21T21:20:44.109694584Z"
+    created: "2026-01-21T21:25:29.685620618Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -72,7 +72,7 @@ entries:
     version: 1.1.0-pr184
   kgateway-routing:
   - apiVersion: v2
-    created: "2026-01-21T21:20:44.110149843Z"
+    created: "2026-01-21T21:25:29.686121883Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -99,7 +99,7 @@ entries:
     version: 0.1.0-pr182
   persistent-volume:
   - apiVersion: v2
-    created: "2026-01-21T21:20:44.111082841Z"
+    created: "2026-01-21T21:25:29.687121065Z"
     dependencies:
     - name: common
       repository: https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts
@@ -127,4 +127,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/persistent-volume-0.1.0-pr198.tgz
     version: 0.1.0-pr198
-generated: "2026-01-21T21:20:44.107424875Z"
+generated: "2026-01-21T21:25:29.682337629Z"
