@@ -1,0 +1,39 @@
+persistentVolumes:
+  data-volume:
+    enabled: true
+    capacity: 10Gi
+    accessModes:
+      - ReadWriteOnce
+    hostPath:
+      path: /mnt/data
+      type: DirectoryOrCreate
+
+  nfs-volume:
+    enabled: true
+    capacity: 100Gi
+    accessModes:
+      - ReadWriteMany
+    storageClassName: nfs
+    nfs:
+      server: nfs-server.example.com
+      path: /export/data
+
+persistentVolumeClaims:
+  app-data:
+    enabled: true
+    storageClassName: standard
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+
+  bound-claim:
+    enabled: true
+    volumeName: data-volume
+    storageClassName: ""
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi

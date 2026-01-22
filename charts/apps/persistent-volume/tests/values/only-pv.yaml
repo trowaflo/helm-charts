@@ -1,0 +1,11 @@
+persistentVolumes:
+  data-volume:
+    enabled: true
+    capacity: 10Gi
+    accessModes:
+      - ReadWriteOnce
+    hostPath:
+      path: /mnt/data
+      type: DirectoryOrCreate
+
+persistentVolumeClaims: {}

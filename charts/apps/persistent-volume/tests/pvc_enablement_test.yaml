@@ -1,0 +1,94 @@
+suite: test persistent-volume chart - PVC enablement
+release:
+  name: persistent-volume-test
+  namespace: storage-test
+tests:
+  # Test PVCs with default values (both PVCs enabled)
+  - it: should render both PersistentVolumeClaims when enabled
+    template: templates/common.yaml
+    values:
+      - values/default.yaml
+    asserts:
+      - hasDocuments:
+          count: 4  # 2 PVs + 2 PVCs
+      - isKind:
+          of: PersistentVolumeClaim
+        documentIndex: 2
+      - equal:
+          path: metadata.name
+          value: app-data
+        documentIndex: 2
+      - equal:
+          path: spec.resources.requests.storage
+          value: 10Gi
+        documentIndex: 2
+      - isKind:
+          of: PersistentVolumeClaim
+        documentIndex: 3
+      - equal:
+          path: metadata.name
+          value: bound-claim
+        documentIndex: 3
+
+  # Test with only PVCs enabled
+  - it: should only render PersistentVolumeClaims when PVs disabled
+    template: templates/common.yaml
+    values:
+      - values/only-pvc.yaml
+    asserts:
+      - hasDocuments:
+          count: 1  # 1 PVC only
+      - isKind:
+          of: PersistentVolumeClaim
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: app-data
+        documentIndex: 0
+
+  # Test with no PVCs enabled
+  - it: should not render any PersistentVolumeClaims when disabled
+    template: templates/common.yaml
+    set:
+      persistentVolumes: {}
+      persistentVolumeClaims: {}
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # Test PVC with storageClassName
+  - it: should configure storageClassName correctly
+    template: templates/common.yaml
+    values:
+      - values/only-pvc.yaml
+    asserts:
+      - equal:
+          path: spec.storageClassName
+          value: "standard"
+        documentIndex: 0
+
+  # Test PVC with volumeName binding
+  - it: should configure volumeName for manual binding
+    template: templates/common.yaml
+    values:
+      - values/default.yaml
+    asserts:
+      - equal:
+          path: spec.volumeName
+          value: data-volume
+        documentIndex: 3
+      - equal:
+          path: spec.storageClassName
+          value: ""
+        documentIndex: 3
+
+  # Test PVC namespace
+  - it: should use default namespace when not specified
+    template: templates/common.yaml
+    values:
+      - values/only-pvc.yaml
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: storage-test
+        documentIndex: 0
