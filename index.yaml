@@ -1266,6 +1266,36 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/kgateway-routing-0.1.0/kgateway-routing-0.1.0.tgz
     version: 0.1.0
+  persistent-volume:
+  - apiVersion: v2
+    created: "2026-01-22T18:48:06.690981433Z"
+    dependencies:
+    - name: common
+      repository: file://../../library/common
+      version: 2.1.2
+    description: Helm chart for declarative creation and management of Kubernetes
+      PersistentVolumes (PV) and PersistentVolumeClaims (PVC). Supports multiple storage
+      backends including hostPath, NFS, and other volume types with flexible configuration
+      for capacity, access modes, and storage classes.
+    digest: 4070f63a9f4c06d7bd67c5f492904586eb2e87e569e27fc96454311fc4f35cb4
+    keywords:
+    - kubernetes
+    - storage
+    - persistentvolume
+    - persistentvolumeclaim
+    - pv
+    - pvc
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: persistent-volume
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    - https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/persistent-volume-0.1.0/persistent-volume-0.1.0.tgz
+    version: 0.1.0
   portainer:
   - apiVersion: v2
     created: "2026-01-01T16:23:42.209380968Z"
@@ -1804,4 +1834,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2026-01-21T21:58:41.124560367Z"
+generated: "2026-01-22T18:48:06.691159505Z"
