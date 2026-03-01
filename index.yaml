@@ -42,6 +42,46 @@ entries:
     version: 1.0.0
   cert-manager-platform:
   - apiVersion: v2
+    created: "2026-03-01T04:43:46.241535823Z"
+    dependencies:
+    - alias: cert-manager
+      condition: cert-manager.enabled
+      name: cert-manager
+      repository: oci://quay.io/jetstack/charts
+      version: v1.19.4
+    - alias: cert-manager-webhook-ovh
+      condition: cert-manager-webhook-ovh.enabled
+      name: cert-manager-webhook-ovh
+      repository: https://aureq.github.io/cert-manager-webhook-ovh/
+      version: 0.8.0
+    description: Wraps cert-manager and cert-manager-webhook-ovh to provide automated
+      X.509 certificate management for Kubernetes with OVH DNS-01 challenge support.
+      Includes configuration validation for breaking changes, Certificate resource
+      management, and streamlined setup for Let's Encrypt certificates.
+    digest: 534d9ea5d59c6061556a0af509e5b15dee324438e3d39980daa5ff8d5bc77095
+    home: https://cert-manager.io
+    keywords:
+    - cert-manager
+    - certificates
+    - tls
+    - ssl
+    - letsencrypt
+    - ovh
+    - dns
+    - acme
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: cert-manager-platform
+    sources:
+    - https://github.com/cert-manager/cert-manager
+    - https://github.com/aureq/cert-manager-webhook-ovh
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/cert-manager-platform-1.2.1/cert-manager-platform-1.2.1.tgz
+    version: 1.2.1
+  - apiVersion: v2
     created: "2026-01-04T11:19:25.789957697Z"
     dependencies:
     - alias: cert-manager
@@ -1864,4 +1904,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2026-02-01T15:11:22.975224921Z"
+generated: "2026-03-01T04:43:46.698334571Z"
