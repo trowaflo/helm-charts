@@ -1,6 +1,6 @@
 apiVersion: v2
 name: cert-manager-platform
-version: 1.2.0
+version: 1.2.1
 type: application
 description: |-
   Wraps cert-manager and cert-manager-webhook-ovh to provide automated X.509 certificate
@@ -26,7 +26,7 @@ sources:
   - https://github.com/trowaflo/helm-charts
 dependencies:
   - name: cert-manager
-    version: v1.19.2
+    version: v1.19.4
     repository: oci://quay.io/jetstack/charts
     alias: cert-manager
     condition: cert-manager.enabled
