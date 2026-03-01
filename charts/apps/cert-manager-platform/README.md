@@ -9,7 +9,7 @@ for Let's Encrypt certificates.
 
 ---
 
-![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
+![Version: 1.2.1](https://img.shields.io/badge/Version-1.2.1-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
 
 **Homepage:** <https://cert-manager.io>
 
@@ -26,7 +26,7 @@ for Let's Encrypt certificates.
 | Repository | Name | Version |
 |------------|------|---------|
 | https://aureq.github.io/cert-manager-webhook-ovh/ | cert-manager-webhook-ovh(cert-manager-webhook-ovh) | 0.8.0 |
-| oci://quay.io/jetstack/charts | cert-manager(cert-manager) | v1.19.2 |
+| oci://quay.io/jetstack/charts | cert-manager(cert-manager) | v1.19.4 |
 
 - Helm: v3+
 
