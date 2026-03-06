@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   cert-manager-platform:
   - apiVersion: v2
-    created: "2026-03-01T22:04:26.764267901Z"
+    created: "2026-03-06T20:45:16.034511843Z"
     dependencies:
     - alias: cert-manager
       condition: cert-manager.enabled
@@ -18,7 +18,7 @@ entries:
       X.509 certificate management for Kubernetes with OVH DNS-01 challenge support.
       Includes configuration validation for breaking changes, Certificate resource
       management, and streamlined setup for Let's Encrypt certificates.
-    digest: 8156c10799cccd7cef091d54a36b06ba3847aed74cfde8ba196a6e3496ffebe1
+    digest: c9c63b818b8d0460daefafaeeb318f08b10bdaa38d4d0d3c7143f5afbb735466
     home: https://cert-manager.io
     keywords:
     - cert-manager
@@ -43,7 +43,7 @@ entries:
     version: 1.3.0-pr219
   common:
   - apiVersion: v2
-    created: "2026-03-01T22:04:26.764913424Z"
+    created: "2026-03-06T20:45:16.035868093Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, Services,
       Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims) across the
@@ -63,7 +63,7 @@ entries:
     version: 2.1.0-pr211
   frigate-exporter:
   - apiVersion: v2
-    created: "2026-03-01T22:04:26.765881549Z"
+    created: "2026-03-06T20:45:16.036864992Z"
     dependencies:
     - name: common
       repository: https://trowaflo.github.io/helm-charts
@@ -71,7 +71,7 @@ entries:
     description: Prometheus exporter for Frigate NVR (Network Video Recorder) system.
       Exports metrics from Frigate cameras, detections, and recording statistics in
       Prometheus-compatible format for integration with monitoring stacks.
-    digest: 1c181bb97795aaa7117f01365dc5b5c9e129bbaec2ca758b802d11cd72670882
+    digest: c412ec6f32a9e4228ca8bd0d87bbe00e2b87053cd9a4678f74b5c074be4a52a3
     home: https://github.com/bairhys/prometheus-frigate-exporter
     icon: https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/images/prometheus-logo.svg
     keywords:
@@ -95,7 +95,7 @@ entries:
     version: 1.1.0-pr219
   graphite-exporter:
   - apiVersion: v2
-    created: "2026-03-01T22:04:26.767141197Z"
+    created: "2026-03-06T20:45:16.038102539Z"
     dependencies:
     - name: common
       repository: https://trowaflo.github.io/helm-charts
@@ -104,7 +104,7 @@ entries:
       to Prometheus format. Enables Prometheus to scrape metrics from legacy Graphite
       systems and sources (e.g., TrueNAS, custom monitoring systems) that emit Graphite-formatted
       metrics.
-    digest: 5f9e51f0f35391dfda9eb1fa74c477a2a4639b1ea705e5c3adf2b851f608ce53
+    digest: fbbc5becf7710ac1f7b93a6ebffdd2ffd8dfd0549e2bacaeef8543ba38a33c9d
     home: https://github.com/prometheus/graphite_exporter
     icon: https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/images/prometheus-logo.svg
     keywords:
@@ -128,7 +128,7 @@ entries:
     version: 1.1.0-pr219
   kgateway-platform:
   - apiVersion: v2
-    created: "2026-03-01T22:04:26.768650591Z"
+    created: "2026-03-06T20:45:16.039618565Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -138,7 +138,7 @@ entries:
     description: Helm chart for configuring the kgateway platform using the Kubernetes
       Gateway API with support for multiple gateways, HTTP(S) routing, and TLS certificate
       integration.
-    digest: fe837a29bc1acb23469b3a82d4babb00a20f1eabe45caf9302cfc541d337f56d
+    digest: 8890263d27e998293d4c62c27595d450f287cf9fdb20f6314468c499b4e8587a
     keywords:
     - kubernetes
     - gateway
@@ -158,7 +158,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-platform-1.2.0-pr219.tgz
     version: 1.2.0-pr219
   - apiVersion: v2
-    created: "2026-03-01T22:04:26.767904219Z"
+    created: "2026-03-06T20:45:16.038877073Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -189,7 +189,7 @@ entries:
     version: 1.1.0-pr184
   kgateway-routing:
   - apiVersion: v2
-    created: "2026-03-01T22:04:26.769091172Z"
+    created: "2026-03-06T20:45:16.040080155Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -216,7 +216,7 @@ entries:
     version: 0.1.0-pr182
   portainer:
   - apiVersion: v2
-    created: "2026-03-01T22:04:26.769766321Z"
+    created: "2026-03-06T20:45:16.040750004Z"
     dependencies:
     - name: portainer
       repository: https://portainer.github.io/k8s
@@ -225,7 +225,7 @@ entries:
       management platform. Provides intuitive UI for managing Docker containers, Kubernetes
       clusters, and registries. Wraps the official Portainer Helm chart with custom
       persistence and networking configuration.
-    digest: 0aea25ef1d4c1037b73ab75d2b8b5f2af479bb0839f330ecbcff258771fdadd9
+    digest: 011304c5cb95da51d2d5ed00d5716b58e578290d92936b4ef873ad2f5451b38e
     home: https://www.portainer.io
     icon: https://raw.githubusercontent.com/portainer/portainer/develop/app/assets/images/logo.png
     keywords:
@@ -249,14 +249,14 @@ entries:
     version: 0.1.0-pr219
   prometheus:
   - apiVersion: v2
-    created: "2026-03-01T22:04:26.779517427Z"
+    created: "2026-03-06T20:45:16.050578944Z"
     dependencies:
     - name: prometheus
       repository: https://prometheus-community.github.io/helm-charts
       version: 28.13.0
     description: Wraps the official kube-prometheus-stack Helm chart providing production-ready
       monitoring stack including Prometheus, Grafana, Alertmanager, and node exporters.
-    digest: c34f639b08fe5aead6561dc6e086ea677dde49e5336c4b0b6620ef3ff21150be
+    digest: d44b02843539e97f94dcd0abf2c2d9b9146e605bb518dde80a105faf69370ad9
     home: https://prometheus.io
     keywords:
     - prometheus
@@ -279,4 +279,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/prometheus-3.6.0-pr219.tgz
     version: 3.6.0-pr219
-generated: "2026-03-01T22:04:26.75603933Z"
+generated: "2026-03-06T20:45:16.027183116Z"
