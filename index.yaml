@@ -42,6 +42,46 @@ entries:
     version: 1.0.0
   cert-manager-platform:
   - apiVersion: v2
+    created: "2026-03-26T22:41:56.252517514Z"
+    dependencies:
+    - alias: cert-manager
+      condition: cert-manager.enabled
+      name: cert-manager
+      repository: oci://quay.io/jetstack/charts
+      version: v1.20.0
+    - alias: cert-manager-webhook-ovh
+      condition: cert-manager-webhook-ovh.enabled
+      name: cert-manager-webhook-ovh
+      repository: https://aureq.github.io/cert-manager-webhook-ovh/
+      version: 0.9.5
+    description: Wraps cert-manager and cert-manager-webhook-ovh to provide automated
+      X.509 certificate management for Kubernetes with OVH DNS-01 challenge support.
+      Includes configuration validation for breaking changes, Certificate resource
+      management, and streamlined setup for Let's Encrypt certificates.
+    digest: b67ce0185168b8e1969a97dcf8adedcc2dc7c2ff96aa430dd1bc3361de5c927b
+    home: https://cert-manager.io
+    keywords:
+    - cert-manager
+    - certificates
+    - tls
+    - ssl
+    - letsencrypt
+    - ovh
+    - dns
+    - acme
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: cert-manager-platform
+    sources:
+    - https://github.com/cert-manager/cert-manager
+    - https://github.com/aureq/cert-manager-webhook-ovh
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/cert-manager-platform-1.3.0/cert-manager-platform-1.3.0.tgz
+    version: 1.3.0
+  - apiVersion: v2
     created: "2026-03-01T04:43:46.241535823Z"
     dependencies:
     - alias: cert-manager
@@ -372,6 +412,37 @@ entries:
     - https://github.com/trowaflo/helm-charts/releases/download/frigate-0.0.1/frigate-0.0.1.tgz
     version: 0.0.1
   frigate-exporter:
+  - apiVersion: v2
+    created: "2026-03-26T22:41:56.361795592Z"
+    dependencies:
+    - name: common
+      repository: https://trowaflo.github.io/helm-charts
+      version: 2.1.2
+    description: Prometheus exporter for Frigate NVR (Network Video Recorder) system.
+      Exports metrics from Frigate cameras, detections, and recording statistics in
+      Prometheus-compatible format for integration with monitoring stacks.
+    digest: 8b7b1b5d72c5d01292fdb655177ff06135a893465cf07c32b1542c17d67c4925
+    home: https://github.com/bairhys/prometheus-frigate-exporter
+    icon: https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/images/prometheus-logo.svg
+    keywords:
+    - prometheus
+    - exporter
+    - frigate
+    - nvr
+    - video
+    - monitoring
+    - metrics
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: frigate-exporter
+    sources:
+    - https://github.com/bairhys/prometheus-frigate-exporter
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/frigate-exporter-1.1.0/frigate-exporter-1.1.0.tgz
+    version: 1.1.0
   - apiVersion: v2
     created: "2026-01-14T07:38:50.650072191Z"
     dependencies:
@@ -964,6 +1035,38 @@ entries:
     version: 0.1.0
   graphite-exporter:
   - apiVersion: v2
+    created: "2026-03-26T22:41:56.492898765Z"
+    dependencies:
+    - name: common
+      repository: https://trowaflo.github.io/helm-charts
+      version: 2.1.2
+    description: Prometheus exporter for converting Graphite plaintext protocol metrics
+      to Prometheus format. Enables Prometheus to scrape metrics from legacy Graphite
+      systems and sources (e.g., TrueNAS, custom monitoring systems) that emit Graphite-formatted
+      metrics.
+    digest: 48d3d0d42c5df98fc25d0959514867304e4abb44d8223197ba91ac8f99ee450d
+    home: https://github.com/prometheus/graphite_exporter
+    icon: https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/images/prometheus-logo.svg
+    keywords:
+    - prometheus
+    - exporter
+    - graphite
+    - monitoring
+    - metrics
+    - truenas
+    - plaintext
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: graphite-exporter
+    sources:
+    - https://github.com/prometheus/graphite_exporter
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/graphite-exporter-1.1.0/graphite-exporter-1.1.0.tgz
+    version: 1.1.0
+  - apiVersion: v2
     created: "2026-01-01T14:37:09.422411654Z"
     dependencies:
     - name: common
@@ -1113,6 +1216,36 @@ entries:
     - https://github.com/trowaflo/helm-charts/releases/download/guacamole-0.1.0/guacamole-0.1.0.tgz
     version: 0.1.0
   kgateway-platform:
+  - apiVersion: v2
+    created: "2026-03-26T22:41:56.599266957Z"
+    dependencies:
+    - alias: kgateway
+      condition: kgateway.enabled
+      name: kgateway
+      repository: oci://cr.kgateway.dev/kgateway-dev/charts
+      version: v2.2.2
+    description: Helm chart for configuring the kgateway platform using the Kubernetes
+      Gateway API with support for multiple gateways, HTTP(S) routing, and TLS certificate
+      integration.
+    digest: 2dcaca92ab516ca42a809af56500d76872c11de0a5c0a864f6593fc8c079d33d
+    keywords:
+    - kubernetes
+    - gateway
+    - kgateway
+    - networking
+    - tls
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: kgateway-platform
+    sources:
+    - https://github.com/kgateway-dev/kgateway
+    - https://docs.kgateway.dev/
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/kgateway-platform-1.2.0/kgateway-platform-1.2.0.tgz
+    version: 1.2.0
   - apiVersion: v2
     created: "2026-01-13T20:27:48.353152774Z"
     dependencies:
@@ -1368,6 +1501,38 @@ entries:
     version: 0.1.0
   portainer:
   - apiVersion: v2
+    created: "2026-03-26T22:41:56.720573392Z"
+    dependencies:
+    - name: portainer
+      repository: https://portainer.github.io/k8s
+      version: 2.39.0
+    description: Portainer Community Edition - container and Kubernetes environment
+      management platform. Provides intuitive UI for managing Docker containers, Kubernetes
+      clusters, and registries. Wraps the official Portainer Helm chart with custom
+      persistence and networking configuration.
+    digest: 50615862bc2cd1040a00e71f7ed17c9c43642edabf4985300c58332687f92a88
+    home: https://www.portainer.io
+    icon: https://raw.githubusercontent.com/portainer/portainer/develop/app/assets/images/logo.png
+    keywords:
+    - portainer
+    - container-management
+    - kubernetes
+    - docker
+    - orchestration
+    - gui
+    - devops
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: portainer
+    sources:
+    - https://github.com/portainer/k8s
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/portainer-0.1.0/portainer-0.1.0.tgz
+    version: 0.1.0
+  - apiVersion: v2
     created: "2026-01-01T16:23:42.209380968Z"
     dependencies:
     - name: portainer
@@ -1475,6 +1640,37 @@ entries:
     - https://github.com/trowaflo/helm-charts/releases/download/portainer-0.0.3/portainer-0.0.3.tgz
     version: 0.0.3
   prometheus:
+  - apiVersion: v2
+    created: "2026-03-26T22:41:56.851363948Z"
+    dependencies:
+    - name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 28.14.1
+    description: Wraps the official kube-prometheus-stack Helm chart providing production-ready
+      monitoring stack including Prometheus, Grafana, Alertmanager, and node exporters.
+    digest: f84b7aab854a91a28f1163ff542a44ddd6e52e6945d3ad0bcdf245627bfb7e4c
+    home: https://prometheus.io
+    keywords:
+    - prometheus
+    - monitoring
+    - alerting
+    - metrics
+    - kubernetes
+    - operator
+    - grafana
+    - observability
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: prometheus
+    sources:
+    - https://github.com/prometheus/prometheus
+    - https://github.com/prometheus-operator/prometheus-operator
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/prometheus-3.6.0/prometheus-3.6.0.tgz
+    version: 3.6.0
   - apiVersion: v2
     created: "2026-01-19T16:32:51.598267165Z"
     dependencies:
@@ -1904,4 +2100,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2026-03-01T04:43:46.698334571Z"
+generated: "2026-03-26T22:41:56.851577153Z"
