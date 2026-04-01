@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   common:
   - apiVersion: v2
-    created: "2026-03-26T22:41:06.37678101Z"
+    created: "2026-04-01T00:45:45.777692843Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, Services,
       Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims) across the
@@ -22,7 +22,7 @@ entries:
     version: 2.1.0-pr211
   kgateway-platform:
   - apiVersion: v2
-    created: "2026-03-26T22:41:06.377691512Z"
+    created: "2026-04-01T00:45:45.778551884Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -53,7 +53,7 @@ entries:
     version: 1.1.0-pr184
   kgateway-routing:
   - apiVersion: v2
-    created: "2026-03-26T22:41:06.378209241Z"
+    created: "2026-04-01T00:45:45.779507674Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -78,4 +78,37 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.1.0-pr182.tgz
     version: 0.1.0-pr182
-generated: "2026-03-26T22:41:06.375881437Z"
+  portainer:
+  - apiVersion: v2
+    created: "2026-04-01T00:45:45.781163581Z"
+    dependencies:
+    - name: portainer
+      repository: https://portainer.github.io/k8s
+      version: 239.0.2
+    description: Portainer Community Edition - container and Kubernetes environment
+      management platform. Provides intuitive UI for managing Docker containers, Kubernetes
+      clusters, and registries. Wraps the official Portainer Helm chart with custom
+      persistence and networking configuration.
+    digest: 9bbda9e3a9714053d55fe0fca40961a7d30c832e412fea7eaea273f084b1cdcb
+    home: https://www.portainer.io
+    icon: https://raw.githubusercontent.com/portainer/portainer/develop/app/assets/images/logo.png
+    keywords:
+    - portainer
+    - container-management
+    - kubernetes
+    - docker
+    - orchestration
+    - gui
+    - devops
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: portainer
+    sources:
+    - https://github.com/portainer/k8s
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/portainer-1.0.0-pr222.tgz
+    version: 1.0.0-pr222
+generated: "2026-04-01T00:45:45.776774261Z"
