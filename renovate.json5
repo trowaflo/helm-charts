@@ -2,43 +2,5 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>trowaflo/renovate-config"
-  ],
-  "timezone": "UTC",
-  "schedule": ["before 3am on the first day of the month"],
-  packageRules: [
-    // Helm Patch Updates
-    {
-      "matchManagers": ["helmv3", "helm-values"],
-      "matchUpdateTypes": ["patch"],
-      "labels": ["helm", "automerge"],
-      "groupName": "AUTOMERGE - Helm Patch Updates",
-      "commitMessagePrefix": "chore(helm):",
-      "commitMessageTopic": "{{depName}}",
-      "bumpVersion": "patch",
-      "automerge": true
-    },
-    // Helm Minor Updates
-    {
-      "matchManagers": ["helmv3", "helm-values"],
-      "matchUpdateTypes": ["minor"],
-      "labels": ["helm", "automerge"],
-      "groupName": "AUTOMERGE - Helm Minor Updates",
-      "commitMessagePrefix": "chore(helm):",
-      "commitMessageTopic": "{{depName}}",
-      "bumpVersion": "minor",
-      "automerge": true
-    },
-    // Helm Major Updates
-    {
-      "matchManagers": ["helmv3", "helm-values"],
-      "matchUpdateTypes": ["major"],
-      "labels": ["helm", "breaking"],
-      "groupName": "BREAKING - helm chart Major Updates",
-      "commitMessagePrefix": "chore(helm)!:",
-      "commitMessageTopic": "{{depName}}",
-      "bumpVersion": "major",
-      "automerge": false
-    }
   ]
-
 }
