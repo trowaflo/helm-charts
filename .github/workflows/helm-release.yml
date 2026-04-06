@@ -26,6 +26,10 @@ jobs:
         tuf-repo-cdn.sigstore.dev:443
         rekor.sigstore.dev:443
         fulcio.sigstore.dev:443
+        pypi.org:443
+        files.pythonhosted.org:443
+        quay.io:443
+        cr.kgateway.dev:443
         aureq.github.io:443
         grafana.github.io:443
         portainer.github.io:443
