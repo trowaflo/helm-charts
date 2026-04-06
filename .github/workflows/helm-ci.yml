@@ -18,6 +18,7 @@ jobs:
       contents: write
       pull-requests: write
       checks: write
+      pages: write
     with:
       enable_lint: true
       enable_unittest: true

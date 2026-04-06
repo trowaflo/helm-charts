@@ -14,6 +14,8 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      pages: write
+      checks: write
     with:
       harden_runner_egress_policy: audit
       enable_pr_cleanup: true
