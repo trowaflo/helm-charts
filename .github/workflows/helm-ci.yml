@@ -1,0 +1,28 @@
+name: Helm CI
+
+on:
+  pull_request:
+    paths:
+      - "charts/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  helm:
+    uses: trowaflo/github-actions/.github/workflows/helm.yml@e943dc3a93aff5f9b2bd542b84caa8c62cb4e55a # PR#35
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
+    with:
+      harden_runner_egress_policy: audit
+      enable_lint: true
+      enable_unittest: true
+      enable_docs_check: true
+      enable_bump: true
+      enable_pr_charts: true
+
+      

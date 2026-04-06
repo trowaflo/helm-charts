@@ -1,8 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -10,7 +8,7 @@ permissions: read-all
 
 jobs:
   quality:
-    uses: trowaflo/github-actions/.github/workflows/quality.yml@fd881256daff836dd9595efd90f646c26a6deae4 # v2.0.0
+    uses: trowaflo/github-actions/.github/workflows/quality.yml@e943dc3a93aff5f9b2bd542b84caa8c62cb4e55a # PR#35
     permissions:
       contents: read
       pull-requests: write
@@ -18,3 +16,10 @@ jobs:
       actions: read
     with:
       harden_runner_egress_policy: audit
+      enable_gitleaks: true
+      enable_checkov: true
+      enable_actionlint: true
+      enable_trivy: true
+      enable_dependency_review: true
+      enable_yamllint: true
+      enable_json_lint: true

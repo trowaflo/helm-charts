@@ -1,0 +1,22 @@
+name: Helm Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "charts/**"
+
+jobs:
+  release:
+    uses: trowaflo/github-actions/.github/workflows/helm.yml@e943dc3a93aff5f9b2bd542b84caa8c62cb4e55a # PR#35
+    permissions:
+      contents: write
+      pages: write
+      checks: write
+    with:
+      harden_runner_egress_policy: audit
+      enable_release: true
+      enable_docs: true
+      enable_unittest: true
+      release_charts_dirs: "charts/library charts/apps"

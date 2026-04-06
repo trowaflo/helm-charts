@@ -1,0 +1,19 @@
+name: Helm PR Cleanup
+
+on:
+  pull_request:
+    types: [closed]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cleanup:
+    uses: trowaflo/github-actions/.github/workflows/helm.yml@e943dc3a93aff5f9b2bd542b84caa8c62cb4e55a # PR#35
+    permissions:
+      contents: write
+      pull-requests: write
+    with:
+      harden_runner_egress_policy: audit
+      enable_pr_cleanup: true
