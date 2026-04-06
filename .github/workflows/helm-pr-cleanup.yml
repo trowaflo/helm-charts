@@ -17,5 +17,4 @@ jobs:
       pages: write
       checks: write
     with:
-      harden_runner_egress_policy: audit
       enable_pr_cleanup: true

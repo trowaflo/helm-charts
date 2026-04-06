@@ -16,7 +16,18 @@ jobs:
       checks: write
       pull-requests: write
     with:
-      harden_runner_egress_policy: audit
+      harden_runner_allowed_endpoints: >-
+        github.com:443
+        api.github.com:443
+        objects.githubusercontent.com:443
+        release-assets.githubusercontent.com:443
+        registry.npmjs.org:443
+        get.helm.sh:443
+        aureq.github.io:443
+        grafana.github.io:443
+        portainer.github.io:443
+        prometheus-community.github.io:443
+        trowaflo.github.io:443
       enable_release: true
       enable_docs: true
       enable_unittest: true
