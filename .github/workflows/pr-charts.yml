@@ -161,7 +161,7 @@ jobs:
 
       - name: Upload artifacts
         if: steps.package.outputs.packaged_charts != ''
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: pr-charts
           path: /tmp/pr-artifacts/*.tgz
