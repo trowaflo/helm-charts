@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   common:
   - apiVersion: v2
-    created: "2026-04-06T19:03:38.137061379Z"
+    created: "2026-04-06T22:24:13.014249739Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, Services,
       Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims) across the
@@ -20,9 +20,74 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-2.1.0-pr211.tgz
     version: 2.1.0-pr211
+  frigate-exporter:
+  - apiVersion: v2
+    created: "2026-04-06T22:24:13.015331252Z"
+    dependencies:
+    - name: common
+      repository: https://trowaflo.github.io/helm-charts
+      version: 2.1.2
+    description: Prometheus exporter for Frigate NVR (Network Video Recorder) system.
+      Exports metrics from Frigate cameras, detections, and recording statistics in
+      Prometheus-compatible format for integration with monitoring stacks.
+    digest: bc5e4014560bcbffa490e93dc19cec8982274e2617ca65616a7fc583dfce9f42
+    home: https://github.com/bairhys/prometheus-frigate-exporter
+    icon: https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/images/prometheus-logo.svg
+    keywords:
+    - prometheus
+    - exporter
+    - frigate
+    - nvr
+    - video
+    - monitoring
+    - metrics
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: frigate-exporter
+    sources:
+    - https://github.com/bairhys/prometheus-frigate-exporter
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/frigate-exporter-1.1.0-pr228.tgz
+    version: 1.1.0-pr228
+  graphite-exporter:
+  - apiVersion: v2
+    created: "2026-04-06T22:24:13.016657344Z"
+    dependencies:
+    - name: common
+      repository: https://trowaflo.github.io/helm-charts
+      version: 2.1.2
+    description: Prometheus exporter for converting Graphite plaintext protocol metrics
+      to Prometheus format. Enables Prometheus to scrape metrics from legacy Graphite
+      systems and sources (e.g., TrueNAS, custom monitoring systems) that emit Graphite-formatted
+      metrics.
+    digest: 090f5440938fde3066276c261e772fecbb95bce11c8a44691499a46cda016d41
+    home: https://github.com/prometheus/graphite_exporter
+    icon: https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/images/prometheus-logo.svg
+    keywords:
+    - prometheus
+    - exporter
+    - graphite
+    - monitoring
+    - metrics
+    - truenas
+    - plaintext
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: graphite-exporter
+    sources:
+    - https://github.com/prometheus/graphite_exporter
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/graphite-exporter-1.1.0-pr228.tgz
+    version: 1.1.0-pr228
   kgateway-platform:
   - apiVersion: v2
-    created: "2026-04-06T19:03:38.138192627Z"
+    created: "2026-04-06T22:24:13.01752227Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -53,7 +118,7 @@ entries:
     version: 1.1.0-pr184
   kgateway-routing:
   - apiVersion: v2
-    created: "2026-04-06T19:03:38.13872467Z"
+    created: "2026-04-06T22:24:13.018374317Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -80,7 +145,7 @@ entries:
     version: 0.1.0-pr182
   portainer:
   - apiVersion: v2
-    created: "2026-04-06T19:03:38.139608344Z"
+    created: "2026-04-06T22:24:13.019605401Z"
     dependencies:
     - name: portainer
       repository: https://portainer.github.io/k8s
@@ -111,4 +176,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/portainer-1.0.0-pr226.tgz
     version: 1.0.0-pr226
-generated: "2026-04-06T19:03:38.136184521Z"
+generated: "2026-04-06T22:24:13.013449331Z"
