@@ -32,7 +32,9 @@ jobs:
         fulcio.sigstore.dev:443
         pypi.org:443
         files.pythonhosted.org:443
+        ghcr.io:443
         quay.io:443
+        cdn01.quay.io:443
         cr.kgateway.dev:443
         aureq.github.io:443
         grafana.github.io:443
