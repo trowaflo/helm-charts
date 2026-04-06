@@ -23,3 +23,4 @@ jobs:
       enable_dependency_review: true
       enable_yamllint: true
       enable_json_lint: true
+      enable_markdown_lint: true
