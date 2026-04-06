@@ -1,0 +1,20 @@
+---
+extends: default
+
+# Helm Go-template files are not valid YAML — exclude them.
+# Upstream subchart archives (.tgz) are also excluded.
+ignore:
+  - "**/templates/**"
+  - "**/charts/**"
+
+rules:
+  line-length:
+    max: 150
+  truthy:
+    check-keys: false
+  comments:
+    min-spaces-from-content: 1
+  document-start: disable
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
