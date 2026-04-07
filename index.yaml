@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   cert-manager-platform:
   - apiVersion: v2
-    created: "2026-04-07T12:16:05.408350139Z"
+    created: "2026-04-07T12:24:49.570751041Z"
     dependencies:
     - alias: cert-manager
       condition: cert-manager.enabled
@@ -18,7 +18,7 @@ entries:
       X.509 certificate management for Kubernetes with OVH DNS-01 challenge support.
       Includes configuration validation for breaking changes, Certificate resource
       management, and streamlined setup for Let's Encrypt certificates.
-    digest: 90fe4d8315677a99798d850ffbd91d92fd2adac2e6a50e6a0f62fbd63ddf60e8
+    digest: e5c03cce6cbace46762891970cfac99e0f7759264e77a551a0d82291e84c05d5
     home: https://cert-manager.io
     keywords:
     - cert-manager
@@ -42,7 +42,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/cert-manager-platform-1.3.1-pr228.tgz
     version: 1.3.1-pr228
   - apiVersion: v2
-    created: "2026-04-07T12:16:05.401054876Z"
+    created: "2026-04-07T12:24:49.562692803Z"
     dependencies:
     - alias: cert-manager
       condition: cert-manager.enabled
@@ -83,7 +83,7 @@ entries:
     version: 1.3.0-pr228
   common:
   - apiVersion: v2
-    created: "2026-04-07T12:16:05.40897526Z"
+    created: "2026-04-07T12:24:49.571378336Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, Services,
       Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims) across the
@@ -103,7 +103,7 @@ entries:
     version: 2.1.0-pr211
   frigate-exporter:
   - apiVersion: v2
-    created: "2026-04-07T12:16:05.410919884Z"
+    created: "2026-04-07T12:24:49.573281802Z"
     dependencies:
     - name: common
       repository: https://trowaflo.github.io/helm-charts
@@ -111,7 +111,7 @@ entries:
     description: Prometheus exporter for Frigate NVR (Network Video Recorder) system.
       Exports metrics from Frigate cameras, detections, and recording statistics in
       Prometheus-compatible format for integration with monitoring stacks.
-    digest: 3e826efb839d0dfb0010d81a19ea1ec50e8d2696be1f9f05aa424d0cc274fbc4
+    digest: 35382e500352bc5b131f53bf6f266ffd45e9ddc5ef43204dc949746918f1504a
     home: https://github.com/bairhys/prometheus-frigate-exporter
     icon: https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/images/prometheus-logo.svg
     keywords:
@@ -134,7 +134,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/frigate-exporter-1.1.1-pr228.tgz
     version: 1.1.1-pr228
   - apiVersion: v2
-    created: "2026-04-07T12:16:05.409960481Z"
+    created: "2026-04-07T12:24:49.572353303Z"
     dependencies:
     - name: common
       repository: https://trowaflo.github.io/helm-charts
@@ -166,7 +166,7 @@ entries:
     version: 1.1.0-pr228
   grafana:
   - apiVersion: v2
-    created: "2026-04-07T12:16:05.414866097Z"
+    created: "2026-04-07T12:24:49.576485224Z"
     dependencies:
     - name: grafana
       repository: https://grafana.github.io/helm-charts
@@ -174,7 +174,7 @@ entries:
     description: Grafana visualization and dashboarding platform with custom extensions.
       Wraps the official Grafana Helm chart with domain-specific customizations, providing
       integrated dashboard provisioning and Traefik IngressRoute support.
-    digest: ba8dbc2625f62cf455193389ee22bf38b2ac4ec8f849438450cb7aaf088239c8
+    digest: 1dacd544976a74e1499a4e9d28949a30a3e62db1de308ed5bc3d4e16a799a658
     home: https://grafana.com
     icon: https://grafana.com/docs/grafana/latest/img/grafana_icon.svg
     keywords:
@@ -197,7 +197,7 @@ entries:
     version: 0.3.7-pr228
   graphite-exporter:
   - apiVersion: v2
-    created: "2026-04-07T12:16:05.417916846Z"
+    created: "2026-04-07T12:24:49.57993804Z"
     dependencies:
     - name: common
       repository: https://trowaflo.github.io/helm-charts
@@ -206,7 +206,7 @@ entries:
       to Prometheus format. Enables Prometheus to scrape metrics from legacy Graphite
       systems and sources (e.g., TrueNAS, custom monitoring systems) that emit Graphite-formatted
       metrics.
-    digest: 6a3c6849d221a4e947c9acefda10730a960a4e825e7873a3a5a14b324fe2bde8
+    digest: b4d503824b16e8c10623af8d1952d361d6c58c1540605f6b9c6a50023c02ef8d
     home: https://github.com/prometheus/graphite_exporter
     icon: https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/images/prometheus-logo.svg
     keywords:
@@ -229,7 +229,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/graphite-exporter-1.1.1-pr228.tgz
     version: 1.1.1-pr228
   - apiVersion: v2
-    created: "2026-04-07T12:16:05.41661144Z"
+    created: "2026-04-07T12:24:49.578653754Z"
     dependencies:
     - name: common
       repository: https://trowaflo.github.io/helm-charts
@@ -262,11 +262,11 @@ entries:
     version: 1.1.0-pr228
   guacamole:
   - apiVersion: v2
-    created: "2026-04-07T12:16:05.418254263Z"
+    created: "2026-04-07T12:24:49.58023696Z"
     description: Apache Guacamole HTML5 remote desktop gateway for secure access to
       virtual machines and servers. Provides browser-based RDP, SSH, and VNC access
       without requiring client-side installations.
-    digest: 6893ffb4d7fc4ab2978aa33d144ec093a508b97d3f82372e10dd4f836d8869c6
+    digest: 70f5cfff384b10460bf6d417a77b66960c9965dfe112e62c99bdc84d047342b8
     home: https://guacamole.apache.org
     icon: https://guacamole.apache.org/images/logo.png
     keywords:
@@ -291,7 +291,37 @@ entries:
     version: 0.3.4-pr228
   kgateway-platform:
   - apiVersion: v2
-    created: "2026-04-07T12:16:05.420540601Z"
+    created: "2026-04-07T12:24:49.582502565Z"
+    dependencies:
+    - alias: kgateway
+      condition: kgateway.enabled
+      name: kgateway
+      repository: oci://cr.kgateway.dev/kgateway-dev/charts
+      version: v2.2.2
+    description: Helm chart for configuring the kgateway platform using the Kubernetes
+      Gateway API with support for multiple gateways, HTTP(S) routing, and TLS certificate
+      integration.
+    digest: f368689d7ec71489d7e20f858322d9e5380590296071469f2dd43e819b742cca
+    keywords:
+    - kubernetes
+    - gateway
+    - kgateway
+    - networking
+    - tls
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: kgateway-platform
+    sources:
+    - https://github.com/kgateway-dev/kgateway
+    - https://docs.kgateway.dev/
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-platform-1.2.1-pr228.tgz
+    version: 1.2.1-pr228
+  - apiVersion: v2
+    created: "2026-04-07T12:24:49.581764913Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -321,7 +351,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-platform-1.2.0-pr228.tgz
     version: 1.2.0-pr228
   - apiVersion: v2
-    created: "2026-04-07T12:16:05.419315995Z"
+    created: "2026-04-07T12:24:49.581023013Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -352,7 +382,33 @@ entries:
     version: 1.1.0-pr184
   kgateway-routing:
   - apiVersion: v2
-    created: "2026-04-07T12:16:05.421466952Z"
+    created: "2026-04-07T12:24:49.584392656Z"
+    description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
+      resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
+      with request/response filters, header modification, and flexible path matching.
+    digest: c6e2096a3a704b5ef0877909906ddb319b381d5642771616ffce5e82165a1b28
+    keywords:
+    - kubernetes
+    - gateway
+    - kgateway
+    - httproute
+    - backend
+    - routing
+    - networking
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: kgateway-routing
+    sources:
+    - https://github.com/kgateway-dev/kgateway
+    - https://docs.kgateway.dev/
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.2.1-pr228.tgz
+    version: 0.2.1-pr228
+  - apiVersion: v2
+    created: "2026-04-07T12:24:49.583436214Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -378,7 +434,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.2.0-pr228.tgz
     version: 0.2.0-pr228
   - apiVersion: v2
-    created: "2026-04-07T12:16:05.421003621Z"
+    created: "2026-04-07T12:24:49.582992122Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -405,7 +461,7 @@ entries:
     version: 0.1.0-pr182
   persistent-volume:
   - apiVersion: v2
-    created: "2026-04-07T12:16:05.422388054Z"
+    created: "2026-04-07T12:24:49.585676745Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -414,7 +470,7 @@ entries:
       PersistentVolumes (PV) and PersistentVolumeClaims (PVC). Supports multiple storage
       backends including hostPath, NFS, and other volume types with flexible configuration
       for capacity, access modes, and storage classes.
-    digest: a0be1e308f09c7a16ddb825e5144939bb618fc88ddbb3be6113a1ecc6a13a876
+    digest: c7a398a31304e3c2955887f16ef81f13758e20b6fc520ad17f7f2f3416da5ab7
     keywords:
     - kubernetes
     - storage
@@ -435,7 +491,7 @@ entries:
     version: 0.1.0-pr228
   portainer:
   - apiVersion: v2
-    created: "2026-04-07T12:16:05.423764972Z"
+    created: "2026-04-07T12:24:49.587169823Z"
     dependencies:
     - name: portainer
       repository: https://portainer.github.io/k8s
@@ -467,7 +523,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/portainer-1.0.0-pr226.tgz
     version: 1.0.0-pr226
   - apiVersion: v2
-    created: "2026-04-07T12:16:05.423058108Z"
+    created: "2026-04-07T12:24:49.586338976Z"
     dependencies:
     - name: portainer
       repository: https://portainer.github.io/k8s
@@ -476,7 +532,7 @@ entries:
       management platform. Provides intuitive UI for managing Docker containers, Kubernetes
       clusters, and registries. Wraps the official Portainer Helm chart with custom
       persistence and networking configuration.
-    digest: 1bd4840973755c4b8f7d8f13a6de076f8196a1b63b436cb57567f782fd1fd1ca
+    digest: 538fef8720b2f5d54674320adf3d687cd355558ab54ab886440e7cb67ee4a1e6
     home: https://www.portainer.io
     icon: https://raw.githubusercontent.com/portainer/portainer/develop/app/assets/images/logo.png
     keywords:
@@ -500,7 +556,38 @@ entries:
     version: 0.1.0-pr228
   prometheus:
   - apiVersion: v2
-    created: "2026-04-07T12:16:05.432751497Z"
+    created: "2026-04-07T12:24:49.60597696Z"
+    dependencies:
+    - name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 28.14.1
+    description: Wraps the official kube-prometheus-stack Helm chart providing production-ready
+      monitoring stack including Prometheus, Grafana, Alertmanager, and node exporters.
+    digest: 2b35859de185f7f48416f57aeaea91ffe603fb6017badc51776591ba573373e2
+    home: https://prometheus.io
+    keywords:
+    - prometheus
+    - monitoring
+    - alerting
+    - metrics
+    - kubernetes
+    - operator
+    - grafana
+    - observability
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: prometheus
+    sources:
+    - https://github.com/prometheus/prometheus
+    - https://github.com/prometheus-operator/prometheus-operator
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/prometheus-3.6.1-pr228.tgz
+    version: 3.6.1-pr228
+  - apiVersion: v2
+    created: "2026-04-07T12:24:49.596025281Z"
     dependencies:
     - name: prometheus
       repository: https://prometheus-community.github.io/helm-charts
@@ -530,4 +617,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/prometheus-3.6.0-pr228.tgz
     version: 3.6.0-pr228
-generated: "2026-04-07T12:16:05.392981079Z"
+generated: "2026-04-07T12:24:49.553682809Z"
