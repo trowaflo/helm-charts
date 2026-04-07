@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   helm:
-    uses: trowaflo/github-actions/.github/workflows/helm-ci.yml@00e8609f90b2006fc546ca967e3edcac94ee0a45 # PR#35
+    uses: trowaflo/github-actions/.github/workflows/helm-ci.yml@413a8c048175f93fe186e2a2a645667a6a6ade00 # v4.0.0
     permissions:
       contents: write
       pull-requests: write
