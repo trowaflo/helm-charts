@@ -45,6 +45,7 @@ jobs:
         trowaflo.github.io:443
       enable_lint: true
       enable_unittest: true
-      enable_docs_check: false
+      enable_docs: true
+      enable_docs_check: true
       enable_bump: true
       enable_pr_charts: true
