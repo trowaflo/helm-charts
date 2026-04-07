@@ -1,6 +1,6 @@
 # prometheus
 
-![Version: 3.6.0](https://img.shields.io/badge/Version-3.6.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 3.6.1](https://img.shields.io/badge/Version-3.6.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Wraps the official kube-prometheus-stack Helm chart providing production-ready monitoring
 stack including Prometheus, Grafana, Alertmanager, and node exporters.

@@ -1,6 +1,6 @@
 # graphite-exporter
 
-![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.1](https://img.shields.io/badge/Version-1.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Prometheus exporter for converting Graphite plaintext protocol metrics to Prometheus format.
 Enables Prometheus to scrape metrics from legacy Graphite systems and sources
