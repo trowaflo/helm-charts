@@ -45,7 +45,7 @@ assignees: ["copilot"]
 
 <!-- Add logs, error messages, or screenshots to help explain the problem -->
 
-```
+```raw
 # Paste logs here
 ```
 
