@@ -19,6 +19,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      checks: write
     with:
       harden_runner_allowed_endpoints: >-
         github.com:443
