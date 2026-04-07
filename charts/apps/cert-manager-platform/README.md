@@ -1,6 +1,6 @@
 # cert-manager-platform
 
-![Version: 1.3.1](https://img.shields.io/badge/Version-1.3.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Wraps cert-manager and cert-manager-webhook-ovh to provide automated X.509 certificate
 management for Kubernetes with OVH DNS-01 challenge support. Includes configuration
