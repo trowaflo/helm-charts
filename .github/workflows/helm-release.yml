@@ -15,6 +15,7 @@ jobs:
     permissions:
       contents: write
       pages: write
+      id-token: write
     with:
       harden_runner_allowed_endpoints: >-
         github.com:443
