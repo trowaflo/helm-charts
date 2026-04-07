@@ -6,6 +6,11 @@ cert-manager:
 # -- Control flags for cert-manager-webhook-ovh subchart.
 # Kept separate from the subchart's own values to avoid schema conflicts
 # (cert-manager-webhook-ovh v0.9.5 has additionalProperties: false).
+#
+# BREAKING CHANGE from v1.3.x: the key was renamed from `cert-manager-webhook-ovh`
+# to `certManagerWebhookOvh`. Update your values files accordingly:
+#   cert-manager-webhook-ovh.enabled  -> certManagerWebhookOvh.enabled
+#   cert-manager-webhook-ovh.configVersion -> certManagerWebhookOvh.configVersion
 certManagerWebhookOvh:
   enabled: true
   # configVersion is required when enabled.
