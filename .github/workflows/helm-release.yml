@@ -11,36 +11,15 @@ permissions: read-all
 
 jobs:
   release:
-    uses: trowaflo/github-actions/.github/workflows/helm.yml@a7086f13b298337461edc6c9ee1ac2ddce212116 # PR#35
+    uses: trowaflo/github-actions/.github/workflows/helm-release.yml@00e8609f90b2006fc546ca967e3edcac94ee0a45 # PR#35
     permissions:
       contents: write
       pages: write
-      checks: write
-      pull-requests: write
     with:
       harden_runner_allowed_endpoints: >-
         github.com:443
         api.github.com:443
         objects.githubusercontent.com:443
         release-assets.githubusercontent.com:443
-        registry.npmjs.org:443
-        get.helm.sh:443
-        tuf-repo-cdn.sigstore.dev:443
-        rekor.sigstore.dev:443
-        fulcio.sigstore.dev:443
-        pypi.org:443
-        files.pythonhosted.org:443
-        ghcr.io:443
-        pkg-containers.githubusercontent.com:443
-        quay.io:443
-        cdn01.quay.io:443
-        cr.kgateway.dev:443
-        aureq.github.io:443
-        grafana.github.io:443
-        portainer.github.io:443
-        prometheus-community.github.io:443
-        trowaflo.github.io:443
       enable_release: true
-      enable_docs: true
-      enable_unittest: true
       release_charts_dirs: "charts/library charts/apps"
