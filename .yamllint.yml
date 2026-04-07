@@ -2,10 +2,11 @@
 extends: default
 
 # Helm Go-template files are not valid YAML — exclude them.
-# Upstream subchart archives (.tgz) are also excluded.
+# Vendored dependency charts and packaged chart archives (.tgz) are also excluded.
 ignore:
   - "**/templates/**"
-  - "**/charts/**"
+  - "charts/**/charts/**"
+  - "**/*.tgz"
 
 rules:
   line-length:
