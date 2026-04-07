@@ -42,8 +42,8 @@ services:
         protocol: UDP
         port: 9109
       graphite-tcp:
-          protocol: TCP
-          port: 9109
+        protocol: TCP
+        port: 9109
 
 ingress:
   main:
@@ -178,5 +178,6 @@ serviceMonitor:
           action: replace
 
         - sourceLabels: [__name__]
+          # yamllint disable-line rule:line-length
           regex: 'truenas_(system_uptime.*|cpu_usage.*|cputemp.*|system_load.*|meminfo.*|arcstats.*|net_.*(speed|received|sent).*|disk_stats_busy__serial_lunid.*)'
           action: keep

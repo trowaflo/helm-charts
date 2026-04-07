@@ -41,7 +41,7 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
-  
+
   # Test with multiple HTTP listener policies
   - it: should render multiple HTTPListenerPolicies when configured
     set:

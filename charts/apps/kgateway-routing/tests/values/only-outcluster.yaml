@@ -11,4 +11,3 @@ routes:
       - name: homeassistant
         host: homeassistant.local
         port: 8123
-
