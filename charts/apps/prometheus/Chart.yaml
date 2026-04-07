@@ -1,6 +1,6 @@
 apiVersion: v2
 name: prometheus
-version: 3.6.0
+version: 3.6.1
 type: application
 description: |-
   Wraps the official kube-prometheus-stack Helm chart providing production-ready monitoring
