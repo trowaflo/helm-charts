@@ -40,7 +40,6 @@ jobs:
         cr.kgateway.dev:443
         aureq.github.io:443
         grafana.github.io:443
-        portainer.github.io:443
         prometheus-community.github.io:443
         trowaflo.github.io:443
       enable_lint: true
