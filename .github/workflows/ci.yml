@@ -8,7 +8,7 @@ permissions: read-all
 
 jobs:
   quality:
-    uses: trowaflo/github-actions/.github/workflows/quality.yml@413a8c048175f93fe186e2a2a645667a6a6ade00 # v4.0.0
+    uses: trowaflo/github-actions/.github/workflows/quality.yml@3f7ba998a4d4e9dcc3ff124be1333f3d84395852 # v4.1.0
     permissions:
       contents: read
       pull-requests: write
