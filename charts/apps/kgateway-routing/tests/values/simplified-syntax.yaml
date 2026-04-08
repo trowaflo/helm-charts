@@ -10,7 +10,7 @@ routes:
     inCluster:
       - name: argocd-server
         port: 80
-  
+
   homeassistant:
     enabled: true
     hostnames:

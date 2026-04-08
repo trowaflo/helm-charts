@@ -1,0 +1,5 @@
+# Checkov configuration for helm-charts
+# Wrapper charts include upstream subcharts whose rendered output triggers K8s
+# security checks we cannot fix (upstream code). Trivy + KICS provide primary
+# IaC coverage. Checkov runs in soft-fail to surface findings without blocking.
+soft-fail: true

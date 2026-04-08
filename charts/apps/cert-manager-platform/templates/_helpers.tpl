@@ -13,7 +13,7 @@ https://github.com/aureq/cert-manager-webhook-ovh
 NOTE: Update this $requiredVersion value when upgrading the cert-manager-webhook-ovh dependency.
 */}}
 {{- define "cert-manager.validateConfig" -}}
-  {{- $webhookOvh := index .Values "cert-manager-webhook-ovh" }}
+  {{- $webhookOvh := .Values.certManagerWebhookOvh }}
   {{- if $webhookOvh.enabled }}
     {{- $requiredVersion := "0.0.2" }}
     {{- $providedVersion := $webhookOvh.configVersion | default "" }}

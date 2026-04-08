@@ -13,3 +13,6 @@ Chart.lock
 **/manualGeneratedTemplate.yaml
 **/renderedTemplate.yaml
 **/output.yaml
+
+#
+.claude/settings.local.json

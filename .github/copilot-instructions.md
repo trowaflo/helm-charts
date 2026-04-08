@@ -1,17 +1,23 @@
 # Copilot Instructions for helm-charts
 
 ## ⚠️ MANDATORY: Review These Instructions
-**ALWAYS read and review this entire file at the start of ANY task or PR.** These instructions are your source of truth for architecture, conventions, and best practices. Update this file when you identify improvements or discover new patterns.
+
+**ALWAYS read and review this entire file at the start of ANY task or PR.**
+These instructions are your source of truth for architecture, conventions, and best practices.
+Update this file when you identify improvements or discover new patterns.
 
 ## Communication Guidelines
+
 - **ALWAYS respond in English**, even if the user writes in French or another language
 - Be concise and technical
 - Focus on actionable information
 
 ## Scope
+
 Repo-wide guidance for GitHub Copilot (PR descriptions/reviews/fixes) for all charts.
 
 ## Tech Stack
+
 - **Helm 3** - Kubernetes package manager for chart templating and deployment
 - **Kubernetes** - Target platform for all charts (Gateway API, standard resources)
 - **helm-unittest** - Unit testing framework for Helm charts
@@ -21,7 +27,9 @@ Repo-wide guidance for GitHub Copilot (PR descriptions/reviews/fixes) for all ch
 - **Gitleaks** - Secret scanning tool
 
 ## Self-improvement mandate
+
 When working on ANY task:
+
 1. Read these instructions completely before starting
 2. Identify patterns or conventions not documented here
 3. Look for optimization opportunities (code duplication, complex conditionals, missing abstractions)
@@ -29,6 +37,7 @@ When working on ANY task:
 5. Propose instruction improvements when you notice gaps or ambiguities
 
 ## General expectations
+
 - Branch from `main`; keep changes small and focused.
 - Run `helm dependency update` in any chart you touch.
 - Chart versions are automatically bumped by CI based on conventional commits (see Versioning section below).
@@ -36,42 +45,54 @@ When working on ANY task:
 - Check PR title and propose improvements.
 
 ## Repository structure
+
 - `charts/apps/` - Application charts (wrapper charts that deploy third-party applications)
 - `charts/library/` - Library charts (shared templates and helpers for reuse)
 - `.github/workflows/` - CI/CD workflows for testing, linting, docs generation, and security scans
 - `tests/` - Integration tests and test fixtures
 
 ## Versioning
+
 Chart versions are **automatically managed** by the `chart-bump.yml` workflow:
+
 - Uses **conventional commits** to determine version bumps
 - `feat:` commits trigger a **minor** version bump
-- `fix:` commits trigger a **patch** version bump  
+- `fix:` commits trigger a **patch** version bump
 - `BREAKING CHANGE:` or `!:` commits trigger a **major** version bump
 - The workflow runs on PRs and automatically updates Chart.yaml versions
 - **Automatic versioning is preferred**: Let the workflow handle version bumps based on conventional commits
-- **Manual version changes are allowed**: If you manually bump the version in Chart.yaml, the workflow will detect this and skip automatic bumping for that chart
+- **Manual version changes are allowed**: If you manually bump the version in Chart.yaml, the workflow
+  will detect this and skip automatic bumping for that chart
 - Use automatic versioning unless you have a specific reason to manually control the version
 
 ## Dependency management
+
 - Renovate bot automatically creates PRs for dependency updates
 - **Patch/minor updates**: Auto-merged if tests pass
 - **Major updates**: Require manual review (may have breaking changes)
 - Always run `helm dependency update` after modifying Chart.yaml dependencies
 
 ## Testing Philosophy
-**Charts in this repo typically wrap public upstream charts.** We assume upstream charts are tested. Our tests focus on:
+
+**Charts in this repo typically wrap public upstream charts.** We assume upstream charts are tested.
+Our tests focus on:
+
 1. **Regression detection**: Verify that upstream chart updates don't break our usage
-2. **Enablement flags**: Verify that `.enabled` flags work as expected (resources rendered when true, not rendered when false)
+2. **Enablement flags**: Verify that `.enabled` flags work as expected
+   (resources rendered when true, not rendered when false)
 3. **Value pass-through**: Verify that our values are correctly passed to subcharts
 4. **Custom templates**: If we add our own templates, test them thoroughly
 
-**DO NOT test upstream chart internals** (e.g., specific deployment fields, subchart template logic). Test the integration points only.
+**DO NOT test upstream chart internals** (e.g., specific deployment fields, subchart template logic).
+Test the integration points only.
 
 ## Required local checks (MANDATORY for any changed chart)
+
 All checks below are **mandatory** before committing:
 
 1. **Helm unittest**: `helm unittest <chart-path>`
-   - Plugin: https://github.com/helm-unittest/helm-unittest
+
+   - Plugin: <https://github.com/helm-unittest/helm-unittest>
    - Install: `helm plugin install https://github.com/helm-unittest/helm-unittest`
    - Every chart MUST have tests covering:
      - Enablement flags (enabled=true renders resources, enabled=false doesn't)
@@ -81,42 +102,52 @@ All checks below are **mandatory** before committing:
    - Update test expectations/snapshots as needed
 
 2. **Render sanity**: `helm template <release> <chart-path>` with appropriate values
+
    - Requires `helm dependency update` first if chart has dependencies
    - Verify templates render without errors
    - Spot-check output for correctness
 
 3. **Documentation**: `helm-docs` when values.yaml or templates change
-   - **IMPORTANT**: Do NOT manually edit or commit README.md files. They are automatically regenerated by CI workflows using helm-docs. Manual changes will be overwritten.
+
+   - **IMPORTANT**: Do NOT manually edit or commit README.md files.
+     They are automatically regenerated by CI workflows using helm-docs.
+     Manual changes will be overwritten.
 
 4. **Validation tests**: Run any chart-specific validation in `tests/` or workflows
 
 ## Code style conventions
 
 ### Helm template indentation
+
 - **ALWAYS use 2-space indentation** inside template definitions (`{{- define ... -}}`)
 - This applies to all template logic lines starting with `{{-`
 - Improves readability and maintains consistency across the repository
-- Example:
-  ```yaml
-  {{- define "chart.fullname" -}}
-    {{- if .Values.fullnameOverride -}}
-      {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
-    {{- else -}}
-      {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
-    {{- end -}}
+
+Example:
+
+```yaml
+{{- define "chart.fullname" -}}
+  {{- if .Values.fullnameOverride -}}
+    {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+  {{- else -}}
+    {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
   {{- end -}}
-  ```
-- Reference: See `charts/apps/cert-manager-platform/templates/_helpers.tpl` for examples
+{{- end -}}
+```
+
+Reference: See `charts/apps/cert-manager-platform/templates/_helpers.tpl` for examples.
 
 ## Test Writing Guidelines
 
-### For umbrella/wrapper charts (charts that only include dependencies):
+### For umbrella/wrapper charts (charts that only include dependencies)
+
 - Create minimal templates (e.g., NOTES.txt, _helpers.tpl) for validation logic
 - Test that enablement flags control subchart rendering
 - Test configuration validation (required values, version constraints)
 - DO NOT test subchart template internals
 
 Example test structure:
+
 ```yaml
 suite: test enablement flags
 templates:
@@ -131,17 +162,20 @@ tests:
           pattern: "component: true"
 ```
 
-### For charts with custom templates:
+### For charts with custom templates
+
 - Test your templates directly
 - Use snapshots for complex outputs
 - Test edge cases and error conditions
 
 ## Code style and formatting
+
 - **Helm templates**: Use 2-space indentation within template definitions for readability
 - **values.yaml**: Keep examples concise - use inline YAML format where possible to avoid verbosity
 - **_helpers.tpl**: Indent template bodies for clarity
 
 ## Security requirements
+
 - **NEVER commit secrets** to the repository
 - **KICS security scanning** runs automatically on all PRs and main branch
   - Scans for Infrastructure-as-Code security issues
@@ -152,14 +186,24 @@ tests:
 - Review security scan results and address issues before merging
 
 ## Chart-specific notes
+
 Keep this section minimal. Add only truly exceptional cases:
 
-- **cert-manager**: Validates `cert-manager-webhook-ovh.configVersion` when webhook enabled. The required version is tied to the dependency version in Chart.yaml (current: v0.8.0 requires "0.0.2"). This value changes with breaking updates from upstream. When upgrading the cert-manager-webhook-ovh dependency, update the `$requiredVersion` in `templates/_helpers.tpl` and the comment in `values.yaml`. See [upstream docs](https://github.com/aureq/cert-manager-webhook-ovh) for configVersion purpose.
+- **cert-manager**: Validates `cert-manager-webhook-ovh.configVersion` when webhook enabled.
+  The required version is tied to the dependency version in Chart.yaml
+  (current: v0.8.0 requires "0.0.2"). This value changes with breaking updates from upstream.
+  When upgrading the cert-manager-webhook-ovh dependency, update the `$requiredVersion` in
+  `templates/_helpers.tpl` and the comment in `values.yaml`.
+  See [upstream docs](https://github.com/aureq/cert-manager-webhook-ovh) for configVersion purpose.
 
-- **kgateway-routing**: Pure configuration chart for Gateway API resources (HTTPRoute, Backend). Uses inline backend pattern where backends are defined within route configuration for simplicity. Legacy separate `backends:` section maintained for backwards compatibility only.
+- **kgateway-routing**: Pure configuration chart for Gateway API resources (HTTPRoute, Backend).
+  Uses inline backend pattern where backends are defined within route configuration for simplicity.
+  Legacy separate `backends:` section maintained for backwards compatibility only.
 
 ## CI awareness
+
 Workflows in `.github/workflows/` provide comprehensive automation:
+
 - **lint-test.yml** - Lints charts with chart-testing (ct)
 - **helm-unittest.yml** - Runs helm-unittest tests for all charts
 - **helm-docs.yml** - Auto-generates README.md files (runs on merge to main)
@@ -173,9 +217,11 @@ Workflows in `.github/workflows/` provide comprehensive automation:
 - Mention executed commands in PRs for transparency
 
 ## Key Commands Reference
+
 Quick reference for common tasks:
 
 **Testing and Validation:**
+
 ```bash
 # Run unit tests for a chart
 helm unittest <chart-path>
@@ -188,18 +234,21 @@ helm template <release-name> <chart-path>
 ```
 
 **Dependencies:**
+
 ```bash
 # Update chart dependencies
 helm dependency update <chart-path>
 ```
 
 **Documentation:**
+
 ```bash
 # Generate/update README.md (done by CI, not manually)
 helm-docs <chart-path>
 ```
 
 **Linting:**
+
 ```bash
 # Lint charts with chart-testing
 ct lint --config .github/ct.yaml

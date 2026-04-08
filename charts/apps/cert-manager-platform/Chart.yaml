@@ -1,6 +1,6 @@
 apiVersion: v2
 name: cert-manager-platform
-version: 1.3.0
+version: 2.0.0
 type: application
 description: |-
   Wraps cert-manager and cert-manager-webhook-ovh to provide automated X.509 certificate
@@ -34,4 +34,4 @@ dependencies:
     version: 0.9.5
     repository: https://aureq.github.io/cert-manager-webhook-ovh/
     alias: cert-manager-webhook-ovh
-    condition: cert-manager-webhook-ovh.enabled
+    condition: certManagerWebhookOvh.enabled

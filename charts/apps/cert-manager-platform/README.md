@@ -1,17 +1,19 @@
-
-
 # cert-manager-platform
+
+![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Wraps cert-manager and cert-manager-webhook-ovh to provide automated X.509 certificate
 management for Kubernetes with OVH DNS-01 challenge support. Includes configuration
 validation for breaking changes, Certificate resource management, and streamlined setup
 for Let's Encrypt certificates.
 
----
-
-![Version: 1.2.1](https://img.shields.io/badge/Version-1.2.1-informational?style=flat-square)  ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) 
-
 **Homepage:** <https://cert-manager.io>
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| trowaflo | <trowa.flo@gmail.com> |  |
 
 ## Source Code
 
@@ -21,109 +23,20 @@ for Let's Encrypt certificates.
 
 ## Requirements
 
-## Requirements
-
 | Repository | Name | Version |
 |------------|------|---------|
-| https://aureq.github.io/cert-manager-webhook-ovh/ | cert-manager-webhook-ovh(cert-manager-webhook-ovh) | 0.8.0 |
-| oci://quay.io/jetstack/charts | cert-manager(cert-manager) | v1.19.4 |
-
-- Helm: v3+
-
-## Getting Started
-
-### Add repository
-
-```bash
-helm repo add cert-manager-platform https://example.com/helm-charts
-helm repo update
-```
-
-### Install
-
-```bash
-helm install my-cert-manager-platform cert-manager-platform/cert-manager-platform \
-  --namespace cert-manager-platform \
-  --create-namespace
-```
-
-### Upgrade
-
-```bash
-helm upgrade my-cert-manager-platform cert-manager-platform/cert-manager-platform \
-  --namespace cert-manager-platform \
-  --install
-```
-
-### Uninstall
-
-```bash
-helm uninstall my-cert-manager-platform --namespace cert-manager-platform
-```
+| https://aureq.github.io/cert-manager-webhook-ovh/ | cert-manager-webhook-ovh(cert-manager-webhook-ovh) | 0.9.5 |
+| oci://quay.io/jetstack/charts | cert-manager(cert-manager) | v1.20.0 |
 
 ## Values
 
-<table>
-	<thead>
-		<th>Key</th>
-		<th>Type</th>
-		<th>Default</th>
-		<th>Description</th>
-	</thead>
-	<tbody>
-		<tr>
-			<td>cert-manager-webhook-ovh.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>cert-manager.crds.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>cert-manager.enabled</td>
-			<td>bool</td>
-			<td><pre lang="json">
-true
-</pre>
-</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>certificates</td>
-			<td>object</td>
-			<td><pre lang="">
-{} (empty, no certificates managed by default)
-</pre>
-</td>
-			<td>Certificate resources to manage TLS certificates via cert-manager. Define multiple certificates using map keys (e.g., wildcard-tls, api-tls). Each certificate requires: - enabled: bool - whether to create the certificate - secretName: string (REQUIRED) - name of the secret that will store the certificate - issuerRef: object (REQUIRED) - reference to the cert-manager Issuer or ClusterIssuer - dnsNames: list of strings - DNS names for the certificate - commonName: string (optional) - common name for the certificate - duration: string (optional) - certificate lifetime (e.g., "2160h" for 90 days) - renewBefore: string (optional) - when to renew before expiry (e.g., "360h" for 15 days)  ℹ️ NOTE: For Let's Encrypt certificates, cert-manager automatically detects the certificate expiry from the issued certificate and handles renewal. The duration/renewBefore fields are OPTIONAL - if not specified, cert-manager uses sensible defaults (90 days duration, renew 30 days before expiry for Let's Encrypt). Only set these if you need custom values.  Example:   certificates:     wildcard-tls:       enabled: true       secretName: wildcard-tls       issuerRef:         name: letsencrypt-prod         kind: ClusterIssuer       dnsNames:         - "*.example.com"         - "example.com"       commonName: "*.example.com"       # duration and renewBefore are optional - cert-manager auto-detects from Let's Encrypt </td>
-		</tr>
-		<tr>
-			<td>referenceGrants</td>
-			<td>object</td>
-			<td><pre lang="">
-{} (empty, configure only when using Gateway API)
-</pre>
-</td>
-			<td>ReferenceGrants allow Gateway API resources in other namespaces to reference secrets in the cert-manager-platform namespace (where certificates are stored).  ⚠️ IMPORTANT: ReferenceGrants are Gateway API resources (gateway.networking.k8s.io/v1beta1) that require Gateway API CRDs to be installed cluster-wide. Enabling ReferenceGrants without Gateway API CRDs installed will cause deployment failures.  Only configure this section when using Gateway API (e.g., with kgateway-platform chart). Define multiple grants using map keys (e.g., allow-kgateway-platform, allow-dmz-gateway). Each grant must have 'enabled: true' and 'from'/'to' configuration.  Example:   referenceGrants:     allow-kgateway-platform:       enabled: true       from:         - kind: Gateway           namespace: kgateway-platform       to:         - kind: Secret </td>
-		</tr>
-	</tbody>
-</table>
-
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| trowaflo | <trowa.flo@gmail.com> |  |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| cert-manager.crds.enabled | bool | `true` |  |
+| cert-manager.enabled | bool | `true` |  |
+| certManagerWebhookOvh | object | `{"enabled":true}` | Control flags for cert-manager-webhook-ovh subchart. Kept separate from the subchart's own values to avoid schema conflicts (cert-manager-webhook-ovh v0.9.5 has additionalProperties: false).  BREAKING CHANGE from v1.3.x: the key was renamed from `cert-manager-webhook-ovh` to `certManagerWebhookOvh`. Update your values files accordingly:   cert-manager-webhook-ovh.enabled  -> certManagerWebhookOvh.enabled   cert-manager-webhook-ovh.configVersion -> certManagerWebhookOvh.configVersion |
+| certificates | object | {} (empty, no certificates managed by default) | Certificate resources to manage TLS certificates via cert-manager. Define multiple certificates using map keys (e.g., wildcard-tls, api-tls). Each certificate requires: - enabled: bool - whether to create the certificate - secretName: string (REQUIRED) - name of the secret that will store the certificate - issuerRef: object (REQUIRED) - reference to the cert-manager Issuer or ClusterIssuer - dnsNames: list of strings - DNS names for the certificate - commonName: string (optional) - common name for the certificate - duration: string (optional) - certificate lifetime (e.g., "2160h" for 90 days) - renewBefore: string (optional) - when to renew before expiry (e.g., "360h" for 15 days)  ℹ️ NOTE: For Let's Encrypt certificates, cert-manager automatically detects the certificate expiry from the issued certificate and handles renewal. The duration/renewBefore fields are OPTIONAL - if not specified, cert-manager uses sensible defaults (90 days duration, renew 30 days before expiry for Let's Encrypt). Only set these if you need custom values.  Example:   certificates:     wildcard-tls:       enabled: true       secretName: wildcard-tls       issuerRef:         name: letsencrypt-prod         kind: ClusterIssuer       dnsNames:         - "*.example.com"         - "example.com"       commonName: "*.example.com"       # duration and renewBefore are optional - cert-manager auto-detects from Let's Encrypt  |
+| referenceGrants | object | {} (empty, configure only when using Gateway API) | ReferenceGrants allow Gateway API resources in other namespaces to reference secrets in the cert-manager-platform namespace (where certificates are stored).  ⚠️ IMPORTANT: ReferenceGrants are Gateway API resources (gateway.networking.k8s.io/v1beta1) that require Gateway API CRDs to be installed cluster-wide. Enabling ReferenceGrants without Gateway API CRDs installed will cause deployment failures.  Only configure this section when using Gateway API (e.g., with kgateway-platform chart). Define multiple grants using map keys (e.g., allow-kgateway-platform, allow-dmz-gateway). Each grant must have 'enabled: true' and 'from'/'to' configuration.  Example:   referenceGrants:     allow-kgateway-platform:       enabled: true       from:         - kind: Gateway           namespace: kgateway-platform       to:         - kind: Secret  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

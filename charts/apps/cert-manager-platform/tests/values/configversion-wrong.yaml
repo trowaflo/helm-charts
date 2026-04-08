@@ -3,6 +3,6 @@ cert-manager:
   crds:
     enabled: true
 
-cert-manager-webhook-ovh:
+certManagerWebhookOvh:
   enabled: true
   configVersion: 0.0.1

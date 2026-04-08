@@ -1,6 +1,6 @@
 {{- include "cert-manager.validateConfig" . -}}
 {{- $certManager := index .Values "cert-manager" }}
-{{- $webhookOvh := index .Values "cert-manager-webhook-ovh" }}
+{{- $webhookOvh := .Values.certManagerWebhookOvh }}
 cert-manager has been installed successfully.
 
 Components enabled:
