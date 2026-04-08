@@ -29,7 +29,7 @@ ct lint --config .github/ct.yaml
 ### Chart types
 
 - `charts/apps/` — Application charts. Two sub-patterns:
-  - **Wrapper charts**: Thin wrappers around upstream Helm charts (cert-manager, grafana, prometheus, portainer, guacamole). Define dependencies in `Chart.yaml`, add minimal custom templates (NOTES.txt, _helpers.tpl), and delegate most rendering to upstream subcharts.
+  - **Wrapper charts**: Thin wrappers around upstream Helm charts (cert-manager, grafana, prometheus, guacamole). Define dependencies in `Chart.yaml`, add minimal custom templates (NOTES.txt, _helpers.tpl), and delegate most rendering to upstream subcharts.
   - **Custom charts**: Own full template set (kgateway-routing, frigate-exporter, graphite-exporter, persistent-volume). Use the `common` library chart for Deployment/Service/Ingress/ServiceMonitor/PV/PVC.
 - `charts/library/common/` — Shared library chart. Provides reusable templates for Deployment, Service, Ingress, ServiceMonitor, PersistentVolume, PersistentVolumeClaim with standardised security and observability defaults. All custom application charts depend on it.
 
