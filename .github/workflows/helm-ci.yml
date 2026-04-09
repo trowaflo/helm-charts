@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   helm-ci:
-    uses: trowaflo/github-actions/.github/workflows/ci-helm.yml@16b746a93e387b41b394d2f0c6000d1f9e5d5a49 # v1.1.0
+    uses: trowaflo/github-actions/.github/workflows/ci-helm.yml@d51fc48891c455f85a902e3d23f8ac7a52ef273e # v1.1.0
     permissions:
       contents: write
       checks: write
