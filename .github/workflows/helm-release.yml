@@ -12,7 +12,7 @@ permissions: read-all
 
 jobs:
   release:
-    uses: trowaflo/github-actions/.github/workflows/release-helm.yml@2464b3e45fadaadabfe7df91014d01490a0ad9c9 # v1.0.0
+    uses: trowaflo/github-actions/.github/workflows/release-helm.yml@16b746a93e387b41b394d2f0c6000d1f9e5d5a49 # v1.0.0
     permissions:
       contents: write
       pages: write
