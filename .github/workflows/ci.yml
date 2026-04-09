@@ -7,19 +7,21 @@ on:
 permissions: read-all
 
 jobs:
-  quality:
-    uses: trowaflo/github-actions/.github/workflows/quality.yml@9d58d4647688c45c876ab4c1072e0d1573b0939c # v4.1.0
+  lint:
+    uses: trowaflo/github-actions/.github/workflows/lint.yml@2464b3e45fadaadabfe7df91014d01490a0ad9c9 # v1.0.0
     permissions:
       contents: read
-      pull-requests: write
-      security-events: write
-      actions: read
+      security-events: write   # SARIF uploads (actionlint)
     with:
-      enable_gitleaks: true
-      enable_checkov: true
-      enable_actionlint: true
-      enable_trivy: true
-      enable_dependency_review: true
+      enable_markdown_lint: true
       enable_yamllint: true
       enable_json_lint: true
-      enable_markdown_lint: true
+
+  security:
+    uses: trowaflo/github-actions/.github/workflows/security.yml@2464b3e45fadaadabfe7df91014d01490a0ad9c9 # v1.0.0
+    permissions:
+      contents: read
+      pull-requests: write     # gitleaks annotations, dependency-review, KICS comments
+      security-events: write   # SARIF uploads (kics, trivy, checkov)
+    with:
+      enable_dependency_review: true

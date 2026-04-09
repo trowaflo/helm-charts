@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   cleanup:
-    uses: trowaflo/github-actions/.github/workflows/helm-pr-cleanup.yml@9d58d4647688c45c876ab4c1072e0d1573b0939c # v4.1.0
+    uses: trowaflo/github-actions/.github/workflows/ci-helm-cleanup.yml@2464b3e45fadaadabfe7df91014d01490a0ad9c9 # v1.0.0
     permissions:
       contents: write
       pull-requests: write
