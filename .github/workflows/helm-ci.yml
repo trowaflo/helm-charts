@@ -14,37 +14,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  helm:
-    uses: trowaflo/github-actions/.github/workflows/helm-ci.yml@3f7ba998a4d4e9dcc3ff124be1333f3d84395852 # v4.1.0
+  helm-ci:
+    uses: trowaflo/github-actions/.github/workflows/ci-helm.yml@d51fc48891c455f85a902e3d23f8ac7a52ef273e # v1.1.0
     permissions:
       contents: write
-      pull-requests: write
       checks: write
+      pull-requests: write
     with:
+      charts_dir: "charts"
+      enable_bump: true
+      enable_docs: true
+      enable_docs_check: true
+      enable_lint: true
+      enable_pr_charts: true
+      enable_unittest: true
       harden_runner_allowed_endpoints: >-
-        github.com:443
-        api.github.com:443
-        objects.githubusercontent.com:443
-        release-assets.githubusercontent.com:443
         registry.npmjs.org:443
-        get.helm.sh:443
         tuf-repo-cdn.sigstore.dev:443
         rekor.sigstore.dev:443
         fulcio.sigstore.dev:443
         pypi.org:443
         files.pythonhosted.org:443
-        ghcr.io:443
         pkg-containers.githubusercontent.com:443
-        quay.io:443
         cdn01.quay.io:443
-        cr.kgateway.dev:443
         aureq.github.io:443
         grafana.github.io:443
         prometheus-community.github.io:443
         trowaflo.github.io:443
-      enable_lint: true
-      enable_unittest: true
-      enable_docs: true
-      enable_docs_check: true
-      enable_bump: true
-      enable_pr_charts: true
