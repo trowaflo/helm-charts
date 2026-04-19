@@ -73,22 +73,11 @@ true
 {{- end -}}
 
 {{/*
-Generate PV name from key and config
+Generate a resource name from key and config.
+Used by PersistentVolume and PersistentVolumeClaim: returns config.name if
+provided, otherwise falls back to the map key.
 */}}
-{{- define "common.helpers.pvName" -}}
-  {{- $key := .key -}}
-  {{- $config := .config -}}
-  {{- if $config.name }}
-    {{- $config.name }}
-  {{- else }}
-    {{- $key }}
-  {{- end }}
-{{- end }}
-
-{{/*
-Generate PVC name from key and config
-*/}}
-{{- define "common.helpers.pvcName" -}}
+{{- define "common.helpers.resourceName" -}}
   {{- $key := .key -}}
   {{- $config := .config -}}
   {{- if $config.name }}

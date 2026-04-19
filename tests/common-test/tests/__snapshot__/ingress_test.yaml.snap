@@ -4,12 +4,12 @@ should compute fullnameOverride correctly:
     kind: Ingress
     metadata:
       labels:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: ingress-test
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: common-test
         helm.sh/chart: common-test-0.1.0
-        test: true
-      name: my-ingress
+      name: my-ingress-main
       namespace: ingress-test-namespace-override-test
     spec:
       ingressClassName: traefik
@@ -23,30 +23,6 @@ should compute fullnameOverride correctly:
                     port:
                       name: main
                 path: /
-                pathType: Prefix
-              - backend:
-                  service:
-                    name: my-ingress-main
-                    port:
-                      name: main
-                path: /testpath
-                pathType: Prefix
-        - host: another-chart-example.local
-          http:
-            paths:
-              - backend:
-                  service:
-                    name: my-ingress-main
-                    port:
-                      name: main
-                path: /
-                pathType: Prefix
-              - backend:
-                  service:
-                    name: my-ingress-main
-                    port:
-                      name: main
-                path: /testpath
                 pathType: Prefix
 should compute nameOverride correctly:
   1: |
@@ -54,12 +30,12 @@ should compute nameOverride correctly:
     kind: Ingress
     metadata:
       labels:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: ingress-test
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override
         helm.sh/chart: common-test-0.1.0
-        test: true
-      name: ingress-test-name-override
+      name: ingress-test-name-override-main
       namespace: ingress-test-namespace-override-test
     spec:
       ingressClassName: traefik
@@ -74,42 +50,18 @@ should compute nameOverride correctly:
                       name: main
                 path: /
                 pathType: Prefix
-              - backend:
-                  service:
-                    name: ingress-test-name-override-main
-                    port:
-                      name: main
-                path: /testpath
-                pathType: Prefix
-        - host: another-chart-example.local
-          http:
-            paths:
-              - backend:
-                  service:
-                    name: ingress-test-name-override-main
-                    port:
-                      name: main
-                path: /
-                pathType: Prefix
-              - backend:
-                  service:
-                    name: ingress-test-name-override-main
-                    port:
-                      name: main
-                path: /testpath
-                pathType: Prefix
 should have the right host configured:
   1: |
     apiVersion: networking.k8s.io/v1
     kind: Ingress
     metadata:
       labels:
+        app.kubernetes.io/component: other
         app.kubernetes.io/instance: ingress-test
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: common-test
         helm.sh/chart: common-test-0.1.0
-        test: true
-      name: ingress-test-common-test
+      name: ingress-test-common-test-other
       namespace: ingress-test-namespace-override-test
     spec:
       ingressClassName: traefik
@@ -130,12 +82,12 @@ should match snapshot with default values:
     kind: Ingress
     metadata:
       labels:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: ingress-test
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: common-test
         helm.sh/chart: common-test-0.1.0
-        test: true
-      name: ingress-test-common-test
+      name: ingress-test-common-test-main
       namespace: ingress-test-namespace-override-test
     spec:
       ingressClassName: traefik
@@ -149,28 +101,4 @@ should match snapshot with default values:
                     port:
                       name: main
                 path: /
-                pathType: Prefix
-              - backend:
-                  service:
-                    name: ingress-test-common-test-main
-                    port:
-                      name: main
-                path: /testpath
-                pathType: Prefix
-        - host: another-chart-example.local
-          http:
-            paths:
-              - backend:
-                  service:
-                    name: ingress-test-common-test-main
-                    port:
-                      name: main
-                path: /
-                pathType: Prefix
-              - backend:
-                  service:
-                    name: ingress-test-common-test-main
-                    port:
-                      name: main
-                path: /testpath
                 pathType: Prefix

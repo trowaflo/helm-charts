@@ -1,0 +1,43 @@
+suite: test common chart - values prepare (common.* merge)
+templates:
+  - templates/common.yaml
+values:
+  - values/default.yaml
+release:
+  name: prepare-test
+  namespace: prepare-test
+tests:
+  # common.fullnameOverride at the common.* prefix is lifted to root after merge
+  - it: should honor common.fullnameOverride when consumer does not set it
+    set:
+      common:
+        fullnameOverride: via-common
+      k8sServices:
+        main:
+          enabled: true
+          ports:
+            main:
+              port: 80
+              protocol: TCP
+    asserts:
+      - equal:
+          path: metadata.name
+          value: via-common-main
+
+  # Consumer chart's direct value wins over common.* prefix
+  - it: should prefer chart-level fullnameOverride over common.fullnameOverride
+    set:
+      common:
+        fullnameOverride: from-common
+      fullnameOverride: from-chart
+      k8sServices:
+        main:
+          enabled: true
+          ports:
+            main:
+              port: 80
+              protocol: TCP
+    asserts:
+      - equal:
+          path: metadata.name
+          value: from-chart-main

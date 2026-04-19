@@ -1,6 +1,6 @@
 {{- define "common.values.prepare" -}}
 
-{{- $commonValues := mustDeepCopy .Values.common -}}
+{{- $commonValues := .Values.common | default dict | deepCopy -}}
 {{- $chartValues := mustDeepCopy (omit .Values "common") -}}
 {{- $mergedValues := mustMergeOverwrite $commonValues $chartValues -}}
 {{- $_ := set . "Values" (mustDeepCopy $mergedValues) -}}

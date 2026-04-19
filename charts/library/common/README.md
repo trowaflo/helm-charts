@@ -3,15 +3,15 @@
 # common
 
 Common library chart providing reusable Helm templates and default configurations.
-Standardizes Kubernetes resource deployment (Deployments, Services, Ingress, ServiceMonitor,
-PersistentVolumes, PersistentVolumeClaims) across the chart repository with consistent
-security, observability, and best practices.
+Standardizes Kubernetes resource deployment (Deployments, StatefulSets, CronJobs, Jobs,
+Services, Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims, CNPG Clusters)
+across the chart repository with consistent security, observability, and best practices.
 
 Used by all application charts in this repository for consistency.
 
 ---
 
-![Version: 2.1.2](https://img.shields.io/badge/Version-2.1.2-informational?style=flat-square)  ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) 
+![Version: 3.0.0](https://img.shields.io/badge/Version-3.0.0-informational?style=flat-square)  ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) 
 
 ## Requirements
 
@@ -286,6 +286,39 @@ The chart will always construct the main container.
 		</tr>
 	</tbody>
 </table>
+<h3>Services configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>k8sServices</td>
+			<td>object</td>
+			<td><pre lang="json">
+{
+  "main": {
+    "annotations": {},
+    "enabled": true,
+    "labels": {},
+    "ports": {
+      "main": {
+        "port": 80,
+        "protocol": "TCP"
+      }
+    },
+    "type": "ClusterIP"
+  }
+}
+</pre>
+</td>
+			<td>Service configuration. Additional services can be added under the 'k8sServices' key.</td>
+		</tr>
+	</tbody>
+</table>
 <h3>Monitoring configuration</h3>
 <table>
 	<thead>
@@ -324,39 +357,6 @@ The chart will always construct the main container.
 </pre>
 </td>
 			<td>Monitoring configuration. Additional monitoring resources can be added under the 'serviceMonitor' key.</td>
-		</tr>
-	</tbody>
-</table>
-<h3>Services configuration</h3>
-<table>
-	<thead>
-		<th>Key</th>
-		<th>Type</th>
-		<th>Default</th>
-		<th>Description</th>
-	</thead>
-	<tbody>
-		<tr>
-			<td>services</td>
-			<td>object</td>
-			<td><pre lang="json">
-{
-  "main": {
-    "annotations": {},
-    "enabled": true,
-    "labels": {},
-    "ports": {
-      "main": {
-        "port": 80,
-        "protocol": "TCP"
-      }
-    },
-    "type": "ClusterIP"
-  }
-}
-</pre>
-</td>
-			<td>Service configuration. Additional services can be added under the 'services' key.</td>
 		</tr>
 	</tbody>
 </table>

@@ -1,0 +1,355 @@
+# Test Coverage Documentation
+# ============================
+# This test suite validates the CNPG Cluster manifest rendering from the common library.
+#
+# Covered Test Cases:
+# - [x] Resource not rendered when disabled
+# - [x] Basic resource rendering with minimal configuration
+# - [x] Metadata (name, namespace, labels) correctness
+# - [x] Instances and image configuration
+# - [x] Storage configuration
+# - [x] Bootstrap initdb configuration (database, owner, secret)
+# - [x] PostgreSQL parameters configuration
+# - [x] Monitoring and PodMonitor enablement
+# - [x] Resource requests and limits
+# - [x] Backup configuration
+# - [x] Recovery/restore configuration
+# - [x] Affinity and node selectors
+# - [x] Multiple cluster instances
+#
+# All test cases now covered!
+# ============================
+
+suite: test common chart - CNPG Cluster
+templates:
+  - templates/common.yaml
+release:
+  name: common-test
+  namespace: common-test
+tests:
+  # Negative tests: required fields
+  - it: should fail when imageName is missing
+    set:
+      cnpgClusters:
+        postgresql:
+          enabled: true
+          storage:
+            size: 10Gi
+    asserts:
+      - failedTemplate:
+          errorMessage: "cnpgClusters.postgresql.imageName is required when enabled"
+
+  - it: should fail when storage is missing
+    set:
+      cnpgClusters:
+        postgresql:
+          enabled: true
+          imageName: ghcr.io/cloudnative-pg/postgresql:16.6
+    asserts:
+      - failedTemplate:
+          errorMessage: "cnpgClusters.postgresql.storage is required when enabled"
+
+  - it: should fail when storage.size is missing
+    set:
+      cnpgClusters:
+        postgresql:
+          enabled: true
+          imageName: ghcr.io/cloudnative-pg/postgresql:16.6
+          storage:
+            storageClass: fast-ssd
+    asserts:
+      - failedTemplate:
+          errorMessage: "cnpgClusters.postgresql.storage.size is required when enabled"
+
+  # Test that CNPG Cluster is not rendered when disabled
+  - it: should not render CNPG Cluster when disabled
+    set:
+      cnpgClusters:
+        postgresql:
+          enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # Edge: empty-map parent blocks must be omitted, not rendered as null
+  - it: should not render bootstrap/postgresql/backup keys when given empty blocks
+    set:
+      cnpgClusters:
+        postgresql:
+          enabled: true
+          imageName: ghcr.io/cloudnative-pg/postgresql:16.6
+          storage:
+            size: 10Gi
+          bootstrap: {}
+          postgresql: {}
+          backup: {}
+    asserts:
+      - notExists:
+          path: spec.bootstrap
+      - notExists:
+          path: spec.postgresql
+      - notExists:
+          path: spec.backup
+
+  - it: should preserve instances=0 (scale-to-zero)
+    set:
+      cnpgClusters:
+        postgresql:
+          enabled: true
+          instances: 0
+          imageName: ghcr.io/cloudnative-pg/postgresql:16.6
+          storage:
+            size: 10Gi
+    asserts:
+      - equal:
+          path: spec.instances
+          value: 0
+
+  # Test basic CNPG Cluster rendering
+  - it: should render CNPG Cluster with minimal config
+    set:
+      cnpgClusters:
+        postgresql:
+          enabled: true
+          instances: 1
+          imageName: ghcr.io/cloudnative-pg/postgresql:16.6
+          storage:
+            size: 10Gi
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Cluster
+      - isAPIVersion:
+          of: postgresql.cnpg.io/v1
+      - equal:
+          path: metadata.name
+          value: common-test-postgresql
+      - equal:
+          path: spec.instances
+          value: 1
+      - equal:
+          path: spec.imageName
+          value: ghcr.io/cloudnative-pg/postgresql:16.6
+      - equal:
+          path: spec.storage.size
+          value: 10Gi
+
+  # Test bootstrap configuration
+  - it: should render bootstrap initdb configuration
+    set:
+      cnpgClusters:
+        postgresql:
+          enabled: true
+          instances: 1
+          imageName: ghcr.io/cloudnative-pg/postgresql:16.6
+          storage:
+            size: 10Gi
+          bootstrap:
+            initdb:
+              database: testdb
+              owner: testuser
+              secret:
+                name: db-secret
+    asserts:
+      - equal:
+          path: spec.bootstrap.initdb.database
+          value: testdb
+      - equal:
+          path: spec.bootstrap.initdb.owner
+          value: testuser
+      - equal:
+          path: spec.bootstrap.initdb.secret.name
+          value: db-secret
+
+  # Test PostgreSQL configuration
+  - it: should render PostgreSQL parameters
+    set:
+      cnpgClusters:
+        postgresql:
+          enabled: true
+          instances: 1
+          imageName: ghcr.io/cloudnative-pg/postgresql:16.6
+          storage:
+            size: 10Gi
+          postgresql:
+            parameters:
+              max_connections: "200"
+              shared_buffers: "256MB"
+    asserts:
+      - equal:
+          path: spec.postgresql.parameters.max_connections
+          value: "200"
+      - equal:
+          path: spec.postgresql.parameters.shared_buffers
+          value: "256MB"
+
+  # Test monitoring configuration
+  - it: should render monitoring configuration
+    set:
+      cnpgClusters:
+        postgresql:
+          enabled: true
+          instances: 1
+          imageName: ghcr.io/cloudnative-pg/postgresql:16.6
+          storage:
+            size: 10Gi
+          monitoring:
+            enabled: true
+            podMonitorEnabled: true
+    asserts:
+      - equal:
+          path: spec.monitoring.enablePodMonitor
+          value: true
+
+  # Test resources
+  - it: should render resources configuration
+    set:
+      cnpgClusters:
+        postgresql:
+          enabled: true
+          instances: 1
+          imageName: ghcr.io/cloudnative-pg/postgresql:16.6
+          storage:
+            size: 10Gi
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 2000m
+              memory: 1Gi
+    asserts:
+      - equal:
+          path: spec.resources.requests.cpu
+          value: 100m
+      - equal:
+          path: spec.resources.limits.memory
+          value: 1Gi
+
+  # Test backup configuration
+  - it: should render backup configuration
+    set:
+      cnpgClusters:
+        postgresql:
+          enabled: true
+          instances: 1
+          imageName: ghcr.io/cloudnative-pg/postgresql:16.6
+          storage:
+            size: 10Gi
+          backup:
+            barmanObjectStore:
+              destinationPath: s3://my-bucket/backups
+              s3Credentials:
+                accessKeyId:
+                  name: s3-creds
+                  key: ACCESS_KEY_ID
+                secretAccessKey:
+                  name: s3-creds
+                  key: SECRET_ACCESS_KEY
+            retentionPolicy: "30d"
+    asserts:
+      - isNotNull:
+          path: spec.backup
+      - equal:
+          path: spec.backup.barmanObjectStore.destinationPath
+          value: s3://my-bucket/backups
+      - equal:
+          path: spec.backup.retentionPolicy
+          value: "30d"
+
+  # Test recovery configuration
+  - it: should render recovery configuration
+    set:
+      cnpgClusters:
+        postgresql:
+          enabled: true
+          instances: 1
+          imageName: ghcr.io/cloudnative-pg/postgresql:16.6
+          storage:
+            size: 10Gi
+          bootstrap:
+            recovery:
+              source: backupCluster
+              recoveryTarget:
+                targetTime: "2024-01-01 00:00:00"
+    asserts:
+      - isNotNull:
+          path: spec.bootstrap.recovery
+      - equal:
+          path: spec.bootstrap.recovery.source
+          value: backupCluster
+      - equal:
+          path: spec.bootstrap.recovery.recoveryTarget.targetTime
+          value: "2024-01-01 00:00:00"
+
+  # Test affinity and node selectors
+  - it: should render affinity and node selectors
+    set:
+      cnpgClusters:
+        postgresql:
+          enabled: true
+          instances: 1
+          imageName: ghcr.io/cloudnative-pg/postgresql:16.6
+          storage:
+            size: 10Gi
+          nodeSelector:
+            disktype: ssd
+            tier: database
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/component
+                        operator: In
+                        values:
+                          - postgresql
+                  topologyKey: kubernetes.io/hostname
+    asserts:
+      - isNotNull:
+          path: spec.nodeSelector
+      - equal:
+          path: spec.nodeSelector.disktype
+          value: ssd
+      - isNotNull:
+          path: spec.affinity.podAntiAffinity
+      - equal:
+          path: spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution[0].topologyKey
+          value: kubernetes.io/hostname
+
+  # Test multiple cluster instances
+  - it: should render multiple cluster instances
+    set:
+      cnpgClusters:
+        postgresql:
+          enabled: true
+          instances: 3
+          imageName: ghcr.io/cloudnative-pg/postgresql:16.6
+          storage:
+            size: 10Gi
+        postgresql-replica:
+          enabled: true
+          instances: 2
+          imageName: ghcr.io/cloudnative-pg/postgresql:16.6
+          storage:
+            size: 5Gi
+    asserts:
+      - hasDocuments:
+          count: 2
+      - documentIndex: 0
+        equal:
+          path: metadata.name
+          value: common-test-postgresql
+      - documentIndex: 0
+        equal:
+          path: spec.instances
+          value: 3
+      - documentIndex: 1
+        equal:
+          path: metadata.name
+          value: common-test-postgresql-replica
+      - documentIndex: 1
+        equal:
+          path: spec.instances
+          value: 2

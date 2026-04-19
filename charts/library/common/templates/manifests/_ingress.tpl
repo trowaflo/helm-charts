@@ -1,39 +1,53 @@
 {{- define "common.manifests.ingress" -}}
-{{- if include "common.helpers.hasEnabled" .Values.ingress -}}
+  {{- $fullname := include "common.helpers.fullname" . -}}
+  {{- range $name, $cfg := .Values.ingresses }}
+    {{- if $cfg.enabled }}
+      {{- $_ := required (printf "ingresses.%s.hosts is required and must contain at least one entry when enabled" $name) $cfg.hosts }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "common.helpers.fullname" . }}
-  namespace: {{ include "common.helpers.namespace" . }}
+  name: {{ $fullname }}-{{ $name }}
+  namespace: {{ include "common.helpers.namespace" $ }}
   labels:
-    test: {{include "common.helpers.hasEnabled" .Values.ingress}}
-    {{- include "common.helpers.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
+    {{- include "common.helpers.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $name }}
+  {{- with $cfg.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  ingressClassName: {{ .Values.ingress.className | default "traefik" | quote }}
+  ingressClassName: {{ $cfg.className | default "traefik" | quote }}
   rules:
-  {{- range $serviceName, $cfg := .Values.ingress }}
-    {{- if $cfg.enabled }}
-      {{- range $host := $cfg.hosts }}
+  {{- $defaultTarget := $cfg.targetService | default $name }}
+  {{- range $host := $cfg.hosts }}
+    {{- if not $host.paths }}
+      {{- fail (printf "ingresses.%s host %q: paths is required and must contain at least one entry" $name $host.host) }}
+    {{- end }}
     - host: {{ $host.host }}
       http:
         paths:
         {{- range $path := $host.paths }}
+          {{- $backend := $path.backend | default dict }}
+          {{- $svc := $backend.service | default dict }}
+          {{- $port := $svc.port | default dict }}
           - path: {{ $path.path }}
             pathType: {{ $path.pathType | default "Prefix" }}
             backend:
               service:
-                name: {{ include "common.helpers.fullname" $ }}-{{ $serviceName }}
+                name: {{ $svc.name | default (printf "%s-%s" $fullname $defaultTarget) }}
                 port:
-                  name: {{ $serviceName }}
+                  {{- if $port.number }}
+                  number: {{ $port.number }}
+                  {{- else }}
+                  name: {{ $port.name | default $defaultTarget }}
+                  {{- end }}
         {{- end }}
-      {{- end }}
+  {{- end }}
+  {{- with $cfg.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
     {{- end }}
   {{- end }}
-...
-{{- end }}
 {{- end -}}
