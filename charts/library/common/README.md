@@ -19,7 +19,7 @@ Used by all application charts in this repository for consistency.
 
 ## Values
 
-<h3>Containers configuration</h3>
+<h3>CNPG Clusters configuration</h3>
 <table>
 	<thead>
 		<th>Key</th>
@@ -29,134 +29,53 @@ Used by all application charts in this repository for consistency.
 	</thead>
 	<tbody>
 		<tr>
-			<td>containers</td>
-			<td>object</td>
-			<td><pre lang="">
-The chart will always construct the main container.
-</pre>
-</td>
-			<td>Containers configuration. Additional containers can be added under the 'containers' key.</td>
-		</tr>
-		<tr>
-			<td>containers.main.args</td>
-			<td>list</td>
-			<td><pre lang="json">
-[]
-</pre>
-</td>
-			<td>Command-line arguments passed to the container entrypoint. Use this to override or extend the container's startup command</td>
-		</tr>
-		<tr>
-			<td>containers.main.env</td>
+			<td>cnpgClusters</td>
 			<td>object</td>
 			<td><pre lang="json">
 {}
 </pre>
 </td>
-			<td>Environment variables injected into containers. Can reference ConfigMaps or Secrets via valueFrom</td>
+			<td>CloudNativePG Clusters configuration. Define one or more clusters under the 'cnpgClusters' key.</td>
 		</tr>
+	</tbody>
+</table>
+<h3>CronJobs configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
 		<tr>
-			<td>containers.main.image</td>
+			<td>cronjobs</td>
 			<td>object</td>
 			<td><pre lang="json">
-{
-  "pullPolicy": "Always",
-  "repository": "traefik/whoami",
-  "tag": "latest"
-}
+{}
 </pre>
 </td>
-			<td>Container image configuration including repository, tag, and pull policy</td>
+			<td>CronJobs configuration. Define one or more scheduled jobs under the 'cronjobs' key.</td>
 		</tr>
+	</tbody>
+</table>
+<h3>Deployments configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
 		<tr>
-			<td>containers.main.imagePullSecrets</td>
-			<td>list</td>
-			<td><pre lang="json">
-[]
-</pre>
-</td>
-			<td>List of imagePullSecrets for private container registries. Reference pre-created Secrets in the same namespace</td>
-		</tr>
-		<tr>
-			<td>containers.main.probes.liveness</td>
+			<td>deployments</td>
 			<td>object</td>
 			<td><pre lang="json">
-{
-  "enabled": true,
-  "failureThreshold": 3,
-  "httpGet": {
-    "path": "/health",
-    "port": "main",
-    "scheme": "HTTP"
-  },
-  "initialDelaySeconds": 30,
-  "periodSeconds": 10,
-  "successThreshold": 1,
-  "timeoutSeconds": 5
-}
+{}
 </pre>
 </td>
-			<td>Liveness probe configuration</td>
-		</tr>
-		<tr>
-			<td>containers.main.probes.readiness</td>
-			<td>object</td>
-			<td><pre lang="json">
-{
-  "enabled": true,
-  "failureThreshold": 3,
-  "httpGet": {
-    "path": "/health",
-    "port": "main",
-    "scheme": "HTTP"
-  },
-  "initialDelaySeconds": 30,
-  "periodSeconds": 10,
-  "successThreshold": 1,
-  "timeoutSeconds": 5
-}
-</pre>
-</td>
-			<td>Readiness probe configuration</td>
-		</tr>
-		<tr>
-			<td>containers.main.probes.startup</td>
-			<td>object</td>
-			<td><pre lang="json">
-{
-  "enabled": true,
-  "failureThreshold": 3,
-  "httpGet": {
-    "path": "/health",
-    "port": "main",
-    "scheme": "HTTP"
-  },
-  "initialDelaySeconds": 60,
-  "periodSeconds": 10,
-  "successThreshold": 1,
-  "timeoutSeconds": 5
-}
-</pre>
-</td>
-			<td>Startup probe configuration</td>
-		</tr>
-		<tr>
-			<td>containers.main.resources</td>
-			<td>object</td>
-			<td><pre lang="json">
-{
-  "limits": {
-    "cpu": 2,
-    "memory": "2Gi"
-  },
-  "requests": {
-    "cpu": "1m",
-    "memory": "32Mi"
-  }
-}
-</pre>
-</td>
-			<td>CPU and memory resource allocation for the container</td>
+			<td>Deployments configuration. Define one or more deployments under the 'deployments' key. Each deployment must specify its own containers, replicas, and pod-level settings.</td>
 		</tr>
 	</tbody>
 </table>
@@ -196,55 +115,6 @@ The chart will always construct the main container.
 </td>
 			<td>Override the namespace where resources are deployed. Leave empty to use the release namespace</td>
 		</tr>
-		<tr>
-			<td>podSecurityContext</td>
-			<td>object</td>
-			<td><pre lang="json">
-{
-  "allowPrivilegeEscalation": false,
-  "capabilities": {
-    "drop": [
-      "ALL"
-    ]
-  },
-  "readOnlyRootFilesystem": true,
-  "runAsNonRoot": true,
-  "runAsUser": 65534,
-  "seccompProfile": {
-    "type": "RuntimeDefault"
-  }
-}
-</pre>
-</td>
-			<td>Security context settings applied at the pod level for enhanced security</td>
-		</tr>
-		<tr>
-			<td>replicaCount</td>
-			<td>int</td>
-			<td><pre lang="json">
-1
-</pre>
-</td>
-			<td>Number of desired pods (replicas) for the deployment. Modify to scale the application horizontally</td>
-		</tr>
-		<tr>
-			<td>revisionHistoryLimit</td>
-			<td>int</td>
-			<td><pre lang="json">
-3
-</pre>
-</td>
-			<td>Number of revisions to keep for rollback purposes. Set to 3 for balanced history management</td>
-		</tr>
-		<tr>
-			<td>strategyType</td>
-			<td>string</td>
-			<td><pre lang="json">
-"Recreate"
-</pre>
-</td>
-			<td>Deployment update strategy configuration</td>
-		</tr>
 	</tbody>
 </table>
 <h3>Ingress configuration</h3>
@@ -257,7 +127,7 @@ The chart will always construct the main container.
 	</thead>
 	<tbody>
 		<tr>
-			<td>ingress</td>
+			<td>ingresses</td>
 			<td>object</td>
 			<td><pre lang="json">
 {
@@ -282,7 +152,27 @@ The chart will always construct the main container.
 }
 </pre>
 </td>
-			<td>Ingress configuration. Additional ingress resources can be added under the 'ingress' key.</td>
+			<td>Ingress configuration. Additional ingress resources can be added under the 'ingresses' key.</td>
+		</tr>
+	</tbody>
+</table>
+<h3>Jobs configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>jobs</td>
+			<td>object</td>
+			<td><pre lang="json">
+{}
+</pre>
+</td>
+			<td>Jobs configuration. Define one or more one-shot jobs under the 'jobs' key.</td>
 		</tr>
 	</tbody>
 </table>
@@ -329,34 +219,56 @@ The chart will always construct the main container.
 	</thead>
 	<tbody>
 		<tr>
-			<td>serviceMonitor</td>
+			<td>serviceMonitors</td>
 			<td>object</td>
 			<td><pre lang="json">
 {
-  "enabled": true,
-  "endpoints": [
-    {
-      "metricRelabelings": [
-        {
-          "action": "replace",
-          "regex": "olstring_(.*)",
-          "replacement": "newstring_$1",
-          "sourceLabels": [
-            "__name__"
-          ],
-          "targetLabel": "__name__"
-        }
-      ],
-      "port": "main"
+  "main": {
+    "enabled": true,
+    "endpoints": [
+      {
+        "metricRelabelings": [
+          {
+            "action": "replace",
+            "regex": "olstring_(.*)",
+            "replacement": "newstring_$1",
+            "sourceLabels": [
+              "__name__"
+            ],
+            "targetLabel": "__name__"
+          }
+        ],
+        "port": "main"
+      }
+    ],
+    "labels": {
+      "release": "prometheus"
     }
-  ],
-  "labels": {
-    "release": "prometheus"
   }
 }
 </pre>
 </td>
-			<td>Monitoring configuration. Additional monitoring resources can be added under the 'serviceMonitor' key.</td>
+			<td>Monitoring configuration. Additional monitoring resources can be added under the 'serviceMonitors' key.</td>
+		</tr>
+	</tbody>
+</table>
+<h3>StatefulSets configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>statefulsets</td>
+			<td>object</td>
+			<td><pre lang="json">
+{}
+</pre>
+</td>
+			<td>StatefulSets configuration. Define one or more stateful workloads under the 'statefulsets' key.</td>
 		</tr>
 	</tbody>
 </table>
