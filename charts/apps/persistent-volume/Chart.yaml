@@ -24,4 +24,4 @@ sources:
 dependencies:
   - name: common
     version: 2.1.2
-    repository: file://../../library/common
+    repository: https://trowaflo.github.io/helm-charts
