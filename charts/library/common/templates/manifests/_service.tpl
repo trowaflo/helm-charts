@@ -31,7 +31,6 @@ spec:
     app.kubernetes.io/name: {{ include "common.helpers.name" $ }}
     app.kubernetes.io/instance: {{ $.Release.Name }}
     app.kubernetes.io/component: {{ $targetComponent }}
-...
     {{- end }}
   {{- end }}
 {{- end -}}
