@@ -1,5 +1,6 @@
 {{- define "common.manifests.cnpgCluster" -}}
-  {{- range $name, $cluster := .Values.cnpgClusters }}
+  {{- range $name := keys .Values.cnpgClusters | sortAlpha }}
+    {{- $cluster := index $.Values.cnpgClusters $name }}
     {{- if $cluster.enabled }}
 ---
 apiVersion: postgresql.cnpg.io/v1

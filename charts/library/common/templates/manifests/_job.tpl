@@ -1,5 +1,6 @@
 {{- define "common.manifests.job" -}}
-  {{- range $name, $job := .Values.jobs }}
+  {{- range $name := keys .Values.jobs | sortAlpha }}
+    {{- $job := index $.Values.jobs $name }}
     {{- if $job.enabled }}
       {{- $_ := required (printf "jobs.%s.containers is required and must define at least one container when enabled" $name) $job.containers }}
 ---

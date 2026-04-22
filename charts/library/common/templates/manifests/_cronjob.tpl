@@ -1,5 +1,6 @@
 {{- define "common.manifests.cronjob" -}}
-  {{- range $name, $cronjob := .Values.cronjobs }}
+  {{- range $name := keys .Values.cronjobs | sortAlpha }}
+    {{- $cronjob := index $.Values.cronjobs $name }}
     {{- if $cronjob.enabled }}
       {{- $_ := required (printf "cronjobs.%s.containers is required and must define at least one container when enabled" $name) $cronjob.containers }}
 ---

@@ -22,7 +22,8 @@ Params:
   {{- end }}
   {{- if $container.ports }}
   ports:
-    {{- range $portName, $port := $container.ports }}
+    {{- range $portName := keys $container.ports | sortAlpha }}
+    {{- $port := index $container.ports $portName }}
     - name: {{ $portName }}
       containerPort: {{ required (printf "container %q port %q: containerPort (or port) is required" $containerName $portName) ($port.containerPort | default $port.port) }}
       protocol: {{ include "common.helpers.protocol" ($port.protocol | default "TCP") }}

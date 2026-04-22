@@ -1,5 +1,6 @@
 {{- define "common.manifests.deployment" -}}
-  {{- range $name, $deployment := .Values.deployments }}
+  {{- range $name := keys .Values.deployments | sortAlpha }}
+    {{- $deployment := index $.Values.deployments $name }}
     {{- if $deployment.enabled }}
       {{- $_ := required (printf "deployments.%s.containers is required and must define at least one container when enabled" $name) $deployment.containers }}
 ---

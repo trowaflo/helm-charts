@@ -1,6 +1,7 @@
 {{- define "common.manifests.persistentVolume" -}}
 {{- if include "common.helpers.hasEnabled" .Values.persistentVolumes -}}
-{{- range $key, $config := .Values.persistentVolumes }}
+{{- range $key := keys .Values.persistentVolumes | sortAlpha }}
+{{- $config := index $.Values.persistentVolumes $key }}
 {{- if $config.enabled }}
 {{- /* Validate configuration */ -}}
 {{- include "common.helpers.validatePV" (dict "key" $key "config" $config) }}

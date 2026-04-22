@@ -1,5 +1,6 @@
 {{- define "common.manifests.statefulset" -}}
-  {{- range $name, $statefulset := .Values.statefulsets }}
+  {{- range $name := keys .Values.statefulsets | sortAlpha }}
+    {{- $statefulset := index $.Values.statefulsets $name }}
     {{- if $statefulset.enabled }}
       {{- $_ := required (printf "statefulsets.%s.containers is required and must define at least one container when enabled" $name) $statefulset.containers }}
 ---

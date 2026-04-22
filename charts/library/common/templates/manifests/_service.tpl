@@ -1,5 +1,6 @@
 {{- define "common.manifests.service" -}}
-  {{- range $serviceName, $svcConfig := .Values.k8sServices }}
+  {{- range $serviceName := keys .Values.k8sServices | sortAlpha }}
+    {{- $svcConfig := index $.Values.k8sServices $serviceName }}
     {{- if $svcConfig.enabled }}
       {{- $targetComponent := $svcConfig.targetComponent | default $serviceName }}
 ---
