@@ -818,6 +818,50 @@ tests:
               fieldRef:
                 fieldPath: metadata.name
 
+  - it: should render templated plain scalar env value via tpl
+    set:
+      deployments:
+        main:
+          enabled: true
+          containers:
+            main:
+              image:
+                repository: nginx
+                tag: latest
+              env:
+                REDIS_HOST: "{{ .Release.Name }}-redis"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: REDIS_HOST
+            value: common-test-redis
+
+  - it: should render templated secretKeyRef name via tpl
+    set:
+      deployments:
+        main:
+          enabled: true
+          containers:
+            main:
+              image:
+                repository: nginx
+                tag: latest
+              env:
+                DATABASE_URL:
+                  secretKeyRef:
+                    name: '{{ include "common.helpers.fullname" . }}-postgresql-app'
+                    key: uri
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: common-test-deployment-name-override-postgresql-app
+                key: uri
+
   - it: should still render env from list form (backward compat)
     set:
       deployments:

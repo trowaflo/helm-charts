@@ -34,10 +34,11 @@ Params:
       {{- range $envName, $envValue := $container.env }}
     - name: {{ $envName }}
         {{- if kindIs "map" $envValue }}
+          {{- $rendered := tpl (toYaml $envValue) $root }}
       valueFrom:
-        {{- toYaml $envValue | nindent 8 }}
+        {{- $rendered | nindent 8 }}
         {{- else }}
-      value: {{ $envValue | quote }}
+      value: {{ tpl ($envValue | toString) $root | quote }}
         {{- end }}
       {{- end }}
     {{- else }}
