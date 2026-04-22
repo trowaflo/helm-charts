@@ -88,6 +88,17 @@ provided, otherwise falls back to the map key.
 {{- end }}
 
 {{/*
+Return the name of the CNPG output "app" secret for a given cluster.
+CNPG auto-creates <cluster-fullname>-app with keys: username, password, uri, pgpass.
+Usage: {{ include "common.helpers.cnpgAppSecret" (dict "root" . "name" "postgresql") }}
+*/}}
+{{- define "common.helpers.cnpgAppSecret" -}}
+  {{- $root := .root -}}
+  {{- $name := .name -}}
+  {{- printf "%s-%s-app" (include "common.helpers.fullname" $root) $name -}}
+{{- end -}}
+
+{{/*
 Validate PV configuration - ensure required fields are present
 */}}
 {{- define "common.helpers.validatePV" -}}
