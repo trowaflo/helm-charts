@@ -41,7 +41,7 @@ spec:
       {{- end }}
       {{- with $cluster.bootstrap.initdb.secret }}
       secret:
-        name: {{ tpl (.name | toString) $ }}
+        name: {{ tpl (required (printf "cnpgClusters.%s.bootstrap.initdb.secret.name is required when secret is set" $name) .name) $ }}
       {{- end }}
     {{- end }}
     {{- with $cluster.bootstrap.recovery }}
