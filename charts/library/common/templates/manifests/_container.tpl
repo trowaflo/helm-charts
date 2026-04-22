@@ -30,7 +30,19 @@ Params:
   {{- end }}
   {{- if $container.env }}
   env:
+    {{- if kindIs "map" $container.env }}
+      {{- range $envName, $envValue := $container.env }}
+    - name: {{ $envName }}
+        {{- if kindIs "map" $envValue }}
+      valueFrom:
+        {{- toYaml $envValue | nindent 8 }}
+        {{- else }}
+      value: {{ $envValue | quote }}
+        {{- end }}
+      {{- end }}
+    {{- else }}
     {{- toYaml $container.env | nindent 4 }}
+    {{- end }}
   {{- end }}
   {{- if $container.envFrom }}
   envFrom:
