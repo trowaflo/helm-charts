@@ -162,6 +162,27 @@ tests:
           path: spec.bootstrap.initdb.secret.name
           value: db-secret
 
+  # Test that bootstrap.initdb.secret.name is rendered through tpl
+  - it: should render templated bootstrap initdb secret name via tpl
+    set:
+      cnpgClusters:
+        postgresql:
+          enabled: true
+          instances: 1
+          imageName: ghcr.io/cloudnative-pg/postgresql:16.6
+          storage:
+            size: 10Gi
+          bootstrap:
+            initdb:
+              database: testdb
+              owner: testuser
+              secret:
+                name: '{{ include "common.helpers.fullname" . }}-db-bootstrap'
+    asserts:
+      - equal:
+          path: spec.bootstrap.initdb.secret.name
+          value: common-test-db-bootstrap
+
   # Test PostgreSQL configuration
   - it: should render PostgreSQL parameters
     set:

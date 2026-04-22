@@ -40,7 +40,7 @@ spec:
       {{- end }}
       {{- with $cluster.bootstrap.initdb.secret }}
       secret:
-        name: {{ .name }}
+        name: {{ tpl (.name | toString) $ }}
       {{- end }}
     {{- end }}
     {{- with $cluster.bootstrap.recovery }}
