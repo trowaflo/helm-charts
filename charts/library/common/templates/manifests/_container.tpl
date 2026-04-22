@@ -1,9 +1,20 @@
 {{/*
-Render a container spec
-Params:
-  - $ (root context)
+Render a container spec.
+
+Params (dict):
+  - root (root context; also accessible as $root inside the helper)
   - container (container configuration object)
   - containerName (name of the container)
+
+Container.env shapes:
+  - List form (legacy, emitted verbatim): [{name, value|valueFrom}, ...]
+  - Map form: {NAME: "string"} or {NAME: {secretKeyRef|configMapKeyRef|fieldRef: {...}}}
+    In map form, scalar values and the valueFrom block are passed through `tpl`
+    with the root context, so templated references (e.g. `{{ include ... }}`)
+    expand. Nil values fail fast. Keys are emitted in sorted order.
+
+Container.ports:
+  - Map form: {portName: {containerPort|port, protocol}}. Emitted sorted.
 */}}
 {{- define "common.helpers.container" -}}
   {{- $root := .root -}}

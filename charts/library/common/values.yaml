@@ -11,6 +11,12 @@ namespaceOverride: ''
 
 # -- Deployments configuration. Define one or more deployments under the 'deployments' key.
 # Each deployment must specify its own containers, replicas, and pod-level settings.
+# Per-container `env` accepts two shapes:
+#   1. List form (legacy): `env: [{name, value|valueFrom}, ...]` emitted verbatim.
+#   2. Map form: `env: {NAME: "value"}` or `env: {NAME: {secretKeyRef|configMapKeyRef|fieldRef: {...}}}`.
+#      Map values and nested valueFrom fields pass through `tpl` with root context, so
+#      templated references expand (e.g. `'{{ include "common.helpers.fullname" . }}-redis'`).
+#      Nil values fail fast. Keys are emitted in sorted order.
 # @section -- Deployments configuration
 deployments: {}
 

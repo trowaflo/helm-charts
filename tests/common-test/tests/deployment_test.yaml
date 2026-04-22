@@ -7,7 +7,9 @@
 # - [x] Basic deployment rendering with minimal configuration
 # - [x] Metadata (name, namespace, labels) correctness
 # - [x] Name override (nameOverride and fullnameOverride) functionality
-# - [x] Container environment variables
+# - [x] Container environment variables (list form and map form)
+# - [x] Env map with tpl expansion (scalar + valueFrom)
+# - [x] Env map nil-value guard
 # - [x] Container resource requests and limits
 # - [x] Liveness and readiness probes
 # - [x] Replica count configuration
@@ -18,8 +20,6 @@
 # - [x] Node selectors and tolerations
 # - [x] Security contexts (pod and container level)
 # - [x] Image pull secrets
-#
-# All test cases now covered!
 # ============================
 
 suite: test common chart - Deployment
