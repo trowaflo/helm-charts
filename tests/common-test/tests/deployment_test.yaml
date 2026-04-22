@@ -894,3 +894,74 @@ tests:
               secretKeyRef:
                 name: s
                 key: k
+
+  # A4: guard nil env values (must fail loudly, not silently render as "<nil>")
+  - it: should fail when env map value is nil
+    set:
+      deployments:
+        main:
+          enabled: true
+          containers:
+            main:
+              image:
+                repository: nginx
+                tag: latest
+              env:
+                OOPS: null
+    asserts:
+      - failedTemplate:
+          errorMessage: "container main env OOPS: value is nil (did you forget a value, or mean to use valueFrom?)"
+
+  # C4: mixed-form env (scalar + secretKeyRef + configMapKeyRef + fieldRef in same map)
+  - it: should render mixed-form env map with scalars and refs together
+    set:
+      deployments:
+        main:
+          enabled: true
+          containers:
+            main:
+              image:
+                repository: nginx
+                tag: latest
+              env:
+                PLAIN: hello
+                FROM_SECRET:
+                  secretKeyRef:
+                    name: s1
+                    key: k1
+                FROM_CONFIGMAP:
+                  configMapKeyRef:
+                    name: c1
+                    key: k2
+                FROM_FIELD:
+                  fieldRef:
+                    fieldPath: metadata.name
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PLAIN
+            value: hello
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FROM_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: s1
+                key: k1
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FROM_CONFIGMAP
+            valueFrom:
+              configMapKeyRef:
+                name: c1
+                key: k2
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FROM_FIELD
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name

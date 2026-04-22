@@ -32,7 +32,12 @@ Params:
   {{- if $container.env }}
   env:
     {{- if kindIs "map" $container.env }}
-      {{- range $envName, $envValue := $container.env }}
+      {{- range $envName := keys $container.env | sortAlpha }}
+        {{- $envValue := index $container.env $envName }}
+        {{- if kindIs "invalid" $envValue }}
+          {{- $msg := printf "container %s env %s: value is nil (did you forget a value, or mean to use valueFrom?)" $containerName $envName -}}
+          {{- fail $msg }}
+        {{- end }}
     - name: {{ $envName }}
         {{- if kindIs "map" $envValue }}
           {{- $rendered := tpl (toYaml $envValue) $root }}
