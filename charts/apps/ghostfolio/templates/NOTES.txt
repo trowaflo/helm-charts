@@ -1,0 +1,86 @@
+Ghostfolio has been deployed successfully!
+
+Chart Version: {{ .Chart.Version }}
+Release Name: {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+
+Components deployed:
+- Ghostfolio Application: {{ include "ghostfolio.fullname" . }}
+{{- if .Values.redis.enabled }}
+- Redis Cache: {{ include "ghostfolio.fullname" . }}-redis
+{{- end }}
+{{- if .Values.postgresql.enabled }}
+- PostgreSQL (CNPG): {{ include "ghostfolio.fullname" . }}-postgresql
+{{- end }}
+{{- if .Values.backup.enabled }}
+- Backup CronJob: {{ include "ghostfolio.fullname" . }}-backup (Schedule: {{ .Values.backup.schedule }})
+{{- end }}
+{{- if .Values.restore.enabled }}
+- Restore Job: {{ include "ghostfolio.fullname" . }}-restore
+{{- end }}
+
+To access Ghostfolio:
+
+{{- if .Values.ghostfolio.ingress.enabled }}
+1. Via Ingress:
+{{- range .Values.ghostfolio.ingress.hosts }}
+   http{{ if $.Values.ghostfolio.ingress.tls }}s{{ end }}://{{ .host }}
+{{- end }}
+{{- else }}
+1. Port-forward to the service:
+   kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "ghostfolio.fullname" . }} 3333:3333
+
+2. Access at: http://localhost:3333
+{{- end }}
+
+IMPORTANT - Secret Requirements:
+This chart requires pre-existing secrets. Ensure the following secrets exist:
+
+1. Ghostfolio Application Secrets ({{ .Values.ghostfolio.secretName }}):
+   - ACCESS_TOKEN_SALT: Random string for token salt
+   - JWT_SECRET_KEY: Random string for JWT signing
+
+2. Database Connection Secret ({{ .Values.ghostfolio.database.secretName }}):
+   - {{ .Values.ghostfolio.database.secretKey }}: PostgreSQL connection string
+     Format: postgresql://username:password@host:port/database
+
+3. Redis Password Secret ({{ .Values.ghostfolio.redis.passwordSecretName }}):
+   - {{ .Values.ghostfolio.redis.passwordSecretKey }}: Redis password
+
+{{- if .Values.postgresql.enabled }}
+
+4. PostgreSQL Bootstrap Secret ({{ .Values.postgresql.cluster.bootstrap.initdb.secret.name }}):
+   - username: Database username
+   - password: Database password
+{{- end }}
+
+Example secret creation:
+  kubectl create secret generic {{ .Values.ghostfolio.secretName }} \
+    --from-literal=ACCESS_TOKEN_SALT=$(openssl rand -base64 32) \
+    --from-literal=JWT_SECRET_KEY=$(openssl rand -base64 32) \
+    -n {{ .Release.Namespace }}
+
+{{- if .Values.backup.enabled }}
+
+Backup Configuration:
+- Schedule: {{ .Values.backup.schedule }}
+- NFS Server: {{ .Values.backup.nfs.server }}
+- NFS Path: {{ .Values.backup.nfs.path }}
+- Retention: {{ .Values.backup.retention }} backups
+
+To manually trigger a backup:
+  kubectl create job -n {{ .Release.Namespace }} --from=cronjob/{{ include "ghostfolio.fullname" . }}-backup manual-backup-$(date +%s)
+{{- end }}
+
+{{- if .Values.restore.enabled }}
+
+Restore Configuration:
+- Restore File: {{ .Values.restore.restoreFile }}
+- NFS Server: {{ .Values.restore.nfs.server }}
+- NFS Path: {{ .Values.restore.nfs.path }}
+
+Monitor restore job:
+  kubectl logs -n {{ .Release.Namespace }} -l app.kubernetes.io/component=restore -f
+{{- end }}
+
+For more information, visit: https://ghostfol.io

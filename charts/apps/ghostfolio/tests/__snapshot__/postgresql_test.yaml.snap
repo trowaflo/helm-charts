@@ -1,0 +1,45 @@
+should match snapshot:
+  1: |
+    apiVersion: postgresql.cnpg.io/v1
+    kind: Cluster
+    metadata:
+      labels:
+        app.kubernetes.io/component: database
+        app.kubernetes.io/instance: ghostfolio-test
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: ghostfolio-postgresql
+        helm.sh/chart: ghostfolio-0.1.0
+      name: ghostfolio-test-postgresql
+      namespace: ghostfolio-test
+    spec:
+      bootstrap:
+        initdb:
+          database: ghostfolio
+          owner: ghostfolio
+          secret:
+            name: test-db-app-secret
+      imageName: ghcr.io/cloudnative-pg/postgresql:16.6
+      instances: 1
+      postgresql:
+        parameters:
+          checkpoint_completion_target: "0.9"
+          default_statistics_target: "100"
+          effective_cache_size: 1GB
+          effective_io_concurrency: "200"
+          maintenance_work_mem: 64MB
+          max_connections: "200"
+          max_wal_size: 4GB
+          min_wal_size: 1GB
+          random_page_cost: "1.1"
+          shared_buffers: 256MB
+          wal_buffers: 16MB
+          work_mem: 2621kB
+      resources:
+        limits:
+          cpu: 2000m
+          memory: 1Gi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+      storage:
+        size: 10Gi

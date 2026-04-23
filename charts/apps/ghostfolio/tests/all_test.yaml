@@ -1,0 +1,38 @@
+suite: test ghostfolio chart - All resources
+templates:
+  - templates/deployment.yaml
+  - templates/service.yaml
+  - templates/configmap.yaml
+values:
+  - values/all-enabled.yaml
+release:
+  name: ghostfolio-test
+  namespace: ghostfolio-test
+tests:
+  - it: should render Deployment
+    template: templates/deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: should render Service
+    template: templates/service.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: should render ConfigMap
+    template: templates/configmap.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: should have correct app labels
+    template: templates/deployment.yaml
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: ghostfolio
+      - equal:
+          path: metadata.labels["app.kubernetes.io/instance"]
+          value: ghostfolio-test

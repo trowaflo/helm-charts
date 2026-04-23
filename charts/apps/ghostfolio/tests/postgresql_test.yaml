@@ -1,0 +1,46 @@
+suite: test ghostfolio chart - PostgreSQL
+templates:
+  - templates/postgresql-cluster.yaml
+values:
+  - values/all-enabled.yaml
+release:
+  name: ghostfolio-test
+  namespace: ghostfolio-test
+tests:
+  - it: should create CNPG Cluster when enabled
+    template: templates/postgresql-cluster.yaml
+    asserts:
+      - isKind:
+          of: Cluster
+      - equal:
+          path: metadata.name
+          value: ghostfolio-test-postgresql
+      - equal:
+          path: spec.instances
+          value: 1
+
+  - it: should not create PostgreSQL when disabled
+    template: templates/postgresql-cluster.yaml
+    set:
+      postgresql.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should have correct bootstrap configuration
+    template: templates/postgresql-cluster.yaml
+    asserts:
+      - equal:
+          path: spec.bootstrap.initdb.database
+          value: ghostfolio
+      - equal:
+          path: spec.bootstrap.initdb.owner
+          value: ghostfolio
+      - equal:
+          path: spec.bootstrap.initdb.secret.name
+          value: test-db-app-secret
+
+  - it: should match snapshot
+    template: templates/postgresql-cluster.yaml
+    asserts:
+      - matchSnapshot: {}

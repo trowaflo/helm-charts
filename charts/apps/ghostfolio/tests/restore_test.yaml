@@ -1,0 +1,44 @@
+suite: test ghostfolio chart - Restore
+templates:
+  - templates/restore-job.yaml
+values:
+  - values/all-enabled.yaml
+release:
+  name: ghostfolio-test
+  namespace: ghostfolio-test
+tests:
+  - it: should not create restore job when disabled
+    template: templates/restore-job.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should create restore job when enabled
+    template: templates/restore-job.yaml
+    set:
+      restore.enabled: true
+      restore.restoreFile: "ghostfolio-2024-01-01.dump"
+      restore.nfs.server: "192.168.1.100"
+      restore.nfs.path: "/mnt/backups"
+    asserts:
+      - isKind:
+          of: Job
+      - matchRegex:
+          path: metadata.name
+          pattern: ^ghostfolio-test-restore-
+
+  - it: should have NFS volume when enabled
+    template: templates/restore-job.yaml
+    set:
+      restore.enabled: true
+      restore.restoreFile: "ghostfolio-2024-01-01.dump"
+      restore.nfs.server: "192.168.1.100"
+      restore.nfs.path: "/mnt/backups"
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: backup
+            nfs:
+              server: "192.168.1.100"
+              path: "/mnt/backups"

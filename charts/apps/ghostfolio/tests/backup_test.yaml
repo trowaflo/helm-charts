@@ -1,0 +1,56 @@
+suite: test ghostfolio chart - Backup
+templates:
+  - templates/backup-cronjob.yaml
+values:
+  - values/all-enabled.yaml
+release:
+  name: ghostfolio-test
+  namespace: ghostfolio-test
+tests:
+  - it: should create backup CronJob when enabled
+    template: templates/backup-cronjob.yaml
+    asserts:
+      - isKind:
+          of: CronJob
+      - equal:
+          path: metadata.name
+          value: ghostfolio-test-backup
+      - equal:
+          path: spec.schedule
+          value: "0 2 * * *"
+
+  - it: should not create backup when disabled
+    template: templates/backup-cronjob.yaml
+    set:
+      backup.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should have NFS volume configured
+    template: templates/backup-cronjob.yaml
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.volumes
+          content:
+            name: backup
+            nfs:
+              server: "192.168.1.100"
+              path: "/mnt/backups"
+
+  - it: should have database URL from secret
+    template: templates/backup-cronjob.yaml
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+          content:
+            name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: test-db-secret
+                key: DATABASE_URL
+
+  - it: should match snapshot
+    template: templates/backup-cronjob.yaml
+    asserts:
+      - matchSnapshot: {}

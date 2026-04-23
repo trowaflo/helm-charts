@@ -1,0 +1,308 @@
+---
+# Ghostfolio application configuration
+ghostfolio:
+  image:
+    repository: ghostfolio/ghostfolio
+    tag: 2.167.0
+    pullPolicy: IfNotPresent
+
+  # Number of replicas for the Ghostfolio deployment
+  replicas: 1
+
+  # Application port
+  port: 3333
+
+  # Resource limits and requests
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+
+  # Pod security context
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+
+  # Container security context
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - ALL
+
+  # Secrets configuration - all secrets are externally managed
+  # REQUIRED: Create a secret with the following keys:
+  #   - ACCESS_TOKEN_SALT
+  #   - JWT_SECRET_KEY
+  secretName: ghostfolio-secrets
+
+  # PostgreSQL database configuration
+  database:
+    # Connection details will be constructed from CNPG cluster
+    # DATABASE_URL format: postgresql://username:password@host:port/database
+    # The secret must contain the DATABASE_URL key
+    secretName: ghostfolio-db-secret
+    secretKey: DATABASE_URL
+
+  # Redis configuration
+  redis:
+    # Host will be set to the Redis service name
+    host: ""  # Auto-configured to: {{ include "ghostfolio.fullname" . }}-redis
+    port: 6379
+    # Redis password from secret
+    passwordSecretName: ghostfolio-redis-secret
+    passwordSecretKey: REDIS_PASSWORD
+
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 3333
+    annotations: {}
+
+  # Ingress configuration
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+      # cert-manager.io/cluster-issuer: letsencrypt-prod
+      # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    hosts:
+      - host: ghostfolio.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+      # - secretName: ghostfolio-tls
+      #   hosts:
+      #     - ghostfolio.example.com
+
+  # Liveness and readiness probes
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /api/v1/health
+      port: 3333
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /api/v1/health
+      port: 3333
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+# Redis configuration
+redis:
+  enabled: true
+
+  image:
+    repository: redis
+    tag: 7.4.2-alpine
+    pullPolicy: IfNotPresent
+
+  # Resource limits and requests
+  resources:
+    requests:
+      cpu: 10m
+      memory: 64Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+  # Pod security context
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    runAsGroup: 999
+    fsGroup: 999
+
+  # Container security context
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+
+  # Persistence configuration
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessMode: ReadWriteOnce
+    size: 1Gi
+
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 6379
+
+# PostgreSQL configuration via CloudNativePG (CNPG)
+postgresql:
+  enabled: true
+
+  # CNPG Cluster configuration
+  cluster:
+    # Number of instances (1 = standalone, >1 = with replicas)
+    instances: 1
+
+    # PostgreSQL version
+    imageName: ghcr.io/cloudnative-pg/postgresql:16.6
+
+    # Storage configuration
+    storage:
+      storageClass: ""
+      size: 10Gi
+
+    # Bootstrap configuration
+    # Uses an existing secret for superuser credentials
+    # REQUIRED: Create a secret with keys: username, password
+    bootstrap:
+      initdb:
+        database: ghostfolio
+        owner: ghostfolio
+        # Secret containing database credentials
+        secret:
+          name: ghostfolio-db-app-secret
+
+    # Monitoring (Prometheus)
+    monitoring:
+      enabled: false
+      podMonitorEnabled: false
+
+    # Resource limits
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 2000m
+        memory: 1Gi
+
+    # Backup configuration (integrated CNPG backup)
+    backup:
+      enabled: false
+      # For CNPG native backup, configure barmanObjectStore here
+      # Example for S3-compatible storage:
+      # barmanObjectStore:
+      #   destinationPath: s3://bucket-name/path
+      #   s3Credentials:
+      #     accessKeyId:
+      #       name: backup-credentials
+      #       key: ACCESS_KEY_ID
+      #     secretAccessKey:
+      #       name: backup-credentials
+      #       key: SECRET_ACCESS_KEY
+
+# Custom backup configuration (pg_dump to NFS)
+backup:
+  enabled: false
+
+  # Schedule in cron format (default: daily at 2 AM)
+  schedule: "0 2 * * *"
+
+  # Image for pg_dump
+  image:
+    repository: postgres
+    tag: "16"
+    pullPolicy: IfNotPresent
+
+  # NFS configuration for backup storage
+  nfs:
+    server: ""  # REQUIRED: NFS server address
+    path: ""    # REQUIRED: NFS export path
+
+  # Retention policy (number of backups to keep)
+  retention: 7
+
+  # Resources for backup job
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  # Pod security context
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    runAsGroup: 999
+    fsGroup: 999
+
+  # Container security context
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - ALL
+
+# Restore configuration
+restore:
+  enabled: false
+
+  # Restore file name (from NFS backup location)
+  # Example: ghostfolio-2024-01-15.dump
+  restoreFile: ""
+
+  # Image for pg_restore
+  image:
+    repository: postgres
+    tag: "16"
+    pullPolicy: IfNotPresent
+
+  # NFS configuration (same as backup)
+  nfs:
+    server: ""  # REQUIRED: NFS server address
+    path: ""    # REQUIRED: NFS export path
+
+  # Resources for restore job
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  # Pod security context
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    runAsGroup: 999
+    fsGroup: 999
+
+  # Container security context
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - ALL
+
+# Global settings
+global:
+  # Image pull secrets
+  imagePullSecrets: []
+
+  # Node selector for all pods
+  nodeSelector: {}
+
+  # Tolerations for all pods
+  tolerations: []
+
+  # Affinity for all pods
+  affinity: {}

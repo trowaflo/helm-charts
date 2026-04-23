@@ -1,0 +1,62 @@
+suite: test ghostfolio chart - Redis
+templates:
+  - templates/redis-statefulset.yaml
+  - templates/redis-service.yaml
+values:
+  - values/all-enabled.yaml
+release:
+  name: ghostfolio-test
+  namespace: ghostfolio-test
+tests:
+  - it: should create Redis StatefulSet when enabled
+    template: templates/redis-statefulset.yaml
+    asserts:
+      - isKind:
+          of: StatefulSet
+      - equal:
+          path: metadata.name
+          value: ghostfolio-test-redis
+
+  - it: should not create Redis when disabled
+    template: templates/redis-statefulset.yaml
+    set:
+      redis.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should have security context
+    template: templates/redis-statefulset.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+
+  - it: should have password from secret
+    template: templates/redis-statefulset.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: test-redis-secret
+                key: REDIS_PASSWORD
+
+  - it: should create headless service
+    template: templates/redis-service.yaml
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: spec.clusterIP
+          value: None
+
+  - it: should match snapshot
+    template: templates/redis-statefulset.yaml
+    asserts:
+      - matchSnapshot: {}

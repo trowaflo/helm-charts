@@ -1,0 +1,93 @@
+should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/instance: ghostfolio-test
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: ghostfolio
+        helm.sh/chart: ghostfolio-0.1.0
+      name: ghostfolio-test
+      namespace: ghostfolio-test
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: ghostfolio-test
+          app.kubernetes.io/name: ghostfolio
+      template:
+        metadata:
+          annotations:
+            checksum/config: 2ed3aff6e85b4f147c6a3a7965a6a107bda2c50d55213e04fdbf7b769269b0b0
+          labels:
+            app.kubernetes.io/instance: ghostfolio-test
+            app.kubernetes.io/name: ghostfolio
+        spec:
+          containers:
+            - env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      key: DATABASE_URL
+                      name: test-db-secret
+                - name: REDIS_HOST
+                  value: ghostfolio-test-redis
+                - name: REDIS_PORT
+                  value: "6379"
+                - name: REDIS_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: REDIS_PASSWORD
+                      name: test-redis-secret
+                - name: ACCESS_TOKEN_SALT
+                  valueFrom:
+                    secretKeyRef:
+                      key: ACCESS_TOKEN_SALT
+                      name: test-ghostfolio-secrets
+                - name: JWT_SECRET_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: JWT_SECRET_KEY
+                      name: test-ghostfolio-secrets
+              image: ghostfolio/ghostfolio:2.167.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /api/v1/health
+                  port: 3333
+                initialDelaySeconds: 30
+                periodSeconds: 10
+                timeoutSeconds: 5
+              name: ghostfolio
+              ports:
+                - containerPort: 3333
+                  name: http
+                  protocol: TCP
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /api/v1/health
+                  port: 3333
+                initialDelaySeconds: 10
+                periodSeconds: 5
+                timeoutSeconds: 3
+              resources:
+                limits:
+                  cpu: 1000m
+                  memory: 512Mi
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: false
+          securityContext:
+            fsGroup: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            runAsUser: 1000

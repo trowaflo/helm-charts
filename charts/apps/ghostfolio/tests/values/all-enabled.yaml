@@ -1,0 +1,30 @@
+---
+# Test values with all features enabled
+ghostfolio:
+  secretName: test-ghostfolio-secrets
+  database:
+    secretName: test-db-secret
+    secretKey: DATABASE_URL
+  redis:
+    passwordSecretName: test-redis-secret
+    passwordSecretKey: REDIS_PASSWORD
+
+redis:
+  enabled: true
+
+postgresql:
+  enabled: true
+  cluster:
+    bootstrap:
+      initdb:
+        secret:
+          name: test-db-app-secret
+
+backup:
+  enabled: true
+  nfs:
+    server: "192.168.1.100"
+    path: "/mnt/backups"
+
+restore:
+  enabled: false

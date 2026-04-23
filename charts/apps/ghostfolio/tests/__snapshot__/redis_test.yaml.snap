@@ -1,0 +1,103 @@
+should match snapshot:
+  1: |
+    apiVersion: apps/v1
+    kind: StatefulSet
+    metadata:
+      labels:
+        app.kubernetes.io/component: redis
+        app.kubernetes.io/instance: ghostfolio-test
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: ghostfolio-redis
+        helm.sh/chart: ghostfolio-0.1.0
+      name: ghostfolio-test-redis
+      namespace: ghostfolio-test
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: ghostfolio-test
+          app.kubernetes.io/name: ghostfolio-redis
+      serviceName: ghostfolio-test-redis
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/instance: ghostfolio-test
+            app.kubernetes.io/name: ghostfolio-redis
+        spec:
+          containers:
+            - command:
+                - redis-server
+                - --requirepass
+                - $(REDIS_PASSWORD)
+                - --appendonly
+                - "yes"
+                - --dir
+                - /data
+              env:
+                - name: REDIS_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: REDIS_PASSWORD
+                      name: test-redis-secret
+              image: redis:7.4.2-alpine
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                exec:
+                  command:
+                    - sh
+                    - -c
+                    - redis-cli -a "$REDIS_PASSWORD" ping | grep PONG
+                failureThreshold: 3
+                initialDelaySeconds: 30
+                periodSeconds: 10
+                timeoutSeconds: 5
+              name: redis
+              ports:
+                - containerPort: 6379
+                  name: redis
+                  protocol: TCP
+              readinessProbe:
+                exec:
+                  command:
+                    - sh
+                    - -c
+                    - redis-cli -a "$REDIS_PASSWORD" ping | grep PONG
+                failureThreshold: 3
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 3
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
+                requests:
+                  cpu: 10m
+                  memory: 64Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              volumeMounts:
+                - mountPath: /data
+                  name: data
+                - mountPath: /tmp
+                  name: tmp
+          securityContext:
+            fsGroup: 999
+            runAsGroup: 999
+            runAsNonRoot: true
+            runAsUser: 999
+          volumes:
+            - emptyDir: {}
+              name: tmp
+      volumeClaimTemplates:
+        - metadata:
+            name: data
+          spec:
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 1Gi

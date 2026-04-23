@@ -1,0 +1,25 @@
+apiVersion: v2
+name: ghostfolio
+version: 0.1.0
+type: application
+description: |-
+  Privacy-first open source portfolio tracker with PostgreSQL (CNPG) and Redis support.
+  ArgoCD-compatible chart with no drift from lookup or randAlphaNum - all secrets externally managed.
+  Includes automated backup to NFS and manual restore capabilities.
+keywords:
+  - ghostfolio
+  - portfolio
+  - finance
+  - tracker
+  - postgresql
+  - redis
+  - cnpg
+  - backup
+home: https://ghostfol.io
+icon: https://raw.githubusercontent.com/ghostfolio/ghostfolio/main/apps/client/src/favicon.svg
+maintainers:
+  - name: trowaflo
+    email: trowa.flo@gmail.com
+sources:
+  - https://github.com/ghostfolio/ghostfolio
+  - https://github.com/trowaflo/helm-charts
