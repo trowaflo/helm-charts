@@ -23,3 +23,8 @@ maintainers:
 sources:
   - https://github.com/ghostfolio/ghostfolio
   - https://github.com/trowaflo/helm-charts
+
+dependencies:
+  - name: common
+    version: 2.2.0
+    repository: file://../../library/common

@@ -2,10 +2,11 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: {{ include "ghostfolio.fullname" . }}-postgresql
-  namespace: {{ .Release.Namespace }}
+  name: {{ include "common.helpers.fullname" . }}-postgresql
+  namespace: {{ include "common.helpers.namespace" . }}
   labels:
-    {{- include "ghostfolio.postgresql.labels" . | nindent 4 }}
+    {{- include "common.helpers.labels" . | nindent 4 }}
+    app.kubernetes.io/component: database
 spec:
   instances: {{ .Values.postgresql.cluster.instances }}
 
