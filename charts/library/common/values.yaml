@@ -18,29 +18,74 @@ namespaceOverride: ''
 #      templated references expand (e.g. `'{{ include "common.helpers.fullname" . }}-redis'`).
 #      Nil values fail fast. Keys are emitted in sorted order.
 # @section -- Deployments configuration
-deployments: {}
+deployments:
+  main:
+    # -- Enable or disable this deployment
+    enabled: false
+    replicas: 1
+    revisionHistoryLimit: 3
+    # containers: required when enabled — define at least one entry: {main: {image: {repository, tag}}}
 
 # -- StatefulSets configuration. Define one or more stateful workloads under the 'statefulsets' key.
 # @section -- StatefulSets configuration
-statefulsets: {}
+statefulsets:
+  main:
+    # -- Enable or disable this StatefulSet
+    enabled: false
+    replicas: 1
+    revisionHistoryLimit: 3
+    # containers: required when enabled — define at least one entry: {main: {image: {repository, tag}}}
+    # -- VolumeClaimTemplates for persistent storage. Each entry requires metadata.name and spec.resources.requests.storage
+    volumeClaimTemplates: []
 
 # -- CronJobs configuration. Define one or more scheduled jobs under the 'cronjobs' key.
 # @section -- CronJobs configuration
-cronjobs: {}
+cronjobs:
+  main:
+    # -- Enable or disable this CronJob
+    enabled: false
+    # -- Cron schedule expression
+    schedule: '0 * * * *'
+    concurrencyPolicy: Forbid
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 3
+    restartPolicy: OnFailure
+    # containers: required when enabled — define at least one entry: {main: {image: {repository, tag}}}
 
 # -- Jobs configuration. Define one or more one-shot jobs under the 'jobs' key.
 # @section -- Jobs configuration
-jobs: {}
+jobs:
+  main:
+    # -- Enable or disable this Job
+    enabled: false
+    restartPolicy: OnFailure
+    # containers: required when enabled — define at least one entry: {main: {image: {repository, tag}}}
 
 # -- CloudNativePG Clusters configuration. Define one or more clusters under the 'cnpgClusters' key.
 # @section -- CNPG Clusters configuration
-cnpgClusters: {}
+cnpgClusters:
+  main:
+    # -- Enable or disable this CNPG Cluster
+    enabled: false
+    instances: 1
+    # -- PostgreSQL image to use. Required when enabled. e.g. ghcr.io/cloudnative-pg/postgresql:16
+    imageName: ''
+    storage:
+      # -- Storage size for the cluster. Required when enabled. e.g. 10Gi
+      size: ''
+    bootstrap:
+      initdb:
+        database: app
+        owner: app
+    monitoring:
+      enabled: false
+      podMonitorEnabled: false
 
 # -- Service configuration. Additional services can be added under the 'k8sServices' key.
 # @section -- Services configuration
 k8sServices:
   main:
-    enabled: true
+    enabled: false
     type: ClusterIP
     annotations: {}
     labels: {}
@@ -73,7 +118,7 @@ ingresses:
 # @section -- Monitoring configuration
 serviceMonitors:
   main:
-    enabled: true
+    enabled: false
     labels:
       release: prometheus
     endpoints:
