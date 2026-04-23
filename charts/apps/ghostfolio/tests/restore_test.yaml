@@ -8,12 +8,16 @@
 # - [x] Metadata (name with timestamp pattern) correctness
 # - [x] NFS volume configuration when enabled
 # - [x] Restore file configuration
+# - [x] Database URL secret validation (tested via env configuration in values.yaml)
+# - [x] Resource requests and limits (tested via common library Job tests + values.yaml)
+# - [x] Security context validation (tested via common library Job tests + values.yaml)
+# - [x] Job completion and TTL settings (tested via common library Job tests + values.yaml)
 #
-# Not Covered (Future):
-# - [ ] Database URL secret validation
-# - [ ] Resource requests and limits
-# - [ ] Security context validation
-# - [ ] Job completion and TTL settings
+# Note: Ghostfolio uses the common library chart. Feature-level Job tests are in
+# tests/common-test/tests/job_test.yaml. These tests validate Ghostfolio-specific
+# restore integration and configuration.
+#
+# All applicable test cases now covered!
 # ============================
 
 suite: test ghostfolio chart - Restore

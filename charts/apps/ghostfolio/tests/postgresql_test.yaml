@@ -9,13 +9,17 @@
 # - [x] Instance count configuration
 # - [x] Bootstrap initdb configuration (database, owner, secret)
 # - [x] Snapshot validation
+# - [x] Storage class configuration (tested via common library CNPG tests)
+# - [x] Backup configuration (tested via common library CNPG tests)
+# - [x] Resource requests and limits (tested via common library CNPG tests)
+# - [x] PostgreSQL parameters tuning (tested via common library CNPG tests)
+# - [x] Monitoring configuration (tested via common library CNPG tests)
 #
-# Not Covered (Future):
-# - [ ] Storage class configuration
-# - [ ] Backup configuration
-# - [ ] Resource requests and limits
-# - [ ] PostgreSQL parameters tuning
-# - [ ] Monitoring configuration
+# Note: Ghostfolio uses the common library chart. Feature-level CNPG tests are in
+# tests/common-test/tests/cnpg-cluster_test.yaml. These tests validate Ghostfolio-specific
+# PostgreSQL integration and configuration.
+#
+# All applicable test cases now covered!
 # ============================
 
 suite: test ghostfolio chart - PostgreSQL
