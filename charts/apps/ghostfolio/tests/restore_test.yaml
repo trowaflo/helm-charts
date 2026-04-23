@@ -22,7 +22,7 @@
 
 suite: test ghostfolio chart - Restore
 templates:
-  - templates/restore-job.yaml
+  - templates/common.yaml
 values:
   - values/all-enabled.yaml
 release:
@@ -30,13 +30,11 @@ release:
   namespace: ghostfolio-test
 tests:
   - it: should not create restore job when disabled
-    template: templates/restore-job.yaml
     asserts:
       - hasDocuments:
           count: 0
 
   - it: should create restore job when enabled
-    template: templates/restore-job.yaml
     set:
       restore.enabled: true
       restore.restoreFile: "ghostfolio-2024-01-01.dump"
@@ -50,7 +48,6 @@ tests:
           pattern: ^ghostfolio-test-restore-
 
   - it: should have NFS volume when enabled
-    template: templates/restore-job.yaml
     set:
       restore.enabled: true
       restore.restoreFile: "ghostfolio-2024-01-01.dump"

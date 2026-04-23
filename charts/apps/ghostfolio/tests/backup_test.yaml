@@ -24,7 +24,7 @@
 
 suite: test ghostfolio chart - Backup
 templates:
-  - templates/backup-cronjob.yaml
+  - templates/common.yaml
 values:
   - values/all-enabled.yaml
 release:
@@ -32,7 +32,6 @@ release:
   namespace: ghostfolio-test
 tests:
   - it: should create backup CronJob when enabled
-    template: templates/backup-cronjob.yaml
     asserts:
       - isKind:
           of: CronJob
@@ -44,7 +43,6 @@ tests:
           value: "0 2 * * *"
 
   - it: should not create backup when disabled
-    template: templates/backup-cronjob.yaml
     set:
       backup.enabled: false
     asserts:
@@ -52,7 +50,6 @@ tests:
           count: 0
 
   - it: should have NFS volume configured
-    template: templates/backup-cronjob.yaml
     asserts:
       - contains:
           path: spec.jobTemplate.spec.template.spec.volumes
@@ -63,7 +60,6 @@ tests:
               path: "/mnt/backups"
 
   - it: should have database URL from secret
-    template: templates/backup-cronjob.yaml
     asserts:
       - contains:
           path: spec.jobTemplate.spec.template.spec.containers[0].env
@@ -75,6 +71,5 @@ tests:
                 key: DATABASE_URL
 
   - it: should match snapshot
-    template: templates/backup-cronjob.yaml
     asserts:
       - matchSnapshot: {}

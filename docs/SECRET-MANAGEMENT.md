@@ -13,6 +13,7 @@ The Ghostfolio chart follows a **GitOps-first** approach where secrets are manag
 The chart requires three secrets to be pre-created:
 
 ### 1. Application Secrets (`ghostfolio-secrets`)
+
 ```yaml
 apiVersion: v1
 kind: Secret
@@ -26,6 +27,7 @@ stringData:
 ```
 
 ### 2. Database Connection Secret (`ghostfolio-db-secret`)
+
 ```yaml
 apiVersion: v1
 kind: Secret
@@ -38,6 +40,7 @@ stringData:
 ```
 
 ### 3. Redis Password Secret (`ghostfolio-redis-secret`)
+
 ```yaml
 apiVersion: v1
 kind: Secret
@@ -133,17 +136,20 @@ stringData:
 ### Problems with Auto-Generated Secrets
 
 **Option 1: Using `randAlphaNum`**
+
 ```yaml
 # ❌ BAD - Causes GitOps drift
 env:
   - name: SECRET
     value: {{ randAlphaNum 32 | b64enc }}
 ```
+
 - Every `helm template` generates different values
 - ArgoCD sees perpetual drift
 - Secrets change on every sync
 
 **Option 2: Using `lookup` function**
+
 ```yaml
 # ❌ BAD - Doesn't work offline
 {{- $secret := lookup "v1" "Secret" .Release.Namespace "my-secret" }}
@@ -151,6 +157,7 @@ env:
   # Generate new secret
 {{- end }}
 ```
+
 - Requires cluster access
 - Doesn't work with ArgoCD's offline rendering
 - Can't preview changes locally
@@ -158,6 +165,7 @@ env:
 ### Our Approach: External Secret Management
 
 ✅ **GOOD - Explicit external management**
+
 ```yaml
 env:
   - name: SECRET
@@ -168,6 +176,7 @@ env:
 ```
 
 Benefits:
+
 - ✅ No drift - secrets are immutable references
 - ✅ Works offline - ArgoCD can render templates without cluster access
 - ✅ GitOps-friendly - only references in Git, not values
@@ -192,6 +201,7 @@ secrets:
 ```
 
 **Implementation considerations:**
+
 - Would still be opt-in (default: false)
 - Would use annotations to make secrets immutable after creation
 - Would include warnings in NOTES.txt about GitOps compatibility
