@@ -62,8 +62,8 @@ tests:
             name: DATABASE_URL
             valueFrom:
               secretKeyRef:
-                name: ghostfolio-db-secret
-                key: DATABASE_URL
+                name: ghostfolio-test-postgresql-app
+                key: uri
 
   - it: should match snapshot
     documentSelector:

@@ -58,7 +58,7 @@ tests:
             name: REDIS_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: ghostfolio-redis-secret
+                name: ghostfolio-test-redis
                 key: REDIS_PASSWORD
 
   - it: should match snapshot

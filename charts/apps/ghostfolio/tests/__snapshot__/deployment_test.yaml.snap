@@ -8,7 +8,7 @@ should match snapshot:
         app.kubernetes.io/instance: ghostfolio-test
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: ghostfolio
-        helm.sh/chart: ghostfolio-3.0.0
+        helm.sh/chart: ghostfolio-4.0.0
       name: ghostfolio-test-main
       namespace: ghostfolio-test
     spec:
@@ -31,32 +31,32 @@ should match snapshot:
           automountServiceAccountToken: false
           containers:
             - env:
-                - name: DATABASE_URL
-                  valueFrom:
-                    secretKeyRef:
-                      key: DATABASE_URL
-                      name: ghostfolio-db-secret
-                - name: REDIS_HOST
-                  value: '{{ include "common.helpers.fullname" . }}-redis'
-                - name: REDIS_PORT
-                  value: "6379"
-                - name: REDIS_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      key: REDIS_PASSWORD
-                      name: ghostfolio-redis-secret
                 - name: ACCESS_TOKEN_SALT
                   valueFrom:
                     secretKeyRef:
                       key: ACCESS_TOKEN_SALT
-                      name: ghostfolio-secrets
+                      name: ghostfolio-test-secrets
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      key: uri
+                      name: ghostfolio-test-postgresql-app
                 - name: JWT_SECRET_KEY
                   valueFrom:
                     secretKeyRef:
                       key: JWT_SECRET_KEY
-                      name: ghostfolio-secrets
+                      name: ghostfolio-test-secrets
                 - name: NODE_ENV
                   value: production
+                - name: REDIS_HOST
+                  value: ghostfolio-test-redis
+                - name: REDIS_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: REDIS_PASSWORD
+                      name: ghostfolio-test-redis
+                - name: REDIS_PORT
+                  value: "6379"
               image: ghostfolio/ghostfolio:2.167.0
               imagePullPolicy: IfNotPresent
               livenessProbe:

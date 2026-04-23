@@ -1,23 +1,24 @@
 ---
-# Ghostfolio-specific configuration
+# Ghostfolio facade: secret handling and CNPG bootstrap knobs.
 ghostfolio:
-  # Secrets configuration - all secrets are externally managed
-  # REQUIRED: Create a secret with the following keys:
-  #   - ACCESS_TOKEN_SALT
-  #   - JWT_SECRET_KEY
-  secretName: ghostfolio-secrets
-
-  # PostgreSQL database configuration
-  database:
-    secretName: ghostfolio-db-secret
-
-  # Redis configuration
+  auth:
+    # If set, chart skips auto-generation of <release>-ghostfolio-secrets and
+    # expects the named Secret to exist with keys ACCESS_TOKEN_SALT + JWT_SECRET_KEY.
+    existingSecret: ""
   redis:
-    host: ""  # Auto-configured to release-name-redis
-    port: 6379
-    passwordSecretName: ghostfolio-redis-secret
+    auth:
+      # If set, chart skips auto-generation of <release>-ghostfolio-redis and
+      # expects the named Secret to exist with key REDIS_PASSWORD.
+      existingSecret: ""
+  database:
+    bootstrap:
+      # If set, chart skips auto-generation of <release>-ghostfolio-db-bootstrap and
+      # expects the named Secret to exist with keys username + password (kubernetes.io/basic-auth).
+      existingSecret: ""
+      # Seed username for auto-generated bootstrap secret (ignored when existingSecret is set).
+      username: ghostfolio
 
-# Deployment configuration
+# Main deployment
 deployments:
   main:
     enabled: true
@@ -45,32 +46,25 @@ deployments:
             protocol: TCP
 
         env:
-          - name: DATABASE_URL
-            valueFrom:
-              secretKeyRef:
-                name: ghostfolio-db-secret
-                key: DATABASE_URL
-          - name: REDIS_HOST
-            value: "{{ include \"common.helpers.fullname\" . }}-redis"
-          - name: REDIS_PORT
-            value: "6379"
-          - name: REDIS_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: ghostfolio-redis-secret
-                key: REDIS_PASSWORD
-          - name: ACCESS_TOKEN_SALT
-            valueFrom:
-              secretKeyRef:
-                name: ghostfolio-secrets
-                key: ACCESS_TOKEN_SALT
-          - name: JWT_SECRET_KEY
-            valueFrom:
-              secretKeyRef:
-                name: ghostfolio-secrets
-                key: JWT_SECRET_KEY
-          - name: NODE_ENV
-            value: production
+          NODE_ENV: production
+          REDIS_HOST: '{{ include "common.helpers.fullname" . }}-redis'
+          REDIS_PORT: "6379"
+          DATABASE_URL:
+            secretKeyRef:
+              name: '{{ include "common.helpers.cnpgAppSecret" (dict "root" . "name" "postgresql") }}'
+              key: uri
+          REDIS_PASSWORD:
+            secretKeyRef:
+              name: '{{ include "ghostfolio.secretName.redis" . }}'
+              key: REDIS_PASSWORD
+          ACCESS_TOKEN_SALT:
+            secretKeyRef:
+              name: '{{ include "ghostfolio.secretName.auth" . }}'
+              key: ACCESS_TOKEN_SALT
+          JWT_SECRET_KEY:
+            secretKeyRef:
+              name: '{{ include "ghostfolio.secretName.auth" . }}'
+              key: JWT_SECRET_KEY
 
         livenessProbe:
           httpGet:
@@ -109,7 +103,7 @@ deployments:
             drop:
               - ALL
 
-# Service configuration
+# Services
 k8sServices:
   main:
     enabled: true
@@ -131,13 +125,12 @@ k8sServices:
         protocol: TCP
         port: 6379
 
-# Ingress configuration
+# Ingress (off by default)
 ingresses:
   main:
     enabled: false
     className: ""
     annotations: {}
-      # cert-manager.io/cluster-issuer: letsencrypt-prod
     hosts:
       - host: ghostfolio.example.com
         paths:
@@ -146,11 +139,8 @@ ingresses:
             service: main
             port: http
     tls: []
-      # - secretName: ghostfolio-tls
-      #   hosts:
-      #     - ghostfolio.example.com
 
-# Redis StatefulSet configuration
+# Redis StatefulSet
 statefulsets:
   redis:
     enabled: true
@@ -185,11 +175,10 @@ statefulsets:
             protocol: TCP
 
         env:
-          - name: REDIS_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: ghostfolio-redis-secret
-                key: REDIS_PASSWORD
+          REDIS_PASSWORD:
+            secretKeyRef:
+              name: '{{ include "ghostfolio.secretName.redis" . }}'
+              key: REDIS_PASSWORD
 
         livenessProbe:
           exec:
@@ -248,7 +237,7 @@ statefulsets:
             requests:
               storage: 1Gi
 
-# Backup CronJob configuration
+# Backup CronJob (off by default)
 cronjobs:
   backup:
     enabled: false
@@ -288,11 +277,10 @@ cronjobs:
             echo "Backup process completed successfully"
 
         env:
-          - name: DATABASE_URL
-            valueFrom:
-              secretKeyRef:
-                name: ghostfolio-db-secret
-                key: DATABASE_URL
+          DATABASE_URL:
+            secretKeyRef:
+              name: '{{ include "common.helpers.cnpgAppSecret" (dict "root" . "name" "postgresql") }}'
+              key: uri
 
         volumeMounts:
           - name: backup
@@ -319,11 +307,7 @@ cronjobs:
           server: ""  # REQUIRED when backup enabled
           path: ""    # REQUIRED when backup enabled
 
-# Backup configuration
-backup:
-  retention: 7
-
-# Restore Job configuration
+# Restore Job (off by default)
 jobs:
   restore:
     enabled: false
@@ -362,11 +346,10 @@ jobs:
             echo "Restore process completed"
 
         env:
-          - name: DATABASE_URL
-            valueFrom:
-              secretKeyRef:
-                name: ghostfolio-db-secret
-                key: DATABASE_URL
+          DATABASE_URL:
+            secretKeyRef:
+              name: '{{ include "common.helpers.cnpgAppSecret" (dict "root" . "name" "postgresql") }}'
+              key: uri
 
         volumeMounts:
           - name: backup
@@ -394,11 +377,15 @@ jobs:
           server: ""  # REQUIRED when restore enabled
           path: ""    # REQUIRED when restore enabled
 
-# Restore configuration
+# Backup tunables
+backup:
+  retention: 7
+
+# Restore tunables
 restore:
   restoreFile: ""
 
-# PostgreSQL CNPG Cluster configuration
+# CNPG PostgreSQL Cluster
 cnpgClusters:
   postgresql:
     enabled: true
@@ -414,7 +401,7 @@ cnpgClusters:
         database: ghostfolio
         owner: ghostfolio
         secret:
-          name: ghostfolio-db-app-secret
+          name: '{{ include "ghostfolio.secretName.dbBootstrap" . }}'
 
     postgresql:
       parameters:
@@ -447,7 +434,7 @@ cnpgClusters:
       enabled: false
       retentionPolicy: "30d"
 
-# Global settings
+# Global
 global:
   imagePullSecrets: []
   nodeSelector: {}

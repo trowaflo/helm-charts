@@ -50,7 +50,7 @@ tests:
           value: ghostfolio
       - equal:
           path: spec.bootstrap.initdb.secret.name
-          value: test-db-app-secret
+          value: ghostfolio-test-db-bootstrap
 
   - it: should match snapshot
     documentSelector:

@@ -1,21 +1,5 @@
 ---
 # Test values with all features enabled
-ghostfolio:
-  secretName: ghostfolio-secrets
-  database:
-    secretName: ghostfolio-db-secret
-    secretKey: DATABASE_URL
-  redis:
-    passwordSecretName: ghostfolio-redis-secret
-    passwordSecretKey: REDIS_PASSWORD
-
-cnpgClusters:
-  postgresql:
-    bootstrap:
-      initdb:
-        secret:
-          name: test-db-app-secret
-
 cronjobs:
   backup:
     enabled: true
@@ -24,11 +8,3 @@ cronjobs:
         nfs:
           server: "192.168.1.100"
           path: "/mnt/backups"
-    containers:
-      backup:
-        env:
-          - name: DATABASE_URL
-            valueFrom:
-              secretKeyRef:
-                name: ghostfolio-db-secret
-                key: DATABASE_URL

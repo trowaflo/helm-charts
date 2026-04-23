@@ -49,15 +49,15 @@ tests:
             name: DATABASE_URL
             valueFrom:
               secretKeyRef:
-                name: ghostfolio-db-secret
-                key: DATABASE_URL
+                name: ghostfolio-test-postgresql-app
+                key: uri
       - contains:
           path: spec.template.spec.containers[0].env
           content:
             name: ACCESS_TOKEN_SALT
             valueFrom:
               secretKeyRef:
-                name: ghostfolio-secrets
+                name: ghostfolio-test-secrets
                 key: ACCESS_TOKEN_SALT
 
   - it: should have security context

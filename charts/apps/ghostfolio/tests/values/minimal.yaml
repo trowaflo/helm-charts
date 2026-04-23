@@ -1,22 +1,17 @@
 ---
 # Test values with minimal configuration
-ghostfolio:
-  secretName: test-ghostfolio-secrets
-  database:
-    secretName: test-db-secret
-    secretKey: DATABASE_URL
+statefulsets:
   redis:
-    passwordSecretName: test-redis-secret
-    passwordSecretKey: REDIS_PASSWORD
+    enabled: false
 
-redis:
-  enabled: false
+cnpgClusters:
+  postgresql:
+    enabled: false
 
-postgresql:
-  enabled: false
+cronjobs:
+  backup:
+    enabled: false
 
-backup:
-  enabled: false
-
-restore:
-  enabled: false
+jobs:
+  restore:
+    enabled: false
