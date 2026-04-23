@@ -1,7 +1,8 @@
 {{- define "common.manifests.ingress" -}}
   {{- $fullname := include "common.helpers.fullname" . -}}
-  {{- range $name := keys .Values.ingresses | sortAlpha }}
-    {{- $cfg := index $.Values.ingresses $name }}
+  {{- $ingresses := .Values.ingresses | default dict -}}
+  {{- range $name := keys $ingresses | sortAlpha }}
+    {{- $cfg := index $ingresses $name }}
     {{- if $cfg.enabled }}
       {{- $_ := required (printf "ingresses.%s.hosts is required and must contain at least one entry when enabled" $name) $cfg.hosts }}
 ---
