@@ -1,3 +1,23 @@
+# Test Coverage Documentation
+# ============================
+# This test suite validates the Ghostfolio Backup CronJob rendering.
+#
+# Covered Test Cases:
+# - [x] Backup CronJob creation when enabled
+# - [x] Backup CronJob not created when disabled
+# - [x] Metadata (name, namespace) correctness
+# - [x] Schedule configuration (cron expression)
+# - [x] NFS volume configuration
+# - [x] Database URL from secret
+# - [x] Snapshot validation
+#
+# Not Covered (Future):
+# - [ ] Retention policy validation
+# - [ ] Backup verification steps
+# - [ ] Resource requests and limits
+# - [ ] Security context validation
+# ============================
+
 suite: test ghostfolio chart - Backup
 templates:
   - templates/backup-cronjob.yaml

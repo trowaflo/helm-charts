@@ -1,3 +1,23 @@
+# Test Coverage Documentation
+# ============================
+# This test suite validates the Ghostfolio Deployment rendering.
+#
+# Covered Test Cases:
+# - [x] Deployment resource creation
+# - [x] Metadata (name, namespace) correctness
+# - [x] Replica count configuration
+# - [x] Environment variables (DATABASE_URL, REDIS_HOST, ACCESS_TOKEN_SALT)
+# - [x] Security context (runAsNonRoot, allowPrivilegeEscalation)
+# - [x] Health probes (liveness and readiness)
+# - [x] Snapshot validation
+#
+# Not Covered (Future):
+# - [ ] Resource requests and limits validation
+# - [ ] Volume mounts
+# - [ ] Image pull policy
+# - [ ] Service account configuration
+# ============================
+
 suite: test ghostfolio chart - Deployment
 templates:
   - templates/deployment.yaml

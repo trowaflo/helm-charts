@@ -1,3 +1,23 @@
+# Test Coverage Documentation
+# ============================
+# This test suite validates the Ghostfolio Redis StatefulSet and Service rendering.
+#
+# Covered Test Cases:
+# - [x] Redis StatefulSet creation when enabled
+# - [x] Redis StatefulSet not created when disabled
+# - [x] Metadata (name, namespace) correctness
+# - [x] Security context (runAsNonRoot, allowPrivilegeEscalation)
+# - [x] Password configuration from secret
+# - [x] Headless service creation with ClusterIP None
+# - [x] Snapshot validation
+#
+# Not Covered (Future):
+# - [ ] Persistence configuration
+# - [ ] Resource requests and limits
+# - [ ] Redis configuration parameters
+# - [ ] Volume claim templates
+# ============================
+
 suite: test ghostfolio chart - Redis
 templates:
   - templates/redis-statefulset.yaml

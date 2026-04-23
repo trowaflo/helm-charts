@@ -1,3 +1,21 @@
+# Test Coverage Documentation
+# ============================
+# This test suite validates the Ghostfolio Restore Job rendering.
+#
+# Covered Test Cases:
+# - [x] Restore Job not created when disabled (default)
+# - [x] Restore Job creation when enabled
+# - [x] Metadata (name with timestamp pattern) correctness
+# - [x] NFS volume configuration when enabled
+# - [x] Restore file configuration
+#
+# Not Covered (Future):
+# - [ ] Database URL secret validation
+# - [ ] Resource requests and limits
+# - [ ] Security context validation
+# - [ ] Job completion and TTL settings
+# ============================
+
 suite: test ghostfolio chart - Restore
 templates:
   - templates/restore-job.yaml

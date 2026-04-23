@@ -1,3 +1,23 @@
+# Test Coverage Documentation
+# ============================
+# This test suite validates the Ghostfolio PostgreSQL CNPG Cluster rendering.
+#
+# Covered Test Cases:
+# - [x] CNPG Cluster creation when enabled
+# - [x] CNPG Cluster not created when disabled
+# - [x] Metadata (name, namespace) correctness
+# - [x] Instance count configuration
+# - [x] Bootstrap initdb configuration (database, owner, secret)
+# - [x] Snapshot validation
+#
+# Not Covered (Future):
+# - [ ] Storage class configuration
+# - [ ] Backup configuration
+# - [ ] Resource requests and limits
+# - [ ] PostgreSQL parameters tuning
+# - [ ] Monitoring configuration
+# ============================
+
 suite: test ghostfolio chart - PostgreSQL
 templates:
   - templates/postgresql-cluster.yaml
