@@ -1,6 +1,6 @@
 # ghostfolio
 
-![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 3.0.0](https://img.shields.io/badge/Version-3.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Privacy-first open source portfolio tracker with PostgreSQL (CNPG) and Redis support.
 ArgoCD-compatible chart with no drift from lookup or randAlphaNum - all secrets externally managed.
@@ -23,7 +23,7 @@ Includes automated backup to NFS and manual restore capabilities.
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../../library/common | common | 2.1.2 |
+| file://../../library/common | common | 3.0.0 |
 
 ## Values
 
@@ -88,60 +88,60 @@ Includes automated backup to NFS and manual restore capabilities.
 | cronjobs.backup.volumes[0].name | string | `"backup"` |  |
 | cronjobs.backup.volumes[0].nfs.path | string | `""` |  |
 | cronjobs.backup.volumes[0].nfs.server | string | `""` |  |
-| deployment.containers.main.env[0].name | string | `"DATABASE_URL"` |  |
-| deployment.containers.main.env[0].valueFrom.secretKeyRef.key | string | `"DATABASE_URL"` |  |
-| deployment.containers.main.env[0].valueFrom.secretKeyRef.name | string | `"ghostfolio-db-secret"` |  |
-| deployment.containers.main.env[1].name | string | `"REDIS_HOST"` |  |
-| deployment.containers.main.env[1].value | string | `"{{ include \"common.helpers.fullname\" . }}-redis"` |  |
-| deployment.containers.main.env[2].name | string | `"REDIS_PORT"` |  |
-| deployment.containers.main.env[2].value | string | `"6379"` |  |
-| deployment.containers.main.env[3].name | string | `"REDIS_PASSWORD"` |  |
-| deployment.containers.main.env[3].valueFrom.secretKeyRef.key | string | `"REDIS_PASSWORD"` |  |
-| deployment.containers.main.env[3].valueFrom.secretKeyRef.name | string | `"ghostfolio-redis-secret"` |  |
-| deployment.containers.main.env[4].name | string | `"ACCESS_TOKEN_SALT"` |  |
-| deployment.containers.main.env[4].valueFrom.secretKeyRef.key | string | `"ACCESS_TOKEN_SALT"` |  |
-| deployment.containers.main.env[4].valueFrom.secretKeyRef.name | string | `"ghostfolio-secrets"` |  |
-| deployment.containers.main.env[5].name | string | `"JWT_SECRET_KEY"` |  |
-| deployment.containers.main.env[5].valueFrom.secretKeyRef.key | string | `"JWT_SECRET_KEY"` |  |
-| deployment.containers.main.env[5].valueFrom.secretKeyRef.name | string | `"ghostfolio-secrets"` |  |
-| deployment.containers.main.env[6].name | string | `"NODE_ENV"` |  |
-| deployment.containers.main.env[6].value | string | `"production"` |  |
-| deployment.containers.main.image.pullPolicy | string | `"IfNotPresent"` |  |
-| deployment.containers.main.image.repository | string | `"ghostfolio/ghostfolio"` |  |
-| deployment.containers.main.image.tag | string | `"2.167.0"` |  |
-| deployment.containers.main.livenessProbe.failureThreshold | int | `3` |  |
-| deployment.containers.main.livenessProbe.httpGet.path | string | `"/api/v1/health"` |  |
-| deployment.containers.main.livenessProbe.httpGet.port | string | `"http"` |  |
-| deployment.containers.main.livenessProbe.httpGet.scheme | string | `"HTTP"` |  |
-| deployment.containers.main.livenessProbe.initialDelaySeconds | int | `30` |  |
-| deployment.containers.main.livenessProbe.periodSeconds | int | `10` |  |
-| deployment.containers.main.livenessProbe.successThreshold | int | `1` |  |
-| deployment.containers.main.livenessProbe.timeoutSeconds | int | `5` |  |
-| deployment.containers.main.ports.http.containerPort | int | `3333` |  |
-| deployment.containers.main.ports.http.protocol | string | `"TCP"` |  |
-| deployment.containers.main.readinessProbe.failureThreshold | int | `3` |  |
-| deployment.containers.main.readinessProbe.httpGet.path | string | `"/api/v1/health"` |  |
-| deployment.containers.main.readinessProbe.httpGet.port | string | `"http"` |  |
-| deployment.containers.main.readinessProbe.httpGet.scheme | string | `"HTTP"` |  |
-| deployment.containers.main.readinessProbe.initialDelaySeconds | int | `10` |  |
-| deployment.containers.main.readinessProbe.periodSeconds | int | `5` |  |
-| deployment.containers.main.readinessProbe.successThreshold | int | `1` |  |
-| deployment.containers.main.readinessProbe.timeoutSeconds | int | `3` |  |
-| deployment.containers.main.resources.limits.cpu | string | `"1000m"` |  |
-| deployment.containers.main.resources.limits.memory | string | `"512Mi"` |  |
-| deployment.containers.main.resources.requests.cpu | string | `"100m"` |  |
-| deployment.containers.main.resources.requests.memory | string | `"256Mi"` |  |
-| deployment.containers.main.securityContext.allowPrivilegeEscalation | bool | `false` |  |
-| deployment.containers.main.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
-| deployment.containers.main.securityContext.readOnlyRootFilesystem | bool | `true` |  |
-| deployment.enabled | bool | `true` |  |
-| deployment.podSecurityContext.fsGroup | int | `1000` |  |
-| deployment.podSecurityContext.runAsGroup | int | `1000` |  |
-| deployment.podSecurityContext.runAsNonRoot | bool | `true` |  |
-| deployment.podSecurityContext.runAsUser | int | `1000` |  |
-| deployment.replicas | int | `1` |  |
-| deployment.revisionHistoryLimit | int | `3` |  |
-| deployment.strategyType | string | `"Recreate"` |  |
+| deployments.main.containers.main.env[0].name | string | `"DATABASE_URL"` |  |
+| deployments.main.containers.main.env[0].valueFrom.secretKeyRef.key | string | `"DATABASE_URL"` |  |
+| deployments.main.containers.main.env[0].valueFrom.secretKeyRef.name | string | `"ghostfolio-db-secret"` |  |
+| deployments.main.containers.main.env[1].name | string | `"REDIS_HOST"` |  |
+| deployments.main.containers.main.env[1].value | string | `"{{ include \"common.helpers.fullname\" . }}-redis"` |  |
+| deployments.main.containers.main.env[2].name | string | `"REDIS_PORT"` |  |
+| deployments.main.containers.main.env[2].value | string | `"6379"` |  |
+| deployments.main.containers.main.env[3].name | string | `"REDIS_PASSWORD"` |  |
+| deployments.main.containers.main.env[3].valueFrom.secretKeyRef.key | string | `"REDIS_PASSWORD"` |  |
+| deployments.main.containers.main.env[3].valueFrom.secretKeyRef.name | string | `"ghostfolio-redis-secret"` |  |
+| deployments.main.containers.main.env[4].name | string | `"ACCESS_TOKEN_SALT"` |  |
+| deployments.main.containers.main.env[4].valueFrom.secretKeyRef.key | string | `"ACCESS_TOKEN_SALT"` |  |
+| deployments.main.containers.main.env[4].valueFrom.secretKeyRef.name | string | `"ghostfolio-secrets"` |  |
+| deployments.main.containers.main.env[5].name | string | `"JWT_SECRET_KEY"` |  |
+| deployments.main.containers.main.env[5].valueFrom.secretKeyRef.key | string | `"JWT_SECRET_KEY"` |  |
+| deployments.main.containers.main.env[5].valueFrom.secretKeyRef.name | string | `"ghostfolio-secrets"` |  |
+| deployments.main.containers.main.env[6].name | string | `"NODE_ENV"` |  |
+| deployments.main.containers.main.env[6].value | string | `"production"` |  |
+| deployments.main.containers.main.image.pullPolicy | string | `"IfNotPresent"` |  |
+| deployments.main.containers.main.image.repository | string | `"ghostfolio/ghostfolio"` |  |
+| deployments.main.containers.main.image.tag | string | `"2.167.0"` |  |
+| deployments.main.containers.main.livenessProbe.failureThreshold | int | `3` |  |
+| deployments.main.containers.main.livenessProbe.httpGet.path | string | `"/api/v1/health"` |  |
+| deployments.main.containers.main.livenessProbe.httpGet.port | string | `"http"` |  |
+| deployments.main.containers.main.livenessProbe.httpGet.scheme | string | `"HTTP"` |  |
+| deployments.main.containers.main.livenessProbe.initialDelaySeconds | int | `30` |  |
+| deployments.main.containers.main.livenessProbe.periodSeconds | int | `10` |  |
+| deployments.main.containers.main.livenessProbe.successThreshold | int | `1` |  |
+| deployments.main.containers.main.livenessProbe.timeoutSeconds | int | `5` |  |
+| deployments.main.containers.main.ports.http.containerPort | int | `3333` |  |
+| deployments.main.containers.main.ports.http.protocol | string | `"TCP"` |  |
+| deployments.main.containers.main.readinessProbe.failureThreshold | int | `3` |  |
+| deployments.main.containers.main.readinessProbe.httpGet.path | string | `"/api/v1/health"` |  |
+| deployments.main.containers.main.readinessProbe.httpGet.port | string | `"http"` |  |
+| deployments.main.containers.main.readinessProbe.httpGet.scheme | string | `"HTTP"` |  |
+| deployments.main.containers.main.readinessProbe.initialDelaySeconds | int | `10` |  |
+| deployments.main.containers.main.readinessProbe.periodSeconds | int | `5` |  |
+| deployments.main.containers.main.readinessProbe.successThreshold | int | `1` |  |
+| deployments.main.containers.main.readinessProbe.timeoutSeconds | int | `3` |  |
+| deployments.main.containers.main.resources.limits.cpu | string | `"1000m"` |  |
+| deployments.main.containers.main.resources.limits.memory | string | `"512Mi"` |  |
+| deployments.main.containers.main.resources.requests.cpu | string | `"100m"` |  |
+| deployments.main.containers.main.resources.requests.memory | string | `"256Mi"` |  |
+| deployments.main.containers.main.securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| deployments.main.containers.main.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| deployments.main.containers.main.securityContext.readOnlyRootFilesystem | bool | `true` |  |
+| deployments.main.enabled | bool | `true` |  |
+| deployments.main.podSecurityContext.fsGroup | int | `1000` |  |
+| deployments.main.podSecurityContext.runAsGroup | int | `1000` |  |
+| deployments.main.podSecurityContext.runAsNonRoot | bool | `true` |  |
+| deployments.main.podSecurityContext.runAsUser | int | `1000` |  |
+| deployments.main.replicas | int | `1` |  |
+| deployments.main.revisionHistoryLimit | int | `3` |  |
+| deployments.main.strategy.type | string | `"Recreate"` |  |
 | ghostfolio.database.secretName | string | `"ghostfolio-db-secret"` |  |
 | ghostfolio.redis.host | string | `""` |  |
 | ghostfolio.redis.passwordSecretName | string | `"ghostfolio-redis-secret"` |  |
