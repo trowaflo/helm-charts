@@ -4,25 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-```bash
-# Run tests for a single chart
-helm unittest charts/apps/<chart-name>
+Use `/test`, `/lint`, `/render` skills (defined in `.claude/commands/`).
 
-# Run tests for all charts
-for chart in charts/*/*/; do
-  [ -d "${chart}tests" ] && helm unittest "${chart}"
-done
-
-# Update snapshots
-helm unittest -u charts/apps/<chart-name>
-
-# Render templates (run dependency update first if chart has dependencies)
-helm dependency update charts/apps/<chart-name>
-helm template <release-name> charts/apps/<chart-name>
-
-# Lint all changed charts
-ct lint --config .github/ct.yaml
-```
+> `helm dependency update` required before `/render` or unittest on charts with dependencies.
 
 ## Architecture
 
