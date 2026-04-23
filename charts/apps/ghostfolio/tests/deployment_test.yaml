@@ -23,17 +23,17 @@
 
 suite: test ghostfolio chart - Deployment
 templates:
-  - templates/deployment.yaml
-  - templates/service.yaml
-  - templates/configmap.yaml
+  - templates/common.yaml
 values:
   - values/all-enabled.yaml
 release:
   name: ghostfolio-test
   namespace: ghostfolio-test
+documentSelector:
+  path: kind
+  value: Deployment
 tests:
   - it: should create a Deployment
-    template: templates/deployment.yaml
     asserts:
       - isKind:
           of: Deployment
@@ -45,7 +45,6 @@ tests:
           value: 1
 
   - it: should have correct environment variables
-    template: templates/deployment.yaml
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -70,7 +69,6 @@ tests:
                 key: ACCESS_TOKEN_SALT
 
   - it: should have security context
-    template: templates/deployment.yaml
     asserts:
       - equal:
           path: spec.template.spec.securityContext.runAsNonRoot
@@ -80,7 +78,6 @@ tests:
           value: false
 
   - it: should have probes enabled
-    template: templates/deployment.yaml
     asserts:
       - isNotNull:
           path: spec.template.spec.containers[0].livenessProbe
@@ -88,6 +85,5 @@ tests:
           path: spec.template.spec.containers[0].readinessProbe
 
   - it: should match snapshot
-    template: templates/deployment.yaml
     asserts:
       - matchSnapshot: {}
