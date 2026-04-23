@@ -9,7 +9,7 @@ Components deployed:
 {{- if .Values.statefulsets.redis.enabled }}
 - Redis Cache: {{ include "common.helpers.fullname" . }}-redis
 {{- end }}
-{{- if .Values.postgresql.enabled }}
+{{- if .Values.cnpgClusters.postgresql.enabled }}
 - PostgreSQL (CNPG): {{ include "common.helpers.fullname" . }}-postgresql
 {{- end }}
 {{- if .Values.cronjobs.backup.enabled }}
@@ -47,9 +47,9 @@ This chart requires pre-existing secrets. Ensure the following secrets exist:
 3. Redis Password Secret ({{ .Values.ghostfolio.redis.passwordSecretName }}):
    - {{ .Values.ghostfolio.redis.passwordSecretKey }}: Redis password
 
-{{- if .Values.postgresql.enabled }}
+{{- if .Values.cnpgClusters.postgresql.enabled }}
 
-4. PostgreSQL Bootstrap Secret ({{ .Values.postgresql.cluster.bootstrap.initdb.secret.name }}):
+4. PostgreSQL Bootstrap Secret ({{ .Values.cnpgClusters.postgresql.bootstrap.initdb.secret.name }}):
    - username: Database username
    - password: Database password
 {{- end }}

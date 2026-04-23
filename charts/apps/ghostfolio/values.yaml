@@ -368,10 +368,10 @@ jobs:
 restore:
   restoreFile: ""
 
-# PostgreSQL CNPG configuration
-postgresql:
-  enabled: true
-  cluster:
+# PostgreSQL CNPG Cluster configuration
+cnpgClusters:
+  postgresql:
+    enabled: true
     instances: 1
     imageName: ghcr.io/cloudnative-pg/postgresql:16.6
 
@@ -385,6 +385,21 @@ postgresql:
         owner: ghostfolio
         secret:
           name: ghostfolio-db-app-secret
+
+    postgresql:
+      parameters:
+        max_connections: "200"
+        shared_buffers: "256MB"
+        effective_cache_size: "1GB"
+        maintenance_work_mem: "64MB"
+        checkpoint_completion_target: "0.9"
+        wal_buffers: "16MB"
+        default_statistics_target: "100"
+        random_page_cost: "1.1"
+        effective_io_concurrency: "200"
+        work_mem: "2621kB"
+        min_wal_size: "1GB"
+        max_wal_size: "4GB"
 
     monitoring:
       enabled: false
@@ -400,6 +415,7 @@ postgresql:
 
     backup:
       enabled: false
+      retentionPolicy: "30d"
 
 # Global settings
 global:
