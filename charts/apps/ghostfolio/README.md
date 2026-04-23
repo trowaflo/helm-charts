@@ -23,7 +23,7 @@ Includes automated backup to NFS and manual restore capabilities.
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../../library/common | common | 2.2.0 |
+| file://../../library/common | common | 2.1.2 |
 
 ## Values
 
@@ -142,10 +142,8 @@ Includes automated backup to NFS and manual restore capabilities.
 | deployment.replicas | int | `1` |  |
 | deployment.revisionHistoryLimit | int | `3` |  |
 | deployment.strategyType | string | `"Recreate"` |  |
-| ghostfolio.database.secretKey | string | `"DATABASE_URL"` |  |
 | ghostfolio.database.secretName | string | `"ghostfolio-db-secret"` |  |
 | ghostfolio.redis.host | string | `""` |  |
-| ghostfolio.redis.passwordSecretKey | string | `"REDIS_PASSWORD"` |  |
 | ghostfolio.redis.passwordSecretName | string | `"ghostfolio-redis-secret"` |  |
 | ghostfolio.redis.port | int | `6379` |  |
 | ghostfolio.secretName | string | `"ghostfolio-secrets"` |  |
@@ -191,19 +189,19 @@ Includes automated backup to NFS and manual restore capabilities.
 | jobs.restore.volumes[0].name | string | `"backup"` |  |
 | jobs.restore.volumes[0].nfs.path | string | `""` |  |
 | jobs.restore.volumes[0].nfs.server | string | `""` |  |
+| k8sServices.main.annotations | object | `{}` |  |
+| k8sServices.main.enabled | bool | `true` |  |
+| k8sServices.main.labels | object | `{}` |  |
+| k8sServices.main.ports.http.port | int | `3333` |  |
+| k8sServices.main.ports.http.protocol | string | `"TCP"` |  |
+| k8sServices.main.type | string | `"ClusterIP"` |  |
+| k8sServices.redis.annotations | object | `{}` |  |
+| k8sServices.redis.enabled | bool | `true` |  |
+| k8sServices.redis.labels | object | `{}` |  |
+| k8sServices.redis.ports.redis.port | int | `6379` |  |
+| k8sServices.redis.ports.redis.protocol | string | `"TCP"` |  |
+| k8sServices.redis.type | string | `"ClusterIP"` |  |
 | restore.restoreFile | string | `""` |  |
-| services.main.annotations | object | `{}` |  |
-| services.main.enabled | bool | `true` |  |
-| services.main.labels | object | `{}` |  |
-| services.main.ports.http.port | int | `3333` |  |
-| services.main.ports.http.protocol | string | `"TCP"` |  |
-| services.main.type | string | `"ClusterIP"` |  |
-| services.redis.annotations | object | `{}` |  |
-| services.redis.enabled | bool | `true` |  |
-| services.redis.labels | object | `{}` |  |
-| services.redis.ports.redis.port | int | `6379` |  |
-| services.redis.ports.redis.protocol | string | `"TCP"` |  |
-| services.redis.type | string | `"ClusterIP"` |  |
 | statefulsets.redis.containers.redis.command[0] | string | `"redis-server"` |  |
 | statefulsets.redis.containers.redis.command[1] | string | `"--requirepass"` |  |
 | statefulsets.redis.containers.redis.command[2] | string | `"$(REDIS_PASSWORD)"` |  |
