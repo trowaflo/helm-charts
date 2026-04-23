@@ -7,12 +7,13 @@ should match snapshot:
         app.kubernetes.io/component: redis
         app.kubernetes.io/instance: ghostfolio-test
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: ghostfolio-redis
-        helm.sh/chart: ghostfolio-0.1.0
+        app.kubernetes.io/name: ghostfolio
+        helm.sh/chart: ghostfolio-0.2.0
       name: ghostfolio-test-redis
       namespace: ghostfolio-test
     spec:
       replicas: 1
+      revisionHistoryLimit: 3
       selector:
         matchLabels:
           app.kubernetes.io/instance: ghostfolio-test
@@ -24,6 +25,7 @@ should match snapshot:
             app.kubernetes.io/instance: ghostfolio-test
             app.kubernetes.io/name: ghostfolio-redis
         spec:
+          automountServiceAccountToken: false
           containers:
             - command:
                 - redis-server
@@ -38,7 +40,7 @@ should match snapshot:
                   valueFrom:
                     secretKeyRef:
                       key: REDIS_PASSWORD
-                      name: test-redis-secret
+                      name: ghostfolio-redis-secret
               image: redis:7.4.2-alpine
               imagePullPolicy: IfNotPresent
               livenessProbe:

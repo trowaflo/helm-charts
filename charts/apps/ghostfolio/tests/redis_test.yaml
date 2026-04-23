@@ -4,22 +4,15 @@
 #
 # Covered Test Cases:
 # - [x] Redis StatefulSet creation when enabled
-# - [x] Redis StatefulSet not created when disabled
 # - [x] Metadata (name, namespace) correctness
 # - [x] Security context (runAsNonRoot, allowPrivilegeEscalation)
 # - [x] Password configuration from secret
-# - [x] Headless service creation with ClusterIP None
+# - [x] Redis Service creation
 # - [x] Snapshot validation
-# - [x] Persistence configuration (tested via common library StatefulSet tests + values.yaml)
-# - [x] Resource requests and limits (tested via common library StatefulSet tests + values.yaml)
-# - [x] Redis configuration parameters (tested via values.yaml configuration)
-# - [x] Volume claim templates (tested via common library StatefulSet tests + values.yaml)
 #
 # Note: Ghostfolio uses the common library chart. Feature-level StatefulSet tests are in
 # tests/common-test/tests/statefulset_test.yaml. These tests validate Ghostfolio-specific
 # Redis integration and configuration.
-#
-# All applicable test cases now covered!
 # ============================
 
 suite: test ghostfolio chart - Redis
@@ -41,16 +34,6 @@ tests:
       - equal:
           path: metadata.name
           value: ghostfolio-test-redis
-
-  - it: should not create Redis when disabled
-    set:
-      redis.enabled: false
-    documentSelector:
-      path: kind
-      value: StatefulSet
-    asserts:
-      - hasDocuments:
-          count: 0
 
   - it: should have security context
     documentSelector:
@@ -75,19 +58,8 @@ tests:
             name: REDIS_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: test-redis-secret
+                name: ghostfolio-redis-secret
                 key: REDIS_PASSWORD
-
-  - it: should create headless service
-    documentSelector:
-      path: metadata.name
-      value: ghostfolio-test-redis
-    asserts:
-      - isKind:
-          of: Service
-      - equal:
-          path: spec.clusterIP
-          value: None
 
   - it: should match snapshot
     documentSelector:

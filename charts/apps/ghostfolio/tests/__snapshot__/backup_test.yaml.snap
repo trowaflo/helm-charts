@@ -7,8 +7,8 @@ should match snapshot:
         app.kubernetes.io/component: backup
         app.kubernetes.io/instance: ghostfolio-test
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: ghostfolio-backup
-        helm.sh/chart: ghostfolio-0.1.0
+        app.kubernetes.io/name: ghostfolio
+        helm.sh/chart: ghostfolio-0.2.0
       name: ghostfolio-test-backup
       namespace: ghostfolio-test
     spec:
@@ -28,34 +28,23 @@ should match snapshot:
                     - -c
                     - |
                       set -e
-
-                      # Generate backup filename with timestamp
                       BACKUP_FILE="/backup/ghostfolio-$(date +%Y-%m-%d-%H%M%S).dump"
-
                       echo "Starting backup to $BACKUP_FILE"
-
-                      # Perform pg_dump with custom format
                       pg_dump -Fc -v -f "$BACKUP_FILE" "$DATABASE_URL"
-
                       echo "Backup completed: $BACKUP_FILE"
-
-                      # Verify backup integrity
                       echo "Verifying backup integrity..."
                       pg_restore --list "$BACKUP_FILE" > /dev/null
                       echo "Backup verification successful"
-
-                      # Cleanup old backups (keep last N)
-                      echo "Cleaning up old backups (keeping last 7)"
+                      echo "Cleaning up old backups (keeping last {{ .Values.backup.retention | default 7 }})"
                       cd /backup
-                      ls -t ghostfolio-*.dump | tail -n +8 | xargs -r rm -f
-
+                      ls -t ghostfolio-*.dump | tail -n +{{ add1 (.Values.backup.retention | default 7) }} | xargs -r rm -f
                       echo "Backup process completed successfully"
                   env:
                     - name: DATABASE_URL
                       valueFrom:
                         secretKeyRef:
                           key: DATABASE_URL
-                          name: test-db-secret
+                          name: ghostfolio-db-secret
                   image: postgres:16
                   imagePullPolicy: IfNotPresent
                   name: backup

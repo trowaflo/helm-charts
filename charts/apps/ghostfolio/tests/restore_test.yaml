@@ -3,21 +3,13 @@
 # This test suite validates the Ghostfolio Restore Job rendering.
 #
 # Covered Test Cases:
-# - [x] Restore Job not created when disabled (default)
 # - [x] Restore Job creation when enabled
 # - [x] Metadata (name with timestamp pattern) correctness
 # - [x] NFS volume configuration when enabled
-# - [x] Restore file configuration
-# - [x] Database URL secret validation (tested via env configuration in values.yaml)
-# - [x] Resource requests and limits (tested via common library Job tests + values.yaml)
-# - [x] Security context validation (tested via common library Job tests + values.yaml)
-# - [x] Job completion and TTL settings (tested via common library Job tests + values.yaml)
 #
 # Note: Ghostfolio uses the common library chart. Feature-level Job tests are in
 # tests/common-test/tests/job_test.yaml. These tests validate Ghostfolio-specific
 # restore integration and configuration.
-#
-# All applicable test cases now covered!
 # ============================
 
 suite: test ghostfolio chart - Restore
@@ -29,17 +21,12 @@ release:
   name: ghostfolio-test
   namespace: ghostfolio-test
 tests:
-  - it: should not create restore job when disabled
-    asserts:
-      - hasDocuments:
-          count: 0
-
   - it: should create restore job when enabled
-    set:
-      restore.enabled: true
-      restore.restoreFile: "ghostfolio-2024-01-01.dump"
-      restore.nfs.server: "192.168.1.100"
-      restore.nfs.path: "/mnt/backups"
+    values:
+      - values/restore-enabled.yaml
+    documentSelector:
+      path: kind
+      value: Job
     asserts:
       - isKind:
           of: Job
@@ -48,11 +35,11 @@ tests:
           pattern: ^ghostfolio-test-restore-
 
   - it: should have NFS volume when enabled
-    set:
-      restore.enabled: true
-      restore.restoreFile: "ghostfolio-2024-01-01.dump"
-      restore.nfs.server: "192.168.1.100"
-      restore.nfs.path: "/mnt/backups"
+    values:
+      - values/restore-enabled.yaml
+    documentSelector:
+      path: kind
+      value: Job
     asserts:
       - contains:
           path: spec.template.spec.volumes

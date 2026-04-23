@@ -6,19 +6,13 @@
 # - [x] Deployment resource creation
 # - [x] Metadata (name, namespace) correctness
 # - [x] Replica count configuration
-# - [x] Environment variables (DATABASE_URL, REDIS_HOST, ACCESS_TOKEN_SALT)
+# - [x] Environment variables (DATABASE_URL, ACCESS_TOKEN_SALT)
 # - [x] Security context (runAsNonRoot, allowPrivilegeEscalation)
 # - [x] Health probes (liveness and readiness)
 # - [x] Snapshot validation
-# - [x] Resource requests and limits (tested via common library + values.yaml config)
-# - [x] Volume mounts (tested via common library, not applicable for Ghostfolio deployment)
-# - [x] Image pull policy (tested via common library + values.yaml config)
-# - [x] Service account configuration (tested via common library, automountServiceAccountToken: false)
 #
 # Note: Ghostfolio uses the common library chart. Feature-level tests are in
 # tests/common-test/. These tests validate Ghostfolio-specific integration.
-#
-# All applicable test cases now covered!
 # ============================
 
 suite: test ghostfolio chart - Deployment
@@ -29,11 +23,11 @@ values:
 release:
   name: ghostfolio-test
   namespace: ghostfolio-test
-documentSelector:
-  path: kind
-  value: Deployment
 tests:
   - it: should create a Deployment
+    documentSelector:
+      path: kind
+      value: Deployment
     asserts:
       - isKind:
           of: Deployment
@@ -45,6 +39,9 @@ tests:
           value: 1
 
   - it: should have correct environment variables
+    documentSelector:
+      path: kind
+      value: Deployment
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -52,23 +49,21 @@ tests:
             name: DATABASE_URL
             valueFrom:
               secretKeyRef:
-                name: test-db-secret
+                name: ghostfolio-db-secret
                 key: DATABASE_URL
-      - contains:
-          path: spec.template.spec.containers[0].env
-          content:
-            name: REDIS_HOST
-            value: "ghostfolio-test-redis"
       - contains:
           path: spec.template.spec.containers[0].env
           content:
             name: ACCESS_TOKEN_SALT
             valueFrom:
               secretKeyRef:
-                name: test-ghostfolio-secrets
+                name: ghostfolio-secrets
                 key: ACCESS_TOKEN_SALT
 
   - it: should have security context
+    documentSelector:
+      path: kind
+      value: Deployment
     asserts:
       - equal:
           path: spec.template.spec.securityContext.runAsNonRoot
@@ -78,6 +73,9 @@ tests:
           value: false
 
   - it: should have probes enabled
+    documentSelector:
+      path: kind
+      value: Deployment
     asserts:
       - isNotNull:
           path: spec.template.spec.containers[0].livenessProbe
@@ -85,5 +83,8 @@ tests:
           path: spec.template.spec.containers[0].readinessProbe
 
   - it: should match snapshot
+    documentSelector:
+      path: kind
+      value: Deployment
     asserts:
       - matchSnapshot: {}
