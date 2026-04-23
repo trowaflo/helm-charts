@@ -13,6 +13,10 @@ should compute fullnameOverride correctly:
       namespace: common-test-namespace-override-test
     spec:
       ports:
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: http
         - name: main
           port: 80
           protocol: TCP
@@ -37,6 +41,10 @@ should compute nameOverride correctly:
       namespace: common-test-namespace-override-test
     spec:
       ports:
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: http
         - name: main
           port: 80
           protocol: TCP
@@ -89,6 +97,10 @@ should have the correct service type:
       namespace: common-test-namespace-override-test
     spec:
       ports:
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: http
         - name: main
           port: 80
           protocol: TCP
@@ -113,6 +125,10 @@ should match snapshot with default values:
       namespace: common-test-namespace-override-test
     spec:
       ports:
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: http
         - name: main
           port: 80
           protocol: TCP
