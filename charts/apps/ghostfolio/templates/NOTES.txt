@@ -19,6 +19,15 @@ Components deployed:
 - Restore Job: {{ include "common.helpers.fullname" . }}-restore
 {{- end }}
 
+Secrets:
+- Auth: {{ include "ghostfolio.secretName.auth" . }}{{ if .Values.ghostfolio.auth.existingSecret }} (external){{ else }} (auto-generated){{ end }}
+{{- if .Values.statefulsets.redis.enabled }}
+- Redis: {{ include "ghostfolio.secretName.redis" . }}{{ if .Values.ghostfolio.redis.auth.existingSecret }} (external){{ else }} (auto-generated){{ end }}
+{{- end }}
+{{- if .Values.cnpgClusters.postgresql.enabled }}
+- DB bootstrap: {{ include "ghostfolio.secretName.dbBootstrap" . }}{{ if .Values.ghostfolio.database.bootstrap.existingSecret }} (external){{ else }} (auto-generated){{ end }}
+{{- end }}
+
 To access Ghostfolio:
 
 {{- if .Values.ingresses.main.enabled }}
@@ -32,33 +41,6 @@ To access Ghostfolio:
 
 2. Access at: http://localhost:3333
 {{- end }}
-
-IMPORTANT - Secret Requirements:
-This chart requires pre-existing secrets. Ensure the following secrets exist:
-
-1. Ghostfolio Application Secrets ({{ .Values.ghostfolio.secretName }}):
-   - ACCESS_TOKEN_SALT: Random string for token salt
-   - JWT_SECRET_KEY: Random string for JWT signing
-
-2. Database Connection Secret ({{ .Values.ghostfolio.database.secretName }}):
-   - DATABASE_URL: PostgreSQL connection string
-     Format: postgresql://username:password@host:port/database
-
-3. Redis Password Secret ({{ .Values.ghostfolio.redis.passwordSecretName }}):
-   - REDIS_PASSWORD: Redis password
-
-{{- if .Values.cnpgClusters.postgresql.enabled }}
-
-4. PostgreSQL Bootstrap Secret ({{ .Values.cnpgClusters.postgresql.bootstrap.initdb.secret.name }}):
-   - username: Database username
-   - password: Database password
-{{- end }}
-
-Example secret creation:
-  kubectl create secret generic {{ .Values.ghostfolio.secretName }} \
-    --from-literal=ACCESS_TOKEN_SALT=$(openssl rand -base64 32) \
-    --from-literal=JWT_SECRET_KEY=$(openssl rand -base64 32) \
-    -n {{ .Release.Namespace }}
 
 {{- if .Values.cronjobs.backup.enabled }}
 
