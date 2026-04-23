@@ -41,11 +41,11 @@ This chart requires pre-existing secrets. Ensure the following secrets exist:
    - JWT_SECRET_KEY: Random string for JWT signing
 
 2. Database Connection Secret ({{ .Values.ghostfolio.database.secretName }}):
-   - {{ .Values.ghostfolio.database.secretKey }}: PostgreSQL connection string
+   - DATABASE_URL: PostgreSQL connection string
      Format: postgresql://username:password@host:port/database
 
 3. Redis Password Secret ({{ .Values.ghostfolio.redis.passwordSecretName }}):
-   - {{ .Values.ghostfolio.redis.passwordSecretKey }}: Redis password
+   - REDIS_PASSWORD: Redis password
 
 {{- if .Values.cnpgClusters.postgresql.enabled }}
 

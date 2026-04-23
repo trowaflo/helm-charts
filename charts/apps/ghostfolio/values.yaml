@@ -10,14 +10,12 @@ ghostfolio:
   # PostgreSQL database configuration
   database:
     secretName: ghostfolio-db-secret
-    secretKey: DATABASE_URL # kics-scan ignore-line
 
   # Redis configuration
   redis:
     host: ""  # Auto-configured to release-name-redis
     port: 6379
     passwordSecretName: ghostfolio-redis-secret
-    passwordSecretKey: REDIS_PASSWORD # kics-scan ignore-line
 
 # Deployment configuration
 deployment:
@@ -110,7 +108,7 @@ deployment:
             - ALL
 
 # Service configuration
-services:
+k8sServices:
   main:
     enabled: true
     type: ClusterIP
