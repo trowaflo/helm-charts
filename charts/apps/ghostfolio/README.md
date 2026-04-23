@@ -1,6 +1,6 @@
 # ghostfolio
 
-![Version: 4.0.0](https://img.shields.io/badge/Version-4.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 6.0.0](https://img.shields.io/badge/Version-6.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Privacy-first open source portfolio tracker with PostgreSQL (CNPG) and Redis support.
 ArgoCD-compatible chart with no drift from lookup or randAlphaNum - all secrets externally managed.
@@ -34,7 +34,7 @@ Includes automated backup to NFS and manual restore capabilities.
 | cnpgClusters.postgresql.backup.retentionPolicy | string | `"30d"` |  |
 | cnpgClusters.postgresql.bootstrap.initdb.database | string | `"ghostfolio"` |  |
 | cnpgClusters.postgresql.bootstrap.initdb.owner | string | `"ghostfolio"` |  |
-| cnpgClusters.postgresql.bootstrap.initdb.secret.name | string | `"ghostfolio-db-app-secret"` |  |
+| cnpgClusters.postgresql.bootstrap.initdb.secret.name | string | `"{{ include \"ghostfolio.secretName.dbBootstrap\" . }}"` |  |
 | cnpgClusters.postgresql.enabled | bool | `true` |  |
 | cnpgClusters.postgresql.imageName | string | `"ghcr.io/cloudnative-pg/postgresql:16.6"` |  |
 | cnpgClusters.postgresql.instances | int | `1` |  |
@@ -62,9 +62,8 @@ Includes automated backup to NFS and manual restore capabilities.
 | cronjobs.backup.containers.backup.command[0] | string | `"/bin/bash"` |  |
 | cronjobs.backup.containers.backup.command[1] | string | `"-c"` |  |
 | cronjobs.backup.containers.backup.command[2] | string | `"set -e\nBACKUP_FILE=\"/backup/ghostfolio-$(date +%Y-%m-%d-%H%M%S).dump\"\necho \"Starting backup to $BACKUP_FILE\"\npg_dump -Fc -v -f \"$BACKUP_FILE\" \"$DATABASE_URL\"\necho \"Backup completed: $BACKUP_FILE\"\necho \"Verifying backup integrity...\"\npg_restore --list \"$BACKUP_FILE\" > /dev/null\necho \"Backup verification successful\"\necho \"Cleaning up old backups (keeping last {{ .Values.backup.retention | default 7 }})\"\ncd /backup\nls -t ghostfolio-*.dump | tail -n +{{ add1 (.Values.backup.retention | default 7) }} | xargs -r rm -f\necho \"Backup process completed successfully\"\n"` |  |
-| cronjobs.backup.containers.backup.env[0].name | string | `"DATABASE_URL"` |  |
-| cronjobs.backup.containers.backup.env[0].valueFrom.secretKeyRef.key | string | `"DATABASE_URL"` |  |
-| cronjobs.backup.containers.backup.env[0].valueFrom.secretKeyRef.name | string | `"ghostfolio-db-secret"` |  |
+| cronjobs.backup.containers.backup.env.DATABASE_URL.secretKeyRef.key | string | `"uri"` |  |
+| cronjobs.backup.containers.backup.env.DATABASE_URL.secretKeyRef.name | string | `"{{ include \"common.helpers.cnpgAppSecret\" (dict \"root\" . \"name\" \"postgresql\") }}"` |  |
 | cronjobs.backup.containers.backup.image.pullPolicy | string | `"IfNotPresent"` |  |
 | cronjobs.backup.containers.backup.image.repository | string | `"postgres"` |  |
 | cronjobs.backup.containers.backup.image.tag | string | `"16"` |  |
@@ -88,24 +87,17 @@ Includes automated backup to NFS and manual restore capabilities.
 | cronjobs.backup.volumes[0].name | string | `"backup"` |  |
 | cronjobs.backup.volumes[0].nfs.path | string | `""` |  |
 | cronjobs.backup.volumes[0].nfs.server | string | `""` |  |
-| deployments.main.containers.main.env[0].name | string | `"DATABASE_URL"` |  |
-| deployments.main.containers.main.env[0].valueFrom.secretKeyRef.key | string | `"DATABASE_URL"` |  |
-| deployments.main.containers.main.env[0].valueFrom.secretKeyRef.name | string | `"ghostfolio-db-secret"` |  |
-| deployments.main.containers.main.env[1].name | string | `"REDIS_HOST"` |  |
-| deployments.main.containers.main.env[1].value | string | `"{{ include \"common.helpers.fullname\" . }}-redis"` |  |
-| deployments.main.containers.main.env[2].name | string | `"REDIS_PORT"` |  |
-| deployments.main.containers.main.env[2].value | string | `"6379"` |  |
-| deployments.main.containers.main.env[3].name | string | `"REDIS_PASSWORD"` |  |
-| deployments.main.containers.main.env[3].valueFrom.secretKeyRef.key | string | `"REDIS_PASSWORD"` |  |
-| deployments.main.containers.main.env[3].valueFrom.secretKeyRef.name | string | `"ghostfolio-redis-secret"` |  |
-| deployments.main.containers.main.env[4].name | string | `"ACCESS_TOKEN_SALT"` |  |
-| deployments.main.containers.main.env[4].valueFrom.secretKeyRef.key | string | `"ACCESS_TOKEN_SALT"` |  |
-| deployments.main.containers.main.env[4].valueFrom.secretKeyRef.name | string | `"ghostfolio-secrets"` |  |
-| deployments.main.containers.main.env[5].name | string | `"JWT_SECRET_KEY"` |  |
-| deployments.main.containers.main.env[5].valueFrom.secretKeyRef.key | string | `"JWT_SECRET_KEY"` |  |
-| deployments.main.containers.main.env[5].valueFrom.secretKeyRef.name | string | `"ghostfolio-secrets"` |  |
-| deployments.main.containers.main.env[6].name | string | `"NODE_ENV"` |  |
-| deployments.main.containers.main.env[6].value | string | `"production"` |  |
+| deployments.main.containers.main.env.ACCESS_TOKEN_SALT.secretKeyRef.key | string | `"ACCESS_TOKEN_SALT"` |  |
+| deployments.main.containers.main.env.ACCESS_TOKEN_SALT.secretKeyRef.name | string | `"{{ include \"ghostfolio.secretName.auth\" . }}"` |  |
+| deployments.main.containers.main.env.DATABASE_URL.secretKeyRef.key | string | `"uri"` |  |
+| deployments.main.containers.main.env.DATABASE_URL.secretKeyRef.name | string | `"{{ include \"common.helpers.cnpgAppSecret\" (dict \"root\" . \"name\" \"postgresql\") }}"` |  |
+| deployments.main.containers.main.env.JWT_SECRET_KEY.secretKeyRef.key | string | `"JWT_SECRET_KEY"` |  |
+| deployments.main.containers.main.env.JWT_SECRET_KEY.secretKeyRef.name | string | `"{{ include \"ghostfolio.secretName.auth\" . }}"` |  |
+| deployments.main.containers.main.env.NODE_ENV | string | `"production"` |  |
+| deployments.main.containers.main.env.REDIS_HOST | string | `"{{ include \"common.helpers.fullname\" . }}-redis"` |  |
+| deployments.main.containers.main.env.REDIS_PASSWORD.secretKeyRef.key | string | `"REDIS_PASSWORD"` |  |
+| deployments.main.containers.main.env.REDIS_PASSWORD.secretKeyRef.name | string | `"{{ include \"ghostfolio.secretName.redis\" . }}"` |  |
+| deployments.main.containers.main.env.REDIS_PORT | string | `"6379"` |  |
 | deployments.main.containers.main.image.pullPolicy | string | `"IfNotPresent"` |  |
 | deployments.main.containers.main.image.repository | string | `"ghostfolio/ghostfolio"` |  |
 | deployments.main.containers.main.image.tag | string | `"2.167.0"` |  |
@@ -142,11 +134,10 @@ Includes automated backup to NFS and manual restore capabilities.
 | deployments.main.replicas | int | `1` |  |
 | deployments.main.revisionHistoryLimit | int | `3` |  |
 | deployments.main.strategy.type | string | `"Recreate"` |  |
-| ghostfolio.database.secretName | string | `"ghostfolio-db-secret"` |  |
-| ghostfolio.redis.host | string | `""` |  |
-| ghostfolio.redis.passwordSecretName | string | `"ghostfolio-redis-secret"` |  |
-| ghostfolio.redis.port | int | `6379` |  |
-| ghostfolio.secretName | string | `"ghostfolio-secrets"` |  |
+| ghostfolio.auth.existingSecret | string | `""` |  |
+| ghostfolio.database.bootstrap.existingSecret | string | `""` |  |
+| ghostfolio.database.bootstrap.username | string | `"ghostfolio"` |  |
+| ghostfolio.redis.auth.existingSecret | string | `""` |  |
 | global.affinity | object | `{}` |  |
 | global.imagePullSecrets | list | `[]` |  |
 | global.nodeSelector | object | `{}` |  |
@@ -163,9 +154,8 @@ Includes automated backup to NFS and manual restore capabilities.
 | jobs.restore.containers.restore.command[0] | string | `"/bin/bash"` |  |
 | jobs.restore.containers.restore.command[1] | string | `"-c"` |  |
 | jobs.restore.containers.restore.command[2] | string | `"set -e\nRESTORE_FILE=\"/backup/{{ .Values.restore.restoreFile }}\"\nif [ ! -f \"$RESTORE_FILE\" ]; then\n  echo \"ERROR: Restore file not found: $RESTORE_FILE\"\n  exit 1\nfi\necho \"Starting restore from $RESTORE_FILE\"\necho \"Verifying backup file integrity...\"\npg_restore --list \"$RESTORE_FILE\" > /dev/null\necho \"Backup file verification successful\"\necho \"Restoring database...\"\npg_restore -v --clean --if-exists -d \"$DATABASE_URL\" \"$RESTORE_FILE\" || true\necho \"Restore process completed\"\n"` |  |
-| jobs.restore.containers.restore.env[0].name | string | `"DATABASE_URL"` |  |
-| jobs.restore.containers.restore.env[0].valueFrom.secretKeyRef.key | string | `"DATABASE_URL"` |  |
-| jobs.restore.containers.restore.env[0].valueFrom.secretKeyRef.name | string | `"ghostfolio-db-secret"` |  |
+| jobs.restore.containers.restore.env.DATABASE_URL.secretKeyRef.key | string | `"uri"` |  |
+| jobs.restore.containers.restore.env.DATABASE_URL.secretKeyRef.name | string | `"{{ include \"common.helpers.cnpgAppSecret\" (dict \"root\" . \"name\" \"postgresql\") }}"` |  |
 | jobs.restore.containers.restore.image.pullPolicy | string | `"IfNotPresent"` |  |
 | jobs.restore.containers.restore.image.repository | string | `"postgres"` |  |
 | jobs.restore.containers.restore.image.tag | string | `"16"` |  |
@@ -209,9 +199,8 @@ Includes automated backup to NFS and manual restore capabilities.
 | statefulsets.redis.containers.redis.command[4] | string | `"yes"` |  |
 | statefulsets.redis.containers.redis.command[5] | string | `"--dir"` |  |
 | statefulsets.redis.containers.redis.command[6] | string | `"/data"` |  |
-| statefulsets.redis.containers.redis.env[0].name | string | `"REDIS_PASSWORD"` |  |
-| statefulsets.redis.containers.redis.env[0].valueFrom.secretKeyRef.key | string | `"REDIS_PASSWORD"` |  |
-| statefulsets.redis.containers.redis.env[0].valueFrom.secretKeyRef.name | string | `"ghostfolio-redis-secret"` |  |
+| statefulsets.redis.containers.redis.env.REDIS_PASSWORD.secretKeyRef.key | string | `"REDIS_PASSWORD"` |  |
+| statefulsets.redis.containers.redis.env.REDIS_PASSWORD.secretKeyRef.name | string | `"{{ include \"ghostfolio.secretName.redis\" . }}"` |  |
 | statefulsets.redis.containers.redis.image.pullPolicy | string | `"IfNotPresent"` |  |
 | statefulsets.redis.containers.redis.image.repository | string | `"redis"` |  |
 | statefulsets.redis.containers.redis.image.tag | string | `"7.4.2-alpine"` |  |
