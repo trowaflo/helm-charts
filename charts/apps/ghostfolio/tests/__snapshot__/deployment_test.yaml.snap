@@ -4,17 +4,19 @@ should match snapshot:
     kind: Deployment
     metadata:
       labels:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: ghostfolio-test
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: ghostfolio
-        helm.sh/chart: ghostfolio-1.0.0
-      name: ghostfolio-test
+        helm.sh/chart: ghostfolio-2.0.0
+      name: ghostfolio-test-main
       namespace: ghostfolio-test
     spec:
       replicas: 1
       revisionHistoryLimit: 3
       selector:
         matchLabels:
+          app.kubernetes.io/component: main
           app.kubernetes.io/instance: ghostfolio-test
           app.kubernetes.io/name: ghostfolio
       strategy:
@@ -22,6 +24,7 @@ should match snapshot:
       template:
         metadata:
           labels:
+            app.kubernetes.io/component: main
             app.kubernetes.io/instance: ghostfolio-test
             app.kubernetes.io/name: ghostfolio
         spec:
@@ -94,6 +97,8 @@ should match snapshot:
                   drop:
                     - ALL
                 readOnlyRootFilesystem: true
+                runAsNonRoot: true
+          enableServiceLinks: false
           securityContext:
             fsGroup: 1000
             runAsGroup: 1000

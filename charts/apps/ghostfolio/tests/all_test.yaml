@@ -17,11 +17,14 @@ tests:
 
   - it: should render main Service
     documentSelector:
-      path: metadata.name
-      value: ghostfolio-test-main
+      path: spec.ports[0].name
+      value: http
     asserts:
       - isKind:
           of: Service
+      - equal:
+          path: metadata.name
+          value: ghostfolio-test-main
 
   - it: should have correct app labels
     documentSelector:

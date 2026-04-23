@@ -33,7 +33,7 @@ tests:
           of: Deployment
       - equal:
           path: metadata.name
-          value: ghostfolio-test
+          value: ghostfolio-test-main
       - equal:
           path: spec.replicas
           value: 1

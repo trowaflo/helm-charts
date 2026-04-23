@@ -32,7 +32,7 @@ tests:
           of: Job
       - matchRegex:
           path: metadata.name
-          pattern: ^ghostfolio-test-restore-
+          pattern: ^ghostfolio-test-restore$
 
   - it: should have NFS volume when enabled
     values:

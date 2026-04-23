@@ -18,94 +18,96 @@ ghostfolio:
     passwordSecretName: ghostfolio-redis-secret
 
 # Deployment configuration
-deployment:
-  enabled: true
-  replicas: 1
-  revisionHistoryLimit: 3
-  strategyType: Recreate
+deployments:
+  main:
+    enabled: true
+    replicas: 1
+    revisionHistoryLimit: 3
+    strategy:
+      type: Recreate
 
-  podSecurityContext:
-    runAsNonRoot: true
-    runAsUser: 1000
-    runAsGroup: 1000
-    fsGroup: 1000
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
 
-  containers:
-    main:
-      image:
-        repository: ghostfolio/ghostfolio
-        tag: 2.167.0
-        pullPolicy: IfNotPresent
+    containers:
+      main:
+        image:
+          repository: ghostfolio/ghostfolio
+          tag: 2.167.0
+          pullPolicy: IfNotPresent
 
-      ports:
-        http:
-          containerPort: 3333
-          protocol: TCP
+        ports:
+          http:
+            containerPort: 3333
+            protocol: TCP
 
-      env:
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: ghostfolio-db-secret
-              key: DATABASE_URL
-        - name: REDIS_HOST
-          value: "{{ include \"common.helpers.fullname\" . }}-redis"
-        - name: REDIS_PORT
-          value: "6379"
-        - name: REDIS_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: ghostfolio-redis-secret
-              key: REDIS_PASSWORD
-        - name: ACCESS_TOKEN_SALT
-          valueFrom:
-            secretKeyRef:
-              name: ghostfolio-secrets
-              key: ACCESS_TOKEN_SALT
-        - name: JWT_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: ghostfolio-secrets
-              key: JWT_SECRET_KEY
-        - name: NODE_ENV
-          value: production
+        env:
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: ghostfolio-db-secret
+                key: DATABASE_URL
+          - name: REDIS_HOST
+            value: "{{ include \"common.helpers.fullname\" . }}-redis"
+          - name: REDIS_PORT
+            value: "6379"
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: ghostfolio-redis-secret
+                key: REDIS_PASSWORD
+          - name: ACCESS_TOKEN_SALT
+            valueFrom:
+              secretKeyRef:
+                name: ghostfolio-secrets
+                key: ACCESS_TOKEN_SALT
+          - name: JWT_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: ghostfolio-secrets
+                key: JWT_SECRET_KEY
+          - name: NODE_ENV
+            value: production
 
-      livenessProbe:
-        httpGet:
-          path: /api/v1/health
-          port: http
-          scheme: HTTP
-        initialDelaySeconds: 30
-        periodSeconds: 10
-        timeoutSeconds: 5
-        failureThreshold: 3
-        successThreshold: 1
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
 
-      readinessProbe:
-        httpGet:
-          path: /api/v1/health
-          port: http
-          scheme: HTTP
-        initialDelaySeconds: 10
-        periodSeconds: 5
-        timeoutSeconds: 3
-        failureThreshold: 3
-        successThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+          successThreshold: 1
 
-      resources:
-        requests:
-          cpu: 100m
-          memory: 256Mi
-        limits:
-          cpu: 1000m
-          memory: 512Mi
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 512Mi
 
-      securityContext:
-        allowPrivilegeEscalation: false
-        readOnlyRootFilesystem: true
-        capabilities:
-          drop:
-            - ALL
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
 
 # Service configuration
 k8sServices:
