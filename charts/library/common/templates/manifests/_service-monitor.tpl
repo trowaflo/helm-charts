@@ -1,6 +1,7 @@
 {{- define "common.manifests.serviceMonitor" -}}
-  {{- range $name := keys .Values.serviceMonitors | sortAlpha }}
-    {{- $sm := index $.Values.serviceMonitors $name }}
+  {{- $serviceMonitors := .Values.serviceMonitors | default dict }}
+  {{- range $name := keys $serviceMonitors | sortAlpha }}
+    {{- $sm := index $serviceMonitors $name }}
     {{- if $sm.enabled }}
       {{- $targetService := $sm.targetService | default $name }}
 ---
