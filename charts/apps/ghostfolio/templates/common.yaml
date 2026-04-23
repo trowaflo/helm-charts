@@ -1,1 +1,2 @@
+{{- include "ghostfolio.validate" . -}}
 {{- include "common.loader" . -}}

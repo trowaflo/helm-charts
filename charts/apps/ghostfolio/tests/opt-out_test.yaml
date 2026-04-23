@@ -1,0 +1,94 @@
+suite: test ghostfolio chart - Secret opt-out (existingSecret)
+templates:
+  - templates/secrets.yaml
+release:
+  name: ghostfolio-test
+  namespace: ghostfolio-test
+tests:
+  - it: should not render auth Secret when ghostfolio.auth.existingSecret is set
+    set:
+      ghostfolio:
+        auth:
+          existingSecret: ext-auth
+        redis:
+          auth:
+            existingSecret: ext-redis
+        database:
+          bootstrap:
+            existingSecret: ext-db
+      statefulsets:
+        redis:
+          enabled: true
+      cnpgClusters:
+        postgresql:
+          enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render only auth Secret when redis and postgresql are disabled
+    set:
+      ghostfolio:
+        auth:
+          existingSecret: ""
+        redis:
+          auth:
+            existingSecret: ""
+        database:
+          bootstrap:
+            existingSecret: ""
+            username: ghostfolio
+      statefulsets:
+        redis:
+          enabled: false
+      cnpgClusters:
+        postgresql:
+          enabled: false
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: ghostfolio-test-secrets
+
+  - it: should render all three Secrets with auto-generated names by default
+    set:
+      ghostfolio:
+        auth:
+          existingSecret: ""
+        redis:
+          auth:
+            existingSecret: ""
+        database:
+          bootstrap:
+            existingSecret: ""
+            username: ghostfolio
+      statefulsets:
+        redis:
+          enabled: true
+      cnpgClusters:
+        postgresql:
+          enabled: true
+    asserts:
+      - hasDocuments:
+          count: 3
+      - documentIndex: 0
+        equal:
+          path: metadata.name
+          value: ghostfolio-test-secrets
+      - documentIndex: 1
+        equal:
+          path: metadata.name
+          value: ghostfolio-test-redis
+      - documentIndex: 2
+        equal:
+          path: metadata.name
+          value: ghostfolio-test-db-bootstrap
+      - documentIndex: 0
+        equal:
+          path: metadata.annotations["helm.sh/hook"]
+          value: pre-install
+      - documentIndex: 0
+        equal:
+          path: metadata.annotations["helm.sh/resource-policy"]
+          value: keep

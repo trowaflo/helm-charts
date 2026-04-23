@@ -7,3 +7,6 @@ jobs:
         nfs:
           server: "192.168.1.100"
           path: "/mnt/backups"
+
+restore:
+  restoreFile: ghostfolio-2026-04-21.dump

@@ -28,6 +28,10 @@ Secrets:
 - DB bootstrap: {{ include "ghostfolio.secretName.dbBootstrap" . }}{{ if .Values.ghostfolio.database.bootstrap.existingSecret }} (external){{ else }} (auto-generated){{ end }}
 {{- end }}
 
+Note: auto-generated secrets use helm.sh/resource-policy: keep and persist after
+`helm uninstall`. Re-install reuses existing values. To rotate, delete the Secret
+manually and re-install.
+
 To access Ghostfolio:
 
 {{- if .Values.ingresses.main.enabled }}
