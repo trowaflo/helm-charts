@@ -5,85 +5,53 @@ release:
   name: ghostfolio-test
   namespace: ghostfolio-test
 tests:
-  - it: should not render auth Secret when ghostfolio.auth.existingSecret is set
+  - it: should not render any Secret when existingSecret is set for all
     set:
-      ghostfolio:
+      secrets:
         auth:
           existingSecret: ext-auth
         redis:
-          auth:
-            existingSecret: ext-redis
-        database:
-          bootstrap:
-            existingSecret: ext-db
-      statefulsets:
-        redis:
-          enabled: true
-      cnpgClusters:
-        postgresql:
-          enabled: true
+          existingSecret: ext-redis
+        db-bootstrap:
+          existingSecret: ext-db
     asserts:
       - hasDocuments:
           count: 0
 
-  - it: should render only auth Secret when redis and postgresql are disabled
+  - it: should not render redis Secret when secrets.redis.existingSecret is set
     set:
-      ghostfolio:
-        auth:
-          existingSecret: ""
+      secrets:
         redis:
-          auth:
-            existingSecret: ""
-        database:
-          bootstrap:
-            existingSecret: ""
-            username: ghostfolio
-      statefulsets:
-        redis:
-          enabled: false
-      cnpgClusters:
-        postgresql:
-          enabled: false
+          existingSecret: ext-redis
     asserts:
       - hasDocuments:
-          count: 1
-      - equal:
-          path: metadata.name
-          value: ghostfolio-test-secrets
-
-  - it: should render all three Secrets with auto-generated names by default
-    set:
-      ghostfolio:
-        auth:
-          existingSecret: ""
-        redis:
-          auth:
-            existingSecret: ""
-        database:
-          bootstrap:
-            existingSecret: ""
-            username: ghostfolio
-      statefulsets:
-        redis:
-          enabled: true
-      cnpgClusters:
-        postgresql:
-          enabled: true
-    asserts:
-      - hasDocuments:
-          count: 3
+          count: 2
       - documentIndex: 0
         equal:
           path: metadata.name
-          value: ghostfolio-test-secrets
+          value: ghostfolio-test-auth
       - documentIndex: 1
         equal:
           path: metadata.name
-          value: ghostfolio-test-redis
-      - documentIndex: 2
+          value: ghostfolio-test-db-bootstrap
+
+  - it: should render all three Secrets with auto-generated names by default
+    asserts:
+      - hasDocuments:
+          count: 3
+      # sorted alphabetically: auth (0), db-bootstrap (1), redis (2)
+      - documentIndex: 0
+        equal:
+          path: metadata.name
+          value: ghostfolio-test-auth
+      - documentIndex: 1
         equal:
           path: metadata.name
           value: ghostfolio-test-db-bootstrap
+      - documentIndex: 2
+        equal:
+          path: metadata.name
+          value: ghostfolio-test-redis
       - documentIndex: 0
         equal:
           path: metadata.annotations["helm.sh/hook"]
@@ -92,3 +60,7 @@ tests:
         equal:
           path: metadata.annotations["helm.sh/resource-policy"]
           value: keep
+      - documentIndex: 1
+        equal:
+          path: type
+          value: kubernetes.io/basic-auth

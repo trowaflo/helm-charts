@@ -1,115 +1,119 @@
 ---
-# Ghostfolio facade: secret handling and CNPG bootstrap knobs.
-ghostfolio:
-  auth:
-    # If set, chart skips auto-generation of <release>-ghostfolio-secrets and
-    # expects the named Secret to exist with keys ACCESS_TOKEN_SALT + JWT_SECRET_KEY.
-    existingSecret: ""
-  redis:
-    auth:
-      # If set, chart skips auto-generation of <release>-ghostfolio-redis and
-      # expects the named Secret to exist with key REDIS_PASSWORD.
-      existingSecret: ""
-  database:
-    bootstrap:
-      # If set, chart skips auto-generation of <release>-ghostfolio-db-bootstrap and
-      # expects the named Secret to exist with keys username + password (kubernetes.io/basic-auth).
-      existingSecret: ""
-      # Seed username for auto-generated bootstrap secret (ignored when existingSecret is set).
-      username: ghostfolio
+# ─────────────────────────────────────────────────────────────────────────────
+# Images — centralised declarations, referenced via imageSelector
+# ─────────────────────────────────────────────────────────────────────────────
+image:
+  repository: ghostfolio/ghostfolio
+  tag: 2.167.0
 
+redisImage:
+  repository: redis
+  tag: 7.4.2-alpine
+
+postgresImage:
+  repository: postgres
+  tag: "16"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Auto-generated secrets (set existingSecret to bring your own)
+# ─────────────────────────────────────────────────────────────────────────────
+secrets:
+  auth:
+    enabled: true
+    existingSecret: ""
+    data:
+      ACCESS_TOKEN_SALT: ""
+      JWT_SECRET_KEY: ""
+  redis:
+    enabled: true
+    existingSecret: ""
+    data:
+      REDIS_PASSWORD: ""
+  db-bootstrap:
+    enabled: true
+    existingSecret: ""
+    type: kubernetes.io/basic-auth
+    data:
+      username: ghostfolio
+      password: ""
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Main deployment
+# ─────────────────────────────────────────────────────────────────────────────
 deployments:
   main:
     enabled: true
-    replicas: 1
-    revisionHistoryLimit: 3
     strategy:
       type: Recreate
 
-    podSecurityContext:
-      runAsNonRoot: true
-      runAsUser: 1000
-      runAsGroup: 1000
-      fsGroup: 1000
+    podSpec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
 
-    containers:
-      main:
-        image:
-          repository: ghostfolio/ghostfolio
-          tag: 2.167.0
-          pullPolicy: IfNotPresent
+      containers:
+        main:
+          imageSelector: image
 
-        ports:
-          http:
-            containerPort: 3333
-            protocol: TCP
+          ports:
+            http:
+              containerPort: 3333
+              protocol: TCP
 
-        env:
-          NODE_ENV: production
-          REDIS_HOST: '{{ include "common.helpers.fullname" . }}-redis'
-          REDIS_PORT: "6379"
-          DATABASE_URL:
-            secretKeyRef:
-              name: '{{ include "common.helpers.cnpgAppSecret" (dict "root" . "name" "postgresql") }}'
-              key: uri
-          REDIS_PASSWORD:
-            secretKeyRef:
-              name: '{{ include "ghostfolio.secretName.redis" . }}'
-              key: REDIS_PASSWORD
-          ACCESS_TOKEN_SALT:
-            secretKeyRef:
-              name: '{{ include "ghostfolio.secretName.auth" . }}'
-              key: ACCESS_TOKEN_SALT
-          JWT_SECRET_KEY:
-            secretKeyRef:
-              name: '{{ include "ghostfolio.secretName.auth" . }}'
-              key: JWT_SECRET_KEY
+          env:
+            NODE_ENV: production
+            REDIS_HOST: '{{ include "common.helpers.fullname" . }}-redis'
+            REDIS_PORT: "6379"
+            DATABASE_URL:
+              secretKeyRef:
+                name: '{{ include "common.helpers.cnpgAppSecret" (dict "root" . "name" "postgresql") }}'
+                key: uri
+            REDIS_PASSWORD:
+              secretKeyRef:
+                name: '{{ include "common.helpers.secretName" (dict "root" . "name" "redis") }}'
+                key: REDIS_PASSWORD
+            ACCESS_TOKEN_SALT:
+              secretKeyRef:
+                name: '{{ include "common.helpers.secretName" (dict "root" . "name" "auth") }}'
+                key: ACCESS_TOKEN_SALT
+            JWT_SECRET_KEY:
+              secretKeyRef:
+                name: '{{ include "common.helpers.secretName" (dict "root" . "name" "auth") }}'
+                key: JWT_SECRET_KEY
 
-        livenessProbe:
-          httpGet:
-            path: /api/v1/health
-            port: http
-            scheme: HTTP
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-          successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 30
 
-        readinessProbe:
-          httpGet:
-            path: /api/v1/health
-            port: http
-            scheme: HTTP
-          initialDelaySeconds: 10
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
-          successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
 
-        resources:
-          requests:
-            cpu: 100m
-            memory: 256Mi
-          limits:
-            cpu: 1000m
-            memory: 512Mi
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 512Mi
 
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          capabilities:
-            drop:
-              - ALL
-
+# ─────────────────────────────────────────────────────────────────────────────
 # Services
+# ─────────────────────────────────────────────────────────────────────────────
 k8sServices:
   main:
     enabled: true
     type: ClusterIP
-    annotations: {}
-    labels: {}
     ports:
       http:
         protocol: TCP
@@ -118,19 +122,17 @@ k8sServices:
   redis:
     enabled: true
     type: ClusterIP
-    annotations: {}
-    labels: {}
     ports:
       redis:
         protocol: TCP
         port: 6379
 
+# ─────────────────────────────────────────────────────────────────────────────
 # Ingress (off by default)
+# ─────────────────────────────────────────────────────────────────────────────
 ingresses:
   main:
     enabled: false
-    className: ""
-    annotations: {}
     hosts:
       - host: ghostfolio.example.com
         paths:
@@ -140,92 +142,79 @@ ingresses:
             port: http
     tls: []
 
+# ─────────────────────────────────────────────────────────────────────────────
 # Redis StatefulSet
+# ─────────────────────────────────────────────────────────────────────────────
 statefulsets:
   redis:
     enabled: true
-    replicas: 1
-    revisionHistoryLimit: 3
 
-    podSecurityContext:
-      runAsNonRoot: true
-      runAsUser: 999
-      runAsGroup: 999
-      fsGroup: 999
+    podSpec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
 
-    containers:
-      redis:
-        image:
-          repository: redis
-          tag: 7.4.2-alpine
-          pullPolicy: IfNotPresent
+      containers:
+        redis:
+          imageSelector: redisImage
 
-        command:
-          - redis-server
-          - --requirepass
-          - $(REDIS_PASSWORD)
-          - --appendonly
-          - "yes"
-          - --dir
-          - /data
+          command:
+            - redis-server
+            - --requirepass
+            - $(REDIS_PASSWORD)
+            - --appendonly
+            - "yes"
+            - --dir
+            - /data
 
-        ports:
-          redis:
-            containerPort: 6379
-            protocol: TCP
+          ports:
+            redis:
+              containerPort: 6379
+              protocol: TCP
 
-        env:
-          REDIS_PASSWORD:
-            secretKeyRef:
-              name: '{{ include "ghostfolio.secretName.redis" . }}'
-              key: REDIS_PASSWORD
+          env:
+            REDIS_PASSWORD:
+              secretKeyRef:
+                name: '{{ include "common.helpers.secretName" (dict "root" . "name" "redis") }}'
+                key: REDIS_PASSWORD
 
-        livenessProbe:
-          exec:
-            command:
-              - sh
-              - -c
-              - redis-cli -a "$REDIS_PASSWORD" ping | grep PONG
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - redis-cli -a "$REDIS_PASSWORD" ping | grep PONG
+            initialDelaySeconds: 30
 
-        readinessProbe:
-          exec:
-            command:
-              - sh
-              - -c
-              - redis-cli -a "$REDIS_PASSWORD" ping | grep PONG
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - redis-cli -a "$REDIS_PASSWORD" ping | grep PONG
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
 
-        volumeMounts:
-          - name: data
-            mountPath: /data
-          - name: tmp
-            mountPath: /tmp
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: tmp
+              mountPath: /tmp
 
-        resources:
-          requests:
-            cpu: 10m
-            memory: 64Mi
-          limits:
-            cpu: 500m
-            memory: 256Mi
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
 
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          capabilities:
-            drop:
-              - ALL
-
-    volumes:
-      - name: tmp
-        emptyDir: {}
+      volumes:
+        - name: tmp
+          emptyDir: {}
 
     volumeClaimTemplates:
       - metadata:
@@ -237,147 +226,137 @@ statefulsets:
             requests:
               storage: 1Gi
 
+# ─────────────────────────────────────────────────────────────────────────────
 # Backup CronJob (off by default)
+# ─────────────────────────────────────────────────────────────────────────────
 cronjobs:
   backup:
     enabled: false
     schedule: "0 2 * * *"
-    successfulJobsHistoryLimit: 3
-    failedJobsHistoryLimit: 3
-    concurrencyPolicy: Forbid
 
-    podSecurityContext:
-      runAsNonRoot: true
-      runAsUser: 999
-      runAsGroup: 999
-      fsGroup: 999
+    podSpec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
 
-    containers:
-      backup:
-        image:
-          repository: postgres
-          tag: "16"
-          pullPolicy: IfNotPresent
+      containers:
+        backup:
+          imageSelector: postgresImage
 
-        command:
-          - /bin/bash
-          - -c
-          - |
-            set -e
-            BACKUP_FILE="/backup/ghostfolio-$(date +%Y-%m-%d-%H%M%S).dump"
-            echo "Starting backup to $BACKUP_FILE"
-            pg_dump -Fc -v -f "$BACKUP_FILE" "$DATABASE_URL"
-            echo "Backup completed: $BACKUP_FILE"
-            echo "Verifying backup integrity..."
-            pg_restore --list "$BACKUP_FILE" > /dev/null
-            echo "Backup verification successful"
-            echo "Cleaning up old backups (keeping last {{ .Values.backup.retention | default 7 }})"
-            cd /backup
-            ls -t ghostfolio-*.dump | tail -n +{{ add1 (.Values.backup.retention | default 7) }} | xargs -r rm -f
-            echo "Backup process completed successfully"
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              BACKUP_FILE="/backup/ghostfolio-$(date +%Y-%m-%d-%H%M%S).dump"
+              echo "Starting backup to $BACKUP_FILE"
+              pg_dump -Fc -v -f "$BACKUP_FILE" "$DATABASE_URL"
+              echo "Backup completed: $BACKUP_FILE"
+              echo "Verifying backup integrity..."
+              pg_restore --list "$BACKUP_FILE" > /dev/null
+              echo "Backup verification successful"
+              echo "Cleaning up old backups (keeping last {{ .Values.backup.retention | default 7 }})"
+              cd /backup
+              ls -t ghostfolio-*.dump | tail -n +{{ add1 (.Values.backup.retention | default 7) }} | xargs -r rm -f
+              echo "Backup process completed successfully"
 
-        env:
-          DATABASE_URL:
-            secretKeyRef:
-              name: '{{ include "common.helpers.cnpgAppSecret" (dict "root" . "name" "postgresql") }}'
-              key: uri
+          env:
+            DATABASE_URL:
+              secretKeyRef:
+                name: '{{ include "common.helpers.cnpgAppSecret" (dict "root" . "name" "postgresql") }}'
+                key: uri
 
-        volumeMounts:
-          - name: backup
-            mountPath: /backup
+          volumeMounts:
+            - name: backup
+              mountPath: /backup
 
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 500m
-            memory: 512Mi
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
 
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: false
-          capabilities:
-            drop:
-              - ALL
+          securityContext:
+            readOnlyRootFilesystem: false
 
-    volumes:
-      - name: backup
-        nfs:
-          server: ""  # REQUIRED when backup enabled
-          path: ""    # REQUIRED when backup enabled
+      volumes:
+        - name: backup
+          nfs:
+            server: ""  # REQUIRED when backup enabled
+            path: ""    # REQUIRED when backup enabled
 
+# ─────────────────────────────────────────────────────────────────────────────
 # Restore Job (off by default)
+# ─────────────────────────────────────────────────────────────────────────────
 jobs:
   restore:
     enabled: false
     ttlSecondsAfterFinished: 86400
-    restartPolicy: OnFailure
 
-    podSecurityContext:
-      runAsNonRoot: true
-      runAsUser: 999
-      runAsGroup: 999
-      fsGroup: 999
+    podSpec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
 
-    containers:
-      restore:
-        image:
-          repository: postgres
-          tag: "16"
-          pullPolicy: IfNotPresent
+      containers:
+        restore:
+          imageSelector: postgresImage
 
-        command:
-          - /bin/bash
-          - -c
-          - |
-            set -e
-            RESTORE_FILE="/backup/{{ .Values.restore.restoreFile }}"
-            if [ ! -f "$RESTORE_FILE" ]; then
-              echo "ERROR: Restore file not found: $RESTORE_FILE"
-              exit 1
-            fi
-            echo "Starting restore from $RESTORE_FILE"
-            echo "Verifying backup file integrity..."
-            pg_restore --list "$RESTORE_FILE" > /dev/null
-            echo "Backup file verification successful"
-            echo "Restoring database..."
-            pg_restore -v --clean --if-exists -d "$DATABASE_URL" "$RESTORE_FILE" || true
-            echo "Restore process completed"
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              RESTORE_FILE="/backup/{{ .Values.restore.restoreFile }}"
+              if [ ! -f "$RESTORE_FILE" ]; then
+                echo "ERROR: Restore file not found: $RESTORE_FILE"
+                exit 1
+              fi
+              echo "Starting restore from $RESTORE_FILE"
+              echo "Verifying backup file integrity..."
+              pg_restore --list "$RESTORE_FILE" > /dev/null
+              echo "Backup file verification successful"
+              echo "Restoring database..."
+              pg_restore -v --clean --if-exists -d "$DATABASE_URL" "$RESTORE_FILE" || true
+              echo "Restore process completed"
 
-        env:
-          DATABASE_URL:
-            secretKeyRef:
-              name: '{{ include "common.helpers.cnpgAppSecret" (dict "root" . "name" "postgresql") }}'
-              key: uri
+          env:
+            DATABASE_URL:
+              secretKeyRef:
+                name: '{{ include "common.helpers.cnpgAppSecret" (dict "root" . "name" "postgresql") }}'
+                key: uri
 
-        volumeMounts:
-          - name: backup
-            mountPath: /backup
-            readOnly: true
+          volumeMounts:
+            - name: backup
+              mountPath: /backup
+              readOnly: true
 
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 500m
-            memory: 512Mi
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
 
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: false
-          capabilities:
-            drop:
-              - ALL
+          securityContext:
+            readOnlyRootFilesystem: false
 
-    volumes:
-      - name: backup
-        nfs:
-          server: ""  # REQUIRED when restore enabled
-          path: ""    # REQUIRED when restore enabled
+      volumes:
+        - name: backup
+          nfs:
+            server: ""  # REQUIRED when restore enabled
+            path: ""    # REQUIRED when restore enabled
 
+# ─────────────────────────────────────────────────────────────────────────────
 # Backup tunables
+# ─────────────────────────────────────────────────────────────────────────────
 backup:
   retention: 7
 
@@ -385,7 +364,9 @@ backup:
 restore:
   restoreFile: ""
 
+# ─────────────────────────────────────────────────────────────────────────────
 # CNPG PostgreSQL Cluster
+# ─────────────────────────────────────────────────────────────────────────────
 cnpgClusters:
   postgresql:
     enabled: true
@@ -401,7 +382,7 @@ cnpgClusters:
         database: ghostfolio
         owner: ghostfolio
         secret:
-          name: '{{ include "ghostfolio.secretName.dbBootstrap" . }}'
+          name: '{{ include "common.helpers.secretName" (dict "root" . "name" "db-bootstrap") }}'
 
     postgresql:
       parameters:

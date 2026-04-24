@@ -57,7 +57,7 @@ tests:
             name: ACCESS_TOKEN_SALT
             valueFrom:
               secretKeyRef:
-                name: ghostfolio-test-secrets
+                name: ghostfolio-test-auth
                 key: ACCESS_TOKEN_SALT
 
   - it: should have security context
