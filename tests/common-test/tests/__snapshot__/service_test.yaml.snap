@@ -10,7 +10,7 @@ should compute fullnameOverride correctly:
         app.kubernetes.io/name: service-name-override
         helm.sh/chart: common-test-0.1.0
       name: my-service-main
-      namespace: common-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ports:
         - name: main
@@ -34,7 +34,7 @@ should compute nameOverride correctly:
         app.kubernetes.io/name: custom
         helm.sh/chart: common-test-0.1.0
       name: common-test-custom-main
-      namespace: common-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ports:
         - name: main
@@ -58,7 +58,7 @@ should have all defined service type and ports:
         app.kubernetes.io/name: service-name-override
         helm.sh/chart: common-test-0.1.0
       name: common-test-service-name-override-extra
-      namespace: common-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ports:
         - name: http
@@ -86,7 +86,7 @@ should have the correct service type:
         app.kubernetes.io/name: service-name-override
         helm.sh/chart: common-test-0.1.0
       name: common-test-service-name-override-main
-      namespace: common-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ports:
         - name: main
@@ -110,7 +110,7 @@ should match snapshot with default values:
         app.kubernetes.io/name: service-name-override
         helm.sh/chart: common-test-0.1.0
       name: common-test-service-name-override-main
-      namespace: common-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ports:
         - name: main

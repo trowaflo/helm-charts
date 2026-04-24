@@ -10,7 +10,7 @@ should match snapshot with a realistic stack:
         app.kubernetes.io/name: common-test
         helm.sh/chart: common-test-0.1.0
       name: common-test-main
-      namespace: common-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ports:
         - name: main
@@ -33,7 +33,7 @@ should match snapshot with a realistic stack:
         app.kubernetes.io/name: common-test
         helm.sh/chart: common-test-0.1.0
       name: common-test-main
-      namespace: common-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       replicas: 1
       revisionHistoryLimit: 3
@@ -79,7 +79,7 @@ should match snapshot with a realistic stack:
         helm.sh/chart: common-test-0.1.0
         release: prometheus
       name: common-test-main
-      namespace: common-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       endpoints:
         - port: main

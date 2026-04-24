@@ -10,7 +10,7 @@ should compute fullnameOverride correctly:
         app.kubernetes.io/name: common-test
         helm.sh/chart: common-test-0.1.0
       name: my-ingress-main
-      namespace: ingress-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ingressClassName: traefik
       rules:
@@ -36,7 +36,7 @@ should compute nameOverride correctly:
         app.kubernetes.io/name: name-override
         helm.sh/chart: common-test-0.1.0
       name: ingress-test-name-override-main
-      namespace: ingress-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ingressClassName: traefik
       rules:
@@ -62,7 +62,7 @@ should have the right host configured:
         app.kubernetes.io/name: common-test
         helm.sh/chart: common-test-0.1.0
       name: ingress-test-common-test-other
-      namespace: ingress-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ingressClassName: traefik
       rules:
@@ -88,7 +88,7 @@ should match snapshot with default values:
         app.kubernetes.io/name: common-test
         helm.sh/chart: common-test-0.1.0
       name: ingress-test-common-test-main
-      namespace: ingress-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ingressClassName: traefik
       rules:

@@ -17,11 +17,15 @@
 
 
 {{- define "common.helpers.namespace" -}}
-{{- $namespace := default .Chart.Name .Values.namespaceOverride -}}
-{{- if contains $namespace .Release.Name -}}
+{{- if .Values.namespaceOverride -}}
+{{- .Values.namespaceOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := .Chart.Name -}}
+{{- if contains $name .Release.Name -}}
 {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- printf "%s-%s" .Release.Name $namespace | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 

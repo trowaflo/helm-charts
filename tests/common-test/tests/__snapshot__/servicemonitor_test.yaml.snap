@@ -11,7 +11,7 @@ should render ServiceMonitor when enabled:
         helm.sh/chart: common-test-0.1.0
         release: prometheus
       name: common-test-service-monitor-name-override-main
-      namespace: common-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       endpoints:
         - port: main
