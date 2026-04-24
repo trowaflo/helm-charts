@@ -20,9 +20,13 @@ Container.ports:
   {{- $root := .root -}}
   {{- $container := .container -}}
   {{- $containerName := .containerName -}}
+  {{- $imageConfig := $container.image | default dict -}}
+  {{- if $container.imageSelector -}}
+    {{- $imageConfig = index $root.Values $container.imageSelector | default dict -}}
+  {{- end -}}
 - name: {{ $containerName }}
-  image: "{{ $container.image.repository }}:{{ $container.image.tag | default $root.Chart.AppVersion }}"
-  imagePullPolicy: {{ $container.image.pullPolicy | default "IfNotPresent" }}
+  image: "{{ $imageConfig.repository }}:{{ $imageConfig.tag | default $root.Chart.AppVersion }}"
+  imagePullPolicy: {{ $imageConfig.pullPolicy | default "IfNotPresent" }}
   {{- if $container.command }}
   command:
     {{- toYaml $container.command | nindent 4 }}
@@ -68,15 +72,15 @@ Container.ports:
   {{- end }}
   {{- if $container.livenessProbe }}
   livenessProbe:
-    {{- toYaml $container.livenessProbe | nindent 4 }}
+    {{- toYaml (mergeOverwrite (dict "periodSeconds" 10 "timeoutSeconds" 5 "failureThreshold" 3 "successThreshold" 1) $container.livenessProbe) | nindent 4 }}
   {{- end }}
   {{- if $container.readinessProbe }}
   readinessProbe:
-    {{- toYaml $container.readinessProbe | nindent 4 }}
+    {{- toYaml (mergeOverwrite (dict "periodSeconds" 10 "timeoutSeconds" 5 "failureThreshold" 3 "successThreshold" 1) $container.readinessProbe) | nindent 4 }}
   {{- end }}
   {{- if $container.startupProbe }}
   startupProbe:
-    {{- toYaml $container.startupProbe | nindent 4 }}
+    {{- toYaml (mergeOverwrite (dict "periodSeconds" 10 "timeoutSeconds" 5 "failureThreshold" 30 "successThreshold" 1) $container.startupProbe) | nindent 4 }}
   {{- end }}
   {{- if $container.volumeMounts }}
   volumeMounts:

@@ -44,22 +44,23 @@ tests:
           enabled: true
     asserts:
       - failedTemplate:
-          errorMessage: "jobs.restore.containers is required and must define at least one container when enabled"
+          errorMessage: "jobs.restore.podSpec.containers is required and must define at least one container when enabled"
 
   - it: should render initContainers when provided
     set:
       jobs:
         restore:
           enabled: true
-          initContainers:
-            - name: wait-for-db
-              image: busybox:1.36
-              command: ["sh", "-c", "until nc -z db 5432; do sleep 1; done"]
-          containers:
-            restore:
-              image:
-                repository: postgres
-                tag: "16"
+          podSpec:
+            initContainers:
+              - name: wait-for-db
+                image: busybox:1.36
+                command: ["sh", "-c", "until nc -z db 5432; do sleep 1; done"]
+            containers:
+              restore:
+                image:
+                  repository: postgres
+                  tag: "16"
     asserts:
       - isNotNull:
           path: spec.template.spec.initContainers
@@ -72,12 +73,13 @@ tests:
       jobs:
         restore:
           enabled: true
-          serviceAccountName: db-migrator
-          containers:
-            restore:
-              image:
-                repository: postgres
-                tag: "16"
+          podSpec:
+            serviceAccountName: db-migrator
+            containers:
+              restore:
+                image:
+                  repository: postgres
+                  tag: "16"
     asserts:
       - equal:
           path: spec.template.spec.serviceAccountName
@@ -88,19 +90,20 @@ tests:
       jobs:
         restore:
           enabled: true
-          containers:
-            restore:
-              image:
-                repository: postgres
-                tag: "16"
-          affinity:
-            nodeAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                nodeSelectorTerms:
-                  - matchExpressions:
-                      - key: disktype
-                        operator: In
-                        values: [ssd]
+          podSpec:
+            containers:
+              restore:
+                image:
+                  repository: postgres
+                  tag: "16"
+            affinity:
+              nodeAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  nodeSelectorTerms:
+                    - matchExpressions:
+                        - key: disktype
+                          operator: In
+                          values: [ssd]
     asserts:
       - isNotNull:
           path: spec.template.spec.affinity
@@ -114,12 +117,13 @@ tests:
       jobs:
         restore:
           enabled: true
-          containers:
-            restore:
-              image:
-                repository: postgres
-                tag: "16"
-                pullPolicy: IfNotPresent
+          podSpec:
+            containers:
+              restore:
+                image:
+                  repository: postgres
+                  tag: "16"
+                  pullPolicy: IfNotPresent
     asserts:
       - hasDocuments:
           count: 1
@@ -138,22 +142,23 @@ tests:
       jobs:
         restore:
           enabled: true
-          containers:
-            restore:
-              image:
-                repository: postgres
-                tag: "16"
-              command:
-                - /bin/bash
-                - -c
-                - echo "restore"
-              resources:
-                requests:
-                  cpu: 100m
-                  memory: 128Mi
-                limits:
-                  cpu: 500m
-                  memory: 512Mi
+          podSpec:
+            containers:
+              restore:
+                image:
+                  repository: postgres
+                  tag: "16"
+                command:
+                  - /bin/bash
+                  - -c
+                  - echo "restore"
+                resources:
+                  requests:
+                    cpu: 100m
+                    memory: 128Mi
+                  limits:
+                    cpu: 500m
+                    memory: 512Mi
     asserts:
       - equal:
           path: spec.template.spec.containers[0].command[0]
@@ -172,11 +177,12 @@ tests:
         restore:
           enabled: true
           ttlSecondsAfterFinished: 86400
-          containers:
-            restore:
-              image:
-                repository: postgres
-                tag: "16"
+          podSpec:
+            containers:
+              restore:
+                image:
+                  repository: postgres
+                  tag: "16"
     asserts:
       - equal:
           path: spec.ttlSecondsAfterFinished
@@ -190,11 +196,12 @@ tests:
           enabled: true
           completions: 5
           parallelism: 2
-          containers:
-            restore:
-              image:
-                repository: postgres
-                tag: "16"
+          podSpec:
+            containers:
+              restore:
+                image:
+                  repository: postgres
+                  tag: "16"
     asserts:
       - equal:
           path: spec.completions
@@ -213,11 +220,12 @@ tests:
           parallelism: 0
           activeDeadlineSeconds: 0
           ttlSecondsAfterFinished: 0
-          containers:
-            restore:
-              image:
-                repository: postgres
-                tag: "16"
+          podSpec:
+            containers:
+              restore:
+                image:
+                  repository: postgres
+                  tag: "16"
     asserts:
       - equal:
           path: spec.backoffLimit
@@ -242,11 +250,12 @@ tests:
         restore:
           enabled: true
           backoffLimit: 10
-          containers:
-            restore:
-              image:
-                repository: postgres
-                tag: "16"
+          podSpec:
+            containers:
+              restore:
+                image:
+                  repository: postgres
+                  tag: "16"
     asserts:
       - equal:
           path: spec.backoffLimit
@@ -259,11 +268,12 @@ tests:
         restore:
           enabled: true
           activeDeadlineSeconds: 3600
-          containers:
-            restore:
-              image:
-                repository: postgres
-                tag: "16"
+          podSpec:
+            containers:
+              restore:
+                image:
+                  repository: postgres
+                  tag: "16"
     asserts:
       - equal:
           path: spec.activeDeadlineSeconds
@@ -275,21 +285,22 @@ tests:
       jobs:
         restore:
           enabled: true
-          containers:
-            restore:
-              image:
-                repository: postgres
-                tag: "16"
-              command:
-                - pg_restore
-            validator:
-              image:
-                repository: postgres
-                tag: "16"
-              command:
-                - psql
-                - -c
-                - "SELECT 1"
+          podSpec:
+            containers:
+              restore:
+                image:
+                  repository: postgres
+                  tag: "16"
+                command:
+                  - pg_restore
+              validator:
+                image:
+                  repository: postgres
+                  tag: "16"
+                command:
+                  - psql
+                  - -c
+                  - "SELECT 1"
     asserts:
       - equal:
           path: spec.template.spec.containers[0].name
@@ -307,23 +318,24 @@ tests:
       jobs:
         restore:
           enabled: true
-          containers:
-            restore:
-              image:
-                repository: postgres
-                tag: "16"
-              volumeMounts:
-                - name: backup-data
-                  mountPath: /backup
-                - name: restore-config
-                  mountPath: /etc/config
-          volumes:
-            - name: backup-data
-              persistentVolumeClaim:
-                claimName: backup-pvc
-            - name: restore-config
-              secret:
-                secretName: restore-secret
+          podSpec:
+            containers:
+              restore:
+                image:
+                  repository: postgres
+                  tag: "16"
+                volumeMounts:
+                  - name: backup-data
+                    mountPath: /backup
+                  - name: restore-config
+                    mountPath: /etc/config
+            volumes:
+              - name: backup-data
+                persistentVolumeClaim:
+                  claimName: backup-pvc
+              - name: restore-config
+                secret:
+                  secretName: restore-secret
     asserts:
       - contains:
           path: spec.template.spec.containers[0].volumeMounts
@@ -359,11 +371,12 @@ tests:
               - action: Ignore
                 onPodConditions:
                   - type: DisruptionTarget
-          containers:
-            restore:
-              image:
-                repository: postgres
-                tag: "16"
+          podSpec:
+            containers:
+              restore:
+                image:
+                  repository: postgres
+                  tag: "16"
     asserts:
       - isNotNull:
           path: spec.podFailurePolicy

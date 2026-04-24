@@ -2,7 +2,12 @@
   {{- range $name := keys .Values.statefulsets | sortAlpha }}
     {{- $statefulset := index $.Values.statefulsets $name }}
     {{- if $statefulset.enabled }}
-      {{- $_ := required (printf "statefulsets.%s.containers is required and must define at least one container when enabled" $name) $statefulset.containers }}
+      {{- $podSpec := $statefulset.podSpec | default dict -}}
+      {{- $_ := required (printf "statefulsets.%s.podSpec.containers is required and must define at least one container when enabled" $name) $podSpec.containers }}
+      {{- $defaultUpdateStrategy := dict "type" "RollingUpdate" -}}
+      {{- $updateStrategy := mergeOverwrite (deepCopy $defaultUpdateStrategy) ($statefulset.updateStrategy | default dict) -}}
+      {{- $defaultPodSecCtx := dict "runAsNonRoot" true "fsGroupChangePolicy" "OnRootMismatch" -}}
+      {{- $podSecCtx := mergeOverwrite (deepCopy $defaultPodSecCtx) ($podSpec.securityContext | default dict) }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -27,10 +32,8 @@ spec:
   {{- with $statefulset.podManagementPolicy }}
   podManagementPolicy: {{ . }}
   {{- end }}
-  {{- with $statefulset.updateStrategy }}
   updateStrategy:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- toYaml $updateStrategy | nindent 4 }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "common.helpers.name" $ }}
@@ -42,80 +45,78 @@ spec:
         app.kubernetes.io/name: {{ include "common.helpers.name" $ }}
         app.kubernetes.io/instance: {{ $.Release.Name }}
         app.kubernetes.io/component: {{ $name }}
-      {{- with $statefulset.podAnnotations }}
+      {{- with $podSpec.annotations }}
       annotations:
         {{- range $key, $value := . }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
       {{- end }}
     spec:
-      {{- with $statefulset.serviceAccountName }}
+      {{- with $podSpec.serviceAccountName }}
       serviceAccountName: {{ . }}
       {{- end }}
       automountServiceAccountToken: false
-      enableServiceLinks: {{ $statefulset.enableServiceLinks | default false }}
-      {{- if hasKey $statefulset "shareProcessNamespace" }}
-      shareProcessNamespace: {{ $statefulset.shareProcessNamespace }}
+      enableServiceLinks: {{ $podSpec.enableServiceLinks | default false }}
+      {{- if hasKey $podSpec "shareProcessNamespace" }}
+      shareProcessNamespace: {{ $podSpec.shareProcessNamespace }}
       {{- end }}
-      {{- if hasKey $statefulset "hostNetwork" }}
-      hostNetwork: {{ $statefulset.hostNetwork }}
+      {{- if hasKey $podSpec "hostNetwork" }}
+      hostNetwork: {{ $podSpec.hostNetwork }}
       {{- end }}
-      {{- with $statefulset.hostAliases }}
+      {{- with $podSpec.hostAliases }}
       hostAliases:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $statefulset.dnsPolicy }}
+      {{- with $podSpec.dnsPolicy }}
       dnsPolicy: {{ . }}
       {{- end }}
-      {{- with $statefulset.dnsConfig }}
+      {{- with $podSpec.dnsConfig }}
       dnsConfig:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $statefulset.schedulerName }}
+      {{- with $podSpec.schedulerName }}
       schedulerName: {{ . }}
       {{- end }}
-      {{- with $statefulset.runtimeClassName }}
+      {{- with $podSpec.runtimeClassName }}
       runtimeClassName: {{ . }}
       {{- end }}
-      {{- if hasKey $statefulset "terminationGracePeriodSeconds" }}
-      terminationGracePeriodSeconds: {{ $statefulset.terminationGracePeriodSeconds }}
+      {{- if hasKey $podSpec "terminationGracePeriodSeconds" }}
+      terminationGracePeriodSeconds: {{ $podSpec.terminationGracePeriodSeconds }}
       {{- end }}
-      {{- with $statefulset.priorityClassName }}
+      {{- with $podSpec.priorityClassName }}
       priorityClassName: {{ . }}
       {{- end }}
-      {{- with $statefulset.topologySpreadConstraints }}
+      {{- with $podSpec.topologySpreadConstraints }}
       topologySpreadConstraints:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $statefulset.imagePullSecrets }}
+      {{- with $podSpec.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $statefulset.podSecurityContext }}
       securityContext:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with $statefulset.initContainers }}
+        {{- toYaml $podSecCtx | nindent 8 }}
+      {{- with $podSpec.initContainers }}
       initContainers:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        {{- range $containerName, $container := $statefulset.containers }}
+        {{- range $containerName, $container := $podSpec.containers }}
         {{- include "common.helpers.container" (dict "root" $ "container" $container "containerName" $containerName) | nindent 8 }}
         {{- end }}
-      {{- with $statefulset.volumes }}
+      {{- with $podSpec.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $statefulset.nodeSelector }}
+      {{- with $podSpec.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $statefulset.affinity }}
+      {{- with $podSpec.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $statefulset.tolerations }}
+      {{- with $podSpec.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

@@ -42,6 +42,8 @@ should match snapshot with a realistic stack:
           app.kubernetes.io/component: main
           app.kubernetes.io/instance: common-test
           app.kubernetes.io/name: common-test
+      strategy:
+        type: RollingUpdate
       template:
         metadata:
           labels:
@@ -62,6 +64,9 @@ should match snapshot with a realistic stack:
                 readOnlyRootFilesystem: true
                 runAsNonRoot: true
           enableServiceLinks: false
+          securityContext:
+            fsGroupChangePolicy: OnRootMismatch
+            runAsNonRoot: true
   3: |
     apiVersion: monitoring.coreos.com/v1
     kind: ServiceMonitor

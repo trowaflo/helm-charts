@@ -3,7 +3,12 @@
   {{- range $name := keys $deployments | sortAlpha }}
     {{- $deployment := index $deployments $name }}
     {{- if $deployment.enabled }}
-      {{- $_ := required (printf "deployments.%s.containers is required and must define at least one container when enabled" $name) $deployment.containers }}
+      {{- $podSpec := $deployment.podSpec | default dict -}}
+      {{- $_ := required (printf "deployments.%s.podSpec.containers is required and must define at least one container when enabled" $name) $podSpec.containers }}
+      {{- $defaultStrategy := dict "type" "RollingUpdate" -}}
+      {{- $strategy := mergeOverwrite (deepCopy $defaultStrategy) ($deployment.strategy | default dict) -}}
+      {{- $defaultPodSecCtx := dict "runAsNonRoot" true "fsGroupChangePolicy" "OnRootMismatch" -}}
+      {{- $podSecCtx := mergeOverwrite (deepCopy $defaultPodSecCtx) ($podSpec.securityContext | default dict) }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -24,10 +29,8 @@ spec:
   {{- else }}
   revisionHistoryLimit: 3
   {{- end }}
-  {{- with $deployment.strategy }}
   strategy:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- toYaml $strategy | nindent 4 }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "common.helpers.name" $ }}
@@ -39,80 +42,78 @@ spec:
         app.kubernetes.io/name: {{ include "common.helpers.name" $ }}
         app.kubernetes.io/instance: {{ $.Release.Name }}
         app.kubernetes.io/component: {{ $name }}
-      {{- with $deployment.podAnnotations }}
+      {{- with $podSpec.annotations }}
       annotations:
         {{- range $key, $value := . }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
       {{- end }}
     spec:
-      {{- with $deployment.serviceAccountName }}
+      {{- with $podSpec.serviceAccountName }}
       serviceAccountName: {{ . }}
       {{- end }}
       automountServiceAccountToken: false
-      enableServiceLinks: {{ $deployment.enableServiceLinks | default false }}
-      {{- if hasKey $deployment "shareProcessNamespace" }}
-      shareProcessNamespace: {{ $deployment.shareProcessNamespace }}
+      enableServiceLinks: {{ $podSpec.enableServiceLinks | default false }}
+      {{- if hasKey $podSpec "shareProcessNamespace" }}
+      shareProcessNamespace: {{ $podSpec.shareProcessNamespace }}
       {{- end }}
-      {{- if hasKey $deployment "hostNetwork" }}
-      hostNetwork: {{ $deployment.hostNetwork }}
+      {{- if hasKey $podSpec "hostNetwork" }}
+      hostNetwork: {{ $podSpec.hostNetwork }}
       {{- end }}
-      {{- with $deployment.hostAliases }}
+      {{- with $podSpec.hostAliases }}
       hostAliases:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $deployment.dnsPolicy }}
+      {{- with $podSpec.dnsPolicy }}
       dnsPolicy: {{ . }}
       {{- end }}
-      {{- with $deployment.dnsConfig }}
+      {{- with $podSpec.dnsConfig }}
       dnsConfig:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $deployment.schedulerName }}
+      {{- with $podSpec.schedulerName }}
       schedulerName: {{ . }}
       {{- end }}
-      {{- with $deployment.runtimeClassName }}
+      {{- with $podSpec.runtimeClassName }}
       runtimeClassName: {{ . }}
       {{- end }}
-      {{- if hasKey $deployment "terminationGracePeriodSeconds" }}
-      terminationGracePeriodSeconds: {{ $deployment.terminationGracePeriodSeconds }}
+      {{- if hasKey $podSpec "terminationGracePeriodSeconds" }}
+      terminationGracePeriodSeconds: {{ $podSpec.terminationGracePeriodSeconds }}
       {{- end }}
-      {{- with $deployment.priorityClassName }}
+      {{- with $podSpec.priorityClassName }}
       priorityClassName: {{ . }}
       {{- end }}
-      {{- with $deployment.topologySpreadConstraints }}
+      {{- with $podSpec.topologySpreadConstraints }}
       topologySpreadConstraints:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $deployment.imagePullSecrets }}
+      {{- with $podSpec.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $deployment.podSecurityContext }}
       securityContext:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with $deployment.initContainers }}
+        {{- toYaml $podSecCtx | nindent 8 }}
+      {{- with $podSpec.initContainers }}
       initContainers:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        {{- range $containerName, $container := $deployment.containers }}
+        {{- range $containerName, $container := $podSpec.containers }}
         {{- include "common.helpers.container" (dict "root" $ "container" $container "containerName" $containerName) | nindent 8 }}
         {{- end }}
-      {{- with $deployment.volumes }}
+      {{- with $podSpec.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $deployment.nodeSelector }}
+      {{- with $podSpec.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $deployment.affinity }}
+      {{- with $podSpec.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $deployment.tolerations }}
+      {{- with $podSpec.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

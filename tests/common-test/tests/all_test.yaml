@@ -22,11 +22,12 @@ set:
   deployments:
     main:
       enabled: true
-      containers:
-        main:
-          image:
-            repository: nginx
-            tag: latest
+      podSpec:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
 release:
   name: common-test
   namespace: common-test

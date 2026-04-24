@@ -1,11 +1,23 @@
-# Test Command
+---
+description: Run helm unittest for the current chart. When working on charts/library/common, test both tests/common-test AND dependent app charts. Always delete stale common-*.tgz and run helm dependency update before testing.
+---
 
-Run helm unittest for this repo.
+## Common library
 
-Determine the target chart from the current working context (files recently edited, branch name, etc.). If unclear, ask.
+```bash
+for target in tests/common-test charts/apps/ghostfolio; do
+  rm -f "${target}/charts/common-*.tgz"
+  helm dependency update "${target}"
+  helm unittest "${target}"
+done
+```
 
-- Single chart: `helm unittest charts/apps/<chart-name>`
-- All charts: `for chart in charts/*/*/; do [ -d "${chart}tests" ] && helm dependency update "${chart}" && helm unittest "${chart}"; done`
-- Update snapshots: `helm unittest -u charts/apps/<chart-name>`
+## Single app chart
 
-If the user doesn't specify, run the chart currently being worked on. Run all charts only if explicitly asked.
+```bash
+rm -f charts/apps/<chart>/charts/common-*.tgz
+helm dependency update charts/apps/<chart>
+helm unittest charts/apps/<chart>
+```
+
+## Update snapshots: append `-u` to helm unittest

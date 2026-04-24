@@ -24,7 +24,13 @@ deployments:
     enabled: false
     replicas: 1
     revisionHistoryLimit: 3
-    # containers: required when enabled — define at least one entry: {main: {image: {repository, tag}}}
+    # -- Deployment strategy. Defaults to RollingUpdate; set type: Recreate for stateful apps
+    strategy:
+      type: RollingUpdate
+    # -- Pod-level spec. Groups all pod-level fields (containers, securityContext, volumes, affinity, etc.)
+    # podSpec:
+    #   securityContext: {}   # Defaults: runAsNonRoot=true, fsGroupChangePolicy=OnRootMismatch
+    #   containers:           # required — at minimum: {main: {imageSelector: image}} or {main: {image: {repository, tag}}}
 
 # -- StatefulSets configuration. Define one or more stateful workloads under the 'statefulsets' key.
 # @section -- StatefulSets configuration
@@ -34,7 +40,13 @@ statefulsets:
     enabled: false
     replicas: 1
     revisionHistoryLimit: 3
-    # containers: required when enabled — define at least one entry: {main: {image: {repository, tag}}}
+    # -- StatefulSet update strategy. Defaults to RollingUpdate
+    updateStrategy:
+      type: RollingUpdate
+    # -- Pod-level spec. Groups all pod-level fields (containers, securityContext, volumes, affinity, etc.)
+    # podSpec:
+    #   securityContext: {}
+    #   containers:           # required — at minimum: {main: {imageSelector: image}} or {main: {image: {repository, tag}}}
     # -- VolumeClaimTemplates for persistent storage. Each entry requires metadata.name and spec.resources.requests.storage
     volumeClaimTemplates: []
 
@@ -49,8 +61,9 @@ cronjobs:
     concurrencyPolicy: Forbid
     successfulJobsHistoryLimit: 3
     failedJobsHistoryLimit: 3
-    restartPolicy: OnFailure
-    # containers: required when enabled — define at least one entry: {main: {image: {repository, tag}}}
+    # podSpec:
+    #   restartPolicy: OnFailure
+    #   containers:           # required — at minimum: {main: {imageSelector: image}} or {main: {image: {repository, tag}}}
 
 # -- Jobs configuration. Define one or more one-shot jobs under the 'jobs' key.
 # @section -- Jobs configuration
@@ -58,8 +71,9 @@ jobs:
   main:
     # -- Enable or disable this Job
     enabled: false
-    restartPolicy: OnFailure
-    # containers: required when enabled — define at least one entry: {main: {image: {repository, tag}}}
+    # podSpec:
+    #   restartPolicy: OnFailure
+    #   containers:           # required — at minimum: {main: {imageSelector: image}} or {main: {image: {repository, tag}}}
 
 # -- CloudNativePG Clusters configuration. Define one or more clusters under the 'cnpgClusters' key.
 # @section -- CNPG Clusters configuration
@@ -80,6 +94,25 @@ cnpgClusters:
     monitoring:
       enabled: false
       podMonitorEnabled: false
+
+# -- Secrets configuration. Define secrets to auto-generate under the 'secrets' key.
+# Each entry auto-creates a Secret with pre-install hook and resource-policy: keep.
+# Set existingSecret to opt out and reference an external Secret instead.
+# Empty data values generate a random 32-char alphanumeric string, preserved across upgrades via lookup.
+# Non-empty data values are used as the initial seed (also preserved on upgrade).
+# @section -- Secrets configuration
+secrets:
+  main:
+    # -- Enable or disable this secret
+    enabled: false
+    # -- If set, skip generation and use this existing Secret instead
+    existingSecret: ""
+    # -- Secret type. Defaults to Opaque. Use kubernetes.io/basic-auth for username/password pairs
+    type: Opaque
+    # -- Data keys to generate. Empty string → random 32-char value, preserved across upgrades.
+    # Non-empty string → used as initial seed (also preserved via lookup on upgrade).
+    data:
+      MY_SECRET_KEY: ""
 
 # -- Service configuration. Additional services can be added under the 'k8sServices' key.
 # @section -- Services configuration

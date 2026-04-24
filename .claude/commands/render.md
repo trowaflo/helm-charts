@@ -1,10 +1,9 @@
-# Render Command
-
-Render a chart's templates.
-
-Determine the chart from current context (files recently edited, branch name, etc.). Use the chart name as the release name unless the user specifies otherwise.
+---
+description: Render a chart's templates with helm template. Infer chart from context (edited files, branch name). Use chart name as release name unless specified. Always run helm dependency update first.
+---
 
 ```bash
-helm dependency update charts/apps/<chart-name>
-helm template <chart-name> charts/apps/<chart-name>
+rm -f charts/apps/<chart>/charts/common-*.tgz
+helm dependency update charts/apps/<chart>
+helm template <chart> charts/apps/<chart>
 ```

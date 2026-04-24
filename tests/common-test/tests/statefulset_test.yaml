@@ -45,24 +45,25 @@ tests:
           enabled: true
     asserts:
       - failedTemplate:
-          errorMessage: "statefulsets.redis.containers is required and must define at least one container when enabled"
+          errorMessage: "statefulsets.redis.podSpec.containers is required and must define at least one container when enabled"
 
   - it: should fail when volumeClaimTemplates entry lacks storage
     set:
       statefulsets:
         redis:
           enabled: true
-          containers:
-            redis:
-              image:
-                repository: redis
-                tag: 7-alpine
           volumeClaimTemplates:
             - metadata:
                 name: data
               spec:
                 accessModes:
                   - ReadWriteOnce
+          podSpec:
+            containers:
+              redis:
+                image:
+                  repository: redis
+                  tag: 7-alpine
     asserts:
       - failedTemplate:
           errorMessage: "statefulsets.redis.volumeClaimTemplates[data].spec.resources.requests.storage is required"
@@ -74,11 +75,12 @@ tests:
           enabled: true
           replicas: 0
           revisionHistoryLimit: 0
-          containers:
-            redis:
-              image:
-                repository: redis
-                tag: 7-alpine
+          podSpec:
+            containers:
+              redis:
+                image:
+                  repository: redis
+                  tag: 7-alpine
     asserts:
       - equal:
           path: spec.replicas
@@ -92,12 +94,13 @@ tests:
       statefulsets:
         redis:
           enabled: true
-          serviceAccountName: redis-runner
-          containers:
-            redis:
-              image:
-                repository: redis
-                tag: 7-alpine
+          podSpec:
+            serviceAccountName: redis-runner
+            containers:
+              redis:
+                image:
+                  repository: redis
+                  tag: 7-alpine
     asserts:
       - equal:
           path: spec.template.spec.serviceAccountName
@@ -109,11 +112,12 @@ tests:
         redis:
           enabled: true
           serviceName: custom-headless
-          containers:
-            redis:
-              image:
-                repository: redis
-                tag: 7-alpine
+          podSpec:
+            containers:
+              redis:
+                image:
+                  repository: redis
+                  tag: 7-alpine
     asserts:
       - equal:
           path: spec.serviceName
@@ -125,16 +129,17 @@ tests:
       statefulsets:
         redis:
           enabled: true
-          containers:
-            redis:
-              image:
-                repository: redis
-                tag: 7-alpine
-                pullPolicy: IfNotPresent
-              ports:
-                redis:
-                  containerPort: 6379
-                  protocol: TCP
+          podSpec:
+            containers:
+              redis:
+                image:
+                  repository: redis
+                  tag: 7-alpine
+                  pullPolicy: IfNotPresent
+                ports:
+                  redis:
+                    containerPort: 6379
+                    protocol: TCP
     asserts:
       - hasDocuments:
           count: 1
@@ -156,18 +161,19 @@ tests:
       statefulsets:
         redis:
           enabled: true
-          containers:
-            redis:
-              image:
-                repository: redis
-                tag: 7-alpine
-              env:
-                - name: TEST_VAR
-                  value: test-value
-              resources:
-                requests:
-                  cpu: 100m
-                  memory: 128Mi
+          podSpec:
+            containers:
+              redis:
+                image:
+                  repository: redis
+                  tag: 7-alpine
+                env:
+                  - name: TEST_VAR
+                    value: test-value
+                resources:
+                  requests:
+                    cpu: 100m
+                    memory: 128Mi
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -184,11 +190,6 @@ tests:
       statefulsets:
         redis:
           enabled: true
-          containers:
-            redis:
-              image:
-                repository: redis
-                tag: 7-alpine
           volumeClaimTemplates:
             - metadata:
                 name: data
@@ -198,6 +199,12 @@ tests:
                 resources:
                   requests:
                     storage: 1Gi
+          podSpec:
+            containers:
+              redis:
+                image:
+                  repository: redis
+                  tag: 7-alpine
     asserts:
       - isNotEmpty:
           path: spec.volumeClaimTemplates
@@ -212,11 +219,12 @@ tests:
         redis:
           enabled: true
           podManagementPolicy: Parallel
-          containers:
-            redis:
-              image:
-                repository: redis
-                tag: 7-alpine
+          podSpec:
+            containers:
+              redis:
+                image:
+                  repository: redis
+                  tag: 7-alpine
     asserts:
       - equal:
           path: spec.podManagementPolicy
@@ -232,11 +240,12 @@ tests:
             type: RollingUpdate
             rollingUpdate:
               partition: 2
-          containers:
-            redis:
-              image:
-                repository: redis
-                tag: 7-alpine
+          podSpec:
+            containers:
+              redis:
+                image:
+                  repository: redis
+                  tag: 7-alpine
     asserts:
       - equal:
           path: spec.updateStrategy.type
@@ -251,14 +260,6 @@ tests:
       statefulsets:
         redis:
           enabled: true
-          containers:
-            redis:
-              image:
-                repository: redis
-                tag: 7-alpine
-              volumeMounts:
-                - name: data
-                  mountPath: /data
           volumeClaimTemplates:
             - metadata:
                 name: data
@@ -269,6 +270,15 @@ tests:
                 resources:
                   requests:
                     storage: 10Gi
+          podSpec:
+            containers:
+              redis:
+                image:
+                  repository: redis
+                  tag: 7-alpine
+                volumeMounts:
+                  - name: data
+                    mountPath: /data
     asserts:
       - equal:
           path: spec.volumeClaimTemplates[0].spec.storageClassName
@@ -288,18 +298,6 @@ tests:
       statefulsets:
         redis:
           enabled: true
-          initContainers:
-            - name: init-permissions
-              image: busybox:1.36
-              command: ['sh', '-c', 'chown -R 999:999 /data']
-              volumeMounts:
-                - name: data
-                  mountPath: /data
-          containers:
-            redis:
-              image:
-                repository: redis
-                tag: 7-alpine
           volumeClaimTemplates:
             - metadata:
                 name: data
@@ -309,6 +307,19 @@ tests:
                 resources:
                   requests:
                     storage: 1Gi
+          podSpec:
+            initContainers:
+              - name: init-permissions
+                image: busybox:1.36
+                command: ['sh', '-c', 'chown -R 999:999 /data']
+                volumeMounts:
+                  - name: data
+                    mountPath: /data
+            containers:
+              redis:
+                image:
+                  repository: redis
+                  tag: 7-alpine
     asserts:
       - isNotNull:
           path: spec.template.spec.initContainers
@@ -325,21 +336,22 @@ tests:
       statefulsets:
         redis:
           enabled: true
-          containers:
-            redis:
-              image:
-                repository: redis
-                tag: 7-alpine
-          affinity:
-            podAntiAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                - labelSelector:
-                    matchExpressions:
-                      - key: app.kubernetes.io/name
-                        operator: In
-                        values:
-                          - common-test-redis
-                  topologyKey: kubernetes.io/hostname
+          podSpec:
+            containers:
+              redis:
+                image:
+                  repository: redis
+                  tag: 7-alpine
+            affinity:
+              podAntiAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  - labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values:
+                            - common-test-redis
+                    topologyKey: kubernetes.io/hostname
     asserts:
       - isNotNull:
           path: spec.template.spec.affinity.podAntiAffinity
@@ -353,19 +365,20 @@ tests:
       statefulsets:
         redis:
           enabled: true
-          containers:
-            redis:
-              image:
-                repository: redis
-                tag: 7-alpine
-          nodeSelector:
-            disktype: ssd
-            tier: database
-          tolerations:
-            - key: "database"
-              operator: "Equal"
-              value: "redis"
-              effect: "NoSchedule"
+          podSpec:
+            containers:
+              redis:
+                image:
+                  repository: redis
+                  tag: 7-alpine
+            nodeSelector:
+              disktype: ssd
+              tier: database
+            tolerations:
+              - key: "database"
+                operator: "Equal"
+                value: "redis"
+                effect: "NoSchedule"
     asserts:
       - equal:
           path: spec.template.spec.nodeSelector.disktype

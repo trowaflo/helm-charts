@@ -46,7 +46,7 @@ tests:
           schedule: "0 2 * * *"
     asserts:
       - failedTemplate:
-          errorMessage: "cronjobs.backup.containers is required and must define at least one container when enabled"
+          errorMessage: "cronjobs.backup.podSpec.containers is required and must define at least one container when enabled"
 
   - it: should render initContainers when provided
     set:
@@ -54,15 +54,16 @@ tests:
         backup:
           enabled: true
           schedule: "0 2 * * *"
-          initContainers:
-            - name: fetch-secrets
-              image: busybox:1.36
-              command: ["sh", "-c", "echo fetching"]
-          containers:
-            backup:
-              image:
-                repository: postgres
-                tag: "16"
+          podSpec:
+            initContainers:
+              - name: fetch-secrets
+                image: busybox:1.36
+                command: ["sh", "-c", "echo fetching"]
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
     asserts:
       - isNotNull:
           path: spec.jobTemplate.spec.template.spec.initContainers
@@ -76,12 +77,13 @@ tests:
         backup:
           enabled: true
           schedule: "0 2 * * *"
-          serviceAccountName: backup-runner
-          containers:
-            backup:
-              image:
-                repository: postgres
-                tag: "16"
+          podSpec:
+            serviceAccountName: backup-runner
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
     asserts:
       - equal:
           path: spec.jobTemplate.spec.template.spec.serviceAccountName
@@ -93,19 +95,20 @@ tests:
         backup:
           enabled: true
           schedule: "0 2 * * *"
-          containers:
-            backup:
-              image:
-                repository: postgres
-                tag: "16"
-          affinity:
-            nodeAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                nodeSelectorTerms:
-                  - matchExpressions:
-                      - key: disktype
-                        operator: In
-                        values: [ssd]
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+            affinity:
+              nodeAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  nodeSelectorTerms:
+                    - matchExpressions:
+                        - key: disktype
+                          operator: In
+                          values: [ssd]
     asserts:
       - isNotNull:
           path: spec.jobTemplate.spec.template.spec.affinity
@@ -122,12 +125,13 @@ tests:
         backup:
           enabled: true
           schedule: "0 2 * * *"
-          containers:
-            backup:
-              image:
-                repository: postgres
-                tag: "16"
-                pullPolicy: IfNotPresent
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+                  pullPolicy: IfNotPresent
     asserts:
       - hasDocuments:
           count: 1
@@ -150,18 +154,19 @@ tests:
         backup:
           enabled: true
           schedule: "0 2 * * *"
-          containers:
-            backup:
-              image:
-                repository: postgres
-                tag: "16"
-              command:
-                - /bin/bash
-                - -c
-                - echo "backup"
-              env:
-                - name: DATABASE_URL
-                  value: postgresql://localhost/db
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+                command:
+                  - /bin/bash
+                  - -c
+                  - echo "backup"
+                env:
+                  - name: DATABASE_URL
+                    value: postgresql://localhost/db
     asserts:
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].command[0]
@@ -182,11 +187,12 @@ tests:
           failedJobsHistoryLimit: 0
           startingDeadlineSeconds: 0
           ttlSecondsAfterFinished: 0
-          containers:
-            backup:
-              image:
-                repository: postgres
-                tag: "16"
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
     asserts:
       - equal:
           path: spec.successfulJobsHistoryLimit
@@ -210,11 +216,12 @@ tests:
           schedule: "0 2 * * *"
           successfulJobsHistoryLimit: 5
           failedJobsHistoryLimit: 10
-          containers:
-            backup:
-              image:
-                repository: postgres
-                tag: "16"
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
     asserts:
       - equal:
           path: spec.successfulJobsHistoryLimit
@@ -231,11 +238,12 @@ tests:
           enabled: true
           schedule: "0 2 * * *"
           startingDeadlineSeconds: 300
-          containers:
-            backup:
-              image:
-                repository: postgres
-                tag: "16"
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
     asserts:
       - equal:
           path: spec.startingDeadlineSeconds
@@ -249,11 +257,12 @@ tests:
           enabled: true
           schedule: "0 2 * * *"
           suspend: true
-          containers:
-            backup:
-              image:
-                repository: postgres
-                tag: "16"
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
     asserts:
       - equal:
           path: spec.suspend
@@ -267,11 +276,12 @@ tests:
           enabled: true
           schedule: "0 2 * * *"
           timeZone: "Europe/Paris"
-          containers:
-            backup:
-              image:
-                repository: postgres
-                tag: "16"
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
     asserts:
       - equal:
           path: spec.timeZone
@@ -284,20 +294,21 @@ tests:
         backup:
           enabled: true
           schedule: "0 2 * * *"
-          containers:
-            backup:
-              image:
-                repository: postgres
-                tag: "16"
-              command:
-                - pg_dump
-            uploader:
-              image:
-                repository: rclone/rclone
-                tag: latest
-              command:
-                - rclone
-                - copy
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+                command:
+                  - pg_dump
+              uploader:
+                image:
+                  repository: rclone/rclone
+                  tag: latest
+                command:
+                  - rclone
+                  - copy
     asserts:
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].name
@@ -316,23 +327,24 @@ tests:
         backup:
           enabled: true
           schedule: "0 2 * * *"
-          containers:
-            backup:
-              image:
-                repository: postgres
-                tag: "16"
-              volumeMounts:
-                - name: backup-storage
-                  mountPath: /backup
-                - name: config
-                  mountPath: /etc/backup
-          volumes:
-            - name: backup-storage
-              persistentVolumeClaim:
-                claimName: backup-pvc
-            - name: config
-              configMap:
-                name: backup-config
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+                volumeMounts:
+                  - name: backup-storage
+                    mountPath: /backup
+                  - name: config
+                    mountPath: /etc/backup
+            volumes:
+              - name: backup-storage
+                persistentVolumeClaim:
+                  claimName: backup-pvc
+              - name: config
+                configMap:
+                  name: backup-config
     asserts:
       - contains:
           path: spec.jobTemplate.spec.template.spec.containers[0].volumeMounts
@@ -360,11 +372,12 @@ tests:
           enabled: true
           schedule: "0 2 * * *"
           ttlSecondsAfterFinished: 3600
-          containers:
-            backup:
-              image:
-                repository: postgres
-                tag: "16"
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
     asserts:
       - equal:
           path: spec.jobTemplate.spec.ttlSecondsAfterFinished

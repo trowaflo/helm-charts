@@ -2,7 +2,10 @@
   {{- range $name := keys .Values.cronjobs | sortAlpha }}
     {{- $cronjob := index $.Values.cronjobs $name }}
     {{- if $cronjob.enabled }}
-      {{- $_ := required (printf "cronjobs.%s.containers is required and must define at least one container when enabled" $name) $cronjob.containers }}
+      {{- $podSpec := $cronjob.podSpec | default dict -}}
+      {{- $_ := required (printf "cronjobs.%s.podSpec.containers is required and must define at least one container when enabled" $name) $podSpec.containers }}
+      {{- $defaultPodSecCtx := dict "runAsNonRoot" true "fsGroupChangePolicy" "OnRootMismatch" -}}
+      {{- $podSecCtx := mergeOverwrite (deepCopy $defaultPodSecCtx) ($podSpec.securityContext | default dict) }}
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -45,81 +48,79 @@ spec:
             app.kubernetes.io/name: {{ include "common.helpers.name" $ }}
             app.kubernetes.io/instance: {{ $.Release.Name }}
             app.kubernetes.io/component: {{ $name }}
-          {{- with $cronjob.podAnnotations }}
+          {{- with $podSpec.annotations }}
           annotations:
             {{- range $key, $value := . }}
             {{ $key }}: {{ $value | quote }}
             {{- end }}
           {{- end }}
         spec:
-          restartPolicy: {{ $cronjob.restartPolicy | default "OnFailure" }}
-          {{- with $cronjob.serviceAccountName }}
+          restartPolicy: {{ $podSpec.restartPolicy | default "OnFailure" }}
+          {{- with $podSpec.serviceAccountName }}
           serviceAccountName: {{ . }}
           {{- end }}
           automountServiceAccountToken: false
-          enableServiceLinks: {{ $cronjob.enableServiceLinks | default false }}
-          {{- if hasKey $cronjob "shareProcessNamespace" }}
-          shareProcessNamespace: {{ $cronjob.shareProcessNamespace }}
+          enableServiceLinks: {{ $podSpec.enableServiceLinks | default false }}
+          {{- if hasKey $podSpec "shareProcessNamespace" }}
+          shareProcessNamespace: {{ $podSpec.shareProcessNamespace }}
           {{- end }}
-          {{- if hasKey $cronjob "hostNetwork" }}
-          hostNetwork: {{ $cronjob.hostNetwork }}
+          {{- if hasKey $podSpec "hostNetwork" }}
+          hostNetwork: {{ $podSpec.hostNetwork }}
           {{- end }}
-          {{- with $cronjob.hostAliases }}
+          {{- with $podSpec.hostAliases }}
           hostAliases:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with $cronjob.dnsPolicy }}
+          {{- with $podSpec.dnsPolicy }}
           dnsPolicy: {{ . }}
           {{- end }}
-          {{- with $cronjob.dnsConfig }}
+          {{- with $podSpec.dnsConfig }}
           dnsConfig:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with $cronjob.schedulerName }}
+          {{- with $podSpec.schedulerName }}
           schedulerName: {{ . }}
           {{- end }}
-          {{- with $cronjob.runtimeClassName }}
+          {{- with $podSpec.runtimeClassName }}
           runtimeClassName: {{ . }}
           {{- end }}
-          {{- if hasKey $cronjob "terminationGracePeriodSeconds" }}
-          terminationGracePeriodSeconds: {{ $cronjob.terminationGracePeriodSeconds }}
+          {{- if hasKey $podSpec "terminationGracePeriodSeconds" }}
+          terminationGracePeriodSeconds: {{ $podSpec.terminationGracePeriodSeconds }}
           {{- end }}
-          {{- with $cronjob.priorityClassName }}
+          {{- with $podSpec.priorityClassName }}
           priorityClassName: {{ . }}
           {{- end }}
-          {{- with $cronjob.topologySpreadConstraints }}
+          {{- with $podSpec.topologySpreadConstraints }}
           topologySpreadConstraints:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with $cronjob.imagePullSecrets }}
+          {{- with $podSpec.imagePullSecrets }}
           imagePullSecrets:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with $cronjob.podSecurityContext }}
           securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with $cronjob.initContainers }}
+            {{- toYaml $podSecCtx | nindent 12 }}
+          {{- with $podSpec.initContainers }}
           initContainers:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           containers:
-            {{- range $containerName, $container := $cronjob.containers }}
+            {{- range $containerName, $container := $podSpec.containers }}
             {{- include "common.helpers.container" (dict "root" $ "container" $container "containerName" $containerName) | nindent 12 }}
             {{- end }}
-          {{- with $cronjob.volumes }}
+          {{- with $podSpec.volumes }}
           volumes:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with $cronjob.nodeSelector }}
+          {{- with $podSpec.nodeSelector }}
           nodeSelector:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with $cronjob.affinity }}
+          {{- with $podSpec.affinity }}
           affinity:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with $cronjob.tolerations }}
+          {{- with $podSpec.tolerations }}
           tolerations:
             {{- toYaml . | nindent 12 }}
           {{- end }}

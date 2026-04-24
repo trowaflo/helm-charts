@@ -381,16 +381,17 @@ tests:
       deployments:
         main:
           enabled: true
-          containers:
-            main:
-              image:
-                repository: nginx
-                tag: latest
-              env:
-                DB_SECRET:
-                  secretKeyRef:
-                    name: '{{ include "common.helpers.cnpgAppSecret" (dict "root" . "name" "postgresql") }}'
-                    key: uri
+          podSpec:
+            containers:
+              main:
+                image:
+                  repository: nginx
+                  tag: latest
+                env:
+                  DB_SECRET:
+                    secretKeyRef:
+                      name: '{{ include "common.helpers.cnpgAppSecret" (dict "root" . "name" "postgresql") }}'
+                      key: uri
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env

@@ -102,6 +102,23 @@ Usage: {{ include "common.helpers.cnpgAppSecret" (dict "root" . "name" "postgres
 {{- end -}}
 
 {{/*
+Return the name of a managed secret.
+If secrets.<name>.existingSecret is set, returns that value.
+Otherwise returns "<release-fullname>-<name>".
+Usage: {{ include "common.helpers.secretName" (dict "root" . "name" "my-secret") }}
+*/}}
+{{- define "common.helpers.secretName" -}}
+  {{- $root := required "common.helpers.secretName: root is required" .root -}}
+  {{- $name := required "common.helpers.secretName: name is required" .name -}}
+  {{- $secret := index ($root.Values.secrets | default dict) $name | default dict -}}
+  {{- if $secret.existingSecret -}}
+    {{- $secret.existingSecret -}}
+  {{- else -}}
+    {{- printf "%s-%s" (include "common.helpers.fullname" $root) $name -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
 Validate PV configuration - ensure required fields are present
 */}}
 {{- define "common.helpers.validatePV" -}}
