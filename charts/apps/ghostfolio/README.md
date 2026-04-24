@@ -1,6 +1,6 @@
 # ghostfolio
 
-![Version: 5.0.0](https://img.shields.io/badge/Version-5.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 7.0.0](https://img.shields.io/badge/Version-7.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Privacy-first open source portfolio tracker with PostgreSQL (CNPG) and Redis support.
 ArgoCD-compatible chart with no drift from lookup or randAlphaNum - all secrets externally managed.
@@ -23,7 +23,7 @@ Includes automated backup to NFS and manual restore capabilities.
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../../library/common | common | 3.0.0 |
+| file://../../library/common | common | 4.0.0 |
 
 ## Values
 
@@ -34,7 +34,7 @@ Includes automated backup to NFS and manual restore capabilities.
 | cnpgClusters.postgresql.backup.retentionPolicy | string | `"30d"` |  |
 | cnpgClusters.postgresql.bootstrap.initdb.database | string | `"ghostfolio"` |  |
 | cnpgClusters.postgresql.bootstrap.initdb.owner | string | `"ghostfolio"` |  |
-| cnpgClusters.postgresql.bootstrap.initdb.secret.name | string | `"{{ include \"ghostfolio.secretName.dbBootstrap\" . }}"` |  |
+| cnpgClusters.postgresql.bootstrap.initdb.secret.name | string | `"{{ include \"common.helpers.secretName\" (dict \"root\" . \"name\" \"db-bootstrap\") }}"` |  |
 | cnpgClusters.postgresql.enabled | bool | `true` |  |
 | cnpgClusters.postgresql.imageName | string | `"ghcr.io/cloudnative-pg/postgresql:16.6"` |  |
 | cnpgClusters.postgresql.instances | int | `1` |  |
@@ -58,92 +58,68 @@ Includes automated backup to NFS and manual restore capabilities.
 | cnpgClusters.postgresql.resources.requests.memory | string | `"256Mi"` |  |
 | cnpgClusters.postgresql.storage.size | string | `"10Gi"` |  |
 | cnpgClusters.postgresql.storage.storageClass | string | `""` |  |
-| cronjobs.backup.concurrencyPolicy | string | `"Forbid"` |  |
-| cronjobs.backup.containers.backup.command[0] | string | `"/bin/bash"` |  |
-| cronjobs.backup.containers.backup.command[1] | string | `"-c"` |  |
-| cronjobs.backup.containers.backup.command[2] | string | `"set -e\nBACKUP_FILE=\"/backup/ghostfolio-$(date +%Y-%m-%d-%H%M%S).dump\"\necho \"Starting backup to $BACKUP_FILE\"\npg_dump -Fc -v -f \"$BACKUP_FILE\" \"$DATABASE_URL\"\necho \"Backup completed: $BACKUP_FILE\"\necho \"Verifying backup integrity...\"\npg_restore --list \"$BACKUP_FILE\" > /dev/null\necho \"Backup verification successful\"\necho \"Cleaning up old backups (keeping last {{ .Values.backup.retention | default 7 }})\"\ncd /backup\nls -t ghostfolio-*.dump | tail -n +{{ add1 (.Values.backup.retention | default 7) }} | xargs -r rm -f\necho \"Backup process completed successfully\"\n"` |  |
-| cronjobs.backup.containers.backup.env.DATABASE_URL.secretKeyRef.key | string | `"uri"` |  |
-| cronjobs.backup.containers.backup.env.DATABASE_URL.secretKeyRef.name | string | `"{{ include \"common.helpers.cnpgAppSecret\" (dict \"root\" . \"name\" \"postgresql\") }}"` |  |
-| cronjobs.backup.containers.backup.image.pullPolicy | string | `"IfNotPresent"` |  |
-| cronjobs.backup.containers.backup.image.repository | string | `"postgres"` |  |
-| cronjobs.backup.containers.backup.image.tag | string | `"16"` |  |
-| cronjobs.backup.containers.backup.resources.limits.cpu | string | `"500m"` |  |
-| cronjobs.backup.containers.backup.resources.limits.memory | string | `"512Mi"` |  |
-| cronjobs.backup.containers.backup.resources.requests.cpu | string | `"100m"` |  |
-| cronjobs.backup.containers.backup.resources.requests.memory | string | `"128Mi"` |  |
-| cronjobs.backup.containers.backup.securityContext.allowPrivilegeEscalation | bool | `false` |  |
-| cronjobs.backup.containers.backup.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
-| cronjobs.backup.containers.backup.securityContext.readOnlyRootFilesystem | bool | `false` |  |
-| cronjobs.backup.containers.backup.volumeMounts[0].mountPath | string | `"/backup"` |  |
-| cronjobs.backup.containers.backup.volumeMounts[0].name | string | `"backup"` |  |
 | cronjobs.backup.enabled | bool | `false` |  |
-| cronjobs.backup.failedJobsHistoryLimit | int | `3` |  |
-| cronjobs.backup.podSecurityContext.fsGroup | int | `999` |  |
-| cronjobs.backup.podSecurityContext.runAsGroup | int | `999` |  |
-| cronjobs.backup.podSecurityContext.runAsNonRoot | bool | `true` |  |
-| cronjobs.backup.podSecurityContext.runAsUser | int | `999` |  |
+| cronjobs.backup.podSpec.containers.backup.command[0] | string | `"/bin/bash"` |  |
+| cronjobs.backup.podSpec.containers.backup.command[1] | string | `"-c"` |  |
+| cronjobs.backup.podSpec.containers.backup.command[2] | string | `"set -e\nBACKUP_FILE=\"/backup/ghostfolio-$(date +%Y-%m-%d-%H%M%S).dump\"\necho \"Starting backup to $BACKUP_FILE\"\npg_dump -Fc -v -f \"$BACKUP_FILE\" \"$DATABASE_URL\"\necho \"Backup completed: $BACKUP_FILE\"\necho \"Verifying backup integrity...\"\npg_restore --list \"$BACKUP_FILE\" > /dev/null\necho \"Backup verification successful\"\necho \"Cleaning up old backups (keeping last {{ .Values.backup.retention | default 7 }})\"\ncd /backup\nls -t ghostfolio-*.dump | tail -n +{{ add1 (.Values.backup.retention | default 7) }} | xargs -r rm -f\necho \"Backup process completed successfully\"\n"` |  |
+| cronjobs.backup.podSpec.containers.backup.env.DATABASE_URL.secretKeyRef.key | string | `"uri"` |  |
+| cronjobs.backup.podSpec.containers.backup.env.DATABASE_URL.secretKeyRef.name | string | `"{{ include \"common.helpers.cnpgAppSecret\" (dict \"root\" . \"name\" \"postgresql\") }}"` |  |
+| cronjobs.backup.podSpec.containers.backup.imageSelector | string | `"postgresImage"` |  |
+| cronjobs.backup.podSpec.containers.backup.resources.limits.cpu | string | `"500m"` |  |
+| cronjobs.backup.podSpec.containers.backup.resources.limits.memory | string | `"512Mi"` |  |
+| cronjobs.backup.podSpec.containers.backup.resources.requests.cpu | string | `"100m"` |  |
+| cronjobs.backup.podSpec.containers.backup.resources.requests.memory | string | `"128Mi"` |  |
+| cronjobs.backup.podSpec.containers.backup.securityContext.readOnlyRootFilesystem | bool | `false` |  |
+| cronjobs.backup.podSpec.containers.backup.volumeMounts[0].mountPath | string | `"/backup"` |  |
+| cronjobs.backup.podSpec.containers.backup.volumeMounts[0].name | string | `"backup"` |  |
+| cronjobs.backup.podSpec.securityContext.fsGroup | int | `999` |  |
+| cronjobs.backup.podSpec.securityContext.runAsGroup | int | `999` |  |
+| cronjobs.backup.podSpec.securityContext.runAsNonRoot | bool | `true` |  |
+| cronjobs.backup.podSpec.securityContext.runAsUser | int | `999` |  |
+| cronjobs.backup.podSpec.volumes[0].name | string | `"backup"` |  |
+| cronjobs.backup.podSpec.volumes[0].nfs.path | string | `""` |  |
+| cronjobs.backup.podSpec.volumes[0].nfs.server | string | `""` |  |
 | cronjobs.backup.schedule | string | `"0 2 * * *"` |  |
-| cronjobs.backup.successfulJobsHistoryLimit | int | `3` |  |
-| cronjobs.backup.volumes[0].name | string | `"backup"` |  |
-| cronjobs.backup.volumes[0].nfs.path | string | `""` |  |
-| cronjobs.backup.volumes[0].nfs.server | string | `""` |  |
-| deployments.main.containers.main.env.ACCESS_TOKEN_SALT.secretKeyRef.key | string | `"ACCESS_TOKEN_SALT"` |  |
-| deployments.main.containers.main.env.ACCESS_TOKEN_SALT.secretKeyRef.name | string | `"{{ include \"ghostfolio.secretName.auth\" . }}"` |  |
-| deployments.main.containers.main.env.DATABASE_URL.secretKeyRef.key | string | `"uri"` |  |
-| deployments.main.containers.main.env.DATABASE_URL.secretKeyRef.name | string | `"{{ include \"common.helpers.cnpgAppSecret\" (dict \"root\" . \"name\" \"postgresql\") }}"` |  |
-| deployments.main.containers.main.env.JWT_SECRET_KEY.secretKeyRef.key | string | `"JWT_SECRET_KEY"` |  |
-| deployments.main.containers.main.env.JWT_SECRET_KEY.secretKeyRef.name | string | `"{{ include \"ghostfolio.secretName.auth\" . }}"` |  |
-| deployments.main.containers.main.env.NODE_ENV | string | `"production"` |  |
-| deployments.main.containers.main.env.REDIS_HOST | string | `"{{ include \"common.helpers.fullname\" . }}-redis"` |  |
-| deployments.main.containers.main.env.REDIS_PASSWORD.secretKeyRef.key | string | `"REDIS_PASSWORD"` |  |
-| deployments.main.containers.main.env.REDIS_PASSWORD.secretKeyRef.name | string | `"{{ include \"ghostfolio.secretName.redis\" . }}"` |  |
-| deployments.main.containers.main.env.REDIS_PORT | string | `"6379"` |  |
-| deployments.main.containers.main.image.pullPolicy | string | `"IfNotPresent"` |  |
-| deployments.main.containers.main.image.repository | string | `"ghostfolio/ghostfolio"` |  |
-| deployments.main.containers.main.image.tag | string | `"2.167.0"` |  |
-| deployments.main.containers.main.livenessProbe.failureThreshold | int | `3` |  |
-| deployments.main.containers.main.livenessProbe.httpGet.path | string | `"/api/v1/health"` |  |
-| deployments.main.containers.main.livenessProbe.httpGet.port | string | `"http"` |  |
-| deployments.main.containers.main.livenessProbe.httpGet.scheme | string | `"HTTP"` |  |
-| deployments.main.containers.main.livenessProbe.initialDelaySeconds | int | `30` |  |
-| deployments.main.containers.main.livenessProbe.periodSeconds | int | `10` |  |
-| deployments.main.containers.main.livenessProbe.successThreshold | int | `1` |  |
-| deployments.main.containers.main.livenessProbe.timeoutSeconds | int | `5` |  |
-| deployments.main.containers.main.ports.http.containerPort | int | `3333` |  |
-| deployments.main.containers.main.ports.http.protocol | string | `"TCP"` |  |
-| deployments.main.containers.main.readinessProbe.failureThreshold | int | `3` |  |
-| deployments.main.containers.main.readinessProbe.httpGet.path | string | `"/api/v1/health"` |  |
-| deployments.main.containers.main.readinessProbe.httpGet.port | string | `"http"` |  |
-| deployments.main.containers.main.readinessProbe.httpGet.scheme | string | `"HTTP"` |  |
-| deployments.main.containers.main.readinessProbe.initialDelaySeconds | int | `10` |  |
-| deployments.main.containers.main.readinessProbe.periodSeconds | int | `5` |  |
-| deployments.main.containers.main.readinessProbe.successThreshold | int | `1` |  |
-| deployments.main.containers.main.readinessProbe.timeoutSeconds | int | `3` |  |
-| deployments.main.containers.main.resources.limits.cpu | string | `"1000m"` |  |
-| deployments.main.containers.main.resources.limits.memory | string | `"512Mi"` |  |
-| deployments.main.containers.main.resources.requests.cpu | string | `"100m"` |  |
-| deployments.main.containers.main.resources.requests.memory | string | `"256Mi"` |  |
-| deployments.main.containers.main.securityContext.allowPrivilegeEscalation | bool | `false` |  |
-| deployments.main.containers.main.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
-| deployments.main.containers.main.securityContext.readOnlyRootFilesystem | bool | `true` |  |
 | deployments.main.enabled | bool | `true` |  |
-| deployments.main.podSecurityContext.fsGroup | int | `1000` |  |
-| deployments.main.podSecurityContext.runAsGroup | int | `1000` |  |
-| deployments.main.podSecurityContext.runAsNonRoot | bool | `true` |  |
-| deployments.main.podSecurityContext.runAsUser | int | `1000` |  |
-| deployments.main.replicas | int | `1` |  |
-| deployments.main.revisionHistoryLimit | int | `3` |  |
+| deployments.main.podSpec.containers.main.env.ACCESS_TOKEN_SALT.secretKeyRef.key | string | `"ACCESS_TOKEN_SALT"` |  |
+| deployments.main.podSpec.containers.main.env.ACCESS_TOKEN_SALT.secretKeyRef.name | string | `"{{ include \"common.helpers.secretName\" (dict \"root\" . \"name\" \"auth\") }}"` |  |
+| deployments.main.podSpec.containers.main.env.DATABASE_URL.secretKeyRef.key | string | `"uri"` |  |
+| deployments.main.podSpec.containers.main.env.DATABASE_URL.secretKeyRef.name | string | `"{{ include \"common.helpers.cnpgAppSecret\" (dict \"root\" . \"name\" \"postgresql\") }}"` |  |
+| deployments.main.podSpec.containers.main.env.JWT_SECRET_KEY.secretKeyRef.key | string | `"JWT_SECRET_KEY"` |  |
+| deployments.main.podSpec.containers.main.env.JWT_SECRET_KEY.secretKeyRef.name | string | `"{{ include \"common.helpers.secretName\" (dict \"root\" . \"name\" \"auth\") }}"` |  |
+| deployments.main.podSpec.containers.main.env.NODE_ENV | string | `"production"` |  |
+| deployments.main.podSpec.containers.main.env.REDIS_HOST | string | `"{{ include \"common.helpers.fullname\" . }}-redis"` |  |
+| deployments.main.podSpec.containers.main.env.REDIS_PASSWORD.secretKeyRef.key | string | `"REDIS_PASSWORD"` |  |
+| deployments.main.podSpec.containers.main.env.REDIS_PASSWORD.secretKeyRef.name | string | `"{{ include \"common.helpers.secretName\" (dict \"root\" . \"name\" \"redis\") }}"` |  |
+| deployments.main.podSpec.containers.main.env.REDIS_PORT | string | `"6379"` |  |
+| deployments.main.podSpec.containers.main.imageSelector | string | `"image"` |  |
+| deployments.main.podSpec.containers.main.livenessProbe.httpGet.path | string | `"/api/v1/health"` |  |
+| deployments.main.podSpec.containers.main.livenessProbe.httpGet.port | string | `"http"` |  |
+| deployments.main.podSpec.containers.main.livenessProbe.httpGet.scheme | string | `"HTTP"` |  |
+| deployments.main.podSpec.containers.main.livenessProbe.initialDelaySeconds | int | `30` |  |
+| deployments.main.podSpec.containers.main.ports.http.containerPort | int | `3333` |  |
+| deployments.main.podSpec.containers.main.ports.http.protocol | string | `"TCP"` |  |
+| deployments.main.podSpec.containers.main.readinessProbe.httpGet.path | string | `"/api/v1/health"` |  |
+| deployments.main.podSpec.containers.main.readinessProbe.httpGet.port | string | `"http"` |  |
+| deployments.main.podSpec.containers.main.readinessProbe.httpGet.scheme | string | `"HTTP"` |  |
+| deployments.main.podSpec.containers.main.readinessProbe.initialDelaySeconds | int | `10` |  |
+| deployments.main.podSpec.containers.main.readinessProbe.periodSeconds | int | `5` |  |
+| deployments.main.podSpec.containers.main.readinessProbe.timeoutSeconds | int | `3` |  |
+| deployments.main.podSpec.containers.main.resources.limits.cpu | string | `"1000m"` |  |
+| deployments.main.podSpec.containers.main.resources.limits.memory | string | `"512Mi"` |  |
+| deployments.main.podSpec.containers.main.resources.requests.cpu | string | `"100m"` |  |
+| deployments.main.podSpec.containers.main.resources.requests.memory | string | `"256Mi"` |  |
+| deployments.main.podSpec.securityContext.fsGroup | int | `1000` |  |
+| deployments.main.podSpec.securityContext.runAsGroup | int | `1000` |  |
+| deployments.main.podSpec.securityContext.runAsNonRoot | bool | `true` |  |
+| deployments.main.podSpec.securityContext.runAsUser | int | `1000` |  |
 | deployments.main.strategy.type | string | `"Recreate"` |  |
-| ghostfolio.auth.existingSecret | string | `""` |  |
-| ghostfolio.database.bootstrap.existingSecret | string | `""` |  |
-| ghostfolio.database.bootstrap.username | string | `"ghostfolio"` |  |
-| ghostfolio.redis.auth.existingSecret | string | `""` |  |
 | global.affinity | object | `{}` |  |
 | global.imagePullSecrets | list | `[]` |  |
 | global.nodeSelector | object | `{}` |  |
 | global.tolerations | list | `[]` |  |
-| ingresses.main.annotations | object | `{}` |  |
-| ingresses.main.className | string | `""` |  |
+| image.repository | string | `"ghostfolio/ghostfolio"` |  |
+| image.tag | string | `"2.167.0"` |  |
 | ingresses.main.enabled | bool | `false` |  |
 | ingresses.main.hosts[0].host | string | `"ghostfolio.example.com"` |  |
 | ingresses.main.hosts[0].paths[0].path | string | `"/"` |  |
@@ -151,98 +127,94 @@ Includes automated backup to NFS and manual restore capabilities.
 | ingresses.main.hosts[0].paths[0].port | string | `"http"` |  |
 | ingresses.main.hosts[0].paths[0].service | string | `"main"` |  |
 | ingresses.main.tls | list | `[]` |  |
-| jobs.restore.containers.restore.command[0] | string | `"/bin/bash"` |  |
-| jobs.restore.containers.restore.command[1] | string | `"-c"` |  |
-| jobs.restore.containers.restore.command[2] | string | `"set -e\nRESTORE_FILE=\"/backup/{{ .Values.restore.restoreFile }}\"\nif [ ! -f \"$RESTORE_FILE\" ]; then\n  echo \"ERROR: Restore file not found: $RESTORE_FILE\"\n  exit 1\nfi\necho \"Starting restore from $RESTORE_FILE\"\necho \"Verifying backup file integrity...\"\npg_restore --list \"$RESTORE_FILE\" > /dev/null\necho \"Backup file verification successful\"\necho \"Restoring database...\"\npg_restore -v --clean --if-exists -d \"$DATABASE_URL\" \"$RESTORE_FILE\" || true\necho \"Restore process completed\"\n"` |  |
-| jobs.restore.containers.restore.env.DATABASE_URL.secretKeyRef.key | string | `"uri"` |  |
-| jobs.restore.containers.restore.env.DATABASE_URL.secretKeyRef.name | string | `"{{ include \"common.helpers.cnpgAppSecret\" (dict \"root\" . \"name\" \"postgresql\") }}"` |  |
-| jobs.restore.containers.restore.image.pullPolicy | string | `"IfNotPresent"` |  |
-| jobs.restore.containers.restore.image.repository | string | `"postgres"` |  |
-| jobs.restore.containers.restore.image.tag | string | `"16"` |  |
-| jobs.restore.containers.restore.resources.limits.cpu | string | `"500m"` |  |
-| jobs.restore.containers.restore.resources.limits.memory | string | `"512Mi"` |  |
-| jobs.restore.containers.restore.resources.requests.cpu | string | `"100m"` |  |
-| jobs.restore.containers.restore.resources.requests.memory | string | `"128Mi"` |  |
-| jobs.restore.containers.restore.securityContext.allowPrivilegeEscalation | bool | `false` |  |
-| jobs.restore.containers.restore.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
-| jobs.restore.containers.restore.securityContext.readOnlyRootFilesystem | bool | `false` |  |
-| jobs.restore.containers.restore.volumeMounts[0].mountPath | string | `"/backup"` |  |
-| jobs.restore.containers.restore.volumeMounts[0].name | string | `"backup"` |  |
-| jobs.restore.containers.restore.volumeMounts[0].readOnly | bool | `true` |  |
 | jobs.restore.enabled | bool | `false` |  |
-| jobs.restore.podSecurityContext.fsGroup | int | `999` |  |
-| jobs.restore.podSecurityContext.runAsGroup | int | `999` |  |
-| jobs.restore.podSecurityContext.runAsNonRoot | bool | `true` |  |
-| jobs.restore.podSecurityContext.runAsUser | int | `999` |  |
-| jobs.restore.restartPolicy | string | `"OnFailure"` |  |
+| jobs.restore.podSpec.containers.restore.command[0] | string | `"/bin/bash"` |  |
+| jobs.restore.podSpec.containers.restore.command[1] | string | `"-c"` |  |
+| jobs.restore.podSpec.containers.restore.command[2] | string | `"set -e\nRESTORE_FILE=\"/backup/{{ .Values.restore.restoreFile }}\"\nif [ ! -f \"$RESTORE_FILE\" ]; then\n  echo \"ERROR: Restore file not found: $RESTORE_FILE\"\n  exit 1\nfi\necho \"Starting restore from $RESTORE_FILE\"\necho \"Verifying backup file integrity...\"\npg_restore --list \"$RESTORE_FILE\" > /dev/null\necho \"Backup file verification successful\"\necho \"Restoring database...\"\npg_restore -v --clean --if-exists -d \"$DATABASE_URL\" \"$RESTORE_FILE\" || true\necho \"Restore process completed\"\n"` |  |
+| jobs.restore.podSpec.containers.restore.env.DATABASE_URL.secretKeyRef.key | string | `"uri"` |  |
+| jobs.restore.podSpec.containers.restore.env.DATABASE_URL.secretKeyRef.name | string | `"{{ include \"common.helpers.cnpgAppSecret\" (dict \"root\" . \"name\" \"postgresql\") }}"` |  |
+| jobs.restore.podSpec.containers.restore.imageSelector | string | `"postgresImage"` |  |
+| jobs.restore.podSpec.containers.restore.resources.limits.cpu | string | `"500m"` |  |
+| jobs.restore.podSpec.containers.restore.resources.limits.memory | string | `"512Mi"` |  |
+| jobs.restore.podSpec.containers.restore.resources.requests.cpu | string | `"100m"` |  |
+| jobs.restore.podSpec.containers.restore.resources.requests.memory | string | `"128Mi"` |  |
+| jobs.restore.podSpec.containers.restore.securityContext.readOnlyRootFilesystem | bool | `false` |  |
+| jobs.restore.podSpec.containers.restore.volumeMounts[0].mountPath | string | `"/backup"` |  |
+| jobs.restore.podSpec.containers.restore.volumeMounts[0].name | string | `"backup"` |  |
+| jobs.restore.podSpec.containers.restore.volumeMounts[0].readOnly | bool | `true` |  |
+| jobs.restore.podSpec.securityContext.fsGroup | int | `999` |  |
+| jobs.restore.podSpec.securityContext.runAsGroup | int | `999` |  |
+| jobs.restore.podSpec.securityContext.runAsNonRoot | bool | `true` |  |
+| jobs.restore.podSpec.securityContext.runAsUser | int | `999` |  |
+| jobs.restore.podSpec.volumes[0].name | string | `"backup"` |  |
+| jobs.restore.podSpec.volumes[0].nfs.path | string | `""` |  |
+| jobs.restore.podSpec.volumes[0].nfs.server | string | `""` |  |
 | jobs.restore.ttlSecondsAfterFinished | int | `86400` |  |
-| jobs.restore.volumes[0].name | string | `"backup"` |  |
-| jobs.restore.volumes[0].nfs.path | string | `""` |  |
-| jobs.restore.volumes[0].nfs.server | string | `""` |  |
-| k8sServices.main.annotations | object | `{}` |  |
 | k8sServices.main.enabled | bool | `true` |  |
-| k8sServices.main.labels | object | `{}` |  |
 | k8sServices.main.ports.http.port | int | `3333` |  |
 | k8sServices.main.ports.http.protocol | string | `"TCP"` |  |
 | k8sServices.main.type | string | `"ClusterIP"` |  |
-| k8sServices.redis.annotations | object | `{}` |  |
 | k8sServices.redis.enabled | bool | `true` |  |
-| k8sServices.redis.labels | object | `{}` |  |
 | k8sServices.redis.ports.redis.port | int | `6379` |  |
 | k8sServices.redis.ports.redis.protocol | string | `"TCP"` |  |
 | k8sServices.redis.type | string | `"ClusterIP"` |  |
+| postgresImage.repository | string | `"postgres"` |  |
+| postgresImage.tag | string | `"16"` |  |
+| redisImage.repository | string | `"redis"` |  |
+| redisImage.tag | string | `"7.4.2-alpine"` |  |
 | restore.restoreFile | string | `""` |  |
-| statefulsets.redis.containers.redis.command[0] | string | `"redis-server"` |  |
-| statefulsets.redis.containers.redis.command[1] | string | `"--requirepass"` |  |
-| statefulsets.redis.containers.redis.command[2] | string | `"$(REDIS_PASSWORD)"` |  |
-| statefulsets.redis.containers.redis.command[3] | string | `"--appendonly"` |  |
-| statefulsets.redis.containers.redis.command[4] | string | `"yes"` |  |
-| statefulsets.redis.containers.redis.command[5] | string | `"--dir"` |  |
-| statefulsets.redis.containers.redis.command[6] | string | `"/data"` |  |
-| statefulsets.redis.containers.redis.env.REDIS_PASSWORD.secretKeyRef.key | string | `"REDIS_PASSWORD"` |  |
-| statefulsets.redis.containers.redis.env.REDIS_PASSWORD.secretKeyRef.name | string | `"{{ include \"ghostfolio.secretName.redis\" . }}"` |  |
-| statefulsets.redis.containers.redis.image.pullPolicy | string | `"IfNotPresent"` |  |
-| statefulsets.redis.containers.redis.image.repository | string | `"redis"` |  |
-| statefulsets.redis.containers.redis.image.tag | string | `"7.4.2-alpine"` |  |
-| statefulsets.redis.containers.redis.livenessProbe.exec.command[0] | string | `"sh"` |  |
-| statefulsets.redis.containers.redis.livenessProbe.exec.command[1] | string | `"-c"` |  |
-| statefulsets.redis.containers.redis.livenessProbe.exec.command[2] | string | `"redis-cli -a \"$REDIS_PASSWORD\" ping | grep PONG"` |  |
-| statefulsets.redis.containers.redis.livenessProbe.failureThreshold | int | `3` |  |
-| statefulsets.redis.containers.redis.livenessProbe.initialDelaySeconds | int | `30` |  |
-| statefulsets.redis.containers.redis.livenessProbe.periodSeconds | int | `10` |  |
-| statefulsets.redis.containers.redis.livenessProbe.timeoutSeconds | int | `5` |  |
-| statefulsets.redis.containers.redis.ports.redis.containerPort | int | `6379` |  |
-| statefulsets.redis.containers.redis.ports.redis.protocol | string | `"TCP"` |  |
-| statefulsets.redis.containers.redis.readinessProbe.exec.command[0] | string | `"sh"` |  |
-| statefulsets.redis.containers.redis.readinessProbe.exec.command[1] | string | `"-c"` |  |
-| statefulsets.redis.containers.redis.readinessProbe.exec.command[2] | string | `"redis-cli -a \"$REDIS_PASSWORD\" ping | grep PONG"` |  |
-| statefulsets.redis.containers.redis.readinessProbe.failureThreshold | int | `3` |  |
-| statefulsets.redis.containers.redis.readinessProbe.initialDelaySeconds | int | `5` |  |
-| statefulsets.redis.containers.redis.readinessProbe.periodSeconds | int | `5` |  |
-| statefulsets.redis.containers.redis.readinessProbe.timeoutSeconds | int | `3` |  |
-| statefulsets.redis.containers.redis.resources.limits.cpu | string | `"500m"` |  |
-| statefulsets.redis.containers.redis.resources.limits.memory | string | `"256Mi"` |  |
-| statefulsets.redis.containers.redis.resources.requests.cpu | string | `"10m"` |  |
-| statefulsets.redis.containers.redis.resources.requests.memory | string | `"64Mi"` |  |
-| statefulsets.redis.containers.redis.securityContext.allowPrivilegeEscalation | bool | `false` |  |
-| statefulsets.redis.containers.redis.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
-| statefulsets.redis.containers.redis.securityContext.readOnlyRootFilesystem | bool | `true` |  |
-| statefulsets.redis.containers.redis.volumeMounts[0].mountPath | string | `"/data"` |  |
-| statefulsets.redis.containers.redis.volumeMounts[0].name | string | `"data"` |  |
-| statefulsets.redis.containers.redis.volumeMounts[1].mountPath | string | `"/tmp"` |  |
-| statefulsets.redis.containers.redis.volumeMounts[1].name | string | `"tmp"` |  |
+| secrets.auth.data.ACCESS_TOKEN_SALT | string | `""` |  |
+| secrets.auth.data.JWT_SECRET_KEY | string | `""` |  |
+| secrets.auth.enabled | bool | `true` |  |
+| secrets.auth.existingSecret | string | `""` |  |
+| secrets.db-bootstrap.data.password | string | `""` |  |
+| secrets.db-bootstrap.data.username | string | `"ghostfolio"` |  |
+| secrets.db-bootstrap.enabled | bool | `true` |  |
+| secrets.db-bootstrap.existingSecret | string | `""` |  |
+| secrets.db-bootstrap.type | string | `"kubernetes.io/basic-auth"` |  |
+| secrets.redis.data.REDIS_PASSWORD | string | `""` |  |
+| secrets.redis.enabled | bool | `true` |  |
+| secrets.redis.existingSecret | string | `""` |  |
 | statefulsets.redis.enabled | bool | `true` |  |
-| statefulsets.redis.podSecurityContext.fsGroup | int | `999` |  |
-| statefulsets.redis.podSecurityContext.runAsGroup | int | `999` |  |
-| statefulsets.redis.podSecurityContext.runAsNonRoot | bool | `true` |  |
-| statefulsets.redis.podSecurityContext.runAsUser | int | `999` |  |
-| statefulsets.redis.replicas | int | `1` |  |
-| statefulsets.redis.revisionHistoryLimit | int | `3` |  |
+| statefulsets.redis.podSpec.containers.redis.command[0] | string | `"redis-server"` |  |
+| statefulsets.redis.podSpec.containers.redis.command[1] | string | `"--requirepass"` |  |
+| statefulsets.redis.podSpec.containers.redis.command[2] | string | `"$(REDIS_PASSWORD)"` |  |
+| statefulsets.redis.podSpec.containers.redis.command[3] | string | `"--appendonly"` |  |
+| statefulsets.redis.podSpec.containers.redis.command[4] | string | `"yes"` |  |
+| statefulsets.redis.podSpec.containers.redis.command[5] | string | `"--dir"` |  |
+| statefulsets.redis.podSpec.containers.redis.command[6] | string | `"/data"` |  |
+| statefulsets.redis.podSpec.containers.redis.env.REDIS_PASSWORD.secretKeyRef.key | string | `"REDIS_PASSWORD"` |  |
+| statefulsets.redis.podSpec.containers.redis.env.REDIS_PASSWORD.secretKeyRef.name | string | `"{{ include \"common.helpers.secretName\" (dict \"root\" . \"name\" \"redis\") }}"` |  |
+| statefulsets.redis.podSpec.containers.redis.imageSelector | string | `"redisImage"` |  |
+| statefulsets.redis.podSpec.containers.redis.livenessProbe.exec.command[0] | string | `"sh"` |  |
+| statefulsets.redis.podSpec.containers.redis.livenessProbe.exec.command[1] | string | `"-c"` |  |
+| statefulsets.redis.podSpec.containers.redis.livenessProbe.exec.command[2] | string | `"redis-cli -a \"$REDIS_PASSWORD\" ping | grep PONG"` |  |
+| statefulsets.redis.podSpec.containers.redis.livenessProbe.initialDelaySeconds | int | `30` |  |
+| statefulsets.redis.podSpec.containers.redis.ports.redis.containerPort | int | `6379` |  |
+| statefulsets.redis.podSpec.containers.redis.ports.redis.protocol | string | `"TCP"` |  |
+| statefulsets.redis.podSpec.containers.redis.readinessProbe.exec.command[0] | string | `"sh"` |  |
+| statefulsets.redis.podSpec.containers.redis.readinessProbe.exec.command[1] | string | `"-c"` |  |
+| statefulsets.redis.podSpec.containers.redis.readinessProbe.exec.command[2] | string | `"redis-cli -a \"$REDIS_PASSWORD\" ping | grep PONG"` |  |
+| statefulsets.redis.podSpec.containers.redis.readinessProbe.initialDelaySeconds | int | `5` |  |
+| statefulsets.redis.podSpec.containers.redis.readinessProbe.periodSeconds | int | `5` |  |
+| statefulsets.redis.podSpec.containers.redis.readinessProbe.timeoutSeconds | int | `3` |  |
+| statefulsets.redis.podSpec.containers.redis.resources.limits.cpu | string | `"500m"` |  |
+| statefulsets.redis.podSpec.containers.redis.resources.limits.memory | string | `"256Mi"` |  |
+| statefulsets.redis.podSpec.containers.redis.resources.requests.cpu | string | `"10m"` |  |
+| statefulsets.redis.podSpec.containers.redis.resources.requests.memory | string | `"64Mi"` |  |
+| statefulsets.redis.podSpec.containers.redis.volumeMounts[0].mountPath | string | `"/data"` |  |
+| statefulsets.redis.podSpec.containers.redis.volumeMounts[0].name | string | `"data"` |  |
+| statefulsets.redis.podSpec.containers.redis.volumeMounts[1].mountPath | string | `"/tmp"` |  |
+| statefulsets.redis.podSpec.containers.redis.volumeMounts[1].name | string | `"tmp"` |  |
+| statefulsets.redis.podSpec.securityContext.fsGroup | int | `999` |  |
+| statefulsets.redis.podSpec.securityContext.runAsGroup | int | `999` |  |
+| statefulsets.redis.podSpec.securityContext.runAsNonRoot | bool | `true` |  |
+| statefulsets.redis.podSpec.securityContext.runAsUser | int | `999` |  |
+| statefulsets.redis.podSpec.volumes[0].emptyDir | object | `{}` |  |
+| statefulsets.redis.podSpec.volumes[0].name | string | `"tmp"` |  |
 | statefulsets.redis.volumeClaimTemplates[0].metadata.name | string | `"data"` |  |
 | statefulsets.redis.volumeClaimTemplates[0].spec.accessModes[0] | string | `"ReadWriteOnce"` |  |
 | statefulsets.redis.volumeClaimTemplates[0].spec.resources.requests.storage | string | `"1Gi"` |  |
-| statefulsets.redis.volumes[0].emptyDir | object | `{}` |  |
-| statefulsets.redis.volumes[0].name | string | `"tmp"` |  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
