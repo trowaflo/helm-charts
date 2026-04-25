@@ -122,8 +122,9 @@ spec:
       {{- end }}
   {{- if $statefulset.volumeClaimTemplates }}
   {{- range $vct := $statefulset.volumeClaimTemplates }}
-    {{- $_ := required (printf "statefulsets.%s.volumeClaimTemplates[].metadata.name is required" $name) (($vct.metadata | default dict).name) }}
-    {{- $_ := required (printf "statefulsets.%s.volumeClaimTemplates[%s].spec.resources.requests.storage is required" $name $vct.metadata.name) ((((($vct.spec | default dict).resources) | default dict).requests | default dict).storage) }}
+    {{- $vctName := (($vct.metadata | default dict).name) }}
+    {{- $_ := required (printf "statefulsets.%s.volumeClaimTemplates[].metadata.name is required" $name) $vctName }}
+    {{- $_ := required (printf "statefulsets.%s.volumeClaimTemplates[%s].spec.resources.requests.storage is required" $name $vctName) ((((($vct.spec | default dict).resources) | default dict).requests | default dict).storage) }}
   {{- end }}
   volumeClaimTemplates:
     {{- toYaml $statefulset.volumeClaimTemplates | nindent 4 }}
