@@ -2,20 +2,13 @@
 Fail fast if the chart is configured in an internally inconsistent way.
 
 Current checks:
-  - Main deployment references REDIS_PASSWORD via secrets.redis and cannot
-    start without a Redis. If `statefulsets.redis.enabled=false`, the caller
-    must provide an external Redis secret via `secrets.redis.existingSecret`
-    or disable the main deployment.
-  - Same for CNPG: `DATABASE_URL` env resolves through the CNPG-generated
-    `<release>-postgresql-app` secret. Disabling the cluster requires either
-    overriding deployments.main.containers.main.env.DATABASE_URL or disabling
-    the main deployment.
+  - Main deployment requires PostgreSQL (CNPG). Disabling the cluster
+    requires overriding deployments.main.containers.main.env.DATABASE_URL
+    or disabling the main deployment.
+  - Backup CronJob and restore Job require NFS volume configuration.
+  - Restore Job requires restore.restoreFile to be set.
 */}}
 {{- define "ghostfolio.validate" -}}
-  {{- $redisExisting := (.Values.secrets.redis | default dict).existingSecret -}}
-  {{- if and .Values.deployments.main.enabled (not .Values.statefulsets.redis.enabled) (not $redisExisting) -}}
-    {{- fail "ghostfolio: main deployment requires Redis. Enable statefulsets.redis OR set secrets.redis.existingSecret to an external Redis secret OR disable deployments.main." -}}
-  {{- end -}}
   {{- if and .Values.deployments.main.enabled (not .Values.cnpgClusters.postgresql.enabled) -}}
     {{- fail "ghostfolio: main deployment requires PostgreSQL. Enable cnpgClusters.postgresql OR override deployments.main.containers.main.env.DATABASE_URL to point at an external database OR disable deployments.main." -}}
   {{- end -}}

@@ -49,16 +49,29 @@ tests:
             name: DATABASE_URL
             valueFrom:
               secretKeyRef:
-                name: ghostfolio-test-postgresql-app
-                key: uri
+                key: DATABASE_URL
+                name: ghostfolio-secrets
       - contains:
           path: spec.template.spec.containers[0].env
           content:
             name: ACCESS_TOKEN_SALT
             valueFrom:
               secretKeyRef:
-                name: ghostfolio-test-auth
                 key: ACCESS_TOKEN_SALT
+                name: ghostfolio-secrets
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: JWT_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: JWT_SECRET_KEY
+                name: ghostfolio-secrets
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: NODE_ENV
+            value: production
 
   - it: should have security context
     documentSelector:

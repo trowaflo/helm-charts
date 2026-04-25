@@ -6,8 +6,8 @@ Namespace: {{ .Release.Namespace }}
 
 Components deployed:
 - Ghostfolio Application: {{ include "common.helpers.fullname" . }}
-{{- if .Values.statefulsets.redis.enabled }}
-- Redis Cache: {{ include "common.helpers.fullname" . }}-redis
+{{- if ((.Values.redis).enabled | default true) }}
+- Redis Cache (Valkey): {{ include "common.helpers.fullname" . }}-valkey
 {{- end }}
 {{- if .Values.cnpgClusters.postgresql.enabled }}
 - PostgreSQL (CNPG): {{ include "common.helpers.fullname" . }}-postgresql
@@ -20,17 +20,7 @@ Components deployed:
 {{- end }}
 
 Secrets:
-- Auth: {{ include "common.helpers.secretName" (dict "root" . "name" "auth") }}{{ if (.Values.secrets.auth | default dict).existingSecret }} (external){{ else }} (auto-generated){{ end }}
-{{- if .Values.statefulsets.redis.enabled }}
-- Redis: {{ include "common.helpers.secretName" (dict "root" . "name" "redis") }}{{ if (.Values.secrets.redis | default dict).existingSecret }} (external){{ else }} (auto-generated){{ end }}
-{{- end }}
-{{- if .Values.cnpgClusters.postgresql.enabled }}
-- DB bootstrap: {{ include "common.helpers.secretName" (dict "root" . "name" "db-bootstrap") }}{{ if (.Values.secrets | default dict | dig "db-bootstrap" dict).existingSecret }} (external){{ else }} (auto-generated){{ end }}
-{{- end }}
-
-Note: auto-generated secrets use helm.sh/resource-policy: keep and persist after
-`helm uninstall`. Re-install reuses existing values. To rotate, delete the Secret
-manually and re-install.
+- Ghostfolio: {{ include "common.helpers.secretName" (dict "root" . "name" "ghostfolio-secrets") }}{{ if ((.Values.secrets | default dict | dig "ghostfolio-secrets" dict).existingSecret) }} (external){{ else }} (managed){{ end }}
 
 To access Ghostfolio:
 

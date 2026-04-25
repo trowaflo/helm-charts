@@ -1,11 +1,15 @@
 ---
 # Test values with minimal configuration
-statefulsets:
-  redis:
-    enabled: false
+# Disable valkey subchart
+redis:
+  enabled: false
 
 cnpgClusters:
   postgresql:
+    enabled: false
+
+deployments:
+  main:
     enabled: false
 
 cronjobs:

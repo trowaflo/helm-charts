@@ -1,21 +1,17 @@
 # Test Coverage Documentation
 # ============================
-# This test suite validates the Ghostfolio Redis StatefulSet and Service rendering.
+# This test suite validates the Ghostfolio Redis integration.
 #
 # Covered Test Cases:
-# - [x] Redis StatefulSet creation when enabled
-# - [x] Metadata (name, namespace) correctness
-# - [x] Security context (runAsNonRoot, allowPrivilegeEscalation)
-# - [x] Password configuration from secret
-# - [x] Redis Service creation
-# - [x] Snapshot validation
+# - [x] Deployment has REDIS_HOST env pointing to valkey service
+# - [x] Deployment has REDIS_PASSWORD from secret
+# - [x] Deployment has REDIS_PORT configured
 #
-# Note: Ghostfolio uses the common library chart. Feature-level StatefulSet tests are in
-# tests/common-test/tests/statefulset_test.yaml. These tests validate Ghostfolio-specific
-# Redis integration and configuration.
+# Note: Redis is provided by the valkey subchart dependency (condition: redis.enabled).
+# We only test integration points (env vars) since the subchart is tested upstream.
 # ============================
 
-suite: test ghostfolio chart - Redis
+suite: test ghostfolio chart - Redis integration
 templates:
   - templates/common.yaml
 values:
@@ -24,33 +20,21 @@ release:
   name: ghostfolio-test
   namespace: ghostfolio-test
 tests:
-  - it: should create Redis StatefulSet when enabled
+  - it: should have REDIS_HOST env pointing to valkey service
     documentSelector:
       path: kind
-      value: StatefulSet
+      value: Deployment
     asserts:
-      - isKind:
-          of: StatefulSet
-      - equal:
-          path: metadata.name
-          value: ghostfolio-test-redis
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: REDIS_HOST
+            value: ghostfolio-test-redis
 
-  - it: should have security context
+  - it: should have REDIS_PASSWORD from secret
     documentSelector:
       path: kind
-      value: StatefulSet
-    asserts:
-      - equal:
-          path: spec.template.spec.securityContext.runAsNonRoot
-          value: true
-      - equal:
-          path: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
-          value: false
-
-  - it: should have password from secret
-    documentSelector:
-      path: kind
-      value: StatefulSet
+      value: Deployment
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -61,9 +45,13 @@ tests:
                 name: ghostfolio-test-redis
                 key: REDIS_PASSWORD
 
-  - it: should match snapshot
+  - it: should have REDIS_PORT configured
     documentSelector:
       path: kind
-      value: StatefulSet
+      value: Deployment
     asserts:
-      - matchSnapshot: {}
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: REDIS_PORT
+            value: "6379"
