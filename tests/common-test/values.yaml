@@ -1,18 +1,15 @@
 ---
-containers:
+# Test values for common-test chart
+# This chart validates common library functionality
+# All resources are disabled by default for testing
+k8sServices:
   main:
-    args:
-      - "--test-arg=value"
+    enabled: false
 
-    env:
-      - name: envtest
-        value: thevalue
-      - name: valuefrom
-        valueFrom:
-          secretKeyRef:
-            name: my-secret
-            key: password
-
-ingress:
+ingresses:
   main:
-    enabled: true
+    enabled: false
+
+serviceMonitors:
+  main:
+    enabled: false

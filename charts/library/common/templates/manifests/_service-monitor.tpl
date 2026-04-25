@@ -1,20 +1,29 @@
 {{- define "common.manifests.serviceMonitor" -}}
-{{- if .Values.serviceMonitor.enabled }}
+  {{- $serviceMonitors := .Values.serviceMonitors | default dict }}
+  {{- range $name := keys $serviceMonitors | sortAlpha }}
+    {{- $sm := index $serviceMonitors $name }}
+    {{- if $sm.enabled }}
+      {{- $targetService := $sm.targetService | default $name }}
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "common.helpers.fullname" . }}
-  namespace: {{ include "common.helpers.namespace" . }}
+  name: {{ include "common.helpers.fullname" $ }}-{{ $name }}
+  namespace: {{ include "common.helpers.namespace" $ }}
   labels:
-    release: {{ .Values.serviceMonitor.labels.release }}
+    {{- include "common.helpers.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $name }}
+    {{- with $sm.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "common.helpers.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/name: {{ include "common.helpers.name" $ }}
+      app.kubernetes.io/instance: {{ $.Release.Name }}
+      app.kubernetes.io/component: {{ $targetService }}
   endpoints:
-  {{- range $ep := .Values.serviceMonitor.endpoints }}
+  {{- range $ep := $sm.endpoints }}
     - port: {{ $ep.port }}
     {{- with $ep.relabelings }}
       relabelings:
@@ -25,7 +34,7 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
   {{- end }}
-
 ...
-{{- end }}
+    {{- end }}
+  {{- end }}
 {{- end -}}

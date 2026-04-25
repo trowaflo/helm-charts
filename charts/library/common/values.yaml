@@ -1,12 +1,4 @@
 ---
-# -- Number of desired pods (replicas) for the deployment. Modify to scale the application horizontally
-# @section -- Global settings
-replicaCount: 1
-
-# -- Number of revisions to keep for rollback purposes. Set to 3 for balanced history management
-# @section -- Global settings
-revisionHistoryLimit: 3
-
 # -- Override the Helm-generated release name. Lower priority than fullnameOverride
 # @section -- Global settings
 nameOverride: ''
@@ -17,100 +9,116 @@ fullnameOverride: ''
 # @section -- Global settings
 namespaceOverride: ''
 
-# -- Containers configuration. Additional containers can be added under the 'containers' key.
-# @default -- The chart will always construct the main container.
-# @section -- Containers configuration
-containers:
+# -- Deployments configuration. Define one or more deployments under the 'deployments' key.
+# Each deployment must specify its own containers, replicas, and pod-level settings.
+# Per-container `env` accepts two shapes:
+#   1. List form (legacy): `env: [{name, value|valueFrom}, ...]` emitted verbatim.
+#   2. Map form: `env: {NAME: "value"}` or `env: {NAME: {secretKeyRef|configMapKeyRef|fieldRef: {...}}}`.
+#      Map values and nested valueFrom fields pass through `tpl` with root context, so
+#      templated references expand (e.g. `'{{ include "common.helpers.fullname" . }}-redis'`).
+#      Nil values fail fast. Keys are emitted in sorted order.
+# @section -- Deployments configuration
+deployments:
   main:
-    # -- Command-line arguments passed to the container entrypoint. Use this to override or extend the container's startup command
-    # @section -- Containers configuration
-    args: []
+    # -- Enable or disable this deployment
+    enabled: false
+    replicas: 1
+    revisionHistoryLimit: 3
+    # -- Deployment strategy. Defaults to RollingUpdate; set type: Recreate for stateful apps
+    strategy:
+      type: RollingUpdate
+    # -- Pod-level spec. Groups all pod-level fields (containers, securityContext, volumes, affinity, etc.)
+    # podSpec:
+    #   securityContext: {}   # Defaults: runAsNonRoot=true, fsGroupChangePolicy=OnRootMismatch
+    #   containers:           # required — at minimum: {main: {imageSelector: image}} or {main: {image: {repository, tag}}}
 
-    # -- Environment variables injected into containers. Can reference ConfigMaps or Secrets via valueFrom
-    # @section -- Containers configuration
-    env: {}
+# -- StatefulSets configuration. Define one or more stateful workloads under the 'statefulsets' key.
+# @section -- StatefulSets configuration
+statefulsets:
+  main:
+    # -- Enable or disable this StatefulSet
+    enabled: false
+    replicas: 1
+    revisionHistoryLimit: 3
+    # -- StatefulSet update strategy. Defaults to RollingUpdate
+    updateStrategy:
+      type: RollingUpdate
+    # -- Pod-level spec. Groups all pod-level fields (containers, securityContext, volumes, affinity, etc.)
+    # podSpec:
+    #   securityContext: {}
+    #   containers:           # required — at minimum: {main: {imageSelector: image}} or {main: {image: {repository, tag}}}
+    # -- VolumeClaimTemplates for persistent storage. Each entry requires metadata.name and spec.resources.requests.storage
+    volumeClaimTemplates: []
 
-    # -- Container image configuration including repository, tag, and pull policy
-    # @section -- Containers configuration
-    image:
-      pullPolicy: Always
-      repository: traefik/whoami
-      tag: latest
+# -- CronJobs configuration. Define one or more scheduled jobs under the 'cronjobs' key.
+# @section -- CronJobs configuration
+cronjobs:
+  main:
+    # -- Enable or disable this CronJob
+    enabled: false
+    # -- Cron schedule expression
+    schedule: '0 * * * *'
+    concurrencyPolicy: Forbid
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 3
+    # podSpec:
+    #   restartPolicy: OnFailure
+    #   containers:           # required — at minimum: {main: {imageSelector: image}} or {main: {image: {repository, tag}}}
 
-    # -- List of imagePullSecrets for private container registries. Reference pre-created Secrets in the same namespace
-    # @section -- Containers configuration
-    imagePullSecrets: []
+# -- Jobs configuration. Define one or more one-shot jobs under the 'jobs' key.
+# @section -- Jobs configuration
+jobs:
+  main:
+    # -- Enable or disable this Job
+    enabled: false
+    # podSpec:
+    #   restartPolicy: OnFailure
+    #   containers:           # required — at minimum: {main: {imageSelector: image}} or {main: {image: {repository, tag}}}
 
-    probes:
-      # -- Liveness probe configuration
-      # @section -- Containers configuration
-      liveness:
-        enabled: true
-        failureThreshold: 3
-        httpGet:
-          path: /health
-          port: main
-          scheme: HTTP
-        initialDelaySeconds: 30
-        periodSeconds: 10
-        successThreshold: 1
-        timeoutSeconds: 5
+# -- CloudNativePG Clusters configuration. Define one or more clusters under the 'cnpgClusters' key.
+# @section -- CNPG Clusters configuration
+cnpgClusters:
+  main:
+    # -- Enable or disable this CNPG Cluster
+    enabled: false
+    instances: 1
+    # -- PostgreSQL image to use. Required when enabled. e.g. ghcr.io/cloudnative-pg/postgresql:16
+    imageName: ''
+    storage:
+      # -- Storage size for the cluster. Required when enabled. e.g. 10Gi
+      size: ''
+    bootstrap:
+      initdb:
+        database: app
+        owner: app
+    monitoring:
+      enabled: false
+      podMonitorEnabled: false
 
-      # -- Readiness probe configuration
-      # @section -- Containers configuration
-      readiness:
-        enabled: true
-        failureThreshold: 3
-        httpGet:
-          path: /health
-          port: main
-          scheme: HTTP
-        initialDelaySeconds: 30
-        periodSeconds: 10
-        successThreshold: 1
-        timeoutSeconds: 5
+# -- Secrets configuration. Define secrets to auto-generate under the 'secrets' key.
+# Each entry auto-creates a Secret with pre-install hook and resource-policy: keep.
+# Set existingSecret to opt out and reference an external Secret instead.
+# Empty data values generate a random 32-char alphanumeric string, preserved across upgrades via lookup.
+# Non-empty data values are used as the initial seed (also preserved on upgrade).
+# @section -- Secrets configuration
+secrets:
+  main:
+    # -- Enable or disable this secret
+    enabled: false
+    # -- If set, skip generation and use this existing Secret instead
+    existingSecret: ""
+    # -- Secret type. Defaults to Opaque. Use kubernetes.io/basic-auth for username/password pairs
+    type: Opaque
+    # -- Data keys to generate. Empty string → random 32-char value, preserved across upgrades.
+    # Non-empty string → used as initial seed (also preserved via lookup on upgrade).
+    data:
+      MY_SECRET_KEY: ""
 
-      # -- Startup probe configuration
-      # @section -- Containers configuration
-      startup:
-        enabled: true
-        failureThreshold: 3
-        httpGet:
-          path: /health
-          port: main
-          scheme: HTTP
-        initialDelaySeconds: 60
-        periodSeconds: 10
-        successThreshold: 1
-        timeoutSeconds: 5
-
-    # -- CPU and memory resource allocation for the container
-    # @section -- Containers configuration
-    resources:
-      limits:
-        cpu: 2
-        memory: 2Gi
-      requests:
-        cpu: 1m
-        memory: 32Mi
-
-# -- Security context settings applied at the pod level for enhanced security
-# @section -- Global settings
-podSecurityContext:
-  allowPrivilegeEscalation: false
-  runAsNonRoot: true
-  runAsUser: 65534
-  seccompProfile:
-    type: RuntimeDefault
-  capabilities:
-    drop: ["ALL"]
-  readOnlyRootFilesystem: true
-
-# -- Service configuration. Additional services can be added under the 'services' key.
+# -- Service configuration. Additional services can be added under the 'k8sServices' key.
 # @section -- Services configuration
-services:
+k8sServices:
   main:
-    enabled: true
+    enabled: false
     type: ClusterIP
     annotations: {}
     labels: {}
@@ -119,9 +127,9 @@ services:
         protocol: TCP
         port: 80
 
-# -- Ingress configuration. Additional ingress resources can be added under the 'ingress' key.
+# -- Ingress configuration. Additional ingress resources can be added under the 'ingresses' key.
 # @section -- Ingress configuration
-ingress:
+ingresses:
   main:
     enabled: false
     hosts:
@@ -139,20 +147,18 @@ ingress:
           - path: /testpath
             pathType: Prefix
 
-# -- Monitoring configuration. Additional monitoring resources can be added under the 'serviceMonitor' key.
+# -- Monitoring configuration. Additional monitoring resources can be added under the 'serviceMonitors' key.
 # @section -- Monitoring configuration
-serviceMonitor:
-  enabled: true
-  labels:
-    release: prometheus
-  endpoints:
-    - port: main
-      metricRelabelings:
-        - action: replace
-          sourceLabels: ["__name__"]
-          regex: "olstring_(.*)"
-          replacement: "newstring_$1"
-          targetLabel: "__name__"
-# -- Deployment update strategy configuration
-# @section -- Global settings
-strategyType: Recreate
+serviceMonitors:
+  main:
+    enabled: false
+    labels:
+      release: prometheus
+    endpoints:
+      - port: main
+        metricRelabelings:
+          - action: replace
+            sourceLabels: ["__name__"]
+            regex: "olstring_(.*)"
+            replacement: "newstring_$1"
+            targetLabel: "__name__"

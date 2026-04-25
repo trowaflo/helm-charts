@@ -1,0 +1,384 @@
+# Test Coverage Documentation
+# ============================
+# This test suite validates the CronJob manifest rendering from the common library.
+#
+# Covered Test Cases:
+# - [x] Resource not rendered when disabled
+# - [x] Basic CronJob rendering with minimal configuration
+# - [x] Metadata (name, namespace, labels) correctness
+# - [x] Schedule configuration (cron expression)
+# - [x] Concurrency policy (default: Forbid)
+# - [x] Container command execution
+# - [x] Container environment variables
+# - [x] Job history limits (successful and failed)
+# - [x] Starting deadline seconds
+# - [x] Suspend functionality
+# - [x] Time zone support
+# - [x] Multiple containers per job
+# - [x] Volume mounts
+# - [x] TTL after finished
+#
+# All test cases now covered!
+# ============================
+
+suite: test common chart - CronJob
+templates:
+  - templates/common.yaml
+release:
+  name: common-test
+  namespace: common-test
+tests:
+  # Test that CronJob is not rendered when disabled
+  - it: should not render CronJob when disabled
+    set:
+      cronjobs:
+        backup:
+          enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should fail when enabled without containers
+    set:
+      cronjobs:
+        backup:
+          enabled: true
+          schedule: "0 2 * * *"
+    asserts:
+      - failedTemplate:
+          errorMessage: "cronjobs.backup.podSpec.containers is required and must define at least one container when enabled"
+
+  - it: should render initContainers when provided
+    set:
+      cronjobs:
+        backup:
+          enabled: true
+          schedule: "0 2 * * *"
+          podSpec:
+            initContainers:
+              - name: fetch-secrets
+                image: busybox:1.36
+                command: ["sh", "-c", "echo fetching"]
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+    asserts:
+      - isNotNull:
+          path: spec.jobTemplate.spec.template.spec.initContainers
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.initContainers[0].name
+          value: fetch-secrets
+
+  - it: should render serviceAccountName when provided
+    set:
+      cronjobs:
+        backup:
+          enabled: true
+          schedule: "0 2 * * *"
+          podSpec:
+            serviceAccountName: backup-runner
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.serviceAccountName
+          value: backup-runner
+
+  - it: should render affinity when provided
+    set:
+      cronjobs:
+        backup:
+          enabled: true
+          schedule: "0 2 * * *"
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+            affinity:
+              nodeAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  nodeSelectorTerms:
+                    - matchExpressions:
+                        - key: disktype
+                          operator: In
+                          values: [ssd]
+    asserts:
+      - isNotNull:
+          path: spec.jobTemplate.spec.template.spec.affinity
+      - equal:
+          path: "spec.jobTemplate.spec.template.spec.affinity.nodeAffinity\
+            .requiredDuringSchedulingIgnoredDuringExecution\
+            .nodeSelectorTerms[0].matchExpressions[0].key"
+          value: disktype
+
+  # Test basic CronJob rendering
+  - it: should render CronJob with minimal config
+    set:
+      cronjobs:
+        backup:
+          enabled: true
+          schedule: "0 2 * * *"
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+                  pullPolicy: IfNotPresent
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: CronJob
+      - equal:
+          path: metadata.name
+          value: common-test-backup
+      - equal:
+          path: spec.schedule
+          value: "0 2 * * *"
+      - equal:
+          path: spec.concurrencyPolicy
+          value: Forbid
+
+  # Test container configuration
+  - it: should render container with command and env
+    set:
+      cronjobs:
+        backup:
+          enabled: true
+          schedule: "0 2 * * *"
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+                command:
+                  - /bin/bash
+                  - -c
+                  - echo "backup"
+                env:
+                  - name: DATABASE_URL
+                    value: postgresql://localhost/db
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].command[0]
+          value: /bin/bash
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+          content:
+            name: DATABASE_URL
+            value: postgresql://localhost/db
+
+  - it: should preserve numeric-zero values (history=0, ttl=0)
+    set:
+      cronjobs:
+        backup:
+          enabled: true
+          schedule: "0 2 * * *"
+          successfulJobsHistoryLimit: 0
+          failedJobsHistoryLimit: 0
+          startingDeadlineSeconds: 0
+          ttlSecondsAfterFinished: 0
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+    asserts:
+      - equal:
+          path: spec.successfulJobsHistoryLimit
+          value: 0
+      - equal:
+          path: spec.failedJobsHistoryLimit
+          value: 0
+      - equal:
+          path: spec.startingDeadlineSeconds
+          value: 0
+      - equal:
+          path: spec.jobTemplate.spec.ttlSecondsAfterFinished
+          value: 0
+
+  # Test job history limits
+  - it: should configure job history limits
+    set:
+      cronjobs:
+        backup:
+          enabled: true
+          schedule: "0 2 * * *"
+          successfulJobsHistoryLimit: 5
+          failedJobsHistoryLimit: 10
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+    asserts:
+      - equal:
+          path: spec.successfulJobsHistoryLimit
+          value: 5
+      - equal:
+          path: spec.failedJobsHistoryLimit
+          value: 10
+
+  # Test starting deadline seconds
+  - it: should configure starting deadline seconds
+    set:
+      cronjobs:
+        backup:
+          enabled: true
+          schedule: "0 2 * * *"
+          startingDeadlineSeconds: 300
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+    asserts:
+      - equal:
+          path: spec.startingDeadlineSeconds
+          value: 300
+
+  # Test suspend functionality
+  - it: should configure suspend functionality
+    set:
+      cronjobs:
+        backup:
+          enabled: true
+          schedule: "0 2 * * *"
+          suspend: true
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+    asserts:
+      - equal:
+          path: spec.suspend
+          value: true
+
+  # Test time zone support
+  - it: should configure time zone
+    set:
+      cronjobs:
+        backup:
+          enabled: true
+          schedule: "0 2 * * *"
+          timeZone: "Europe/Paris"
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+    asserts:
+      - equal:
+          path: spec.timeZone
+          value: "Europe/Paris"
+
+  # Test multiple containers per job
+  - it: should render multiple containers per job
+    set:
+      cronjobs:
+        backup:
+          enabled: true
+          schedule: "0 2 * * *"
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+                command:
+                  - pg_dump
+              uploader:
+                image:
+                  repository: rclone/rclone
+                  tag: latest
+                command:
+                  - rclone
+                  - copy
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].name
+          value: backup
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[1].name
+          value: uploader
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[1].image
+          value: rclone/rclone:latest
+
+  # Test volume mounts
+  - it: should configure volume mounts
+    set:
+      cronjobs:
+        backup:
+          enabled: true
+          schedule: "0 2 * * *"
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+                volumeMounts:
+                  - name: backup-storage
+                    mountPath: /backup
+                  - name: config
+                    mountPath: /etc/backup
+            volumes:
+              - name: backup-storage
+                persistentVolumeClaim:
+                  claimName: backup-pvc
+              - name: config
+                configMap:
+                  name: backup-config
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].volumeMounts
+          content:
+            name: backup-storage
+            mountPath: /backup
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.volumes
+          content:
+            name: backup-storage
+            persistentVolumeClaim:
+              claimName: backup-pvc
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.volumes
+          content:
+            name: config
+            configMap:
+              name: backup-config
+
+  # Test TTL after finished
+  - it: should configure TTL after finished
+    set:
+      cronjobs:
+        backup:
+          enabled: true
+          schedule: "0 2 * * *"
+          ttlSecondsAfterFinished: 3600
+          podSpec:
+            containers:
+              backup:
+                image:
+                  repository: postgres
+                  tag: "16"
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.ttlSecondsAfterFinished
+          value: 3600

@@ -4,12 +4,13 @@ should compute fullnameOverride correctly:
     kind: Service
     metadata:
       labels:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: common-test
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: service-name-override
         helm.sh/chart: common-test-0.1.0
       name: my-service-main
-      namespace: common-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ports:
         - name: main
@@ -17,6 +18,7 @@ should compute fullnameOverride correctly:
           protocol: TCP
           targetPort: main
       selector:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: common-test
         app.kubernetes.io/name: service-name-override
       type: ClusterIP
@@ -26,12 +28,13 @@ should compute nameOverride correctly:
     kind: Service
     metadata:
       labels:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: common-test
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: custom
         helm.sh/chart: common-test-0.1.0
       name: common-test-custom-main
-      namespace: common-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ports:
         - name: main
@@ -39,6 +42,7 @@ should compute nameOverride correctly:
           protocol: TCP
           targetPort: main
       selector:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: common-test
         app.kubernetes.io/name: custom
       type: ClusterIP
@@ -48,12 +52,13 @@ should have all defined service type and ports:
     kind: Service
     metadata:
       labels:
+        app.kubernetes.io/component: extra
         app.kubernetes.io/instance: common-test
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: service-name-override
         helm.sh/chart: common-test-0.1.0
       name: common-test-service-name-override-extra
-      namespace: common-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ports:
         - name: http
@@ -65,6 +70,7 @@ should have all defined service type and ports:
           protocol: UDP
           targetPort: metrics
       selector:
+        app.kubernetes.io/component: extra
         app.kubernetes.io/instance: common-test
         app.kubernetes.io/name: service-name-override
       type: LoadBalancer
@@ -74,12 +80,13 @@ should have the correct service type:
     kind: Service
     metadata:
       labels:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: common-test
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: service-name-override
         helm.sh/chart: common-test-0.1.0
       name: common-test-service-name-override-main
-      namespace: common-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ports:
         - name: main
@@ -87,6 +94,7 @@ should have the correct service type:
           protocol: TCP
           targetPort: main
       selector:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: common-test
         app.kubernetes.io/name: service-name-override
       type: LoadBalancer
@@ -96,12 +104,13 @@ should match snapshot with default values:
     kind: Service
     metadata:
       labels:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: common-test
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: service-name-override
         helm.sh/chart: common-test-0.1.0
       name: common-test-service-name-override-main
-      namespace: common-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ports:
         - name: main
@@ -109,6 +118,7 @@ should match snapshot with default values:
           protocol: TCP
           targetPort: main
       selector:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: common-test
         app.kubernetes.io/name: service-name-override
       type: ClusterIP

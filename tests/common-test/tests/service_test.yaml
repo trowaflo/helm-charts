@@ -5,19 +5,25 @@ values:
   - values/default.yaml
 set:
   nameOverride: "service-name-override"
+  k8sServices:
+    main:
+      enabled: true
+      type: ClusterIP
+      ports:
+        main:
+          protocol: TCP
+          port: 80
 release:
   name: common-test
   namespace: common-test
 tests:
   # Snapshot = validates complete coherence with default values
   - it: should match snapshot with default values
-    documentIndex: 0
     asserts:
       - matchSnapshot: {}
 
   # Test computed values - fullnameOverride
   - it: should compute fullnameOverride correctly
-    documentIndex: 0
     set:
       fullnameOverride: "my-service"
     asserts:
@@ -28,7 +34,6 @@ tests:
 
   # Test computed values - nameOverride
   - it: should compute nameOverride correctly
-    documentIndex: 0
     set:
       nameOverride: "custom"
     asserts:
@@ -41,22 +46,63 @@ tests:
       - matchSnapshot: {}
 
   - it: should have the correct service type
-    documentIndex: 0
     set:
-      services:
+      k8sServices:
         main:
           enabled: true
           type: LoadBalancer
+          ports:
+            main:
+              port: 80
+              protocol: TCP
     asserts:
       - equal:
           path: "spec.type"
           value: LoadBalancer
       - matchSnapshot: {}
 
+  # Test component-based selector isolation
+  - it: should select target workload via targetComponent
+    set:
+      k8sServices:
+        main:
+          enabled: false
+        web:
+          enabled: true
+          ports:
+            http:
+              port: 80
+              protocol: TCP
+        metrics:
+          enabled: true
+          targetComponent: web
+          ports:
+            metrics:
+              port: 9090
+              protocol: TCP
+    asserts:
+      # metrics=doc 0, web=doc 1 (alphabetical)
+      - documentIndex: 0
+        equal:
+          path: metadata.name
+          value: common-test-service-name-override-metrics
+      - documentIndex: 0
+        equal:
+          path: "spec.selector[\"app.kubernetes.io/component\"]"
+          value: web
+      - documentIndex: 1
+        equal:
+          path: metadata.name
+          value: common-test-service-name-override-web
+      - documentIndex: 1
+        equal:
+          path: "spec.selector[\"app.kubernetes.io/component\"]"
+          value: web
+
   - it: should have all defined service type and ports
     documentIndex: 0
     set:
-      services:
+      k8sServices:
         main: # main is documentIndex 1 because of ordering by name
           enabled: true
           ports:

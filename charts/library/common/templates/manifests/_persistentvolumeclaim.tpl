@@ -1,6 +1,7 @@
 {{- define "common.manifests.persistentVolumeClaim" -}}
 {{- if include "common.helpers.hasEnabled" .Values.persistentVolumeClaims -}}
-{{- range $key, $config := .Values.persistentVolumeClaims }}
+{{- range $key := keys .Values.persistentVolumeClaims | sortAlpha }}
+{{- $config := index $.Values.persistentVolumeClaims $key }}
 {{- if $config.enabled }}
 {{- /* Validate configuration */ -}}
 {{- include "common.helpers.validatePVC" (dict "key" $key "config" $config) }}
@@ -9,7 +10,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "common.helpers.pvcName" (dict "key" $key "config" $config) }}
+  name: {{ include "common.helpers.resourceName" (dict "key" $key "config" $config) }}
   namespace: {{ $namespace }}
   labels:
     {{- include "common.helpers.labels" $ | nindent 4 }}
