@@ -12,6 +12,10 @@ Container.env shapes:
     In map form, scalar values and the valueFrom block are passed through `tpl`
     with the root context, so templated references (e.g. `{{ include ... }}`)
     expand. Nil values fail fast. Keys are emitted in sorted order.
+    secretKeyRef auto-expansion: when secretKeyRef.name matches a key in
+    .Values.secrets, the name is automatically expanded via common.helpers.secretName
+    (i.e. prefixed with fullname, or replaced by existingSecret if set).
+    Set secretKeyRef.expandObjectName=false to disable this behavior.
 
 Container.ports:
   - Map form: {portName: {containerPort|port, protocol}}. Emitted sorted.
@@ -55,7 +59,21 @@ Container.ports:
         {{- end }}
     - name: {{ $envName }}
         {{- if kindIs "map" $envValue }}
-          {{- $rendered := tpl (toYaml $envValue) $root }}
+          {{- $processedValue := deepCopy $envValue -}}
+          {{- /* Auto-expand secretKeyRef.name when it matches a .Values.secrets key */ -}}
+          {{- if hasKey $processedValue "secretKeyRef" -}}
+            {{- $ref := index $processedValue "secretKeyRef" -}}
+            {{- $rawName := $ref.name | default "" -}}
+            {{- $expand := true -}}
+            {{- if hasKey $ref "expandObjectName" -}}
+              {{- $expand = $ref.expandObjectName -}}
+            {{- end -}}
+            {{- if and $expand (hasKey ($root.Values.secrets | default dict) $rawName) -}}
+              {{- $_ := set $ref "name" (include "common.helpers.secretName" (dict "root" $root "name" $rawName)) -}}
+            {{- end -}}
+            {{- $_ := set $processedValue "secretKeyRef" (omit $ref "expandObjectName") -}}
+          {{- end -}}
+          {{- $rendered := tpl (toYaml $processedValue) $root }}
       valueFrom:
         {{- $rendered | nindent 8 }}
         {{- else }}

@@ -50,7 +50,7 @@ tests:
             valueFrom:
               secretKeyRef:
                 key: DATABASE_URL
-                name: ghostfolio-secrets
+                name: ghostfolio-test-ghostfolio-secrets
       - contains:
           path: spec.template.spec.containers[0].env
           content:
@@ -58,7 +58,7 @@ tests:
             valueFrom:
               secretKeyRef:
                 key: ACCESS_TOKEN_SALT
-                name: ghostfolio-secrets
+                name: ghostfolio-test-ghostfolio-secrets
       - contains:
           path: spec.template.spec.containers[0].env
           content:
@@ -66,7 +66,7 @@ tests:
             valueFrom:
               secretKeyRef:
                 key: JWT_SECRET_KEY
-                name: ghostfolio-secrets
+                name: ghostfolio-test-ghostfolio-secrets
       - contains:
           path: spec.template.spec.containers[0].env
           content:
