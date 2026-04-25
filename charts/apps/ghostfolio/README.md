@@ -1,6 +1,6 @@
 # ghostfolio
 
-![Version: 7.0.0](https://img.shields.io/badge/Version-7.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 8.0.0](https://img.shields.io/badge/Version-8.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Privacy-first open source portfolio tracker with PostgreSQL (CNPG) and Redis support.
 ArgoCD-compatible chart with no drift from lookup or randAlphaNum - all secrets externally managed.
@@ -119,7 +119,7 @@ Includes automated backup to NFS and manual restore capabilities.
 | global.nodeSelector | object | `{}` |  |
 | global.tolerations | list | `[]` |  |
 | image.repository | string | `"ghostfolio/ghostfolio"` |  |
-| image.tag | string | `"2.167.0"` |  |
+| image.tag | string | `"2.255.0@sha256:d3ed46a9a5c82db4457ff919be07f02add26e9f5f116be86793ced9aa422e6d3"` |  |
 | ingresses.main.enabled | bool | `false` |  |
 | ingresses.main.hosts[0].host | string | `"ghostfolio.example.com"` |  |
 | ingresses.main.hosts[0].paths[0].path | string | `"/"` |  |
@@ -159,9 +159,9 @@ Includes automated backup to NFS and manual restore capabilities.
 | k8sServices.redis.ports.redis.protocol | string | `"TCP"` |  |
 | k8sServices.redis.type | string | `"ClusterIP"` |  |
 | postgresImage.repository | string | `"postgres"` |  |
-| postgresImage.tag | string | `"16"` |  |
+| postgresImage.tag | string | `"16@sha256:71e27bf60b70bded003791b5573f8b808365613f341df20ffcf0c1ed7bc13ddf"` |  |
 | redisImage.repository | string | `"redis"` |  |
-| redisImage.tag | string | `"7.4.2-alpine"` |  |
+| redisImage.tag | string | `"8.4.2-alpine@sha256:94dc16bdd00af588f596f01a4e44c1092c31d032e4d00a7537f1269eb0a2aa8e"` |  |
 | restore.restoreFile | string | `""` |  |
 | secrets.auth.data.ACCESS_TOKEN_SALT | string | `""` |  |
 | secrets.auth.data.JWT_SECRET_KEY | string | `""` |  |
