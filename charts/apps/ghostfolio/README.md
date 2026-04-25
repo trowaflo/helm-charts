@@ -1,9 +1,8 @@
 # ghostfolio
 
-![Version: 11.0.0](https://img.shields.io/badge/Version-11.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 12.0.0](https://img.shields.io/badge/Version-12.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-Privacy-first open source portfolio tracker with PostgreSQL (CNPG) and Redis support.
-ArgoCD-compatible chart with no drift from lookup or randAlphaNum - all secrets externally managed.
+Privacy-first open source portfolio tracker with PostgreSQL (CNPG) and Valkey (Redis).
 Includes automated backup to NFS and manual restore capabilities.
 
 **Homepage:** <https://ghostfol.io>
@@ -24,7 +23,7 @@ Includes automated backup to NFS and manual restore capabilities.
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../../library/common | common | 4.0.0 |
-| oci://oci.trueforge.org/truecharts | valkey | 2.1.2 |
+| https://valkey.io/valkey-helm/ | valkey | 0.9.4 |
 
 ## Values
 
@@ -64,7 +63,7 @@ Includes automated backup to NFS and manual restore capabilities.
 | cronjobs.backup.podSpec.containers.backup.command[1] | string | `"-c"` |  |
 | cronjobs.backup.podSpec.containers.backup.command[2] | string | `"set -e\nBACKUP_FILE=\"/backup/ghostfolio-$(date +%Y-%m-%d-%H%M%S).dump\"\necho \"Starting backup to $BACKUP_FILE\"\npg_dump -Fc -v -f \"$BACKUP_FILE\" \"$DATABASE_URL\"\necho \"Backup completed: $BACKUP_FILE\"\necho \"Verifying backup integrity...\"\npg_restore --list \"$BACKUP_FILE\" > /dev/null\necho \"Backup verification successful\"\necho \"Cleaning up old backups (keeping last {{ .Values.backup.retention | default 7 }})\"\ncd /backup\nls -t ghostfolio-*.dump | tail -n +{{ add1 (.Values.backup.retention | default 7) }} | xargs -r rm -f\necho \"Backup process completed successfully\"\n"` |  |
 | cronjobs.backup.podSpec.containers.backup.env.DATABASE_URL.secretKeyRef.key | string | `"uri"` |  |
-| cronjobs.backup.podSpec.containers.backup.env.DATABASE_URL.secretKeyRef.name | string | `"{{ include \"common.helpers.cnpgAppSecret\" (dict \"root\" . \"name\" \"postgresql\") }}"` |  |
+| cronjobs.backup.podSpec.containers.backup.env.DATABASE_URL.secretKeyRef.name | string | `"postgresql"` |  |
 | cronjobs.backup.podSpec.containers.backup.imageSelector | string | `"postgresImage"` |  |
 | cronjobs.backup.podSpec.containers.backup.resources.limits.cpu | string | `"500m"` |  |
 | cronjobs.backup.podSpec.containers.backup.resources.limits.memory | string | `"512Mi"` |  |
@@ -84,14 +83,12 @@ Includes automated backup to NFS and manual restore capabilities.
 | deployments.main.enabled | bool | `true` |  |
 | deployments.main.podSpec.containers.main.env.ACCESS_TOKEN_SALT.secretKeyRef.key | string | `"ACCESS_TOKEN_SALT"` |  |
 | deployments.main.podSpec.containers.main.env.ACCESS_TOKEN_SALT.secretKeyRef.name | string | `"ghostfolio-secrets"` |  |
-| deployments.main.podSpec.containers.main.env.DATABASE_URL.secretKeyRef.key | string | `"DATABASE_URL"` |  |
-| deployments.main.podSpec.containers.main.env.DATABASE_URL.secretKeyRef.name | string | `"ghostfolio-secrets"` |  |
+| deployments.main.podSpec.containers.main.env.DATABASE_URL.secretKeyRef.key | string | `"uri"` |  |
+| deployments.main.podSpec.containers.main.env.DATABASE_URL.secretKeyRef.name | string | `"postgresql"` |  |
 | deployments.main.podSpec.containers.main.env.JWT_SECRET_KEY.secretKeyRef.key | string | `"JWT_SECRET_KEY"` |  |
 | deployments.main.podSpec.containers.main.env.JWT_SECRET_KEY.secretKeyRef.name | string | `"ghostfolio-secrets"` |  |
 | deployments.main.podSpec.containers.main.env.NODE_ENV | string | `"production"` |  |
 | deployments.main.podSpec.containers.main.env.REDIS_HOST | string | `"{{ printf \"%s-valkey\" .Release.Name }}"` |  |
-| deployments.main.podSpec.containers.main.env.REDIS_PASSWORD.secretKeyRef.key | string | `"REDIS_PASSWORD"` |  |
-| deployments.main.podSpec.containers.main.env.REDIS_PASSWORD.secretKeyRef.name | string | `"ghostfolio-secrets"` |  |
 | deployments.main.podSpec.containers.main.env.REDIS_PORT | string | `"6379"` |  |
 | deployments.main.podSpec.containers.main.imageSelector | string | `"image"` |  |
 | deployments.main.podSpec.containers.main.livenessProbe.httpGet.path | string | `"/api/v1/health"` |  |
@@ -133,7 +130,7 @@ Includes automated backup to NFS and manual restore capabilities.
 | jobs.restore.podSpec.containers.restore.command[1] | string | `"-c"` |  |
 | jobs.restore.podSpec.containers.restore.command[2] | string | `"set -e\nRESTORE_FILE=\"/backup/{{ .Values.restore.restoreFile }}\"\nif [ ! -f \"$RESTORE_FILE\" ]; then\n  echo \"ERROR: Restore file not found: $RESTORE_FILE\"\n  exit 1\nfi\necho \"Starting restore from $RESTORE_FILE\"\necho \"Verifying backup file integrity...\"\npg_restore --list \"$RESTORE_FILE\" > /dev/null\necho \"Backup file verification successful\"\necho \"Restoring database...\"\npg_restore -v --clean --if-exists -d \"$DATABASE_URL\" \"$RESTORE_FILE\" || true\necho \"Restore process completed\"\n"` |  |
 | jobs.restore.podSpec.containers.restore.env.DATABASE_URL.secretKeyRef.key | string | `"uri"` |  |
-| jobs.restore.podSpec.containers.restore.env.DATABASE_URL.secretKeyRef.name | string | `"{{ include \"common.helpers.cnpgAppSecret\" (dict \"root\" . \"name\" \"postgresql\") }}"` |  |
+| jobs.restore.podSpec.containers.restore.env.DATABASE_URL.secretKeyRef.name | string | `"postgresql"` |  |
 | jobs.restore.podSpec.containers.restore.imageSelector | string | `"postgresImage"` |  |
 | jobs.restore.podSpec.containers.restore.resources.limits.cpu | string | `"500m"` |  |
 | jobs.restore.podSpec.containers.restore.resources.limits.memory | string | `"512Mi"` |  |
@@ -157,20 +154,12 @@ Includes automated backup to NFS and manual restore capabilities.
 | k8sServices.main.type | string | `"ClusterIP"` |  |
 | postgresImage.repository | string | `"postgres"` |  |
 | postgresImage.tag | string | `"16@sha256:71e27bf60b70bded003791b5573f8b808365613f341df20ffcf0c1ed7bc13ddf"` |  |
-| redis.enabled | bool | `true` |  |
-| redisImage.repository | string | `"redis"` |  |
-| redisImage.tag | string | `"8.4.2-alpine@sha256:94dc16bdd00af588f596f01a4e44c1092c31d032e4d00a7537f1269eb0a2aa8e"` |  |
 | restore.restoreFile | string | `""` |  |
 | secrets.ghostfolio-secrets.data.ACCESS_TOKEN_SALT | string | `""` |  |
-| secrets.ghostfolio-secrets.data.DATABASE_URL | string | `""` |  |
 | secrets.ghostfolio-secrets.data.JWT_SECRET_KEY | string | `""` |  |
-| secrets.ghostfolio-secrets.data.REDIS_PASSWORD | string | `""` |  |
 | secrets.ghostfolio-secrets.enabled | bool | `true` |  |
 | secrets.ghostfolio-secrets.existingSecret | string | `""` |  |
-| valkey.workload.main.podSpec.containers.main.env.ALLOW_EMPTY_PASSWORD | string | `"no"` |  |
-| valkey.workload.main.podSpec.containers.main.env.VALKEY_PASSWORD.secretKeyRef.expandObjectName | bool | `false` |  |
-| valkey.workload.main.podSpec.containers.main.env.VALKEY_PASSWORD.secretKeyRef.key | string | `"REDIS_PASSWORD"` |  |
-| valkey.workload.main.podSpec.containers.main.env.VALKEY_PASSWORD.secretKeyRef.name | string | `"{{ $cn := \"ghostfolio\" }}{{ if contains $cn .Release.Name }}{{ .Release.Name }}{{ else }}{{ printf \"%s-%s\" .Release.Name $cn }}{{ end }}-ghostfolio-secrets"` |  |
+| valkey.enabled | bool | `true` |  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
