@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   cert-manager-platform:
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.442976248Z"
+    created: "2026-04-25T09:48:30.245883378Z"
     dependencies:
     - alias: cert-manager
       condition: cert-manager.enabled
@@ -42,7 +42,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/cert-manager-platform-2.0.0-pr228.tgz
     version: 2.0.0-pr228
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.435657041Z"
+    created: "2026-04-25T09:48:30.238374724Z"
     dependencies:
     - alias: cert-manager
       condition: cert-manager.enabled
@@ -82,7 +82,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/cert-manager-platform-1.3.1-pr228.tgz
     version: 1.3.1-pr228
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.427874414Z"
+    created: "2026-04-25T09:48:30.230947972Z"
     dependencies:
     - alias: cert-manager
       condition: cert-manager.enabled
@@ -123,7 +123,26 @@ entries:
     version: 1.3.0-pr228
   common:
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.448700375Z"
+    created: "2026-04-25T09:48:30.25288993Z"
+    description: Common library chart providing reusable Helm templates and default
+      configurations. Standardizes Kubernetes resource deployment (Deployments, StatefulSets,
+      CronJobs, Jobs, Services, Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims,
+      CNPG Clusters) across the chart repository with consistent security, observability,
+      and best practices.  Used by all application charts in this repository for consistency.
+    digest: 50370f32828392849c7bad1882dfe75d350f5222895a3d80ec542a62ea36ea64
+    home: https://github.com/trowaflo/helm-charts
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: common
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    type: library
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-5.0.0-pr232.tgz
+    version: 5.0.0-pr232
+  - apiVersion: v2
+    created: "2026-04-25T09:48:30.25209199Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, StatefulSets,
       CronJobs, Jobs, Services, Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims,
@@ -142,7 +161,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-4.0.0-pr235.tgz
     version: 4.0.0-pr235
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.447955949Z"
+    created: "2026-04-25T09:48:30.251422931Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, StatefulSets,
       CronJobs, Jobs, Services, Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims,
@@ -161,7 +180,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-4.0.0-pr232.tgz
     version: 4.0.0-pr232
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.447210701Z"
+    created: "2026-04-25T09:48:30.250681437Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, StatefulSets,
       CronJobs, Jobs, Services, Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims,
@@ -180,7 +199,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-3.0.0-pr235.tgz
     version: 3.0.0-pr235
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.446662601Z"
+    created: "2026-04-25T09:48:30.250127723Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, StatefulSets,
       CronJobs, Jobs, Services, Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims,
@@ -199,7 +218,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-3.0.0-pr233.tgz
     version: 3.0.0-pr233
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.44600157Z"
+    created: "2026-04-25T09:48:30.24949977Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, StatefulSets,
       CronJobs, Jobs, Services, Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims,
@@ -218,7 +237,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-3.0.0-pr232.tgz
     version: 3.0.0-pr232
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.445477525Z"
+    created: "2026-04-25T09:48:30.248967687Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, StatefulSets,
       CronJobs, Jobs, Services, Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims,
@@ -237,7 +256,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-2.2.0-pr232.tgz
     version: 2.2.0-pr232
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.444813719Z"
+    created: "2026-04-25T09:48:30.24834256Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, StatefulSets,
       CronJobs, Jobs, Services, Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims,
@@ -256,7 +275,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-2.1.2-pr233.tgz
     version: 2.1.2-pr233
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.444298169Z"
+    created: "2026-04-25T09:48:30.247783907Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, StatefulSets,
       CronJobs, Jobs, Services, Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims,
@@ -275,7 +294,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-2.1.2-pr232.tgz
     version: 2.1.2-pr232
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.443628723Z"
+    created: "2026-04-25T09:48:30.247081345Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, Services,
       Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims) across the
@@ -295,7 +314,7 @@ entries:
     version: 2.1.0-pr211
   frigate-exporter:
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.451561721Z"
+    created: "2026-04-25T09:48:30.255105136Z"
     dependencies:
     - name: common
       repository: https://trowaflo.github.io/helm-charts
@@ -326,7 +345,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/frigate-exporter-1.1.1-pr228.tgz
     version: 1.1.1-pr228
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.450595843Z"
+    created: "2026-04-25T09:48:30.253962032Z"
     dependencies:
     - name: common
       repository: https://trowaflo.github.io/helm-charts
@@ -358,7 +377,42 @@ entries:
     version: 1.1.0-pr228
   ghostfolio:
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.469857912Z"
+    created: "2026-04-25T09:48:30.276310527Z"
+    dependencies:
+    - name: common
+      repository: file://../../library/common
+      version: 5.0.0
+    - condition: valkey.enabled
+      name: valkey
+      repository: https://valkey.io/valkey-helm/
+      version: 0.9.4
+    description: Privacy-first open source portfolio tracker with PostgreSQL (CNPG)
+      and Valkey (Redis). Includes automated backup to NFS and manual restore capabilities.
+    digest: a09dac88a1abe0b082e748deec38cbd6b4d5a16c8e4b914848c943eb942028a9
+    home: https://ghostfol.io
+    icon: https://raw.githubusercontent.com/ghostfolio/ghostfolio/main/apps/client/src/favicon.svg
+    keywords:
+    - ghostfolio
+    - portfolio
+    - finance
+    - tracker
+    - postgresql
+    - redis
+    - cnpg
+    - backup
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: ghostfolio
+    sources:
+    - https://github.com/ghostfolio/ghostfolio
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/ghostfolio-12.0.0-pr232.tgz
+    version: 12.0.0-pr232
+  - apiVersion: v2
+    created: "2026-04-25T09:48:30.273571794Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -393,7 +447,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/ghostfolio-11.0.0-pr232.tgz
     version: 11.0.0-pr232
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.467044664Z"
+    created: "2026-04-25T09:48:30.270653284Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -430,7 +484,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/ghostfolio-10.0.0-pr232.tgz
     version: 10.0.0-pr232
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.513329799Z"
+    created: "2026-04-25T09:48:30.315574097Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -467,7 +521,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/ghostfolio-9.0.0-pr232.tgz
     version: 9.0.0-pr232
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.504038939Z"
+    created: "2026-04-25T09:48:30.303637244Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -504,7 +558,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/ghostfolio-8.0.0-pr232.tgz
     version: 8.0.0-pr232
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.495211789Z"
+    created: "2026-04-25T09:48:30.294255262Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -537,7 +591,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/ghostfolio-7.0.0-pr232.tgz
     version: 7.0.0-pr232
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.492136378Z"
+    created: "2026-04-25T09:48:30.291493002Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -570,7 +624,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/ghostfolio-6.0.0-pr232.tgz
     version: 6.0.0-pr232
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.490223467Z"
+    created: "2026-04-25T09:48:30.289428157Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -603,7 +657,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/ghostfolio-5.0.0-pr235.tgz
     version: 5.0.0-pr235
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.488227672Z"
+    created: "2026-04-25T09:48:30.287470652Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -636,7 +690,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/ghostfolio-5.0.0-pr232.tgz
     version: 5.0.0-pr232
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.483802619Z"
+    created: "2026-04-25T09:48:30.284593417Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -669,7 +723,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/ghostfolio-4.0.0-pr235.tgz
     version: 4.0.0-pr235
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.480213597Z"
+    created: "2026-04-25T09:48:30.28281697Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -702,7 +756,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/ghostfolio-4.0.0-pr232.tgz
     version: 4.0.0-pr232
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.476426998Z"
+    created: "2026-04-25T09:48:30.280964251Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -735,7 +789,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/ghostfolio-3.0.0-pr235.tgz
     version: 3.0.0-pr235
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.472124612Z"
+    created: "2026-04-25T09:48:30.278051187Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -768,7 +822,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/ghostfolio-2.0.0-pr232.tgz
     version: 2.0.0-pr232
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.457349482Z"
+    created: "2026-04-25T09:48:30.261039692Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -801,7 +855,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/ghostfolio-1.0.0-pr232.tgz
     version: 1.0.0-pr232
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.454552028Z"
+    created: "2026-04-25T09:48:30.258886192Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -834,7 +888,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/ghostfolio-0.2.0-pr232.tgz
     version: 0.2.0-pr232
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.452530926Z"
+    created: "2026-04-25T09:48:30.256968641Z"
     description: Privacy-first open source portfolio tracker with PostgreSQL (CNPG)
       and Redis support. ArgoCD-compatible chart with no drift from lookup or randAlphaNum
       - all secrets externally managed. Includes automated backup to NFS and manual
@@ -864,7 +918,7 @@ entries:
     version: 0.1.0-pr232
   grafana:
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.516949828Z"
+    created: "2026-04-25T09:48:30.321896942Z"
     dependencies:
     - name: grafana
       repository: https://grafana.github.io/helm-charts
@@ -895,7 +949,7 @@ entries:
     version: 0.3.7-pr228
   graphite-exporter:
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.520385317Z"
+    created: "2026-04-25T09:48:30.325526108Z"
     dependencies:
     - name: common
       repository: https://trowaflo.github.io/helm-charts
@@ -927,7 +981,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/graphite-exporter-1.1.1-pr228.tgz
     version: 1.1.1-pr228
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.518235221Z"
+    created: "2026-04-25T09:48:30.324200443Z"
     dependencies:
     - name: common
       repository: https://trowaflo.github.io/helm-charts
@@ -960,7 +1014,7 @@ entries:
     version: 1.1.0-pr228
   guacamole:
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.520699733Z"
+    created: "2026-04-25T09:48:30.325860302Z"
     description: Apache Guacamole HTML5 remote desktop gateway for secure access to
       virtual machines and servers. Provides browser-based RDP, SSH, and VNC access
       without requiring client-side installations.
@@ -989,7 +1043,7 @@ entries:
     version: 0.3.4-pr228
   kgateway-platform:
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.522970771Z"
+    created: "2026-04-25T09:48:30.329325853Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -1019,7 +1073,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-platform-1.2.1-pr228.tgz
     version: 1.2.1-pr228
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.522258986Z"
+    created: "2026-04-25T09:48:30.328519127Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -1049,7 +1103,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-platform-1.2.0-pr228.tgz
     version: 1.2.0-pr228
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.521501305Z"
+    created: "2026-04-25T09:48:30.327492369Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -1080,7 +1134,7 @@ entries:
     version: 1.1.0-pr184
   kgateway-routing:
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.524744112Z"
+    created: "2026-04-25T09:48:30.330915932Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -1106,7 +1160,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.2.1-pr228.tgz
     version: 0.2.1-pr228
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.524123967Z"
+    created: "2026-04-25T09:48:30.330372918Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -1132,7 +1186,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.2.0-pr228.tgz
     version: 0.2.0-pr228
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.523437169Z"
+    created: "2026-04-25T09:48:30.329905325Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -1159,7 +1213,7 @@ entries:
     version: 0.1.0-pr182
   persistent-volume:
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.53010712Z"
+    created: "2026-04-25T09:48:30.336366841Z"
     dependencies:
     - name: common
       repository: https://trowaflo.github.io/helm-charts
@@ -1188,7 +1242,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/persistent-volume-0.1.1-pr233.tgz
     version: 0.1.1-pr233
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.529225699Z"
+    created: "2026-04-25T09:48:30.335464797Z"
     dependencies:
     - name: common
       repository: https://trowaflo.github.io/helm-charts
@@ -1197,7 +1251,7 @@ entries:
       PersistentVolumes (PV) and PersistentVolumeClaims (PVC). Supports multiple storage
       backends including hostPath, NFS, and other volume types with flexible configuration
       for capacity, access modes, and storage classes.
-    digest: d2298f7ff46e16e9b4b2b2d6fdeed179b31c3e15a8feb9ea9d3e36c331111a95
+    digest: 3cac17ace992aef5aeb92399493e0b9a962ac2cac077710b852bc0690dcbc475
     keywords:
     - kubernetes
     - storage
@@ -1217,7 +1271,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/persistent-volume-0.1.1-pr232.tgz
     version: 0.1.1-pr232
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.528350209Z"
+    created: "2026-04-25T09:48:30.333676606Z"
     dependencies:
     - name: common
       repository: https://trowaflo.github.io/helm-charts
@@ -1246,7 +1300,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/persistent-volume-0.1.0-pr233.tgz
     version: 0.1.0-pr233
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.527494906Z"
+    created: "2026-04-25T09:48:30.332785953Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -1275,7 +1329,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/persistent-volume-0.1.0-pr232.tgz
     version: 0.1.0-pr232
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.5265297Z"
+    created: "2026-04-25T09:48:30.331861227Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -1305,7 +1359,7 @@ entries:
     version: 0.1.0-pr228
   portainer:
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.531501165Z"
+    created: "2026-04-25T09:48:30.337771053Z"
     dependencies:
     - name: portainer
       repository: https://portainer.github.io/k8s
@@ -1337,7 +1391,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/portainer-1.0.0-pr226.tgz
     version: 1.0.0-pr226
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.5308004Z"
+    created: "2026-04-25T09:48:30.337037203Z"
     dependencies:
     - name: portainer
       repository: https://portainer.github.io/k8s
@@ -1370,7 +1424,7 @@ entries:
     version: 0.1.0-pr228
   prometheus:
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.550746369Z"
+    created: "2026-04-25T09:48:30.356169685Z"
     dependencies:
     - name: prometheus
       repository: https://prometheus-community.github.io/helm-charts
@@ -1401,7 +1455,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/prometheus-3.6.1-pr228.tgz
     version: 3.6.1-pr228
   - apiVersion: v2
-    created: "2026-04-25T09:20:10.541399028Z"
+    created: "2026-04-25T09:48:30.347004946Z"
     dependencies:
     - name: prometheus
       repository: https://prometheus-community.github.io/helm-charts
@@ -1431,4 +1485,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/prometheus-3.6.0-pr228.tgz
     version: 3.6.0-pr228
-generated: "2026-04-25T09:20:10.419441607Z"
+generated: "2026-04-25T09:48:30.223532707Z"
