@@ -999,3 +999,105 @@ tests:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
+
+  # C5: secretKeyRef auto-expansion with .Values.secrets
+  - it: should auto-expand secretKeyRef name matching a secrets key
+    set:
+      secrets:
+        my-secret:
+          enabled: true
+          data:
+            TOKEN: ""
+      deployments:
+        main:
+          enabled: true
+          podSpec:
+            containers:
+              main:
+                image:
+                  repository: nginx
+                  tag: latest
+                env:
+                  MY_TOKEN:
+                    secretKeyRef:
+                      name: my-secret
+                      key: TOKEN
+    asserts:
+      - documentIndex: 1
+        contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MY_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: common-test-deployment-name-override-my-secret
+                key: TOKEN
+
+  # C6: secretKeyRef auto-expansion with .Values.cnpgClusters
+  - it: should auto-expand secretKeyRef name matching a cnpgClusters key
+    set:
+      cnpgClusters:
+        postgresql:
+          enabled: true
+          imageName: ghcr.io/cloudnative-pg/postgresql:16
+          instances: 1
+          storage:
+            size: 1Gi
+      deployments:
+        main:
+          enabled: true
+          podSpec:
+            containers:
+              main:
+                image:
+                  repository: nginx
+                  tag: latest
+                env:
+                  DATABASE_URL:
+                    secretKeyRef:
+                      name: postgresql
+                      key: uri
+    asserts:
+      - documentIndex: 1
+        contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: common-test-deployment-name-override-postgresql-app
+                key: uri
+
+  # C7: secretKeyRef expandObjectName=false disables auto-expansion
+  - it: should not auto-expand when expandObjectName is false
+    set:
+      secrets:
+        my-secret:
+          enabled: true
+          data:
+            TOKEN: ""
+      deployments:
+        main:
+          enabled: true
+          podSpec:
+            containers:
+              main:
+                image:
+                  repository: nginx
+                  tag: latest
+                env:
+                  MY_TOKEN:
+                    secretKeyRef:
+                      name: my-secret
+                      key: TOKEN
+                      expandObjectName: false
+    asserts:
+      - documentIndex: 1
+        contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MY_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: my-secret
+                key: TOKEN

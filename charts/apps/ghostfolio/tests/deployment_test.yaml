@@ -49,8 +49,8 @@ tests:
             name: DATABASE_URL
             valueFrom:
               secretKeyRef:
-                key: DATABASE_URL
-                name: ghostfolio-test-ghostfolio-secrets
+                key: uri
+                name: ghostfolio-test-postgresql-app
       - contains:
           path: spec.template.spec.containers[0].env
           content:

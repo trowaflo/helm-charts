@@ -3,8 +3,7 @@ name: ghostfolio
 version: 11.0.0
 type: application
 description: |-
-  Privacy-first open source portfolio tracker with PostgreSQL (CNPG) and Redis support.
-  ArgoCD-compatible chart with no drift from lookup or randAlphaNum - all secrets externally managed.
+  Privacy-first open source portfolio tracker with PostgreSQL (CNPG) and Valkey (Redis).
   Includes automated backup to NFS and manual restore capabilities.
 keywords:
   - ghostfolio
@@ -29,6 +28,6 @@ dependencies:
     version: 4.0.0
     repository: file://../../library/common
   - name: valkey
-    version: 2.1.2
-    repository: oci://oci.trueforge.org/truecharts
-    condition: redis.enabled
+    version: 0.9.4
+    repository: https://valkey.io/valkey-helm/
+    condition: valkey.enabled

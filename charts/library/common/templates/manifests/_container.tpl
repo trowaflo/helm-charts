@@ -15,6 +15,8 @@ Container.env shapes:
     secretKeyRef auto-expansion: when secretKeyRef.name matches a key in
     .Values.secrets, the name is automatically expanded via common.helpers.secretName
     (i.e. prefixed with fullname, or replaced by existingSecret if set).
+    When secretKeyRef.name matches a key in .Values.cnpgClusters, the name is
+    automatically expanded to <fullname>-<name>-app (CNPG app secret convention).
     Set secretKeyRef.expandObjectName=false to disable this behavior.
 
 Container.ports:
@@ -70,6 +72,8 @@ Container.ports:
             {{- end -}}
             {{- if and $expand (hasKey ($root.Values.secrets | default dict) $rawName) -}}
               {{- $_ := set $ref "name" (include "common.helpers.secretName" (dict "root" $root "name" $rawName)) -}}
+            {{- else if and $expand (hasKey ($root.Values.cnpgClusters | default dict) $rawName) -}}
+              {{- $_ := set $ref "name" (include "common.helpers.cnpgAppSecret" (dict "root" $root "name" $rawName)) -}}
             {{- end -}}
             {{- $_ := set $processedValue "secretKeyRef" (omit $ref "expandObjectName") -}}
           {{- end -}}

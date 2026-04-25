@@ -6,10 +6,6 @@ image:
   repository: ghostfolio/ghostfolio
   tag: 2.255.0@sha256:d3ed46a9a5c82db4457ff919be07f02add26e9f5f116be86793ced9aa422e6d3
 
-redisImage:
-  repository: redis
-  tag: 8.4.2-alpine@sha256:94dc16bdd00af588f596f01a4e44c1092c31d032e4d00a7537f1269eb0a2aa8e
-
 postgresImage:
   repository: postgres
   tag: 16@sha256:71e27bf60b70bded003791b5573f8b808365613f341df20ffcf0c1ed7bc13ddf
@@ -23,9 +19,7 @@ secrets:
     existingSecret: ""
     data:
       ACCESS_TOKEN_SALT: ""
-      DATABASE_URL: ""
       JWT_SECRET_KEY: ""
-      REDIS_PASSWORD: ""
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Main deployment
@@ -58,12 +52,8 @@ deployments:
             REDIS_PORT: "6379"
             DATABASE_URL:
               secretKeyRef:
-                name: 'ghostfolio-secrets'
-                key: DATABASE_URL
-            REDIS_PASSWORD:
-              secretKeyRef:
-                name: 'ghostfolio-secrets'
-                key: REDIS_PASSWORD
+                name: postgresql
+                key: uri
             ACCESS_TOKEN_SALT:
               secretKeyRef:
                 name: 'ghostfolio-secrets'
@@ -163,7 +153,7 @@ cronjobs:
           env:
             DATABASE_URL:
               secretKeyRef:
-                name: '{{ include "common.helpers.cnpgAppSecret" (dict "root" . "name" "postgresql") }}'
+                name: postgresql
                 key: uri
 
           volumeMounts:
@@ -227,7 +217,7 @@ jobs:
           env:
             DATABASE_URL:
               secretKeyRef:
-                name: '{{ include "common.helpers.cnpgAppSecret" (dict "root" . "name" "postgresql") }}'
+                name: postgresql
                 key: uri
 
           volumeMounts:
@@ -321,24 +311,8 @@ global:
   affinity: {}
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Valkey (Redis) subchart overrides
+# Valkey (Redis) subchart — official valkey/valkey chart
+# No auth: secured via NetworkPolicy. Set valkey.enabled: false to BYO Redis.
 # ─────────────────────────────────────────────────────────────────────────────
-redis:
-  enabled: true
-
 valkey:
-  # Override valkey container env to read REDIS_PASSWORD from our ghostfolio-secrets Secret.
-  # The template computes the parent chart's fullname from the subchart tpl context,
-  # since .Release.Name is shared between parent and subchart.
-  workload:
-    main:
-      podSpec:
-        containers:
-          main:
-            env:
-              VALKEY_PASSWORD:
-                secretKeyRef:
-                  expandObjectName: false
-                  name: '{{ $cn := "ghostfolio" }}{{ if contains $cn .Release.Name }}{{ .Release.Name }}{{ else }}{{ printf "%s-%s" .Release.Name $cn }}{{ end }}-ghostfolio-secrets'
-                  key: REDIS_PASSWORD
-              ALLOW_EMPTY_PASSWORD: "no"
+  enabled: true
