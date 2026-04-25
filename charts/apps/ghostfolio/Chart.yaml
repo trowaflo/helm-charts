@@ -1,6 +1,6 @@
 apiVersion: v2
 name: ghostfolio
-version: 14.0.0
+version: 15.0.0
 type: application
 description: |-
   Privacy-first open source portfolio tracker with PostgreSQL (CNPG) and Valkey (Redis).
