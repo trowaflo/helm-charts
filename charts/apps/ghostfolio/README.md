@@ -1,6 +1,6 @@
 # ghostfolio
 
-![Version: 12.0.0](https://img.shields.io/badge/Version-12.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 13.0.0](https://img.shields.io/badge/Version-13.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Privacy-first open source portfolio tracker with PostgreSQL (CNPG) and Valkey (Redis).
 Includes automated backup to NFS and manual restore capabilities.
@@ -22,7 +22,7 @@ Includes automated backup to NFS and manual restore capabilities.
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../../library/common | common | 4.0.0 |
+| file://../../library/common | common | 5.0.0 |
 | https://valkey.io/valkey-helm/ | valkey | 0.9.4 |
 
 ## Values
