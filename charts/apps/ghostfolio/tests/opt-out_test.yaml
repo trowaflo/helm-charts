@@ -1,6 +1,6 @@
 suite: test ghostfolio chart - Secret opt-out (existingSecret)
 templates:
-  - templates/secrets.yaml
+  - templates/common.yaml
 release:
   name: ghostfolio-test
   namespace: ghostfolio-test
@@ -16,7 +16,7 @@ tests:
           existingSecret: ext-db
     asserts:
       - hasDocuments:
-          count: 0
+          count: 5
 
   - it: should not render redis Secret when secrets.redis.existingSecret is set
     set:
@@ -25,12 +25,12 @@ tests:
           existingSecret: ext-redis
     asserts:
       - hasDocuments:
-          count: 2
-      - documentIndex: 0
+          count: 7
+      - documentIndex: 1
         equal:
           path: metadata.name
           value: ghostfolio-test-auth
-      - documentIndex: 1
+      - documentIndex: 2
         equal:
           path: metadata.name
           value: ghostfolio-test-db-bootstrap
@@ -38,29 +38,25 @@ tests:
   - it: should render all three Secrets with auto-generated names by default
     asserts:
       - hasDocuments:
-          count: 3
-      # sorted alphabetically: auth (0), db-bootstrap (1), redis (2)
-      - documentIndex: 0
+          count: 8
+      # index 0 = CNPG Cluster; Secrets sorted alpha: auth(1) db-bootstrap(2) redis(3)
+      - documentIndex: 1
         equal:
           path: metadata.name
           value: ghostfolio-test-auth
-      - documentIndex: 1
-        equal:
-          path: metadata.name
-          value: ghostfolio-test-db-bootstrap
       - documentIndex: 2
         equal:
           path: metadata.name
-          value: ghostfolio-test-redis
-      - documentIndex: 0
+          value: ghostfolio-test-db-bootstrap
+      - documentIndex: 3
         equal:
-          path: metadata.annotations["helm.sh/hook"]
-          value: pre-install
-      - documentIndex: 0
+          path: metadata.name
+          value: ghostfolio-test-redis
+      - documentIndex: 1
         equal:
           path: metadata.annotations["helm.sh/resource-policy"]
           value: keep
-      - documentIndex: 1
+      - documentIndex: 2
         equal:
           path: type
           value: kubernetes.io/basic-auth
