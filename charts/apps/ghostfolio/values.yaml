@@ -20,6 +20,12 @@ secrets:
     data:
       ACCESS_TOKEN_SALT: ""
       JWT_SECRET_KEY: ""
+  db-bootstrap:
+    enabled: true
+    existingSecret: ""
+    data:
+      username: ghostfolio
+      password: ""
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Main deployment

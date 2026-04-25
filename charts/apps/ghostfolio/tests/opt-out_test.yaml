@@ -9,8 +9,8 @@ release:
 tests:
   - it: should render ghostfolio-secrets Secret by default
     documentSelector:
-      path: kind
-      value: Secret
+      path: metadata.name
+      value: ghostfolio-test-ghostfolio-secrets
     asserts:
       - isKind:
           of: Secret
@@ -20,6 +20,20 @@ tests:
       - equal:
           path: metadata.annotations["helm.sh/resource-policy"]
           value: keep
+
+  - it: should render db-bootstrap Secret by default
+    documentSelector:
+      path: metadata.name
+      value: ghostfolio-test-db-bootstrap
+    asserts:
+      - isKind:
+          of: Secret
+      - equal:
+          path: metadata.name
+          value: ghostfolio-test-db-bootstrap
+      - equal:
+          path: stringData.username
+          value: ghostfolio
 
   - it: should not render Secret when existingSecret is set
     set:
