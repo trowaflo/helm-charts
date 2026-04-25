@@ -18,24 +18,13 @@ postgresImage:
 # Auto-generated secrets (set existingSecret to bring your own)
 # ─────────────────────────────────────────────────────────────────────────────
 secrets:
-  auth:
+  ghostfolio-secrets:
     enabled: true
     existingSecret: ""
     data:
       ACCESS_TOKEN_SALT: ""
+      DATABASE_URL: ""
       JWT_SECRET_KEY: ""
-  redis:
-    enabled: true
-    existingSecret: ""
-    data:
-      REDIS_PASSWORD: ""
-  db-bootstrap:
-    enabled: true
-    existingSecret: ""
-    type: kubernetes.io/basic-auth
-    data:
-      username: ghostfolio
-      password: ""
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Main deployment
@@ -68,19 +57,19 @@ deployments:
             REDIS_PORT: "6379"
             DATABASE_URL:
               secretKeyRef:
-                name: '{{ include "common.helpers.cnpgAppSecret" (dict "root" . "name" "postgresql") }}'
-                key: uri
+                name: 'ghostfolio-secrets'
+                key: DATABASE_URL
             REDIS_PASSWORD:
               secretKeyRef:
                 name: '{{ include "common.helpers.secretName" (dict "root" . "name" "redis") }}'
                 key: REDIS_PASSWORD
             ACCESS_TOKEN_SALT:
               secretKeyRef:
-                name: '{{ include "common.helpers.secretName" (dict "root" . "name" "auth") }}'
+                name: 'ghostfolio-secrets'
                 key: ACCESS_TOKEN_SALT
             JWT_SECRET_KEY:
               secretKeyRef:
-                name: '{{ include "common.helpers.secretName" (dict "root" . "name" "auth") }}'
+                name: 'ghostfolio-secrets'
                 key: JWT_SECRET_KEY
 
           livenessProbe:
@@ -119,14 +108,6 @@ k8sServices:
         protocol: TCP
         port: 3333
 
-  redis:
-    enabled: true
-    type: ClusterIP
-    ports:
-      redis:
-        protocol: TCP
-        port: 6379
-
 # ─────────────────────────────────────────────────────────────────────────────
 # Ingress (off by default)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -141,90 +122,6 @@ ingresses:
             service: main
             port: http
     tls: []
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Redis StatefulSet
-# ─────────────────────────────────────────────────────────────────────────────
-statefulsets:
-  redis:
-    enabled: true
-
-    podSpec:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 999
-        runAsGroup: 999
-        fsGroup: 999
-
-      containers:
-        redis:
-          imageSelector: redisImage
-
-          command:
-            - redis-server
-            - --requirepass
-            - $(REDIS_PASSWORD)
-            - --appendonly
-            - "yes"
-            - --dir
-            - /data
-
-          ports:
-            redis:
-              containerPort: 6379
-              protocol: TCP
-
-          env:
-            REDIS_PASSWORD:
-              secretKeyRef:
-                name: '{{ include "common.helpers.secretName" (dict "root" . "name" "redis") }}'
-                key: REDIS_PASSWORD
-
-          livenessProbe:
-            exec:
-              command:
-                - sh
-                - -c
-                - redis-cli -a "$REDIS_PASSWORD" ping | grep PONG
-            initialDelaySeconds: 30
-
-          readinessProbe:
-            exec:
-              command:
-                - sh
-                - -c
-                - redis-cli -a "$REDIS_PASSWORD" ping | grep PONG
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            timeoutSeconds: 3
-
-          volumeMounts:
-            - name: data
-              mountPath: /data
-            - name: tmp
-              mountPath: /tmp
-
-          resources:
-            requests:
-              cpu: 10m
-              memory: 64Mi
-            limits:
-              cpu: 500m
-              memory: 256Mi
-
-      volumes:
-        - name: tmp
-          emptyDir: {}
-
-    volumeClaimTemplates:
-      - metadata:
-          name: data
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: 1Gi
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Backup CronJob (off by default)
