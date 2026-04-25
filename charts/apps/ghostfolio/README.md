@@ -1,6 +1,6 @@
 # ghostfolio
 
-![Version: 14.0.0](https://img.shields.io/badge/Version-14.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 15.0.0](https://img.shields.io/badge/Version-15.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Privacy-first open source portfolio tracker with PostgreSQL (CNPG) and Valkey (Redis).
 Includes automated backup to NFS and manual restore capabilities.
@@ -155,6 +155,10 @@ Includes automated backup to NFS and manual restore capabilities.
 | postgresImage.repository | string | `"postgres"` |  |
 | postgresImage.tag | string | `"16@sha256:71e27bf60b70bded003791b5573f8b808365613f341df20ffcf0c1ed7bc13ddf"` |  |
 | restore.restoreFile | string | `""` |  |
+| secrets.db-bootstrap.data.password | string | `""` |  |
+| secrets.db-bootstrap.data.username | string | `"ghostfolio"` |  |
+| secrets.db-bootstrap.enabled | bool | `true` |  |
+| secrets.db-bootstrap.existingSecret | string | `""` |  |
 | secrets.ghostfolio-secrets.data.ACCESS_TOKEN_SALT | string | `""` |  |
 | secrets.ghostfolio-secrets.data.JWT_SECRET_KEY | string | `""` |  |
 | secrets.ghostfolio-secrets.enabled | bool | `true` |  |
