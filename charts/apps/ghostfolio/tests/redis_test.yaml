@@ -4,11 +4,10 @@
 #
 # Covered Test Cases:
 # - [x] Deployment has REDIS_HOST env pointing to valkey service
-# - [x] Deployment has REDIS_PASSWORD from secret
 # - [x] Deployment has REDIS_PORT configured
 #
-# Note: Redis is provided by the valkey subchart dependency (condition: redis.enabled).
-# We only test integration points (env vars) since the subchart is tested upstream.
+# Note: Redis is provided by the valkey subchart dependency (condition: valkey.enabled).
+# No auth — secured via NetworkPolicy. We only test integration points (env vars).
 # ============================
 
 suite: test ghostfolio chart - Redis integration
@@ -30,20 +29,6 @@ tests:
           content:
             name: REDIS_HOST
             value: ghostfolio-test-valkey
-
-  - it: should have REDIS_PASSWORD from ghostfolio-secrets
-    documentSelector:
-      path: kind
-      value: Deployment
-    asserts:
-      - contains:
-          path: spec.template.spec.containers[0].env
-          content:
-            name: REDIS_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: ghostfolio-test-ghostfolio-secrets
-                key: REDIS_PASSWORD
 
   - it: should have REDIS_PORT configured
     documentSelector:

@@ -50,11 +50,6 @@ should match snapshot:
                   value: production
                 - name: REDIS_HOST
                   value: ghostfolio-test-valkey
-                - name: REDIS_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      key: REDIS_PASSWORD
-                      name: ghostfolio-test-ghostfolio-secrets
                 - name: REDIS_PORT
                   value: "6379"
               image: ghostfolio/ghostfolio:2.255.0@sha256:d3ed46a9a5c82db4457ff919be07f02add26e9f5f116be86793ced9aa422e6d3
