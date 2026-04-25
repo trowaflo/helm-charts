@@ -24,8 +24,6 @@ metadata:
   name: {{ $secretName }}
   namespace: {{ include "common.helpers.namespace" $ }}
   annotations:
-    helm.sh/hook: pre-install
-    helm.sh/hook-delete-policy: before-hook-creation
     helm.sh/resource-policy: keep
   labels:
     {{- include "common.helpers.labels" $ | nindent 4 }}

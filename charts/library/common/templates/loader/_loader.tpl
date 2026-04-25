@@ -12,6 +12,9 @@
   {{/* Render CNPG cluster - database dependency layer */}}
   {{- include "common.manifests.cnpgCluster" . | nindent 0 -}}
 
+  {{/* Render secrets - secret layer */}}
+  {{- include "common.manifests.secret" . | nindent 0 -}}
+
   {{/* Render service - networking layer */}}
   {{- include "common.manifests.service" . | nindent 0 -}}
 

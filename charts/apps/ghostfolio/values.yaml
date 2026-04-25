@@ -4,15 +4,15 @@
 # ─────────────────────────────────────────────────────────────────────────────
 image:
   repository: ghostfolio/ghostfolio
-  tag: 2.167.0
+  tag: 2.255.0@sha256:d3ed46a9a5c82db4457ff919be07f02add26e9f5f116be86793ced9aa422e6d3
 
 redisImage:
   repository: redis
-  tag: 7.4.2-alpine
+  tag: 8.4.2-alpine@sha256:94dc16bdd00af588f596f01a4e44c1092c31d032e4d00a7537f1269eb0a2aa8e
 
 postgresImage:
   repository: postgres
-  tag: "16"
+  tag: 16@sha256:71e27bf60b70bded003791b5573f8b808365613f341df20ffcf0c1ed7bc13ddf
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Auto-generated secrets (set existingSecret to bring your own)
