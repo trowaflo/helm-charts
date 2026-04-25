@@ -8,7 +8,7 @@ should match snapshot:
         app.kubernetes.io/instance: ghostfolio-test
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: ghostfolio
-        helm.sh/chart: ghostfolio-9.0.0
+        helm.sh/chart: ghostfolio-10.0.0
       name: ghostfolio-test-backup
       namespace: ghostfolio-test
     spec:

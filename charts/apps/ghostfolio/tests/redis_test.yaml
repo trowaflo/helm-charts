@@ -29,9 +29,9 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: REDIS_HOST
-            value: ghostfolio-test-redis
+            value: ghostfolio-test-valkey
 
-  - it: should have REDIS_PASSWORD from secret
+  - it: should have REDIS_PASSWORD from ghostfolio-secrets
     documentSelector:
       path: kind
       value: Deployment
@@ -42,7 +42,7 @@ tests:
             name: REDIS_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: ghostfolio-test-redis
+                name: ghostfolio-test-ghostfolio-secrets
                 key: REDIS_PASSWORD
 
   - it: should have REDIS_PORT configured

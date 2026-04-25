@@ -25,6 +25,7 @@ secrets:
       ACCESS_TOKEN_SALT: ""
       DATABASE_URL: ""
       JWT_SECRET_KEY: ""
+      REDIS_PASSWORD: ""
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Main deployment
@@ -53,7 +54,7 @@ deployments:
 
           env:
             NODE_ENV: production
-            REDIS_HOST: '{{ include "common.helpers.fullname" . }}-redis'
+            REDIS_HOST: '{{ printf "%s-valkey" .Release.Name }}'
             REDIS_PORT: "6379"
             DATABASE_URL:
               secretKeyRef:
@@ -61,7 +62,7 @@ deployments:
                 key: DATABASE_URL
             REDIS_PASSWORD:
               secretKeyRef:
-                name: '{{ include "common.helpers.secretName" (dict "root" . "name" "redis") }}'
+                name: 'ghostfolio-secrets'
                 key: REDIS_PASSWORD
             ACCESS_TOKEN_SALT:
               secretKeyRef:
@@ -318,3 +319,26 @@ global:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Valkey (Redis) subchart overrides
+# ─────────────────────────────────────────────────────────────────────────────
+redis:
+  enabled: true
+
+valkey:
+  # Override valkey container env to read REDIS_PASSWORD from our ghostfolio-secrets Secret.
+  # The template computes the parent chart's fullname from the subchart tpl context,
+  # since .Release.Name is shared between parent and subchart.
+  workload:
+    main:
+      podSpec:
+        containers:
+          main:
+            env:
+              VALKEY_PASSWORD:
+                secretKeyRef:
+                  expandObjectName: false
+                  name: '{{ $cn := "ghostfolio" }}{{ if contains $cn .Release.Name }}{{ .Release.Name }}{{ else }}{{ printf "%s-%s" .Release.Name $cn }}{{ end }}-ghostfolio-secrets'
+                  key: REDIS_PASSWORD
+              ALLOW_EMPTY_PASSWORD: "no"
