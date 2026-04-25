@@ -1,6 +1,6 @@
 # ghostfolio
 
-![Version: 8.0.0](https://img.shields.io/badge/Version-8.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 9.0.0](https://img.shields.io/badge/Version-9.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Privacy-first open source portfolio tracker with PostgreSQL (CNPG) and Redis support.
 ArgoCD-compatible chart with no drift from lookup or randAlphaNum - all secrets externally managed.
@@ -24,6 +24,7 @@ Includes automated backup to NFS and manual restore capabilities.
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../../library/common | common | 4.0.0 |
+| oci://oci.trueforge.org/truecharts | valkey | 2.1.2 |
 
 ## Values
 
@@ -82,11 +83,11 @@ Includes automated backup to NFS and manual restore capabilities.
 | cronjobs.backup.schedule | string | `"0 2 * * *"` |  |
 | deployments.main.enabled | bool | `true` |  |
 | deployments.main.podSpec.containers.main.env.ACCESS_TOKEN_SALT.secretKeyRef.key | string | `"ACCESS_TOKEN_SALT"` |  |
-| deployments.main.podSpec.containers.main.env.ACCESS_TOKEN_SALT.secretKeyRef.name | string | `"{{ include \"common.helpers.secretName\" (dict \"root\" . \"name\" \"auth\") }}"` |  |
-| deployments.main.podSpec.containers.main.env.DATABASE_URL.secretKeyRef.key | string | `"uri"` |  |
-| deployments.main.podSpec.containers.main.env.DATABASE_URL.secretKeyRef.name | string | `"{{ include \"common.helpers.cnpgAppSecret\" (dict \"root\" . \"name\" \"postgresql\") }}"` |  |
+| deployments.main.podSpec.containers.main.env.ACCESS_TOKEN_SALT.secretKeyRef.name | string | `"ghostfolio-secrets"` |  |
+| deployments.main.podSpec.containers.main.env.DATABASE_URL.secretKeyRef.key | string | `"DATABASE_URL"` |  |
+| deployments.main.podSpec.containers.main.env.DATABASE_URL.secretKeyRef.name | string | `"ghostfolio-secrets"` |  |
 | deployments.main.podSpec.containers.main.env.JWT_SECRET_KEY.secretKeyRef.key | string | `"JWT_SECRET_KEY"` |  |
-| deployments.main.podSpec.containers.main.env.JWT_SECRET_KEY.secretKeyRef.name | string | `"{{ include \"common.helpers.secretName\" (dict \"root\" . \"name\" \"auth\") }}"` |  |
+| deployments.main.podSpec.containers.main.env.JWT_SECRET_KEY.secretKeyRef.name | string | `"ghostfolio-secrets"` |  |
 | deployments.main.podSpec.containers.main.env.NODE_ENV | string | `"production"` |  |
 | deployments.main.podSpec.containers.main.env.REDIS_HOST | string | `"{{ include \"common.helpers.fullname\" . }}-redis"` |  |
 | deployments.main.podSpec.containers.main.env.REDIS_PASSWORD.secretKeyRef.key | string | `"REDIS_PASSWORD"` |  |
@@ -154,67 +155,16 @@ Includes automated backup to NFS and manual restore capabilities.
 | k8sServices.main.ports.http.port | int | `3333` |  |
 | k8sServices.main.ports.http.protocol | string | `"TCP"` |  |
 | k8sServices.main.type | string | `"ClusterIP"` |  |
-| k8sServices.redis.enabled | bool | `true` |  |
-| k8sServices.redis.ports.redis.port | int | `6379` |  |
-| k8sServices.redis.ports.redis.protocol | string | `"TCP"` |  |
-| k8sServices.redis.type | string | `"ClusterIP"` |  |
 | postgresImage.repository | string | `"postgres"` |  |
 | postgresImage.tag | string | `"16@sha256:71e27bf60b70bded003791b5573f8b808365613f341df20ffcf0c1ed7bc13ddf"` |  |
 | redisImage.repository | string | `"redis"` |  |
 | redisImage.tag | string | `"8.4.2-alpine@sha256:94dc16bdd00af588f596f01a4e44c1092c31d032e4d00a7537f1269eb0a2aa8e"` |  |
 | restore.restoreFile | string | `""` |  |
-| secrets.auth.data.ACCESS_TOKEN_SALT | string | `""` |  |
-| secrets.auth.data.JWT_SECRET_KEY | string | `""` |  |
-| secrets.auth.enabled | bool | `true` |  |
-| secrets.auth.existingSecret | string | `""` |  |
-| secrets.db-bootstrap.data.password | string | `""` |  |
-| secrets.db-bootstrap.data.username | string | `"ghostfolio"` |  |
-| secrets.db-bootstrap.enabled | bool | `true` |  |
-| secrets.db-bootstrap.existingSecret | string | `""` |  |
-| secrets.db-bootstrap.type | string | `"kubernetes.io/basic-auth"` |  |
-| secrets.redis.data.REDIS_PASSWORD | string | `""` |  |
-| secrets.redis.enabled | bool | `true` |  |
-| secrets.redis.existingSecret | string | `""` |  |
-| statefulsets.redis.enabled | bool | `true` |  |
-| statefulsets.redis.podSpec.containers.redis.command[0] | string | `"redis-server"` |  |
-| statefulsets.redis.podSpec.containers.redis.command[1] | string | `"--requirepass"` |  |
-| statefulsets.redis.podSpec.containers.redis.command[2] | string | `"$(REDIS_PASSWORD)"` |  |
-| statefulsets.redis.podSpec.containers.redis.command[3] | string | `"--appendonly"` |  |
-| statefulsets.redis.podSpec.containers.redis.command[4] | string | `"yes"` |  |
-| statefulsets.redis.podSpec.containers.redis.command[5] | string | `"--dir"` |  |
-| statefulsets.redis.podSpec.containers.redis.command[6] | string | `"/data"` |  |
-| statefulsets.redis.podSpec.containers.redis.env.REDIS_PASSWORD.secretKeyRef.key | string | `"REDIS_PASSWORD"` |  |
-| statefulsets.redis.podSpec.containers.redis.env.REDIS_PASSWORD.secretKeyRef.name | string | `"{{ include \"common.helpers.secretName\" (dict \"root\" . \"name\" \"redis\") }}"` |  |
-| statefulsets.redis.podSpec.containers.redis.imageSelector | string | `"redisImage"` |  |
-| statefulsets.redis.podSpec.containers.redis.livenessProbe.exec.command[0] | string | `"sh"` |  |
-| statefulsets.redis.podSpec.containers.redis.livenessProbe.exec.command[1] | string | `"-c"` |  |
-| statefulsets.redis.podSpec.containers.redis.livenessProbe.exec.command[2] | string | `"redis-cli -a \"$REDIS_PASSWORD\" ping | grep PONG"` |  |
-| statefulsets.redis.podSpec.containers.redis.livenessProbe.initialDelaySeconds | int | `30` |  |
-| statefulsets.redis.podSpec.containers.redis.ports.redis.containerPort | int | `6379` |  |
-| statefulsets.redis.podSpec.containers.redis.ports.redis.protocol | string | `"TCP"` |  |
-| statefulsets.redis.podSpec.containers.redis.readinessProbe.exec.command[0] | string | `"sh"` |  |
-| statefulsets.redis.podSpec.containers.redis.readinessProbe.exec.command[1] | string | `"-c"` |  |
-| statefulsets.redis.podSpec.containers.redis.readinessProbe.exec.command[2] | string | `"redis-cli -a \"$REDIS_PASSWORD\" ping | grep PONG"` |  |
-| statefulsets.redis.podSpec.containers.redis.readinessProbe.initialDelaySeconds | int | `5` |  |
-| statefulsets.redis.podSpec.containers.redis.readinessProbe.periodSeconds | int | `5` |  |
-| statefulsets.redis.podSpec.containers.redis.readinessProbe.timeoutSeconds | int | `3` |  |
-| statefulsets.redis.podSpec.containers.redis.resources.limits.cpu | string | `"500m"` |  |
-| statefulsets.redis.podSpec.containers.redis.resources.limits.memory | string | `"256Mi"` |  |
-| statefulsets.redis.podSpec.containers.redis.resources.requests.cpu | string | `"10m"` |  |
-| statefulsets.redis.podSpec.containers.redis.resources.requests.memory | string | `"64Mi"` |  |
-| statefulsets.redis.podSpec.containers.redis.volumeMounts[0].mountPath | string | `"/data"` |  |
-| statefulsets.redis.podSpec.containers.redis.volumeMounts[0].name | string | `"data"` |  |
-| statefulsets.redis.podSpec.containers.redis.volumeMounts[1].mountPath | string | `"/tmp"` |  |
-| statefulsets.redis.podSpec.containers.redis.volumeMounts[1].name | string | `"tmp"` |  |
-| statefulsets.redis.podSpec.securityContext.fsGroup | int | `999` |  |
-| statefulsets.redis.podSpec.securityContext.runAsGroup | int | `999` |  |
-| statefulsets.redis.podSpec.securityContext.runAsNonRoot | bool | `true` |  |
-| statefulsets.redis.podSpec.securityContext.runAsUser | int | `999` |  |
-| statefulsets.redis.podSpec.volumes[0].emptyDir | object | `{}` |  |
-| statefulsets.redis.podSpec.volumes[0].name | string | `"tmp"` |  |
-| statefulsets.redis.volumeClaimTemplates[0].metadata.name | string | `"data"` |  |
-| statefulsets.redis.volumeClaimTemplates[0].spec.accessModes[0] | string | `"ReadWriteOnce"` |  |
-| statefulsets.redis.volumeClaimTemplates[0].spec.resources.requests.storage | string | `"1Gi"` |  |
+| secrets.ghostfolio-secrets.data.ACCESS_TOKEN_SALT | string | `""` |  |
+| secrets.ghostfolio-secrets.data.DATABASE_URL | string | `""` |  |
+| secrets.ghostfolio-secrets.data.JWT_SECRET_KEY | string | `""` |  |
+| secrets.ghostfolio-secrets.enabled | bool | `true` |  |
+| secrets.ghostfolio-secrets.existingSecret | string | `""` |  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
