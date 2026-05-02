@@ -3,7 +3,7 @@
 # common
 
 Common library chart providing reusable Helm templates and default configurations.
-Standardizes Kubernetes resource deployment (Deployments, StatefulSets, CronJobs, Jobs,
+Standardizes Kubernetes resource deployment (Deployments, StatefulSets, DaemonSets, CronJobs, Jobs,
 Services, Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims, CNPG Clusters)
 across the chart repository with consistent security, observability, and best practices.
 
@@ -83,6 +83,34 @@ Used by all application charts in this repository for consistency.
 </pre>
 </td>
 			<td>CronJobs configuration. Define one or more scheduled jobs under the 'cronjobs' key.</td>
+		</tr>
+	</tbody>
+</table>
+<h3>DaemonSets configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>daemonsets</td>
+			<td>object</td>
+			<td><pre lang="json">
+{
+  "main": {
+    "enabled": false,
+    "revisionHistoryLimit": 3,
+    "updateStrategy": {
+      "type": "RollingUpdate"
+    }
+  }
+}
+</pre>
+</td>
+			<td>DaemonSets configuration. Define one or more daemon workloads under the 'daemonsets' key. A DaemonSet ensures one pod runs on every (matching) node. Useful for host-level agents such as mDNS repeaters, log shippers, or node exporters.</td>
 		</tr>
 	</tbody>
 </table>
@@ -405,6 +433,26 @@ false
 </pre>
 </td>
 		<td>Cron schedule expression</td>
+	</tr>
+	<tr>
+		<td>daemonsets.main.enabled</td>
+		<td>bool</td>
+		<td><pre lang="json">
+false
+</pre>
+</td>
+		<td>Enable or disable this DaemonSet</td>
+	</tr>
+	<tr>
+		<td>daemonsets.main.updateStrategy</td>
+		<td>object</td>
+		<td><pre lang="json">
+{
+  "type": "RollingUpdate"
+}
+</pre>
+</td>
+		<td>DaemonSet update strategy. type: RollingUpdate or OnDelete</td>
 	</tr>
 	<tr>
 		<td>deployments.main.enabled</td>
