@@ -4,7 +4,7 @@ version: 3.0.0
 type: library
 description: |-
   Common library chart providing reusable Helm templates and default configurations.
-  Standardizes Kubernetes resource deployment (Deployments, StatefulSets, CronJobs, Jobs,
+  Standardizes Kubernetes resource deployment (Deployments, StatefulSets, DaemonSets, CronJobs, Jobs,
   Services, Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims, CNPG Clusters)
   across the chart repository with consistent security, observability, and best practices.
 

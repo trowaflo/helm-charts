@@ -23,10 +23,12 @@ spec:
   type: {{ $svcConfig.type | default "ClusterIP" }}
   ports:
   {{- range $portName, $portCfg := $svcConfig.ports }}
+  {{- if $portCfg }}
     - name: {{ $portName }}
       port: {{ $portCfg.port }}
       protocol: {{ include "common.helpers.protocol" $portCfg.protocol }}
       targetPort: {{ $portName }}
+  {{- end }}
   {{- end }}
   selector:
     app.kubernetes.io/name: {{ include "common.helpers.name" $ }}

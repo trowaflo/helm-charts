@@ -1,0 +1,2 @@
+nameOverride: "mdns-repeater-test"
+namespaceOverride: "mdns-repeater-test"

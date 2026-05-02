@@ -50,6 +50,23 @@ statefulsets:
     # -- VolumeClaimTemplates for persistent storage. Each entry requires metadata.name and spec.resources.requests.storage
     volumeClaimTemplates: []
 
+# -- DaemonSets configuration. Define one or more daemon workloads under the 'daemonsets' key.
+# A DaemonSet ensures one pod runs on every (matching) node. Useful for host-level agents
+# such as mDNS repeaters, log shippers, or node exporters.
+# @section -- DaemonSets configuration
+daemonsets:
+  main:
+    # -- Enable or disable this DaemonSet
+    enabled: false
+    revisionHistoryLimit: 3
+    # -- DaemonSet update strategy. type: RollingUpdate or OnDelete
+    updateStrategy:
+      type: RollingUpdate
+    # -- Pod-level spec. Groups all pod-level fields (containers, securityContext, volumes, etc.)
+    # podSpec:
+    #   securityContext: {}   # Defaults: runAsNonRoot=true, fsGroupChangePolicy=OnRootMismatch
+    #   containers:           # required — at minimum: {main: {image: {repository, tag}}}
+
 # -- CronJobs configuration. Define one or more scheduled jobs under the 'cronjobs' key.
 # @section -- CronJobs configuration
 cronjobs:

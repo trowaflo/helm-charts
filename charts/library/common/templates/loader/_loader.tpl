@@ -24,6 +24,9 @@
   {{/* Render statefulset - workload layer */}}
   {{- include "common.manifests.statefulset" . | nindent 0 -}}
 
+  {{/* Render daemonset - workload layer */}}
+  {{- include "common.manifests.daemonset" . | nindent 0 -}}
+
   {{/* Render cronjob - workload layer */}}
   {{- include "common.manifests.cronjob" . | nindent 0 -}}
 
