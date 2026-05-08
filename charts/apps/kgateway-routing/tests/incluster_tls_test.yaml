@@ -194,3 +194,97 @@ tests:
       - equal:
           path: spec.targetRefs[0].name
           value: api-service
+
+  - it: should respect namespaceOverride for the BackendConfigPolicy namespace
+    template: templates/backendconfigpolicy.yaml
+    set:
+      namespaceOverride: routing-ns
+      routes:
+        api:
+          enabled: true
+          hostnames: ["api.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: api-service
+              port: 8443
+              tls: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.namespace
+          value: routing-ns
+
+  - it: should place the policy in the backend namespace when inCluster targets a cross-namespace Service
+    template: templates/backendconfigpolicy.yaml
+    set:
+      routes:
+        api:
+          enabled: true
+          namespace: routing-ns
+          hostnames: ["api.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: api-service
+              namespace: app-ns
+              port: 8443
+              tls: true
+              insecure: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.namespace
+          value: app-ns
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-api-policy-app-ns
+      - equal:
+          path: spec.targetRefs[0].kind
+          value: Service
+      - equal:
+          path: spec.targetRefs[0].name
+          value: api-service
+
+  - it: should emit one BCP per target namespace when mixing cross-namespace inCluster TLS
+    template: templates/backendconfigpolicy.yaml
+    set:
+      routes:
+        api:
+          enabled: true
+          namespace: routing-ns
+          hostnames: ["api.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: local-svc
+              port: 8443
+              tls: true
+            - name: remote-svc
+              namespace: other-ns
+              port: 8443
+              tls: true
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: metadata.namespace
+          value: other-ns
+        documentIndex: 0
+      - equal:
+          path: spec.targetRefs[0].name
+          value: remote-svc
+        documentIndex: 0
+      - equal:
+          path: metadata.namespace
+          value: routing-ns
+        documentIndex: 1
+      - equal:
+          path: spec.targetRefs[0].name
+          value: local-svc
+        documentIndex: 1
