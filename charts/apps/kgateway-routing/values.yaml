@@ -14,8 +14,8 @@ defaultParentRefs: []
 # -- Default GatewayExtension reference for routes using `forwardAuth: true`.
 # Allows declaring the ExtAuth provider once globally instead of repeating it on every route.
 # Routes can override per-route by setting `forwardAuth: { extensionRef: { name, namespace } }`.
-# @default -- null (no default; `forwardAuth: true` will fail without it)
-defaultForwardAuth: null
+# @default -- {} (no default; `forwardAuth: true` will fail without it)
+defaultForwardAuth: {}
   # extensionRef:
   #   name: authentik-extauth
   #   namespace: kgateway

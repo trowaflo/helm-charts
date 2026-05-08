@@ -76,3 +76,12 @@ tests:
       - lengthEqual:
           path: spec.rules[0].matches
           count: 1
+
+  - it: should fail when allow is explicitly empty list
+    values:
+      - values/allow-list.yaml
+    set:
+      routes.authentik.allow: []
+    asserts:
+      - failedTemplate:
+          errorMessage: "routes.authentik.allow is set to an empty list; specify at least one path or remove the allow key entirely for catch-all behavior"

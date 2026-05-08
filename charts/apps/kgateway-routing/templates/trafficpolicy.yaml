@@ -2,12 +2,15 @@
 {{- $keys := keys .Values.routes | sortAlpha -}}
 {{- range $key := $keys }}
   {{- $cfg := index $.Values.routes $key }}
-  {{- if and $cfg.enabled $cfg.forwardAuth }}
+  {{- if and $cfg.enabled (hasKey $cfg "forwardAuth") }}
+    {{- if not $cfg.forwardAuth }}
+      {{- fail (printf "routes.%s.forwardAuth is set but empty/false; set it to true or an object with extensionRef, or remove the key entirely" $key) }}
+    {{- end }}
     {{- $name := include "kgateway-routing.routeName" (dict "root" $ "key" $key "config" $cfg) }}
     {{- $routeNamespace := default $namespace $cfg.namespace }}
     {{- $extRef := dict }}
     {{- if kindIs "bool" $cfg.forwardAuth }}
-      {{- if not $.Values.defaultForwardAuth }}
+      {{- if not $.Values.defaultForwardAuth.extensionRef }}
         {{- fail (printf "routes.%s.forwardAuth: true requires .Values.defaultForwardAuth.extensionRef to be set" $key) }}
       {{- end }}
       {{- $extRef = $.Values.defaultForwardAuth.extensionRef }}
@@ -18,7 +21,7 @@
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: TrafficPolicy
 metadata:
-  name: {{ $name }}-forward-auth
+  name: {{ printf "%s-forward-auth" $name | trunc 63 | trimSuffix "-" }}
   namespace: {{ $routeNamespace }}
   {{- with $cfg.labels }}
   labels:
