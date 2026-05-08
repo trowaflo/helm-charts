@@ -1,17 +1,17 @@
-{{- define "common.manifests.deployment" -}}
-  {{- $deployments := .Values.deployments | default dict }}
-  {{- range $name := keys $deployments | sortAlpha }}
-    {{- $deployment := index $deployments $name }}
-    {{- if $deployment.enabled }}
-      {{- $podSpec := $deployment.podSpec | default dict -}}
-      {{- $_ := required (printf "deployments.%s.podSpec.containers is required and must define at least one container when enabled" $name) $podSpec.containers }}
-      {{- $defaultStrategy := dict "type" "RollingUpdate" -}}
-      {{- $strategy := mergeOverwrite (deepCopy $defaultStrategy) ($deployment.strategy | default dict) -}}
+{{- define "common.manifests.daemonset" -}}
+  {{- $daemonsets := .Values.daemonsets | default dict }}
+  {{- range $name := keys $daemonsets | sortAlpha }}
+    {{- $daemonset := index $daemonsets $name }}
+    {{- if $daemonset.enabled }}
+      {{- $podSpec := $daemonset.podSpec | default dict -}}
+      {{- $_ := required (printf "daemonsets.%s.podSpec.containers is required and must define at least one container when enabled" $name) $podSpec.containers }}
+      {{- $defaultUpdateStrategy := dict "type" "RollingUpdate" -}}
+      {{- $updateStrategy := mergeOverwrite (deepCopy $defaultUpdateStrategy) ($daemonset.updateStrategy | default dict) -}}
       {{- $defaultPodSecCtx := dict "runAsNonRoot" true "fsGroupChangePolicy" "OnRootMismatch" -}}
       {{- $podSecCtx := mergeOverwrite (deepCopy $defaultPodSecCtx) ($podSpec.securityContext | default dict) }}
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: {{ include "common.helpers.fullname" $ }}-{{ $name }}
   namespace: {{ include "common.helpers.namespace" $ }}
@@ -19,18 +19,13 @@ metadata:
     {{- include "common.helpers.labels" $ | nindent 4 }}
     app.kubernetes.io/component: {{ $name }}
 spec:
-  {{- if hasKey $deployment "replicas" }}
-  replicas: {{ $deployment.replicas }}
-  {{- else }}
-  replicas: 1
-  {{- end }}
-  {{- if hasKey $deployment "revisionHistoryLimit" }}
-  revisionHistoryLimit: {{ $deployment.revisionHistoryLimit }}
+  {{- if hasKey $daemonset "revisionHistoryLimit" }}
+  revisionHistoryLimit: {{ $daemonset.revisionHistoryLimit }}
   {{- else }}
   revisionHistoryLimit: 3
   {{- end }}
-  strategy:
-    {{- toYaml $strategy | nindent 4 }}
+  updateStrategy:
+    {{- toYaml $updateStrategy | nindent 4 }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "common.helpers.name" $ }}

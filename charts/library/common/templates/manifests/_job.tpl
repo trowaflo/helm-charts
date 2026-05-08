@@ -1,17 +1,14 @@
-{{- define "common.manifests.deployment" -}}
-  {{- $deployments := .Values.deployments | default dict }}
-  {{- range $name := keys $deployments | sortAlpha }}
-    {{- $deployment := index $deployments $name }}
-    {{- if $deployment.enabled }}
-      {{- $podSpec := $deployment.podSpec | default dict -}}
-      {{- $_ := required (printf "deployments.%s.podSpec.containers is required and must define at least one container when enabled" $name) $podSpec.containers }}
-      {{- $defaultStrategy := dict "type" "RollingUpdate" -}}
-      {{- $strategy := mergeOverwrite (deepCopy $defaultStrategy) ($deployment.strategy | default dict) -}}
+{{- define "common.manifests.job" -}}
+  {{- range $name := keys .Values.jobs | sortAlpha }}
+    {{- $job := index $.Values.jobs $name }}
+    {{- if $job.enabled }}
+      {{- $podSpec := $job.podSpec | default dict -}}
+      {{- $_ := required (printf "jobs.%s.podSpec.containers is required and must define at least one container when enabled" $name) $podSpec.containers }}
       {{- $defaultPodSecCtx := dict "runAsNonRoot" true "fsGroupChangePolicy" "OnRootMismatch" -}}
       {{- $podSecCtx := mergeOverwrite (deepCopy $defaultPodSecCtx) ($podSpec.securityContext | default dict) }}
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
   name: {{ include "common.helpers.fullname" $ }}-{{ $name }}
   namespace: {{ include "common.helpers.namespace" $ }}
@@ -19,23 +16,25 @@ metadata:
     {{- include "common.helpers.labels" $ | nindent 4 }}
     app.kubernetes.io/component: {{ $name }}
 spec:
-  {{- if hasKey $deployment "replicas" }}
-  replicas: {{ $deployment.replicas }}
-  {{- else }}
-  replicas: 1
+  {{- if hasKey $job "completions" }}
+  completions: {{ $job.completions }}
   {{- end }}
-  {{- if hasKey $deployment "revisionHistoryLimit" }}
-  revisionHistoryLimit: {{ $deployment.revisionHistoryLimit }}
-  {{- else }}
-  revisionHistoryLimit: 3
+  {{- if hasKey $job "parallelism" }}
+  parallelism: {{ $job.parallelism }}
   {{- end }}
-  strategy:
-    {{- toYaml $strategy | nindent 4 }}
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: {{ include "common.helpers.name" $ }}
-      app.kubernetes.io/instance: {{ $.Release.Name }}
-      app.kubernetes.io/component: {{ $name }}
+  {{- if hasKey $job "activeDeadlineSeconds" }}
+  activeDeadlineSeconds: {{ $job.activeDeadlineSeconds }}
+  {{- end }}
+  {{- if hasKey $job "ttlSecondsAfterFinished" }}
+  ttlSecondsAfterFinished: {{ $job.ttlSecondsAfterFinished }}
+  {{- end }}
+  {{- if hasKey $job "backoffLimit" }}
+  backoffLimit: {{ $job.backoffLimit }}
+  {{- end }}
+  {{- with $job.podFailurePolicy }}
+  podFailurePolicy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   template:
     metadata:
       labels:
@@ -49,6 +48,7 @@ spec:
         {{- end }}
       {{- end }}
     spec:
+      restartPolicy: {{ $podSpec.restartPolicy | default "OnFailure" }}
       {{- with $podSpec.serviceAccountName }}
       serviceAccountName: {{ . }}
       {{- end }}

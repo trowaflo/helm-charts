@@ -1,17 +1,16 @@
-{{- define "common.manifests.deployment" -}}
-  {{- $deployments := .Values.deployments | default dict }}
-  {{- range $name := keys $deployments | sortAlpha }}
-    {{- $deployment := index $deployments $name }}
-    {{- if $deployment.enabled }}
-      {{- $podSpec := $deployment.podSpec | default dict -}}
-      {{- $_ := required (printf "deployments.%s.podSpec.containers is required and must define at least one container when enabled" $name) $podSpec.containers }}
-      {{- $defaultStrategy := dict "type" "RollingUpdate" -}}
-      {{- $strategy := mergeOverwrite (deepCopy $defaultStrategy) ($deployment.strategy | default dict) -}}
+{{- define "common.manifests.statefulset" -}}
+  {{- range $name := keys .Values.statefulsets | sortAlpha }}
+    {{- $statefulset := index $.Values.statefulsets $name }}
+    {{- if $statefulset.enabled }}
+      {{- $podSpec := $statefulset.podSpec | default dict -}}
+      {{- $_ := required (printf "statefulsets.%s.podSpec.containers is required and must define at least one container when enabled" $name) $podSpec.containers }}
+      {{- $defaultUpdateStrategy := dict "type" "RollingUpdate" -}}
+      {{- $updateStrategy := mergeOverwrite (deepCopy $defaultUpdateStrategy) ($statefulset.updateStrategy | default dict) -}}
       {{- $defaultPodSecCtx := dict "runAsNonRoot" true "fsGroupChangePolicy" "OnRootMismatch" -}}
       {{- $podSecCtx := mergeOverwrite (deepCopy $defaultPodSecCtx) ($podSpec.securityContext | default dict) }}
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "common.helpers.fullname" $ }}-{{ $name }}
   namespace: {{ include "common.helpers.namespace" $ }}
@@ -19,18 +18,22 @@ metadata:
     {{- include "common.helpers.labels" $ | nindent 4 }}
     app.kubernetes.io/component: {{ $name }}
 spec:
-  {{- if hasKey $deployment "replicas" }}
-  replicas: {{ $deployment.replicas }}
+  serviceName: {{ $statefulset.serviceName | default (printf "%s-%s" (include "common.helpers.fullname" $) $name) }}
+  {{- if hasKey $statefulset "replicas" }}
+  replicas: {{ $statefulset.replicas }}
   {{- else }}
   replicas: 1
   {{- end }}
-  {{- if hasKey $deployment "revisionHistoryLimit" }}
-  revisionHistoryLimit: {{ $deployment.revisionHistoryLimit }}
+  {{- if hasKey $statefulset "revisionHistoryLimit" }}
+  revisionHistoryLimit: {{ $statefulset.revisionHistoryLimit }}
   {{- else }}
   revisionHistoryLimit: 3
   {{- end }}
-  strategy:
-    {{- toYaml $strategy | nindent 4 }}
+  {{- with $statefulset.podManagementPolicy }}
+  podManagementPolicy: {{ . }}
+  {{- end }}
+  updateStrategy:
+    {{- toYaml $updateStrategy | nindent 4 }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "common.helpers.name" $ }}
@@ -117,6 +120,15 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-    {{- end }}
+  {{- if $statefulset.volumeClaimTemplates }}
+  {{- range $vct := $statefulset.volumeClaimTemplates }}
+    {{- $vctName := (($vct.metadata | default dict).name) }}
+    {{- $_ := required (printf "statefulsets.%s.volumeClaimTemplates[].metadata.name is required" $name) $vctName }}
+    {{- $_ := required (printf "statefulsets.%s.volumeClaimTemplates[%s].spec.resources.requests.storage is required" $name $vctName) ((((($vct.spec | default dict).resources) | default dict).requests | default dict).storage) }}
+  {{- end }}
+  volumeClaimTemplates:
+    {{- toYaml $statefulset.volumeClaimTemplates | nindent 4 }}
+  {{- end }}
+  {{- end }}
   {{- end }}
 {{- end -}}
