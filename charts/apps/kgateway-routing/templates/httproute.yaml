@@ -48,16 +48,24 @@ spec:
     
     {{- if $cfg.inCluster }}
       {{- range $backend := $cfg.inCluster }}
-    - 
-      {{- if $backend.matches }}
-      matches:
+    - matches:
+        {{- if $cfg.allow }}
+        {{- range $cfg.allow }}
+        - path:
+            {{- if eq . "/" }}
+            type: Exact
+            {{- else }}
+            type: PathPrefix
+            {{- end }}
+            value: {{ . | quote }}
+        {{- end }}
+        {{- else if $backend.matches }}
         {{- toYaml $backend.matches | nindent 8 }}
-      {{- else }}
-      matches:
+        {{- else }}
         - path:
             type: PathPrefix
             value: /
-      {{- end }}
+        {{- end }}
       backendRefs:
         {{- if $backend.tls }}
         {{- $backendName := printf "%s-%s-backend" $key $backend.name }}
@@ -145,16 +153,24 @@ spec:
     {{- if $cfg.outCluster }}
       {{- range $idx, $backend := $cfg.outCluster }}
         {{- $backendName := printf "%s-%s-backend" $key $backend.name }}
-    - 
-      {{- if $backend.matches }}
-      matches:
+    - matches:
+        {{- if $cfg.allow }}
+        {{- range $cfg.allow }}
+        - path:
+            {{- if eq . "/" }}
+            type: Exact
+            {{- else }}
+            type: PathPrefix
+            {{- end }}
+            value: {{ . | quote }}
+        {{- end }}
+        {{- else if $backend.matches }}
         {{- toYaml $backend.matches | nindent 8 }}
-      {{- else }}
-      matches:
+        {{- else }}
         - path:
             type: PathPrefix
             value: /
-      {{- end }}
+        {{- end }}
       backendRefs:
         - group: gateway.kgateway.dev
           kind: Backend

@@ -1,0 +1,78 @@
+suite: test kgateway-routing chart - allow list path filtering
+release:
+  name: kgateway-routing-test
+  namespace: kgateway-test
+templates:
+  - templates/httproute.yaml
+tests:
+  - it: should generate one match per allow entry
+    values:
+      - values/allow-list.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: HTTPRoute
+      - lengthEqual:
+          path: spec.rules[0].matches
+          count: 4
+
+  - it: should generate Exact match for root '/'
+    values:
+      - values/allow-list.yaml
+    asserts:
+      - equal:
+          path: spec.rules[0].matches[0].path.type
+          value: Exact
+      - equal:
+          path: spec.rules[0].matches[0].path.value
+          value: /
+
+  - it: should generate PathPrefix match for non-root entries
+    values:
+      - values/allow-list.yaml
+    asserts:
+      - equal:
+          path: spec.rules[0].matches[1].path.type
+          value: PathPrefix
+      - equal:
+          path: spec.rules[0].matches[1].path.value
+          value: /if/flow/
+      - equal:
+          path: spec.rules[0].matches[2].path.type
+          value: PathPrefix
+      - equal:
+          path: spec.rules[0].matches[3].path.type
+          value: PathPrefix
+
+  - it: should not generate a catch-all rule when allow is set
+    values:
+      - values/allow-list.yaml
+    asserts:
+      - lengthEqual:
+          path: spec.rules
+          count: 1
+      # All matches in single rule, none should be PathPrefix `/`
+      - notEqual:
+          path: spec.rules[0].matches[1].path.value
+          value: /
+      - notEqual:
+          path: spec.rules[0].matches[2].path.value
+          value: /
+      - notEqual:
+          path: spec.rules[0].matches[3].path.value
+          value: /
+
+  - it: should preserve current behavior without allow (PathPrefix /)
+    values:
+      - values/only-incluster.yaml
+    asserts:
+      - equal:
+          path: spec.rules[0].matches[0].path.type
+          value: PathPrefix
+      - equal:
+          path: spec.rules[0].matches[0].path.value
+          value: /
+      - lengthEqual:
+          path: spec.rules[0].matches
+          count: 1

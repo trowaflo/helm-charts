@@ -1,0 +1,75 @@
+suite: test kgateway-routing chart - ForwardAuth TrafficPolicy
+release:
+  name: kgateway-routing-test
+  namespace: kgateway-test
+templates:
+  - templates/trafficpolicy.yaml
+tests:
+  - it: should generate TrafficPolicy only for routes with forwardAuth
+    values:
+      - values/forward-auth.yaml
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: TrafficPolicy
+        documentIndex: 0
+      - isKind:
+          of: TrafficPolicy
+        documentIndex: 1
+
+  - it: should reference defaultForwardAuth.extensionRef when forwardAuth is true
+    values:
+      - values/forward-auth.yaml
+    documentSelector:
+      path: metadata.name
+      value: frigate-forward-auth
+    asserts:
+      - equal:
+          path: apiVersion
+          value: gateway.kgateway.dev/v1alpha1
+      - equal:
+          path: kind
+          value: TrafficPolicy
+      - equal:
+          path: metadata.namespace
+          value: kgateway-test
+      - equal:
+          path: spec.targetRefs[0].kind
+          value: HTTPRoute
+      - equal:
+          path: spec.targetRefs[0].name
+          value: frigate
+      - equal:
+          path: spec.targetRefs[0].group
+          value: gateway.networking.k8s.io
+      - equal:
+          path: spec.extAuth.extensionRef.name
+          value: authentik-extauth
+      - equal:
+          path: spec.extAuth.extensionRef.namespace
+          value: kgateway
+
+  - it: should use per-route extensionRef when forwardAuth is an object
+    values:
+      - values/forward-auth.yaml
+    documentSelector:
+      path: metadata.name
+      value: custom-forward-auth
+    asserts:
+      - equal:
+          path: spec.extAuth.extensionRef.name
+          value: other-extauth
+      - equal:
+          path: spec.extAuth.extensionRef.namespace
+          value: other-ns
+      - equal:
+          path: spec.targetRefs[0].name
+          value: custom
+
+  - it: should generate no TrafficPolicy when no route has forwardAuth
+    values:
+      - values/only-incluster.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
