@@ -84,4 +84,6 @@ tests:
       routes.authentik.allow: []
     asserts:
       - failedTemplate:
-          errorMessage: "routes.authentik.allow is set to an empty list; specify at least one path or remove the allow key entirely for catch-all behavior"
+          errorMessage: >-
+            routes.authentik.allow is set to an empty list; specify at least one path
+            or remove the allow key entirely for catch-all behavior
