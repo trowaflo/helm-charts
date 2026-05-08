@@ -13,10 +13,9 @@
   {{- end }}
 {{- end }}
 
-{{- /* Collect all backends from routes */ -}}
+{{- /* Collect Backend CRDs to generate (outCluster only — kgateway has no Kube backend type) */ -}}
 {{- range $routeKey, $routeCfg := .Values.routes }}
   {{- if $routeCfg.enabled }}
-    {{- /* outCluster backends */ -}}
     {{- range $backend := $routeCfg.outCluster }}
       {{- $backendName := printf "%s-%s-backend" $routeKey $backend.name }}
       {{- $backendNamespace := default $namespace (default $routeCfg.namespace $backend.namespace) }}
@@ -24,20 +23,10 @@
       {{- template "kgateway-routing.addBackendMetadata" (list $backendSpec $backend) }}
       {{- $_ := set $generatedBackends $backendName $backendSpec }}
     {{- end }}
-    {{- /* inCluster backends with TLS */ -}}
-    {{- range $backend := $routeCfg.inCluster }}
-      {{- if $backend.tls }}
-        {{- $backendName := printf "%s-%s-backend" $routeKey $backend.name }}
-        {{- $backendNamespace := default $namespace (default $routeCfg.namespace $backend.namespace) }}
-        {{- $backendSpec := dict "type" "Kube" "namespace" $backendNamespace "kube" (dict "serviceName" $backend.name "serviceNamespace" $backendNamespace "port" $backend.port) }}
-        {{- template "kgateway-routing.addBackendMetadata" (list $backendSpec $backend) }}
-        {{- $_ := set $generatedBackends $backendName $backendSpec }}
-      {{- end }}
-    {{- end }}
   {{- end }}
 {{- end }}
 
-{{- /* Render generated backends from routes.outCluster */ -}}
+{{- /* Render generated Backend CRDs */ -}}
 {{- $backendKeys := keys $generatedBackends | sortAlpha -}}
 {{- range $backendName := $backendKeys }}
   {{- $cfg := index $generatedBackends $backendName }}
@@ -57,7 +46,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  type: {{ required (printf "inline backend type is required for %s" $backendName) $cfg.type }}
+  type: {{ $cfg.type }}
   {{- if eq $cfg.type "Static" }}
     {{- if $cfg.static }}
   static:
@@ -67,20 +56,6 @@ spec:
       - host: {{ required "backend static host is required" .host }}
         port: {{ required "backend static port is required" .port }}
         {{- end }}
-      {{- end }}
-    {{- end }}
-  {{- end }}
-  {{- if eq $cfg.type "Kube" }}
-    {{- if $cfg.kube }}
-  kube:
-      {{- if $cfg.kube.serviceName }}
-    serviceName: {{ $cfg.kube.serviceName }}
-      {{- end }}
-      {{- if $cfg.kube.serviceNamespace }}
-    serviceNamespace: {{ $cfg.kube.serviceNamespace }}
-      {{- end }}
-      {{- if $cfg.kube.port }}
-    port: {{ $cfg.kube.port }}
       {{- end }}
     {{- end }}
   {{- end }}

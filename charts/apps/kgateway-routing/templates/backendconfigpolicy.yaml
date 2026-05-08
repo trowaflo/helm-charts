@@ -1,33 +1,62 @@
-{{- range $routeKey, $route := .Values.routes }}
+{{- $namespace := include "kgateway-routing.namespace" . -}}
+{{- $routeKeys := keys .Values.routes | sortAlpha -}}
+{{- range $routeKey := $routeKeys }}
+{{- $route := index $.Values.routes $routeKey }}
 {{- if $route.enabled }}
-{{- $routeNamespace := default $.Release.Namespace $route.namespace }}
-{{- $tlsBackends := list }}
-{{- /* Collect TLS backends from both outCluster and inCluster */ -}}
-{{- range $backendList := list $route.outCluster $route.inCluster }}
-  {{- range $backend := $backendList }}
-    {{- if $backend.tls }}
-      {{- $tlsBackends = append $tlsBackends $backend }}
-    {{- end }}
+{{- $routeNamespace := default $namespace $route.namespace }}
+{{- /* Group TLS targets by the namespace where the BackendConfigPolicy must live. */ -}}
+{{- /* LocalPolicyTargetReference has no namespace field — the policy must be in the */ -}}
+{{- /* same namespace as the target (Service or Backend). */ -}}
+{{- $targetsByNs := dict }}
+{{- /* outCluster TLS: target the generated Backend CRD, lives in backend's namespace */ -}}
+{{- range $backend := $route.outCluster }}
+  {{- if $backend.tls }}
+    {{- $targetNs := default $routeNamespace $backend.namespace }}
+    {{- $existing := index $targetsByNs $targetNs | default (list) }}
+    {{- $entry := dict
+        "group" "gateway.kgateway.dev"
+        "kind" "Backend"
+        "name" (printf "%s-%s-backend" $routeKey $backend.name)
+        "backend" $backend }}
+    {{- $_ := set $targetsByNs $targetNs (append $existing $entry) }}
   {{- end }}
 {{- end }}
-{{- if $tlsBackends }}
+{{- /* inCluster TLS: target the Kubernetes Service directly */ -}}
+{{- range $backend := $route.inCluster }}
+  {{- if $backend.tls }}
+    {{- $targetNs := default $routeNamespace $backend.namespace }}
+    {{- $existing := index $targetsByNs $targetNs | default (list) }}
+    {{- $entry := dict
+        "group" ""
+        "kind" "Service"
+        "name" $backend.name
+        "backend" $backend }}
+    {{- $_ := set $targetsByNs $targetNs (append $existing $entry) }}
+  {{- end }}
+{{- end }}
+{{- range $bcpNs := keys $targetsByNs | sortAlpha }}
+{{- $targets := index $targetsByNs $bcpNs }}
+{{- $bcpName := printf "%s-%s-policy" $.Release.Name $routeKey }}
+{{- if ne $bcpNs $routeNamespace }}
+{{- $bcpName = printf "%s-%s" $bcpName $bcpNs }}
+{{- end }}
 ---
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: BackendConfigPolicy
 metadata:
-  name: {{ printf "%s-%s-policy" $.Release.Name $routeKey }}
-  namespace: {{ $routeNamespace }}
+  name: {{ $bcpName }}
+  namespace: {{ $bcpNs }}
   labels:
     {{- include "kgateway-routing.labels" $ | nindent 4 }}
 spec:
   targetRefs:
-    {{- range $backend := $tlsBackends }}
-    - group: gateway.kgateway.dev
-      kind: Backend
-      name: {{ printf "%s-%s-backend" $routeKey $backend.name }}
+    {{- range $target := $targets }}
+    - group: {{ $target.group | quote }}
+      kind: {{ $target.kind }}
+      name: {{ $target.name }}
     {{- end }}
   tls:
-    {{- $firstBackend := index $tlsBackends 0 }}
+    {{- $firstBackend := (index $targets 0).backend }}
     {{- if $firstBackend.sni }}
     sni: {{ $firstBackend.sni }}
     {{- else if $firstBackend.host }}
