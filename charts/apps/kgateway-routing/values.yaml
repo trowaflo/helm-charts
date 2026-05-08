@@ -98,8 +98,10 @@ defaultForwardAuth: {}
 #         insecure: true
 #         sni: api-service.namespace.svc.cluster.local
 # ```
-# Note: For inCluster, `tls: true` creates a Backend CRD and applies BackendConfigPolicy.
-#       SNI defaults to service name but can be overridden with `sni` field.
+# Note: For inCluster, `tls: true` attaches a BackendConfigPolicy directly to the
+#       Kubernetes Service (via targetRefs). The HTTPRoute keeps referencing the
+#       Service. No Backend CRD is generated — kgateway has no `Kube` backend type.
+#       SNI defaults to the service name but can be overridden with the `sni` field.
 #
 # **Path filtering with `allow:` (default deny):**
 # When `allow` is set on a route, only the listed paths are forwarded to the backend.

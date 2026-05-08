@@ -172,13 +172,13 @@ tests:
           value: RELEASE-NAME-api-policy
       - equal:
           path: spec.targetRefs[0].group
-          value: gateway.kgateway.dev
+          value: ""
       - equal:
           path: spec.targetRefs[0].kind
-          value: Backend
+          value: Service
       - equal:
           path: spec.targetRefs[0].name
-          value: api-api-service-backend
+          value: api-service
       - equal:
           path: spec.tls.sni
           value: api-service
@@ -232,11 +232,23 @@ tests:
       - hasDocuments:
           count: 1
       - equal:
+          path: spec.targetRefs[0].group
+          value: gateway.kgateway.dev
+      - equal:
+          path: spec.targetRefs[0].kind
+          value: Backend
+      - equal:
           path: spec.targetRefs[0].name
           value: mixed-external-api-backend
       - equal:
+          path: spec.targetRefs[1].group
+          value: ""
+      - equal:
+          path: spec.targetRefs[1].kind
+          value: Service
+      - equal:
           path: spec.targetRefs[1].name
-          value: mixed-internal-api-backend
+          value: internal-api
       - equal:
           path: spec.tls.sni
           value: external.example.com
