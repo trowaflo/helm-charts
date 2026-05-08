@@ -1,0 +1,58 @@
+suite: test kgateway-routing chart - backward compatibility (no allow / no forwardAuth)
+release:
+  name: kgateway-routing-test
+  namespace: kgateway-test
+templates:
+  - templates/httproute.yaml
+  - templates/trafficpolicy.yaml
+tests:
+  - it: should preserve current matches behavior when allow is absent (inCluster)
+    template: templates/httproute.yaml
+    values:
+      - values/only-incluster.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: HTTPRoute
+      - lengthEqual:
+          path: spec.rules[0].matches
+          count: 1
+      - equal:
+          path: spec.rules[0].matches[0].path.type
+          value: PathPrefix
+      - equal:
+          path: spec.rules[0].matches[0].path.value
+          value: /
+
+  - it: should preserve current matches behavior when allow is absent (outCluster)
+    template: templates/httproute.yaml
+    values:
+      - values/only-outcluster.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: HTTPRoute
+      - equal:
+          path: spec.rules[0].matches[0].path.type
+          value: PathPrefix
+      - equal:
+          path: spec.rules[0].matches[0].path.value
+          value: /
+
+  - it: should generate no TrafficPolicy when forwardAuth is absent on all routes
+    template: templates/trafficpolicy.yaml
+    values:
+      - values/only-incluster.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should generate no TrafficPolicy with default values
+    template: templates/trafficpolicy.yaml
+    values:
+      - values/default.yaml
+    asserts:
+      - hasDocuments:
+          count: 0

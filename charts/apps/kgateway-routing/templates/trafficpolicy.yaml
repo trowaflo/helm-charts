@@ -1,0 +1,42 @@
+{{- $namespace := include "kgateway-routing.namespace" . -}}
+{{- $keys := keys .Values.routes | sortAlpha -}}
+{{- range $key := $keys }}
+  {{- $cfg := index $.Values.routes $key }}
+  {{- if and $cfg.enabled (hasKey $cfg "forwardAuth") }}
+    {{- if not $cfg.forwardAuth }}
+      {{- fail (printf "routes.%s.forwardAuth is set but empty/false; set it to true or an object with extensionRef, or remove the key entirely" $key) }}
+    {{- end }}
+    {{- $name := include "kgateway-routing.routeName" (dict "root" $ "key" $key "config" $cfg) }}
+    {{- $routeNamespace := default $namespace $cfg.namespace }}
+    {{- $extRef := dict }}
+    {{- if kindIs "bool" $cfg.forwardAuth }}
+      {{- if not $.Values.defaultForwardAuth.extensionRef }}
+        {{- fail (printf "routes.%s.forwardAuth: true requires .Values.defaultForwardAuth.extensionRef to be set" $key) }}
+      {{- end }}
+      {{- $extRef = $.Values.defaultForwardAuth.extensionRef }}
+    {{- else }}
+      {{- $extRef = $cfg.forwardAuth.extensionRef }}
+    {{- end }}
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: {{ printf "%s-forward-auth" $name | trunc 63 | trimSuffix "-" }}
+  namespace: {{ $routeNamespace }}
+  {{- with $cfg.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: {{ $name }}
+  extAuth:
+    extensionRef:
+      name: {{ required (printf "routes.%s.forwardAuth.extensionRef.name (or defaultForwardAuth.extensionRef.name) is required" $key) $extRef.name }}
+      {{- if $extRef.namespace }}
+      namespace: {{ $extRef.namespace }}
+      {{- end }}
+  {{- end }}
+{{- end }}

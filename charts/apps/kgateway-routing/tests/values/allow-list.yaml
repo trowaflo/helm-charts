@@ -1,0 +1,17 @@
+# Test values for `allow:` path filtering
+routes:
+  authentik:
+    enabled: true
+    hostnames:
+      - auth.example.com
+    parentRefs:
+      - name: public-gateway
+        namespace: kgateway-system
+    allow:
+      - /
+      - /if/flow/
+      - /application/o/
+      - /outpost.goauthentik.io/
+    inCluster:
+      - name: authentik-server
+        port: 80

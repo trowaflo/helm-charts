@@ -1,0 +1,47 @@
+# Test values for `forwardAuth:` TrafficPolicy generation
+defaultForwardAuth:
+  extensionRef:
+    name: authentik-extauth
+    namespace: kgateway
+
+routes:
+  # forwardAuth: true → uses defaultForwardAuth
+  frigate:
+    enabled: true
+    hostnames:
+      - frigate.example.com
+    parentRefs:
+      - name: public-gateway
+        namespace: kgateway-system
+    forwardAuth: true
+    inCluster:
+      - name: frigate
+        port: 8971
+
+  # forwardAuth: {extensionRef: ...} → explicit override
+  custom:
+    enabled: true
+    hostnames:
+      - custom.example.com
+    parentRefs:
+      - name: public-gateway
+        namespace: kgateway-system
+    forwardAuth:
+      extensionRef:
+        name: other-extauth
+        namespace: other-ns
+    inCluster:
+      - name: custom-app
+        port: 80
+
+  # No forwardAuth → no TrafficPolicy generated
+  public:
+    enabled: true
+    hostnames:
+      - public.example.com
+    parentRefs:
+      - name: public-gateway
+        namespace: kgateway-system
+    inCluster:
+      - name: public-app
+        port: 80

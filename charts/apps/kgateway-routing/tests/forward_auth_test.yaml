@@ -1,0 +1,118 @@
+suite: test kgateway-routing chart - ForwardAuth TrafficPolicy
+release:
+  name: kgateway-routing-test
+  namespace: kgateway-test
+templates:
+  - templates/trafficpolicy.yaml
+tests:
+  - it: should generate TrafficPolicy only for routes with forwardAuth
+    values:
+      - values/forward-auth.yaml
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: TrafficPolicy
+        documentIndex: 0
+      - isKind:
+          of: TrafficPolicy
+        documentIndex: 1
+
+  - it: should reference defaultForwardAuth.extensionRef when forwardAuth is true
+    values:
+      - values/forward-auth.yaml
+    documentSelector:
+      path: metadata.name
+      value: frigate-forward-auth
+    asserts:
+      - equal:
+          path: apiVersion
+          value: gateway.kgateway.dev/v1alpha1
+      - equal:
+          path: kind
+          value: TrafficPolicy
+      - equal:
+          path: metadata.namespace
+          value: kgateway-test
+      - equal:
+          path: spec.targetRefs[0].kind
+          value: HTTPRoute
+      - equal:
+          path: spec.targetRefs[0].name
+          value: frigate
+      - equal:
+          path: spec.targetRefs[0].group
+          value: gateway.networking.k8s.io
+      - equal:
+          path: spec.extAuth.extensionRef.name
+          value: authentik-extauth
+      - equal:
+          path: spec.extAuth.extensionRef.namespace
+          value: kgateway
+
+  - it: should use per-route extensionRef when forwardAuth is an object
+    values:
+      - values/forward-auth.yaml
+    documentSelector:
+      path: metadata.name
+      value: custom-forward-auth
+    asserts:
+      - equal:
+          path: spec.extAuth.extensionRef.name
+          value: other-extauth
+      - equal:
+          path: spec.extAuth.extensionRef.namespace
+          value: other-ns
+      - equal:
+          path: spec.targetRefs[0].name
+          value: custom
+
+  - it: should generate no TrafficPolicy when no route has forwardAuth
+    values:
+      - values/only-incluster.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should fail when forwardAuth is explicitly false
+    values:
+      - values/forward-auth.yaml
+    set:
+      routes.frigate.forwardAuth: false
+    asserts:
+      - failedTemplate:
+          errorMessage: "routes.frigate.forwardAuth is set but empty/false; set it to true or an object with extensionRef, or remove the key entirely"
+
+  - it: should fail when forwardAuth is explicitly empty map
+    values:
+      - values/forward-auth.yaml
+    set:
+      routes.frigate.forwardAuth: {}
+    asserts:
+      - failedTemplate:
+          errorMessage: "routes.frigate.forwardAuth is set but empty/false; set it to true or an object with extensionRef, or remove the key entirely"
+
+  - it: should truncate TrafficPolicy name to 63 chars
+    set:
+      defaultForwardAuth:
+        extensionRef:
+          name: test-auth
+          namespace: test
+      routes.super-long-route-name-more-than-fifty-chars-for-sure-yes-definitely.enabled: true
+      routes.super-long-route-name-more-than-fifty-chars-for-sure-yes-definitely.forwardAuth: true
+      routes.super-long-route-name-more-than-fifty-chars-for-sure-yes-definitely.hostnames:
+        - test.example.com
+      routes.super-long-route-name-more-than-fifty-chars-for-sure-yes-definitely.inCluster:
+        - name: test
+          port: 80
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: TrafficPolicy
+      - matchRegex:
+          path: metadata.name
+          pattern: "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+      - equal:
+          path: metadata.name
+          value: super-long-route-name-more-than-fifty-chars-for-sure-yes-defini

@@ -11,6 +11,15 @@ defaultParentRefs: []
   # - name: default-gateway
   #   namespace: kgateway-system
 
+# -- Default GatewayExtension reference for routes using `forwardAuth: true`.
+# Allows declaring the ExtAuth provider once globally instead of repeating it on every route.
+# Routes can override per-route by setting `forwardAuth: { extensionRef: { name, namespace } }`.
+# @default -- {} (no default; `forwardAuth: true` will fail without it)
+defaultForwardAuth: {}
+  # extensionRef:
+  #   name: authentik-extauth
+  #   namespace: kgateway
+
 # -- HTTP routes configuration. Define multiple routes by adding entries with any key name.
 # Each route can target either in-cluster Services or out-of-cluster Backends.
 #
@@ -91,6 +100,56 @@ defaultParentRefs: []
 # ```
 # Note: For inCluster, `tls: true` creates a Backend CRD and applies BackendConfigPolicy.
 #       SNI defaults to service name but can be overridden with `sni` field.
+#
+# **Path filtering with `allow:` (default deny):**
+# When `allow` is set on a route, only the listed paths are forwarded to the backend.
+# Anything else returns 404 from the gateway (no rule matches).
+# `/` alone is treated as `Exact` match (root only, not catch-all).
+# Any other path is treated as `PathPrefix`.
+# Without `allow`, the route keeps its current behavior (catch-all `PathPrefix: /`).
+# ```yaml
+# routes:
+#   authentik:
+#     enabled: true
+#     hostnames:
+#       - auth.example.com
+#     allow:
+#       - /                              # Exact: root only
+#       - /if/flow/                      # Prefix: user flows
+#       - /application/o/                # Prefix: OIDC
+#     inCluster:
+#       - name: authentik-server
+#         port: 80
+# ```
+#
+# **ForwardAuth via kgateway TrafficPolicy:**
+# When `forwardAuth: true`, a `TrafficPolicy` is generated that attaches an ExtAuth
+# policy to the route, referencing the GatewayExtension declared in `defaultForwardAuth`.
+# Per-route override is also supported.
+# ```yaml
+# defaultForwardAuth:
+#   extensionRef:
+#     name: authentik-extauth
+#     namespace: kgateway
+# routes:
+#   frigate:
+#     enabled: true
+#     hostnames:
+#       - frigate.example.com
+#     forwardAuth: true                  # uses defaultForwardAuth
+#     inCluster:
+#       - name: frigate
+#         port: 8971
+#   custom:
+#     enabled: true
+#     forwardAuth:                       # explicit override
+#       extensionRef:
+#         name: other-extauth
+#         namespace: kgateway
+#     inCluster:
+#       - name: custom-app
+#         port: 80
+# ```
 #
 # @default -- {} (empty, user must configure routes)
 routes: {}
