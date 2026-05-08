@@ -17,11 +17,15 @@
 
 
 {{- define "common.helpers.namespace" -}}
-{{- $namespace := default .Chart.Name .Values.namespaceOverride -}}
-{{- if contains $namespace .Release.Name -}}
+{{- if .Values.namespaceOverride -}}
+{{- .Values.namespaceOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := .Chart.Name -}}
+{{- if contains $name .Release.Name -}}
 {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- printf "%s-%s" .Release.Name $namespace | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 
@@ -73,9 +77,11 @@ true
 {{- end -}}
 
 {{/*
-Generate PV name from key and config
+Generate a resource name from key and config.
+Used by PersistentVolume and PersistentVolumeClaim: returns config.name if
+provided, otherwise falls back to the map key.
 */}}
-{{- define "common.helpers.pvName" -}}
+{{- define "common.helpers.resourceName" -}}
   {{- $key := .key -}}
   {{- $config := .config -}}
   {{- if $config.name }}
@@ -86,17 +92,35 @@ Generate PV name from key and config
 {{- end }}
 
 {{/*
-Generate PVC name from key and config
+Return the name of the CNPG output "app" secret for a given cluster.
+Format: "<release-fullname>-<name>-app". CNPG auto-creates this Secret
+alongside the Cluster resource with (at least) these keys: username, password,
+uri, pgpass. The full key list depends on the CNPG operator version; confirm
+against the running operator before referencing.
+Usage: {{ include "common.helpers.cnpgAppSecret" (dict "root" . "name" "postgresql") }}
 */}}
-{{- define "common.helpers.pvcName" -}}
-  {{- $key := .key -}}
-  {{- $config := .config -}}
-  {{- if $config.name }}
-    {{- $config.name }}
-  {{- else }}
-    {{- $key }}
-  {{- end }}
-{{- end }}
+{{- define "common.helpers.cnpgAppSecret" -}}
+  {{- $root := required "common.helpers.cnpgAppSecret: root is required" .root -}}
+  {{- $name := required "common.helpers.cnpgAppSecret: name is required" .name -}}
+  {{- printf "%s-%s-app" (include "common.helpers.fullname" $root) $name -}}
+{{- end -}}
+
+{{/*
+Return the name of a managed secret.
+If secrets.<name>.existingSecret is set, returns that value.
+Otherwise returns "<release-fullname>-<name>".
+Usage: {{ include "common.helpers.secretName" (dict "root" . "name" "my-secret") }}
+*/}}
+{{- define "common.helpers.secretName" -}}
+  {{- $root := required "common.helpers.secretName: root is required" .root -}}
+  {{- $name := required "common.helpers.secretName: name is required" .name -}}
+  {{- $secret := index ($root.Values.secrets | default dict) $name | default dict -}}
+  {{- if $secret.existingSecret -}}
+    {{- $secret.existingSecret -}}
+  {{- else -}}
+    {{- printf "%s-%s" (include "common.helpers.fullname" $root) $name -}}
+  {{- end -}}
+{{- end -}}
 
 {{/*
 Validate PV configuration - ensure required fields are present

@@ -3,15 +3,15 @@
 # common
 
 Common library chart providing reusable Helm templates and default configurations.
-Standardizes Kubernetes resource deployment (Deployments, Services, Ingress, ServiceMonitor,
-PersistentVolumes, PersistentVolumeClaims) across the chart repository with consistent
-security, observability, and best practices.
+Standardizes Kubernetes resource deployment (Deployments, StatefulSets, DaemonSets, CronJobs, Jobs,
+Services, Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims, CNPG Clusters)
+across the chart repository with consistent security, observability, and best practices.
 
 Used by all application charts in this repository for consistency.
 
 ---
 
-![Version: 2.1.2](https://img.shields.io/badge/Version-2.1.2-informational?style=flat-square)  ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) 
+![Version: 3.0.0](https://img.shields.io/badge/Version-3.0.0-informational?style=flat-square)  ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) 
 
 ## Requirements
 
@@ -19,7 +19,7 @@ Used by all application charts in this repository for consistency.
 
 ## Values
 
-<h3>Containers configuration</h3>
+<h3>CNPG Clusters configuration</h3>
 <table>
 	<thead>
 		<th>Key</th>
@@ -29,134 +29,117 @@ Used by all application charts in this repository for consistency.
 	</thead>
 	<tbody>
 		<tr>
-			<td>containers</td>
-			<td>object</td>
-			<td><pre lang="">
-The chart will always construct the main container.
-</pre>
-</td>
-			<td>Containers configuration. Additional containers can be added under the 'containers' key.</td>
-		</tr>
-		<tr>
-			<td>containers.main.args</td>
-			<td>list</td>
-			<td><pre lang="json">
-[]
-</pre>
-</td>
-			<td>Command-line arguments passed to the container entrypoint. Use this to override or extend the container's startup command</td>
-		</tr>
-		<tr>
-			<td>containers.main.env</td>
-			<td>object</td>
-			<td><pre lang="json">
-{}
-</pre>
-</td>
-			<td>Environment variables injected into containers. Can reference ConfigMaps or Secrets via valueFrom</td>
-		</tr>
-		<tr>
-			<td>containers.main.image</td>
+			<td>cnpgClusters</td>
 			<td>object</td>
 			<td><pre lang="json">
 {
-  "pullPolicy": "Always",
-  "repository": "traefik/whoami",
-  "tag": "latest"
-}
-</pre>
-</td>
-			<td>Container image configuration including repository, tag, and pull policy</td>
-		</tr>
-		<tr>
-			<td>containers.main.imagePullSecrets</td>
-			<td>list</td>
-			<td><pre lang="json">
-[]
-</pre>
-</td>
-			<td>List of imagePullSecrets for private container registries. Reference pre-created Secrets in the same namespace</td>
-		</tr>
-		<tr>
-			<td>containers.main.probes.liveness</td>
-			<td>object</td>
-			<td><pre lang="json">
-{
-  "enabled": true,
-  "failureThreshold": 3,
-  "httpGet": {
-    "path": "/health",
-    "port": "main",
-    "scheme": "HTTP"
-  },
-  "initialDelaySeconds": 30,
-  "periodSeconds": 10,
-  "successThreshold": 1,
-  "timeoutSeconds": 5
-}
-</pre>
-</td>
-			<td>Liveness probe configuration</td>
-		</tr>
-		<tr>
-			<td>containers.main.probes.readiness</td>
-			<td>object</td>
-			<td><pre lang="json">
-{
-  "enabled": true,
-  "failureThreshold": 3,
-  "httpGet": {
-    "path": "/health",
-    "port": "main",
-    "scheme": "HTTP"
-  },
-  "initialDelaySeconds": 30,
-  "periodSeconds": 10,
-  "successThreshold": 1,
-  "timeoutSeconds": 5
-}
-</pre>
-</td>
-			<td>Readiness probe configuration</td>
-		</tr>
-		<tr>
-			<td>containers.main.probes.startup</td>
-			<td>object</td>
-			<td><pre lang="json">
-{
-  "enabled": true,
-  "failureThreshold": 3,
-  "httpGet": {
-    "path": "/health",
-    "port": "main",
-    "scheme": "HTTP"
-  },
-  "initialDelaySeconds": 60,
-  "periodSeconds": 10,
-  "successThreshold": 1,
-  "timeoutSeconds": 5
-}
-</pre>
-</td>
-			<td>Startup probe configuration</td>
-		</tr>
-		<tr>
-			<td>containers.main.resources</td>
-			<td>object</td>
-			<td><pre lang="json">
-{
-  "limits": {
-    "cpu": 2,
-    "memory": "2Gi"
-  },
-  "requests": {
-    "cpu": "1m",
-    "memory": "32Mi"
+  "main": {
+    "bootstrap": {
+      "initdb": {
+        "database": "app",
+        "owner": "app"
+      }
+    },
+    "enabled": false,
+    "imageName": "",
+    "instances": 1,
+    "monitoring": {
+      "enabled": false,
+      "podMonitorEnabled": false
+    },
+    "storage": {
+      "size": ""
+    }
   }
 }
 </pre>
 </td>
-			<td>CPU and memory resource allocation for the container</td>
+			<td>CloudNativePG Clusters configuration. Define one or more clusters under the 'cnpgClusters' key.</td>
+		</tr>
+	</tbody>
+</table>
+<h3>CronJobs configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>cronjobs</td>
+			<td>object</td>
+			<td><pre lang="json">
+{
+  "main": {
+    "concurrencyPolicy": "Forbid",
+    "enabled": false,
+    "failedJobsHistoryLimit": 3,
+    "schedule": "0 * * * *",
+    "successfulJobsHistoryLimit": 3
+  }
+}
+</pre>
+</td>
+			<td>CronJobs configuration. Define one or more scheduled jobs under the 'cronjobs' key.</td>
+		</tr>
+	</tbody>
+</table>
+<h3>DaemonSets configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>daemonsets</td>
+			<td>object</td>
+			<td><pre lang="json">
+{
+  "main": {
+    "enabled": false,
+    "revisionHistoryLimit": 3,
+    "updateStrategy": {
+      "type": "RollingUpdate"
+    }
+  }
+}
+</pre>
+</td>
+			<td>DaemonSets configuration. Define one or more daemon workloads under the 'daemonsets' key. A DaemonSet ensures one pod runs on every (matching) node. Useful for host-level agents such as mDNS repeaters, log shippers, or node exporters.</td>
+		</tr>
+	</tbody>
+</table>
+<h3>Deployments configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>deployments</td>
+			<td>object</td>
+			<td><pre lang="json">
+{
+  "main": {
+    "enabled": false,
+    "replicas": 1,
+    "revisionHistoryLimit": 3,
+    "strategy": {
+      "type": "RollingUpdate"
+    }
+  }
+}
+</pre>
+</td>
+			<td>Deployments configuration. Define one or more deployments under the 'deployments' key. Each deployment must specify its own containers, replicas, and pod-level settings. Per-container `env` accepts two shapes:   1. List form (legacy): `env: [{name, value|valueFrom}, ...]` emitted verbatim.   2. Map form: `env: {NAME: "value"}` or `env: {NAME: {secretKeyRef|configMapKeyRef|fieldRef: {...}}}`.      Map values and nested valueFrom fields pass through `tpl` with root context, so      templated references expand (e.g. `'{{ include "common.helpers.fullname" . }}-redis'`).      Nil values fail fast. Keys are emitted in sorted order.</td>
 		</tr>
 	</tbody>
 </table>
@@ -196,55 +179,6 @@ The chart will always construct the main container.
 </td>
 			<td>Override the namespace where resources are deployed. Leave empty to use the release namespace</td>
 		</tr>
-		<tr>
-			<td>podSecurityContext</td>
-			<td>object</td>
-			<td><pre lang="json">
-{
-  "allowPrivilegeEscalation": false,
-  "capabilities": {
-    "drop": [
-      "ALL"
-    ]
-  },
-  "readOnlyRootFilesystem": true,
-  "runAsNonRoot": true,
-  "runAsUser": 65534,
-  "seccompProfile": {
-    "type": "RuntimeDefault"
-  }
-}
-</pre>
-</td>
-			<td>Security context settings applied at the pod level for enhanced security</td>
-		</tr>
-		<tr>
-			<td>replicaCount</td>
-			<td>int</td>
-			<td><pre lang="json">
-1
-</pre>
-</td>
-			<td>Number of desired pods (replicas) for the deployment. Modify to scale the application horizontally</td>
-		</tr>
-		<tr>
-			<td>revisionHistoryLimit</td>
-			<td>int</td>
-			<td><pre lang="json">
-3
-</pre>
-</td>
-			<td>Number of revisions to keep for rollback purposes. Set to 3 for balanced history management</td>
-		</tr>
-		<tr>
-			<td>strategyType</td>
-			<td>string</td>
-			<td><pre lang="json">
-"Recreate"
-</pre>
-</td>
-			<td>Deployment update strategy configuration</td>
-		</tr>
 	</tbody>
 </table>
 <h3>Ingress configuration</h3>
@@ -257,7 +191,7 @@ The chart will always construct the main container.
 	</thead>
 	<tbody>
 		<tr>
-			<td>ingress</td>
+			<td>ingresses</td>
 			<td>object</td>
 			<td><pre lang="json">
 {
@@ -282,11 +216,11 @@ The chart will always construct the main container.
 }
 </pre>
 </td>
-			<td>Ingress configuration. Additional ingress resources can be added under the 'ingress' key.</td>
+			<td>Ingress configuration. Additional ingress resources can be added under the 'ingresses' key.</td>
 		</tr>
 	</tbody>
 </table>
-<h3>Monitoring configuration</h3>
+<h3>Jobs configuration</h3>
 <table>
 	<thead>
 		<th>Key</th>
@@ -296,34 +230,17 @@ The chart will always construct the main container.
 	</thead>
 	<tbody>
 		<tr>
-			<td>serviceMonitor</td>
+			<td>jobs</td>
 			<td>object</td>
 			<td><pre lang="json">
 {
-  "enabled": true,
-  "endpoints": [
-    {
-      "metricRelabelings": [
-        {
-          "action": "replace",
-          "regex": "olstring_(.*)",
-          "replacement": "newstring_$1",
-          "sourceLabels": [
-            "__name__"
-          ],
-          "targetLabel": "__name__"
-        }
-      ],
-      "port": "main"
-    }
-  ],
-  "labels": {
-    "release": "prometheus"
+  "main": {
+    "enabled": false
   }
 }
 </pre>
 </td>
-			<td>Monitoring configuration. Additional monitoring resources can be added under the 'serviceMonitor' key.</td>
+			<td>Jobs configuration. Define one or more one-shot jobs under the 'jobs' key.</td>
 		</tr>
 	</tbody>
 </table>
@@ -337,13 +254,13 @@ The chart will always construct the main container.
 	</thead>
 	<tbody>
 		<tr>
-			<td>services</td>
+			<td>k8sServices</td>
 			<td>object</td>
 			<td><pre lang="json">
 {
   "main": {
     "annotations": {},
-    "enabled": true,
+    "enabled": false,
     "labels": {},
     "ports": {
       "main": {
@@ -356,8 +273,283 @@ The chart will always construct the main container.
 }
 </pre>
 </td>
-			<td>Service configuration. Additional services can be added under the 'services' key.</td>
+			<td>Service configuration. Additional services can be added under the 'k8sServices' key.</td>
 		</tr>
+	</tbody>
+</table>
+<h3>Secrets configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>secrets</td>
+			<td>object</td>
+			<td><pre lang="json">
+{
+  "main": {
+    "data": {
+      "MY_SECRET_KEY": ""
+    },
+    "enabled": false,
+    "existingSecret": "",
+    "type": "Opaque"
+  }
+}
+</pre>
+</td>
+			<td>Secrets configuration. Define secrets to auto-generate under the 'secrets' key. Each entry auto-creates a Secret with pre-install hook and resource-policy: keep. Set existingSecret to opt out and reference an external Secret instead. Empty data values generate a random 32-char alphanumeric string, preserved across upgrades via lookup. Non-empty data values are used as the initial seed (also preserved on upgrade).</td>
+		</tr>
+	</tbody>
+</table>
+<h3>Monitoring configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>serviceMonitors</td>
+			<td>object</td>
+			<td><pre lang="json">
+{
+  "main": {
+    "enabled": false,
+    "endpoints": [
+      {
+        "metricRelabelings": [
+          {
+            "action": "replace",
+            "regex": "olstring_(.*)",
+            "replacement": "newstring_$1",
+            "sourceLabels": [
+              "__name__"
+            ],
+            "targetLabel": "__name__"
+          }
+        ],
+        "port": "main"
+      }
+    ],
+    "labels": {
+      "release": "prometheus"
+    }
+  }
+}
+</pre>
+</td>
+			<td>Monitoring configuration. Additional monitoring resources can be added under the 'serviceMonitors' key.</td>
+		</tr>
+	</tbody>
+</table>
+<h3>StatefulSets configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>statefulsets</td>
+			<td>object</td>
+			<td><pre lang="json">
+{
+  "main": {
+    "enabled": false,
+    "replicas": 1,
+    "revisionHistoryLimit": 3,
+    "updateStrategy": {
+      "type": "RollingUpdate"
+    },
+    "volumeClaimTemplates": []
+  }
+}
+</pre>
+</td>
+			<td>StatefulSets configuration. Define one or more stateful workloads under the 'statefulsets' key.</td>
+		</tr>
+	</tbody>
+</table>
+
+<h3>Other Values</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+	<tr>
+		<td>cnpgClusters.main.enabled</td>
+		<td>bool</td>
+		<td><pre lang="json">
+false
+</pre>
+</td>
+		<td>Enable or disable this CNPG Cluster</td>
+	</tr>
+	<tr>
+		<td>cnpgClusters.main.imageName</td>
+		<td>string</td>
+		<td><pre lang="json">
+""
+</pre>
+</td>
+		<td>PostgreSQL image to use. Required when enabled. e.g. ghcr.io/cloudnative-pg/postgresql:16</td>
+	</tr>
+	<tr>
+		<td>cnpgClusters.main.storage.size</td>
+		<td>string</td>
+		<td><pre lang="json">
+""
+</pre>
+</td>
+		<td>Storage size for the cluster. Required when enabled. e.g. 10Gi</td>
+	</tr>
+	<tr>
+		<td>cronjobs.main.enabled</td>
+		<td>bool</td>
+		<td><pre lang="json">
+false
+</pre>
+</td>
+		<td>Enable or disable this CronJob</td>
+	</tr>
+	<tr>
+		<td>cronjobs.main.schedule</td>
+		<td>string</td>
+		<td><pre lang="json">
+"0 * * * *"
+</pre>
+</td>
+		<td>Cron schedule expression</td>
+	</tr>
+	<tr>
+		<td>daemonsets.main.enabled</td>
+		<td>bool</td>
+		<td><pre lang="json">
+false
+</pre>
+</td>
+		<td>Enable or disable this DaemonSet</td>
+	</tr>
+	<tr>
+		<td>daemonsets.main.updateStrategy</td>
+		<td>object</td>
+		<td><pre lang="json">
+{
+  "type": "RollingUpdate"
+}
+</pre>
+</td>
+		<td>DaemonSet update strategy. type: RollingUpdate or OnDelete</td>
+	</tr>
+	<tr>
+		<td>deployments.main.enabled</td>
+		<td>bool</td>
+		<td><pre lang="json">
+false
+</pre>
+</td>
+		<td>Enable or disable this deployment</td>
+	</tr>
+	<tr>
+		<td>deployments.main.strategy</td>
+		<td>object</td>
+		<td><pre lang="json">
+{
+  "type": "RollingUpdate"
+}
+</pre>
+</td>
+		<td>Deployment strategy. Defaults to RollingUpdate; set type: Recreate for stateful apps</td>
+	</tr>
+	<tr>
+		<td>jobs.main.enabled</td>
+		<td>bool</td>
+		<td><pre lang="json">
+false
+</pre>
+</td>
+		<td>Enable or disable this Job</td>
+	</tr>
+	<tr>
+		<td>secrets.main.data</td>
+		<td>object</td>
+		<td><pre lang="json">
+{
+  "MY_SECRET_KEY": ""
+}
+</pre>
+</td>
+		<td>Data keys to generate. Empty string → random 32-char value, preserved across upgrades. Non-empty string → used as initial seed (also preserved via lookup on upgrade).</td>
+	</tr>
+	<tr>
+		<td>secrets.main.enabled</td>
+		<td>bool</td>
+		<td><pre lang="json">
+false
+</pre>
+</td>
+		<td>Enable or disable this secret</td>
+	</tr>
+	<tr>
+		<td>secrets.main.existingSecret</td>
+		<td>string</td>
+		<td><pre lang="json">
+""
+</pre>
+</td>
+		<td>If set, skip generation and use this existing Secret instead</td>
+	</tr>
+	<tr>
+		<td>secrets.main.type</td>
+		<td>string</td>
+		<td><pre lang="json">
+"Opaque"
+</pre>
+</td>
+		<td>Secret type. Defaults to Opaque. Use kubernetes.io/basic-auth for username/password pairs</td>
+	</tr>
+	<tr>
+		<td>statefulsets.main.enabled</td>
+		<td>bool</td>
+		<td><pre lang="json">
+false
+</pre>
+</td>
+		<td>Enable or disable this StatefulSet</td>
+	</tr>
+	<tr>
+		<td>statefulsets.main.updateStrategy</td>
+		<td>object</td>
+		<td><pre lang="json">
+{
+  "type": "RollingUpdate"
+}
+</pre>
+</td>
+		<td>StatefulSet update strategy. Defaults to RollingUpdate</td>
+	</tr>
+	<tr>
+		<td>statefulsets.main.volumeClaimTemplates</td>
+		<td>list</td>
+		<td><pre lang="json">
+[]
+</pre>
+</td>
+		<td>VolumeClaimTemplates for persistent storage. Each entry requires metadata.name and spec.resources.requests.storage</td>
+	</tr>
 	</tbody>
 </table>
 

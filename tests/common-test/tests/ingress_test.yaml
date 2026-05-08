@@ -3,45 +3,115 @@ templates:
   - templates/common.yaml
 values:
   - values/default.yaml
+set:
+  ingresses:
+    main:
+      enabled: true
+      hosts:
+        - host: chart-example.local
+          paths:
+            - path: /
+              pathType: Prefix
 release:
   name: ingress-test
   namespace: namespace-test
 tests:
   # Snapshot = validates complete coherence with default values
   - it: should match snapshot with default values
-    documentIndex: 1
     asserts:
       - matchSnapshot: {}
 
   # Test computed values - fullnameOverride
   - it: should compute fullnameOverride correctly
-    documentIndex: 1
     set:
       fullnameOverride: "my-ingress"
     asserts:
       - equal:
           path: metadata.name
-          value: my-ingress
+          value: my-ingress-main
       - matchSnapshot: {}
 
   # Test computed values - nameOverride
   - it: should compute nameOverride correctly
-    documentIndex: 1
     set:
       nameOverride: "name-override"
     asserts:
       - equal:
           path: "metadata.labels[\"app.kubernetes.io/name\"]"
           value: name-override
-      - equal:
-          path: "spec.rules[0].http.paths[0].backend.service.name"
-          value: ingress-test-name-override-main
       - matchSnapshot: {}
 
-  - it: should have the right host configured
-    documentIndex: 1
+  - it: should fail when enabled without hosts
     set:
-      ingress:
+      ingresses:
+        main:
+          enabled: true
+          hosts: null
+    asserts:
+      - failedTemplate:
+          errorMessage: "ingresses.main.hosts is required and must contain at least one entry when enabled"
+
+  - it: should fail when a host has no paths
+    set:
+      ingresses:
+        main:
+          enabled: true
+          hosts:
+            - host: chart-example.local
+              paths: []
+    asserts:
+      - failedTemplate:
+          errorMessage: "ingresses.main host \"chart-example.local\": paths is required and must contain at least one entry"
+
+  - it: should support backend.port.number override
+    set:
+      ingresses:
+        main:
+          enabled: true
+          hosts:
+            - host: api.example.com
+              paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: custom-svc
+                      port:
+                        number: 8080
+    asserts:
+      - equal:
+          path: "spec.rules[0].http.paths[0].backend.service.name"
+          value: custom-svc
+      - equal:
+          path: "spec.rules[0].http.paths[0].backend.service.port.number"
+          value: 8080
+
+  - it: should support backend.port.name override (distinct from service key)
+    set:
+      ingresses:
+        main:
+          enabled: true
+          hosts:
+            - host: api.example.com
+              paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      port:
+                        name: http-api
+    asserts:
+      - equal:
+          path: "spec.rules[0].http.paths[0].backend.service.port.name"
+          value: http-api
+      # service.name still defaults to <fullname>-<ingressName>
+      - equal:
+          path: "spec.rules[0].http.paths[0].backend.service.name"
+          value: ingress-test-common-test-main
+
+  - it: should have the right host configured
+    set:
+      ingresses:
         main:
           enabled: false
         other:

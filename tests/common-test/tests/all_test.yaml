@@ -3,11 +3,36 @@ templates:
   - templates/common.yaml
 values:
   - values/default.yaml
+set:
+  k8sServices:
+    main:
+      enabled: true
+      type: ClusterIP
+      ports:
+        main:
+          protocol: TCP
+          port: 80
+  serviceMonitors:
+    main:
+      enabled: true
+      labels:
+        release: prometheus
+      endpoints:
+        - port: main
+  deployments:
+    main:
+      enabled: true
+      podSpec:
+        containers:
+          main:
+            image:
+              repository: nginx
+              tag: latest
 release:
   name: common-test
   namespace: common-test
 tests:
-  # Snapshot = validates complete coherence with default values
-  - it: should match snapshot with default values
+  # Snapshot = validates complete coherence with a realistic stack
+  - it: should match snapshot with a realistic stack
     asserts:
       - matchSnapshot: {}

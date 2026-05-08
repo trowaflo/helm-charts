@@ -1,15 +1,16 @@
-should match snapshot with default values:
+should match snapshot with a realistic stack:
   1: |
     apiVersion: v1
     kind: Service
     metadata:
       labels:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: common-test
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: common-test
         helm.sh/chart: common-test-0.1.0
       name: common-test-main
-      namespace: common-test-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ports:
         - name: main
@@ -17,111 +18,44 @@ should match snapshot with default values:
           protocol: TCP
           targetPort: main
       selector:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: common-test
         app.kubernetes.io/name: common-test
       type: ClusterIP
   2: |
-    apiVersion: networking.k8s.io/v1
-    kind: Ingress
-    metadata:
-      labels:
-        app.kubernetes.io/instance: common-test
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: common-test
-        helm.sh/chart: common-test-0.1.0
-        test: true
-      name: common-test
-      namespace: common-test-namespace-override-test
-    spec:
-      ingressClassName: traefik
-      rules:
-        - host: chart-example.local
-          http:
-            paths:
-              - backend:
-                  service:
-                    name: common-test-main
-                    port:
-                      name: main
-                path: /
-                pathType: Prefix
-              - backend:
-                  service:
-                    name: common-test-main
-                    port:
-                      name: main
-                path: /testpath
-                pathType: Prefix
-        - host: another-chart-example.local
-          http:
-            paths:
-              - backend:
-                  service:
-                    name: common-test-main
-                    port:
-                      name: main
-                path: /
-                pathType: Prefix
-              - backend:
-                  service:
-                    name: common-test-main
-                    port:
-                      name: main
-                path: /testpath
-                pathType: Prefix
-  3: |
     apiVersion: apps/v1
     kind: Deployment
     metadata:
       labels:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: common-test
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: common-test
         helm.sh/chart: common-test-0.1.0
-      name: common-test
-      namespace: common-test-namespace-override-test
+      name: common-test-main
+      namespace: namespace-override-test
     spec:
       replicas: 1
       revisionHistoryLimit: 3
       selector:
         matchLabels:
+          app.kubernetes.io/component: main
           app.kubernetes.io/instance: common-test
           app.kubernetes.io/name: common-test
       strategy:
-        type: Recreate
+        type: RollingUpdate
       template:
         metadata:
-          annotations: null
           labels:
+            app.kubernetes.io/component: main
             app.kubernetes.io/instance: common-test
             app.kubernetes.io/name: common-test
         spec:
           automountServiceAccountToken: false
           containers:
-            - args:
-                - --test-arg=value
-              env:
-                - name: envtest
-                  value: thevalue
-                - name: valuefrom
-                  valueFrom:
-                    secretKeyRef:
-                      key: password
-                      name: my-secret
-              image: traefik/whoami:latest
-              imagePullPolicy: Always
+            - image: nginx:latest
+              imagePullPolicy: IfNotPresent
               name: main
-              ports:
-                - containerPort: 80
-                  name: main
-                  protocol: TCP
-              resources:
-                limits:
-                  cpu: 2
-                  memory: 2Gi
-                requests:
-                  cpu: 1m
-                  memory: 32Mi
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
@@ -129,28 +63,28 @@ should match snapshot with default values:
                     - ALL
                 readOnlyRootFilesystem: true
                 runAsNonRoot: true
-                runAsUser: 65534
-                seccompProfile:
-                  type: RuntimeDefault
-  4: |
+          enableServiceLinks: false
+          securityContext:
+            fsGroupChangePolicy: OnRootMismatch
+            runAsNonRoot: true
+  3: |
     apiVersion: monitoring.coreos.com/v1
     kind: ServiceMonitor
     metadata:
       labels:
+        app.kubernetes.io/component: main
+        app.kubernetes.io/instance: common-test
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: common-test
+        helm.sh/chart: common-test-0.1.0
         release: prometheus
-      name: common-test
-      namespace: common-test-namespace-override-test
+      name: common-test-main
+      namespace: namespace-override-test
     spec:
       endpoints:
-        - metricRelabelings:
-            - action: replace
-              regex: olstring_(.*)
-              replacement: newstring_$1
-              sourceLabels:
-                - __name__
-              targetLabel: __name__
-          port: main
+        - port: main
       selector:
         matchLabels:
+          app.kubernetes.io/component: main
           app.kubernetes.io/instance: common-test
           app.kubernetes.io/name: common-test
