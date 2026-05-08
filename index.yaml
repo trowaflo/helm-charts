@@ -1,61 +1,8 @@
 apiVersion: v1
 entries:
-  kgateway-routing:
-  - apiVersion: v2
-    created: "2026-05-08T20:34:36.220584404Z"
-    description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
-      resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
-      with request/response filters, header modification, and flexible path matching.
-    digest: 745810c45485f268d0787358d79ba38df00c1b995b4df90b48d767967ee4469f
-    keywords:
-    - kubernetes
-    - gateway
-    - kgateway
-    - httproute
-    - backend
-    - routing
-    - networking
-    maintainers:
-    - email: trowa.flo@gmail.com
-      name: trowaflo
-    name: kgateway-routing
-    sources:
-    - https://github.com/kgateway-dev/kgateway
-    - https://docs.kgateway.dev/
-    - https://github.com/trowaflo/helm-charts
-    type: application
-    urls:
-    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.3.1-pr239.tgz
-    version: 0.3.1-pr239
-  - apiVersion: v2
-    created: "2026-05-08T20:34:36.219934502Z"
-    description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
-      resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
-      with request/response filters, header modification, and flexible path matching.
-    digest: 66cef66e94afca1b0fbfb8a8d2dfc04f79841f425df9eaa05a55a7248e8ccf69
-    keywords:
-    - kubernetes
-    - gateway
-    - kgateway
-    - httproute
-    - backend
-    - routing
-    - networking
-    maintainers:
-    - email: trowa.flo@gmail.com
-      name: trowaflo
-    name: kgateway-routing
-    sources:
-    - https://github.com/kgateway-dev/kgateway
-    - https://docs.kgateway.dev/
-    - https://github.com/trowaflo/helm-charts
-    type: application
-    urls:
-    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.3.0-pr239.tgz
-    version: 0.3.0-pr239
   portainer:
   - apiVersion: v2
-    created: "2026-05-08T20:34:36.221439187Z"
+    created: "2026-05-08T20:35:49.089224007Z"
     dependencies:
     - name: portainer
       repository: https://portainer.github.io/k8s
@@ -86,4 +33,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/portainer-1.0.0-pr226.tgz
     version: 1.0.0-pr226
-generated: "2026-05-08T20:34:36.218985403Z"
+generated: "2026-05-08T20:35:49.088206069Z"
