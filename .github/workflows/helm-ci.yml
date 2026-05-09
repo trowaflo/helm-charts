@@ -15,10 +15,11 @@ concurrency:
 
 jobs:
   helm-ci:
-    uses: trowaflo/github-actions/.github/workflows/ci-helm.yml@d51fc48891c455f85a902e3d23f8ac7a52ef273e # v1.1.0
+    uses: trowaflo/github-actions/.github/workflows/ci-helm.yml@13b5535f3d2279c29be7438527625372e8ba1c19 # v2.0.0
     permissions:
       contents: write
       checks: write
+      packages: write
       pull-requests: write
     with:
       charts_dir: "charts"
@@ -27,6 +28,7 @@ jobs:
       enable_docs_check: true
       enable_lint: true
       enable_pr_charts: true
+      enable_oci_pr_charts: true
       enable_unittest: true
       harden_runner_allowed_endpoints: >-
         registry.npmjs.org:443
