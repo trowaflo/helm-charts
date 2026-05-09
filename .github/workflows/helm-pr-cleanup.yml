@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   cleanup:
-    uses: trowaflo/github-actions/.github/workflows/ci-helm-cleanup.yml@c9db226c04b9d6413043377e934f2fe0f9d4893c # feat/helm-oci-double-publish
+    uses: trowaflo/github-actions/.github/workflows/ci-helm-cleanup.yml@320734f56e60664aa9cfeccaf5873e6f8171fc76 # feat/helm-oci-double-publish
     permissions:
       contents: write
       packages: write
