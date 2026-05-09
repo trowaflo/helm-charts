@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   helm-ci:
-    uses: trowaflo/github-actions/.github/workflows/ci-helm.yml@320734f56e60664aa9cfeccaf5873e6f8171fc76 # feat/helm-oci-double-publish (PR #55)
+    uses: trowaflo/github-actions/.github/workflows/ci-helm.yml@13b5535f3d2279c29be7438527625372e8ba1c19 # v2.0.0
     permissions:
       contents: write
       checks: write

@@ -1,4 +1,4 @@
-# Pilot: re-validate OCI dual-publish after upstream PR #55 update
+# Pilot: re-validate OCI dual-publish on stable v2.0.0 (after PR #55 merged)
 apiVersion: v2
 name: persistent-volume
 version: 0.1.1
