@@ -1702,6 +1702,35 @@ entries:
     version: 0.1.0
   persistent-volume:
   - apiVersion: v2
+    created: "2026-05-09T11:47:44.51757538Z"
+    dependencies:
+    - name: common
+      repository: file://../../library/common
+      version: 3.0.0
+    description: Helm chart for declarative creation and management of Kubernetes
+      PersistentVolumes (PV) and PersistentVolumeClaims (PVC). Supports multiple storage
+      backends including hostPath, NFS, and other volume types with flexible configuration
+      for capacity, access modes, and storage classes.
+    digest: a30debf6d84a536e645e9961fa16cb29a798dc90e1fe570f5b50e5110f3c84d7
+    keywords:
+    - kubernetes
+    - storage
+    - persistentvolume
+    - persistentvolumeclaim
+    - pv
+    - pvc
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: persistent-volume
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    - https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/persistent-volume-0.2.0/persistent-volume-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     created: "2026-05-08T17:24:10.528136838Z"
     dependencies:
     - name: common
@@ -2391,4 +2420,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2026-05-08T20:36:04.85062876Z"
+generated: "2026-05-09T11:47:44.517788477Z"
