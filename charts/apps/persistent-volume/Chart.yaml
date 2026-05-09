@@ -1,3 +1,4 @@
+# Pilot: validate OCI dual-publish via trowaflo/github-actions PR #55
 apiVersion: v2
 name: persistent-volume
 version: 0.1.1
