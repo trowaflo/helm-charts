@@ -4,7 +4,7 @@ templates:
   - templates/backend.yaml
   - templates/backendconfigpolicy.yaml
 tests:
-  - it: should create Backend CRD for inCluster service with TLS
+  - it: should not create Backend CRD for inCluster service with TLS (kgateway has no Kube type)
     template: templates/backend.yaml
     set:
       routes:
@@ -21,24 +21,7 @@ tests:
               insecure: true
     asserts:
       - hasDocuments:
-          count: 1
-      - isKind:
-          of: Backend
-      - equal:
-          path: metadata.name
-          value: api-api-service-backend
-      - equal:
-          path: spec.type
-          value: Kube
-      - equal:
-          path: spec.kube.serviceName
-          value: api-service
-      - equal:
-          path: spec.kube.port
-          value: 8443
-      - equal:
-          path: spec.kube.serviceNamespace
-          value: NAMESPACE
+          count: 0
 
   - it: should not create Backend CRD for inCluster service without TLS
     template: templates/backend.yaml
@@ -57,7 +40,7 @@ tests:
       - hasDocuments:
           count: 0
 
-  - it: should reference Backend CRD in HTTPRoute when inCluster has TLS
+  - it: should reference the Service directly in HTTPRoute even when TLS is enabled
     template: templates/httproute.yaml
     set:
       routes:
@@ -78,15 +61,16 @@ tests:
           of: HTTPRoute
       - equal:
           path: spec.rules[0].backendRefs[0].group
-          value: gateway.kgateway.dev
+          value: ""
       - equal:
           path: spec.rules[0].backendRefs[0].kind
-          value: Backend
+          value: Service
       - equal:
           path: spec.rules[0].backendRefs[0].name
-          value: api-api-service-backend
-      - isNull:
+          value: api-service
+      - equal:
           path: spec.rules[0].backendRefs[0].port
+          value: 8443
 
   - it: should reference Service directly when inCluster has no TLS
     template: templates/httproute.yaml
@@ -119,7 +103,7 @@ tests:
           path: spec.rules[0].backendRefs[0].port
           value: 80
 
-  - it: should create Backend CRDs for both inCluster and outCluster with TLS
+  - it: should generate one Backend CRD for outCluster TLS only when mixed with inCluster TLS
     template: templates/backend.yaml
     set:
       routes:
@@ -140,32 +124,54 @@ tests:
               tls: true
     asserts:
       - hasDocuments:
-          count: 2
+          count: 1
       - isKind:
           of: Backend
-        documentIndex: 0
       - equal:
           path: metadata.name
           value: mixed-external-api-backend
-        documentIndex: 0
       - equal:
           path: spec.type
           value: Static
-        documentIndex: 0
-      - isKind:
-          of: Backend
-        documentIndex: 1
-      - equal:
-          path: metadata.name
-          value: mixed-internal-api-backend
-        documentIndex: 1
-      - equal:
-          path: spec.type
-          value: Kube
-        documentIndex: 1
 
-  - it: should handle custom namespace for inCluster Backend
-    template: templates/backend.yaml
+  - it: should target the Service via BackendConfigPolicy targetRefs for inCluster TLS
+    template: templates/backendconfigpolicy.yaml
+    set:
+      routes:
+        api:
+          enabled: true
+          hostnames: ["api.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: api-service
+              port: 8443
+              tls: true
+              insecure: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: BackendConfigPolicy
+      - equal:
+          path: spec.targetRefs[0].group
+          value: ""
+      - equal:
+          path: spec.targetRefs[0].kind
+          value: Service
+      - equal:
+          path: spec.targetRefs[0].name
+          value: api-service
+      - equal:
+          path: spec.tls.sni
+          value: api-service
+      - equal:
+          path: spec.tls.insecureSkipVerify
+          value: true
+
+  - it: should place BackendConfigPolicy in custom namespace when route has one
+    template: templates/backendconfigpolicy.yaml
     set:
       routes:
         api:
@@ -186,5 +192,99 @@ tests:
           path: metadata.namespace
           value: custom-ns
       - equal:
-          path: spec.kube.serviceNamespace
-          value: custom-ns
+          path: spec.targetRefs[0].name
+          value: api-service
+
+  - it: should respect namespaceOverride for the BackendConfigPolicy namespace
+    template: templates/backendconfigpolicy.yaml
+    set:
+      namespaceOverride: routing-ns
+      routes:
+        api:
+          enabled: true
+          hostnames: ["api.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: api-service
+              port: 8443
+              tls: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.namespace
+          value: routing-ns
+
+  - it: should place the policy in the backend namespace when inCluster targets a cross-namespace Service
+    template: templates/backendconfigpolicy.yaml
+    set:
+      routes:
+        api:
+          enabled: true
+          namespace: routing-ns
+          hostnames: ["api.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: api-service
+              namespace: app-ns
+              port: 8443
+              tls: true
+              insecure: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.namespace
+          value: app-ns
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-api-policy-app-ns
+      - equal:
+          path: spec.targetRefs[0].kind
+          value: Service
+      - equal:
+          path: spec.targetRefs[0].name
+          value: api-service
+
+  - it: should emit one BCP per target namespace when mixing cross-namespace inCluster TLS
+    template: templates/backendconfigpolicy.yaml
+    set:
+      routes:
+        api:
+          enabled: true
+          namespace: routing-ns
+          hostnames: ["api.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: local-svc
+              port: 8443
+              tls: true
+            - name: remote-svc
+              namespace: other-ns
+              port: 8443
+              tls: true
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: metadata.namespace
+          value: other-ns
+        documentIndex: 0
+      - equal:
+          path: spec.targetRefs[0].name
+          value: remote-svc
+        documentIndex: 0
+      - equal:
+          path: metadata.namespace
+          value: routing-ns
+        documentIndex: 1
+      - equal:
+          path: spec.targetRefs[0].name
+          value: local-svc
+        documentIndex: 1
