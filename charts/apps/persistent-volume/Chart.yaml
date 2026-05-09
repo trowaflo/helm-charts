@@ -1,7 +1,6 @@
-# Pilot: re-validate OCI dual-publish on stable v2.0.0 (after PR #55 merged)
 apiVersion: v2
 name: persistent-volume
-version: 0.1.1
+version: 0.2.0
 type: application
 description: |-
   Helm chart for declarative creation and management of Kubernetes PersistentVolumes (PV)
