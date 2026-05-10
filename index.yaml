@@ -1930,6 +1930,37 @@ entries:
     version: 0.0.3
   prometheus:
   - apiVersion: v2
+    created: "2026-05-10T13:23:50.045100188Z"
+    dependencies:
+    - name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 29.2.0
+    description: Wraps the official kube-prometheus-stack Helm chart providing production-ready
+      monitoring stack including Prometheus, Grafana, Alertmanager, and node exporters.
+    digest: c6b4ab87c556cef9ab44a4a490dd8652438931b5ce057a83dfa3c27878172f45
+    home: https://prometheus.io
+    keywords:
+    - prometheus
+    - monitoring
+    - alerting
+    - metrics
+    - kubernetes
+    - operator
+    - grafana
+    - observability
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: prometheus
+    sources:
+    - https://github.com/prometheus/prometheus
+    - https://github.com/prometheus-operator/prometheus-operator
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/prometheus-4.0.0/prometheus-4.0.0.tgz
+    version: 4.0.0
+  - apiVersion: v2
     created: "2026-05-08T17:24:10.757190312Z"
     dependencies:
     - name: prometheus
@@ -2420,4 +2451,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2026-05-09T11:47:44.517788477Z"
+generated: "2026-05-10T13:23:50.045363945Z"
