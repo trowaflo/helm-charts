@@ -1,0 +1,27 @@
+gateways:
+  public:
+    enabled: true
+    address: "192.168.1.1"
+  private:
+    enabled: true
+    address: "192.168.1.2"
+
+tlsSecret:
+  name: "test-tls-secret"
+  namespace: "cert-namespace"
+
+trafficPolicies:
+  public-security-headers:
+    enabled: true
+    targetGateway: "public"
+    spec:
+      transformation:
+        response:
+          set:
+            - name: Strict-Transport-Security
+              value: "max-age=63072000; includeSubDomains; preload"
+            - name: X-Frame-Options
+              value: "DENY"
+          remove:
+            - "Server"
+            - "X-Powered-By"
