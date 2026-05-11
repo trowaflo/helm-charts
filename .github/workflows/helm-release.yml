@@ -1,6 +1,11 @@
 name: Helm Release
 
 on:
+  # Manual re-trigger — useful when a squash & merge embedded [skip ci] in the
+  # commit body (e.g. auto-bump/helm-docs bots) and suppressed the auto-release
+  # on push to main. The reusable release-helm workflow gates its publish steps
+  # on `github.event_name != 'pull_request'`, so workflow_dispatch fires release.
+  workflow_dispatch:
   pull_request:
   push:
     branches:
