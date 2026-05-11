@@ -1,0 +1,47 @@
+# Test values for `rateLimit:` TrafficPolicy generation
+routes:
+  # rateLimit: object → generates TrafficPolicy <route>-rate-limit
+  mealie:
+    enabled: true
+    hostnames:
+      - mealie.example.com
+    parentRefs:
+      - name: public-gateway
+        namespace: kgateway-system
+    rateLimit:
+      maxTokens: 60
+      tokensPerFill: 20
+      fillInterval: 1s
+    inCluster:
+      - name: mealie
+        port: 10018
+
+  # rateLimit with custom labels propagated to the policy
+  authentik:
+    enabled: true
+    hostnames:
+      - auth.example.com
+    parentRefs:
+      - name: public-gateway
+        namespace: kgateway-system
+    labels:
+      app.kubernetes.io/part-of: forteresse
+    rateLimit:
+      maxTokens: 30
+      tokensPerFill: 10
+      fillInterval: 1s
+    inCluster:
+      - name: authentik-server
+        port: 80
+
+  # No rateLimit → no TrafficPolicy generated for this route
+  public:
+    enabled: true
+    hostnames:
+      - public.example.com
+    parentRefs:
+      - name: public-gateway
+        namespace: kgateway-system
+    inCluster:
+      - name: public-app
+        port: 80

@@ -1,0 +1,153 @@
+suite: test kgateway-routing chart - RateLimit TrafficPolicy
+release:
+  name: kgateway-routing-test
+  namespace: kgateway-test
+templates:
+  - templates/trafficpolicy-rate-limit.yaml
+tests:
+  - it: should generate TrafficPolicy only for routes with rateLimit
+    values:
+      - values/rate-limit.yaml
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: TrafficPolicy
+        documentIndex: 0
+      - isKind:
+          of: TrafficPolicy
+        documentIndex: 1
+
+  - it: should render token bucket spec from rateLimit fields
+    values:
+      - values/rate-limit.yaml
+    documentSelector:
+      path: metadata.name
+      value: mealie-rate-limit
+    asserts:
+      - equal:
+          path: apiVersion
+          value: gateway.kgateway.dev/v1alpha1
+      - equal:
+          path: kind
+          value: TrafficPolicy
+      - equal:
+          path: metadata.namespace
+          value: kgateway-test
+      - equal:
+          path: spec.targetRefs[0].kind
+          value: HTTPRoute
+      - equal:
+          path: spec.targetRefs[0].name
+          value: mealie
+      - equal:
+          path: spec.targetRefs[0].group
+          value: gateway.networking.k8s.io
+      - equal:
+          path: spec.rateLimit.local.tokenBucket.maxTokens
+          value: 60
+      - equal:
+          path: spec.rateLimit.local.tokenBucket.tokensPerFill
+          value: 20
+      - equal:
+          path: spec.rateLimit.local.tokenBucket.fillInterval
+          value: 1s
+
+  - it: should propagate route labels to the policy
+    values:
+      - values/rate-limit.yaml
+    documentSelector:
+      path: metadata.name
+      value: authentik-rate-limit
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/part-of"]
+          value: forteresse
+
+  - it: should generate no TrafficPolicy when no route has rateLimit
+    values:
+      - values/only-incluster.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # ── Failure-path tests (route défini inline, pas de fixture pour éviter
+  # les conflits set vs map du helm-unittest) ─────────────────────────────────
+  - it: should fail when rateLimit is explicitly false
+    set:
+      routes.demo.enabled: true
+      routes.demo.hostnames:
+        - demo.example.com
+      routes.demo.rateLimit: false
+      routes.demo.inCluster:
+        - name: demo
+          port: 80
+    asserts:
+      - failedTemplate:
+          errorMessage: "routes.demo.rateLimit is set but empty; provide maxTokens/tokensPerFill/fillInterval, or remove the key entirely"
+
+  - it: should fail when maxTokens is missing
+    set:
+      routes.demo.enabled: true
+      routes.demo.hostnames:
+        - demo.example.com
+      routes.demo.rateLimit:
+        tokensPerFill: 20
+        fillInterval: 1s
+      routes.demo.inCluster:
+        - name: demo
+          port: 80
+    asserts:
+      - failedTemplate:
+          errorMessage: "routes.demo.rateLimit.maxTokens is required"
+
+  - it: should fail when tokensPerFill is missing
+    set:
+      routes.demo.enabled: true
+      routes.demo.hostnames:
+        - demo.example.com
+      routes.demo.rateLimit:
+        maxTokens: 60
+        fillInterval: 1s
+      routes.demo.inCluster:
+        - name: demo
+          port: 80
+    asserts:
+      - failedTemplate:
+          errorMessage: "routes.demo.rateLimit.tokensPerFill is required"
+
+  - it: should fail when fillInterval is missing
+    set:
+      routes.demo.enabled: true
+      routes.demo.hostnames:
+        - demo.example.com
+      routes.demo.rateLimit:
+        maxTokens: 60
+        tokensPerFill: 20
+      routes.demo.inCluster:
+        - name: demo
+          port: 80
+    asserts:
+      - failedTemplate:
+          errorMessage: "routes.demo.rateLimit.fillInterval is required"
+
+  - it: should truncate TrafficPolicy name to 63 chars
+    set:
+      routes.super-long-route-name-more-than-fifty-chars-for-sure-yes-defi.enabled: true
+      routes.super-long-route-name-more-than-fifty-chars-for-sure-yes-defi.hostnames:
+        - test.example.com
+      routes.super-long-route-name-more-than-fifty-chars-for-sure-yes-defi.rateLimit:
+        maxTokens: 10
+        tokensPerFill: 5
+        fillInterval: 1s
+      routes.super-long-route-name-more-than-fifty-chars-for-sure-yes-defi.inCluster:
+        - name: test
+          port: 80
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: TrafficPolicy
+      - matchRegex:
+          path: metadata.name
+          pattern: "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"

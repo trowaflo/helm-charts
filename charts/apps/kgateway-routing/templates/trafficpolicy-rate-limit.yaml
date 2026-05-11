@@ -1,0 +1,57 @@
+{{/*
+TrafficPolicy local rate limit per-route.
+
+Génère une TrafficPolicy `<route>-rate-limit` pour chaque route qui définit
+un champ `rateLimit:`. Cible la HTTPRoute correspondante (même nom que la clé
+de route).
+
+Le rate limit est LOCAL (token bucket par worker Envoy, pas de Redis/global
+service) — adapté pour homelab single-cluster. Pour un rate limit global
+partagé entre N replicas, utiliser un GatewayExtension type RateLimit + RLS.
+
+Validation : si `rateLimit:` est présent mais incomplet, on fail explicite
+(meilleur que générer une policy invalide que kgateway rejettera silencieusement).
+*/}}
+{{- $namespace := include "kgateway-routing.namespace" . -}}
+{{- $keys := keys .Values.routes | sortAlpha -}}
+{{- range $key := $keys }}
+  {{- $cfg := index $.Values.routes $key }}
+  {{- if and $cfg.enabled (hasKey $cfg "rateLimit") }}
+    {{- if not $cfg.rateLimit }}
+      {{- fail (printf "routes.%s.rateLimit is set but empty; provide maxTokens/tokensPerFill/fillInterval, or remove the key entirely" $key) }}
+    {{- end }}
+    {{- $rl := $cfg.rateLimit }}
+    {{- if not (hasKey $rl "maxTokens") }}
+      {{- fail (printf "routes.%s.rateLimit.maxTokens is required" $key) }}
+    {{- end }}
+    {{- if not (hasKey $rl "tokensPerFill") }}
+      {{- fail (printf "routes.%s.rateLimit.tokensPerFill is required" $key) }}
+    {{- end }}
+    {{- if not (hasKey $rl "fillInterval") }}
+      {{- fail (printf "routes.%s.rateLimit.fillInterval is required" $key) }}
+    {{- end }}
+    {{- $name := include "kgateway-routing.routeName" (dict "root" $ "key" $key "config" $cfg) }}
+    {{- $routeNamespace := default $namespace $cfg.namespace }}
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: {{ printf "%s-rate-limit" $name | trunc 63 | trimSuffix "-" }}
+  namespace: {{ $routeNamespace }}
+  {{- with $cfg.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: {{ $name }}
+  rateLimit:
+    local:
+      tokenBucket:
+        maxTokens: {{ $rl.maxTokens }}
+        tokensPerFill: {{ $rl.tokensPerFill }}
+        fillInterval: {{ $rl.fillInterval | quote }}
+  {{- end }}
+{{- end }}
