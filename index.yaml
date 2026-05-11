@@ -2,7 +2,37 @@ apiVersion: v1
 entries:
   kgateway-platform:
   - apiVersion: v2
-    created: "2026-05-11T21:03:30.208234685Z"
+    created: "2026-05-11T21:12:48.65692909Z"
+    dependencies:
+    - alias: kgateway
+      condition: kgateway.enabled
+      name: kgateway
+      repository: oci://cr.kgateway.dev/kgateway-dev/charts
+      version: v2.2.2
+    description: Helm chart for configuring the kgateway platform using the Kubernetes
+      Gateway API with support for multiple gateways, HTTP(S) routing, and TLS certificate
+      integration.
+    digest: e99aec3058f0101b6b7cc7bc925ac734292041ecf4b366fd9643435ca52cba4e
+    keywords:
+    - kubernetes
+    - gateway
+    - kgateway
+    - networking
+    - tls
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: kgateway-platform
+    sources:
+    - https://github.com/kgateway-dev/kgateway
+    - https://docs.kgateway.dev/
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-platform-1.3.0-pr243.tgz
+    version: 1.3.0-pr243
+  - apiVersion: v2
+    created: "2026-05-11T21:12:48.655979864Z"
     dependencies:
     - alias: kgateway
       condition: kgateway.enabled
@@ -31,4 +61,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-platform-1.2.1-pr243.tgz
     version: 1.2.1-pr243
-generated: "2026-05-11T21:03:30.207129467Z"
+generated: "2026-05-11T21:12:48.654800861Z"
