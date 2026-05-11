@@ -153,5 +153,25 @@ defaultForwardAuth: {}
 #         port: 80
 # ```
 #
+# **Local rate limit via kgateway TrafficPolicy:**
+# When a route defines `rateLimit:`, a `TrafficPolicy <route>-rate-limit` is
+# generated that attaches a token bucket local rate limit to the HTTPRoute.
+# Local = per Envoy worker (no Redis/global RLS); calibrate for the worker
+# count of your gateway.
+# ```yaml
+# routes:
+#   mealie:
+#     enabled: true
+#     hostnames:
+#       - mealie.example.com
+#     rateLimit:
+#       maxTokens: 60       # burst size (3x sustained recommended)
+#       tokensPerFill: 20   # tokens refilled each interval
+#       fillInterval: 1s    # refill cadence → 20 req/s sustained, 60 burst
+#     inCluster:
+#       - name: mealie
+#         port: 10018
+# ```
+#
 # @default -- {} (empty, user must configure routes)
 routes: {}
