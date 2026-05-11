@@ -1,0 +1,59 @@
+{{/*
+TrafficPolicy attached to a Gateway.
+
+Iterates over .Values.trafficPolicies. For each entry where enabled=true and
+targetGateway references an enabled gateway, renders a TrafficPolicy targeting
+that gateway with the user-provided spec body merged under spec:.
+
+Typical use case: gateway-wide concerns like security headers, request/response
+transformations, observability — anything that should apply uniformly to every
+route attached to a given gateway.
+
+The user provides only the spec BODY (transformation/rateLimit/extAuth/etc.).
+The chart auto-fills spec.targetRefs from targetGateway; putting `targetRefs`
+in your spec block will be ignored.
+*/}}
+{{- $namespace := include "kgateway-platform.namespace" . -}}
+{{/* Sort keys for deterministic rendering — Go map iteration is unordered
+     and would cause GitOps drift on every reconcile. Same pattern as
+     templates/gateways.yaml and templates/gatewayparameters.yaml. */}}
+{{- $keys := keys .Values.trafficPolicies | sortAlpha -}}
+{{- range $policyKey := $keys }}
+  {{- $policy := index $.Values.trafficPolicies $policyKey }}
+  {{- if $policy.enabled }}
+    {{- $targetGateway := $policy.targetGateway -}}
+    {{- if not $targetGateway }}
+      {{- fail (printf "trafficPolicies.%s.targetGateway is required" $policyKey) }}
+    {{- end }}
+    {{- $gatewayCfg := index $.Values.gateways $targetGateway -}}
+    {{- if not $gatewayCfg }}
+      {{- fail (printf "trafficPolicies.%s.targetGateway '%s' does not exist in gateways map" $policyKey $targetGateway) }}
+    {{- end }}
+    {{- if $gatewayCfg.enabled }}
+      {{- $gatewayName := include "kgateway-platform.gatewayName" (dict "root" $ "key" $targetGateway "config" $gatewayCfg) -}}
+      {{- $fullname := include "kgateway-platform.fullname" $ -}}
+      {{- $policyName := default (printf "%s-%s" $fullname $policyKey) $policy.name }}
+{{- if $.Capabilities.APIVersions.Has "gateway.kgateway.dev/v1alpha1/TrafficPolicy" }}
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: {{ $policyName | trunc 63 | trimSuffix "-" }}
+  namespace: {{ $namespace }}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: {{ $gatewayName }}
+  {{/* targetRefs is auto-filled above; strip it from user spec so we don't
+       emit a duplicate `targetRefs` key (which would override the chart's
+       Gateway target with whatever the user put). */}}
+  {{- with $policy.spec }}
+  {{- omit . "targetRefs" | toYaml | nindent 2 }}
+  {{- end }}
+{{- else }}
+{{- fail "kgateway TrafficPolicy CRD not available; install CRDs or disable trafficPolicies.*.enabled" }}
+{{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}

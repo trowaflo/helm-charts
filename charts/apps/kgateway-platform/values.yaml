@@ -50,6 +50,40 @@ gateways: {}
 # @default -- {} (empty map, user must configure)
 tlsSecret: {}
 
+# -- TrafficPolicies attached to a Gateway.
+# Map structure where keys are policy names and values reference a target gateway.
+# Each entry requires:
+# - enabled: bool
+# - targetGateway: string (REQUIRED) - must match a gateway key
+# - name: string (optional) - defaults to "<release-name>-<key>"
+# - spec: object (optional) - free-form TrafficPolicy.spec body (transformation,
+#         rateLimit, extAuth, etc.). `targetRefs` is auto-filled from
+#         `targetGateway` and any value provided in spec.targetRefs is ignored.
+#
+# Use case: gateway-wide concerns (security headers, request/response
+# transformations, observability) that should apply to every route attached
+# to a given gateway. For per-route concerns, use kgateway-routing chart instead.
+#
+# Example — defensive security headers on the public gateway:
+#   trafficPolicies:
+#     public-security-headers:
+#       enabled: true
+#       targetGateway: "public"
+#       spec:
+#         transformation:
+#           response:
+#             set:
+#               - name: Strict-Transport-Security
+#                 value: "max-age=63072000; includeSubDomains; preload"
+#               - name: X-Frame-Options
+#                 value: "DENY"
+#             remove:
+#               - "Server"
+#               - "X-Powered-By"
+#
+# @default -- {} (empty, no TrafficPolicies generated)
+trafficPolicies: {}
+
 # -- HTTP listener policies for WebSocket upgrade support.
 # Map structure where keys reference gateway keys from the gateways map.
 # Each policy requires:

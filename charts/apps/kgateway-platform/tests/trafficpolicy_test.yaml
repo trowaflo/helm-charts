@@ -1,0 +1,159 @@
+suite: test kgateway-platform chart - TrafficPolicies
+release:
+  name: kgateway-platform-test
+  namespace: kgateway-test
+capabilities:
+  apiVersions:
+    - gateway.networking.k8s.io/v1/Gateway
+    - gateway.kgateway.dev/v1alpha1/GatewayParameters
+    - gateway.kgateway.dev/v1alpha1/HTTPListenerPolicy
+    - gateway.kgateway.dev/v1alpha1/TrafficPolicy
+templates:
+  - templates/trafficpolicy.yaml
+tests:
+  - it: should render TrafficPolicy when enabled with public gateway
+    values:
+      - values/traffic-policy.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: TrafficPolicy
+      - equal:
+          path: metadata.name
+          value: kgateway-platform-test-public-security-headers
+      - equal:
+          path: metadata.namespace
+          value: kgateway-test
+      - equal:
+          path: spec.targetRefs[0].group
+          value: gateway.networking.k8s.io
+      - equal:
+          path: spec.targetRefs[0].kind
+          value: Gateway
+      - equal:
+          path: spec.targetRefs[0].name
+          value: kgateway-platform-test-public
+      - equal:
+          path: spec.transformation.response.set[0].name
+          value: Strict-Transport-Security
+      - equal:
+          path: spec.transformation.response.set[0].value
+          value: "max-age=63072000; includeSubDomains; preload"
+      - equal:
+          path: spec.transformation.response.remove[0]
+          value: Server
+
+  - it: should not render TrafficPolicy when disabled (empty map)
+    values:
+      - values/default.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should not render TrafficPolicy when targetGateway is disabled
+    set:
+      gateways.public.enabled: false
+      gateways.public.address: "192.168.1.1"
+      trafficPolicies.demo.enabled: true
+      trafficPolicies.demo.targetGateway: "public"
+      trafficPolicies.demo.spec:
+        transformation:
+          response:
+            remove: ["Server"]
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should fail when targetGateway is missing
+    set:
+      gateways.public.enabled: true
+      gateways.public.address: "192.168.1.1"
+      trafficPolicies.demo.enabled: true
+      trafficPolicies.demo.spec:
+        transformation: {}
+    asserts:
+      - failedTemplate:
+          errorMessage: "trafficPolicies.demo.targetGateway is required"
+
+  - it: should fail when targetGateway references unknown gateway
+    set:
+      gateways.public.enabled: true
+      gateways.public.address: "192.168.1.1"
+      trafficPolicies.demo.enabled: true
+      trafficPolicies.demo.targetGateway: "missing"
+      trafficPolicies.demo.spec:
+        transformation: {}
+    asserts:
+      - failedTemplate:
+          errorMessage: "trafficPolicies.demo.targetGateway 'missing' does not exist in gateways map"
+
+  - it: should support custom name override
+    set:
+      gateways.public.enabled: true
+      gateways.public.address: "192.168.1.1"
+      trafficPolicies.demo.enabled: true
+      trafficPolicies.demo.name: "my-custom-tp"
+      trafficPolicies.demo.targetGateway: "public"
+      trafficPolicies.demo.spec:
+        transformation:
+          response:
+            remove: ["Server"]
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-custom-tp
+
+  - it: should truncate long policy names to 63 chars
+    set:
+      gateways.public.enabled: true
+      gateways.public.address: "192.168.1.1"
+      trafficPolicies.this-policy-key-is-deliberately-much-longer-than-sixty-three-chars-yes-really.enabled: true
+      trafficPolicies.this-policy-key-is-deliberately-much-longer-than-sixty-three-chars-yes-really.targetGateway: "public"
+      trafficPolicies.this-policy-key-is-deliberately-much-longer-than-sixty-three-chars-yes-really.spec:
+        transformation:
+          response:
+            remove: ["Server"]
+    asserts:
+      # Valid DNS label (RFC 1123): lowercase alphanumerics + hyphens, no
+      # leading/trailing hyphen.
+      - matchRegex:
+          path: metadata.name
+          pattern: "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+      # Explicit length check — the regex above alone doesn't enforce ≤63.
+      # This regex combines DNS pattern AND total length ≤ 63 characters.
+      - matchRegex:
+          path: metadata.name
+          pattern: "^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$"
+
+  - it: should strip user-provided targetRefs from spec (no duplicate key)
+    set:
+      gateways.public.enabled: true
+      gateways.public.address: "192.168.1.1"
+      trafficPolicies.demo.enabled: true
+      trafficPolicies.demo.targetGateway: "public"
+      trafficPolicies.demo.spec:
+        targetRefs:
+          - group: gateway.networking.k8s.io
+            kind: HTTPRoute
+            name: "evil-override"
+        transformation:
+          response:
+            remove: ["Server"]
+    asserts:
+      - hasDocuments:
+          count: 1
+      # Only one targetRefs entry, and it MUST be the chart-generated Gateway
+      # target — not the user's HTTPRoute override.
+      - equal:
+          path: spec.targetRefs[0].kind
+          value: Gateway
+      - equal:
+          path: spec.targetRefs[0].name
+          value: kgateway-platform-test-public
+      - notExists:
+          path: spec.targetRefs[1]
+      # User transformation still rendered (just targetRefs stripped).
+      - equal:
+          path: spec.transformation.response.remove[0]
+          value: Server
