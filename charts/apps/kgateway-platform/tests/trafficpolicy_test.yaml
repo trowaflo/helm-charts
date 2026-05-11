@@ -115,6 +115,45 @@ tests:
           response:
             remove: ["Server"]
     asserts:
+      # Valid DNS label (RFC 1123): lowercase alphanumerics + hyphens, no
+      # leading/trailing hyphen.
       - matchRegex:
           path: metadata.name
           pattern: "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+      # Explicit length check — the regex above alone doesn't enforce ≤63.
+      # This regex combines DNS pattern AND total length ≤ 63 characters.
+      - matchRegex:
+          path: metadata.name
+          pattern: "^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$"
+
+  - it: should strip user-provided targetRefs from spec (no duplicate key)
+    set:
+      gateways.public.enabled: true
+      gateways.public.address: "192.168.1.1"
+      trafficPolicies.demo.enabled: true
+      trafficPolicies.demo.targetGateway: "public"
+      trafficPolicies.demo.spec:
+        targetRefs:
+          - group: gateway.networking.k8s.io
+            kind: HTTPRoute
+            name: "evil-override"
+        transformation:
+          response:
+            remove: ["Server"]
+    asserts:
+      - hasDocuments:
+          count: 1
+      # Only one targetRefs entry, and it MUST be the chart-generated Gateway
+      # target — not the user's HTTPRoute override.
+      - equal:
+          path: spec.targetRefs[0].kind
+          value: Gateway
+      - equal:
+          path: spec.targetRefs[0].name
+          value: kgateway-platform-test-public
+      - notExists:
+          path: spec.targetRefs[1]
+      # User transformation still rendered (just targetRefs stripped).
+      - equal:
+          path: spec.transformation.response.remove[0]
+          value: Server

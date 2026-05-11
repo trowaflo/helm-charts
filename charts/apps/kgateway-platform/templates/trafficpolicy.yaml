@@ -14,7 +14,12 @@ The chart auto-fills spec.targetRefs from targetGateway; putting `targetRefs`
 in your spec block will be ignored.
 */}}
 {{- $namespace := include "kgateway-platform.namespace" . -}}
-{{- range $policyKey, $policy := .Values.trafficPolicies }}
+{{/* Sort keys for deterministic rendering — Go map iteration is unordered
+     and would cause GitOps drift on every reconcile. Same pattern as
+     templates/gateways.yaml and templates/gatewayparameters.yaml. */}}
+{{- $keys := keys .Values.trafficPolicies | sortAlpha -}}
+{{- range $policyKey := $keys }}
+  {{- $policy := index $.Values.trafficPolicies $policyKey }}
   {{- if $policy.enabled }}
     {{- $targetGateway := $policy.targetGateway -}}
     {{- if not $targetGateway }}
@@ -40,8 +45,11 @@ spec:
     - group: gateway.networking.k8s.io
       kind: Gateway
       name: {{ $gatewayName }}
+  {{/* targetRefs is auto-filled above; strip it from user spec so we don't
+       emit a duplicate `targetRefs` key (which would override the chart's
+       Gateway target with whatever the user put). */}}
   {{- with $policy.spec }}
-  {{- toYaml . | nindent 2 }}
+  {{- omit . "targetRefs" | toYaml | nindent 2 }}
   {{- end }}
 {{- else }}
 {{- fail "kgateway TrafficPolicy CRD not available; install CRDs or disable trafficPolicies.*.enabled" }}
