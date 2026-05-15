@@ -1,0 +1,47 @@
+# Test values for securityHeaders per-route opt-in.
+# Three routes:
+#   - public:   securityHeaders=true   → filter injected
+#   - private:  no securityHeaders     → no filter
+#   - extra:    securityHeaders=true + user filters → filter prepended to user filters
+routes:
+  public:
+    enabled: true
+    securityHeaders: true
+    hostnames:
+      - public.example.com
+    parentRefs:
+      - name: public-gateway
+        namespace: kgateway-system
+    outCluster:
+      - name: backend
+        host: backend.lan
+        port: 8080
+
+  private:
+    enabled: true
+    hostnames:
+      - private.example.com
+    parentRefs:
+      - name: private-gateway
+        namespace: kgateway-system
+    inCluster:
+      - name: svc
+        port: 80
+
+  extra:
+    enabled: true
+    securityHeaders: true
+    hostnames:
+      - extra.example.com
+    parentRefs:
+      - name: public-gateway
+        namespace: kgateway-system
+    inCluster:
+      - name: svc
+        port: 80
+        filters:
+          - type: RequestHeaderModifier
+            requestHeaderModifier:
+              set:
+                - name: X-Forwarded-Proto
+                  value: https

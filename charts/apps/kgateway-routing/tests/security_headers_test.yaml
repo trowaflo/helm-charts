@@ -1,0 +1,235 @@
+suite: test kgateway-routing chart - per-route securityHeaders opt-in
+release:
+  name: kgateway-routing-test
+  namespace: kgateway-test
+templates:
+  - templates/httproute.yaml
+tests:
+  - it: should inject ResponseHeaderModifier filter when route opts in (outCluster)
+    template: templates/httproute.yaml
+    values:
+      - values/security-headers.yaml
+    documentSelector:
+      path: metadata.name
+      value: public
+    asserts:
+      - isKind:
+          of: HTTPRoute
+      - equal:
+          path: spec.rules[0].filters[0].type
+          value: ResponseHeaderModifier
+      - equal:
+          path: spec.rules[0].filters[0].responseHeaderModifier.set[0].name
+          value: Strict-Transport-Security
+      - equal:
+          path: spec.rules[0].filters[0].responseHeaderModifier.set[1].name
+          value: X-Frame-Options
+      - equal:
+          path: spec.rules[0].filters[0].responseHeaderModifier.set[1].value
+          value: DENY
+      - contains:
+          path: spec.rules[0].filters[0].responseHeaderModifier.remove
+          content: Server
+
+  - it: should NOT inject any filter when route does not opt in
+    template: templates/httproute.yaml
+    values:
+      - values/security-headers.yaml
+    documentSelector:
+      path: metadata.name
+      value: private
+    asserts:
+      - isKind:
+          of: HTTPRoute
+      - notExists:
+          path: spec.rules[0].filters
+
+  - it: should prepend securityHeaders filter before user filters (inCluster)
+    template: templates/httproute.yaml
+    values:
+      - values/security-headers.yaml
+    documentSelector:
+      path: metadata.name
+      value: extra
+    asserts:
+      - isKind:
+          of: HTTPRoute
+      - lengthEqual:
+          path: spec.rules[0].filters
+          count: 2
+      - equal:
+          path: spec.rules[0].filters[0].type
+          value: ResponseHeaderModifier
+      - equal:
+          path: spec.rules[0].filters[1].type
+          value: RequestHeaderModifier
+      - equal:
+          path: spec.rules[0].filters[1].requestHeaderModifier.set[0].name
+          value: X-Forwarded-Proto
+
+  - it: should allow overriding the global header list
+    template: templates/httproute.yaml
+    set:
+      defaultSecurityHeaders:
+        set:
+          - name: X-Custom-Sec
+            value: enabled
+        remove:
+          - X-Powered-By
+      routes:
+        public:
+          enabled: true
+          securityHeaders: true
+          hostnames:
+            - public.example.com
+          parentRefs:
+            - name: public-gateway
+              namespace: kgateway-system
+          inCluster:
+            - name: svc
+              port: 80
+    documentSelector:
+      path: metadata.name
+      value: public
+    asserts:
+      - lengthEqual:
+          path: spec.rules[0].filters[0].responseHeaderModifier.set
+          count: 1
+      - equal:
+          path: spec.rules[0].filters[0].responseHeaderModifier.set[0].name
+          value: X-Custom-Sec
+      - lengthEqual:
+          path: spec.rules[0].filters[0].responseHeaderModifier.remove
+          count: 1
+      - equal:
+          path: spec.rules[0].filters[0].responseHeaderModifier.remove[0]
+          value: X-Powered-By
+
+  # Coverage for the raw `rules:` rendering path (separate from inCluster/outCluster).
+  - it: should inject ResponseHeaderModifier filter on raw rules[] when route opts in
+    template: templates/httproute.yaml
+    set:
+      routes:
+        raw:
+          enabled: true
+          securityHeaders: true
+          hostnames:
+            - raw.example.com
+          parentRefs:
+            - name: public-gateway
+              namespace: kgateway-system
+          rules:
+            - matches:
+                - path:
+                    type: PathPrefix
+                    value: /api
+              backendRefs:
+                - name: api-svc
+                  port: 8080
+              filters:
+                - type: URLRewrite
+                  urlRewrite:
+                    path:
+                      type: ReplacePrefixMatch
+                      replacePrefixMatch: /v2/api
+    documentSelector:
+      path: metadata.name
+      value: raw
+    asserts:
+      - lengthEqual:
+          path: spec.rules[0].filters
+          count: 2
+      - equal:
+          path: spec.rules[0].filters[0].type
+          value: ResponseHeaderModifier
+      - equal:
+          path: spec.rules[0].filters[0].responseHeaderModifier.set[0].name
+          value: Strict-Transport-Security
+      - equal:
+          path: spec.rules[0].filters[1].type
+          value: URLRewrite
+
+  # Validation: non-boolean securityHeaders → explicit failure (catches typos).
+  - it: should fail when securityHeaders is a string instead of a bool
+    template: templates/httproute.yaml
+    set:
+      routes:
+        badtype:
+          enabled: true
+          securityHeaders: "true"  # string, not bool
+          hostnames:
+            - bt.example.com
+          parentRefs:
+            - name: g
+              namespace: ns
+          inCluster:
+            - name: svc
+              port: 80
+    asserts:
+      - failedTemplate:
+          errorMessage: "routes.badtype.securityHeaders must be a boolean: set `true` to opt in or `false`/omit to opt out. The header list is configured globally at top-level `defaultSecurityHeaders:` (got string)"
+
+  - it: should fail when securityHeaders is a map instead of a bool
+    template: templates/httproute.yaml
+    set:
+      routes:
+        badtype:
+          enabled: true
+          securityHeaders:
+            enabled: true   # legacy/incorrect nested syntax
+          hostnames:
+            - bt.example.com
+          parentRefs:
+            - name: g
+              namespace: ns
+          inCluster:
+            - name: svc
+              port: 80
+    asserts:
+      - failedTemplate:
+          errorMessage: "routes.badtype.securityHeaders must be a boolean: set `true` to opt in or `false`/omit to opt out. The header list is configured globally at top-level `defaultSecurityHeaders:` (got map)"
+
+  # Validation: missing name in defaultSecurityHeaders.set → required() fires.
+  - it: should fail when defaultSecurityHeaders.set[].name is missing
+    template: templates/httproute.yaml
+    set:
+      defaultSecurityHeaders:
+        set:
+          - value: foo  # name missing
+      routes:
+        public:
+          enabled: true
+          securityHeaders: true
+          hostnames:
+            - public.example.com
+          parentRefs:
+            - name: g
+              namespace: ns
+          inCluster:
+            - name: svc
+              port: 80
+    asserts:
+      - failedTemplate:
+          errorMessage: "defaultSecurityHeaders.set[].name is required"
+
+  - it: should fail when defaultSecurityHeaders.set[].value is missing
+    template: templates/httproute.yaml
+    set:
+      defaultSecurityHeaders:
+        set:
+          - name: X-Custom  # value missing
+      routes:
+        public:
+          enabled: true
+          securityHeaders: true
+          hostnames:
+            - public.example.com
+          parentRefs:
+            - name: g
+              namespace: ns
+          inCluster:
+            - name: svc
+              port: 80
+    asserts:
+      - failedTemplate:
+          errorMessage: "defaultSecurityHeaders.set[].value is required"
