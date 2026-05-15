@@ -85,32 +85,41 @@ Generate backend name from key and config
 
 {{/*
 Render a `ResponseHeaderModifier` filter populated with the global
-`.Values.securityHeaders.set` / `.remove` lists, but only if the route has
-opted in via `securityHeaders: true`.
+`.Values.defaultSecurityHeaders.set` / `.remove` lists, but only if the route
+has opted in via `securityHeaders: true`.
 
 Returns the filter YAML as a list item starting at column 0 (call with
 `| nindent N` to splice into a `filters:` block at the right column), or
 empty if the route did not opt in.
 
+Fails explicitly if the per-route `securityHeaders` field is present but not
+a boolean, so typos like `securityHeaders: "true"` (string) or attempts to
+inline the map shape at route level are caught at render time.
+
 Usage:
-  {{- $sh := include "kgateway-routing.securityHeadersFilter" (dict "root" $ "config" $cfg) }}
+  {{- $sh := include "kgateway-routing.securityHeadersFilter" (dict "root" $ "config" $cfg "key" $key) }}
 */}}
 {{- define "kgateway-routing.securityHeadersFilter" -}}
-{{- $cfg := .config -}}
-{{- if $cfg.securityHeaders -}}
-{{- $sh := .root.Values.securityHeaders | default dict -}}
+  {{- $cfg := .config -}}
+  {{- $key := .key | default "<route>" -}}
+  {{- $optIn := $cfg.securityHeaders -}}
+  {{- if and (hasKey $cfg "securityHeaders") (not (kindIs "bool" $optIn)) -}}
+    {{- fail (printf "routes.%s.securityHeaders must be a boolean: set `true` to opt in or `false`/omit to opt out. The header list is configured globally at top-level `defaultSecurityHeaders:` (got %s)" $key (kindOf $optIn)) -}}
+  {{- end -}}
+  {{- if eq (default false $optIn) true -}}
+    {{- $defaults := .root.Values.defaultSecurityHeaders | default dict -}}
 - type: ResponseHeaderModifier
   responseHeaderModifier:
-{{- with $sh.set }}
+    {{- with $defaults.set }}
     set:
-{{- range . }}
-      - name: {{ required "securityHeaders.set[].name is required" .name }}
-        value: {{ required "securityHeaders.set[].value is required" .value | quote }}
-{{- end }}
-{{- end }}
-{{- with $sh.remove }}
+      {{- range . }}
+      - name: {{ required "defaultSecurityHeaders.set[].name is required" .name }}
+        value: {{ required "defaultSecurityHeaders.set[].value is required" .value | quote }}
+      {{- end }}
+    {{- end }}
+    {{- with $defaults.remove }}
     remove:
-{{- toYaml . | nindent 6 }}
-{{- end }}
-{{- end -}}
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end -}}
 {{- end -}}

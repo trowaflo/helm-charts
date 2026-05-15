@@ -176,8 +176,13 @@ defaultForwardAuth: {}
 # @default -- {} (empty, user must configure routes)
 routes: {}
 
-# -- Security headers injected as a `ResponseHeaderModifier` filter on the
-# rules of routes that opt-in with `routes.<name>.securityHeaders: true`.
+# -- Default security headers injected as a `ResponseHeaderModifier` filter on
+# the rules of routes that opt in with `routes.<name>.securityHeaders: true`.
+#
+# Mirrors the chart convention used by `defaultParentRefs` / `defaultForwardAuth`
+# (a global default, opt-in per-route). Using a distinct name from the per-route
+# boolean flag `securityHeaders:` avoids overloading the same key with two
+# different types at two scopes (map at chart level, bool per-route).
 #
 # Uses the Gateway API native `ResponseHeaderModifier` (header-only mutation,
 # upgrade-safe). Do NOT replicate this via an Envoy `transformation` filter
@@ -190,7 +195,7 @@ routes: {}
 # ```yaml
 # routes:
 #   public-app:
-#     securityHeaders: true        # opt-in
+#     securityHeaders: true        # opt in for this route only
 #     inCluster:
 #       - name: foo
 #         port: 80
@@ -202,9 +207,13 @@ routes: {}
 # ```
 #
 # The `set` / `remove` lists below are the global header set applied to every
-# opted-in route. Override the whole `securityHeaders` block in your values to
-# customize the list. For per-route extra headers, use the route's `filters:`.
-securityHeaders:
+# opted-in route. Override the whole `defaultSecurityHeaders` block in your
+# values to customize the list. For per-route extra response/request headers,
+# use the `filters:` field on each backend (`inCluster[].filters`,
+# `outCluster[].filters`) or on each rule (`rules[].filters`) — these are
+# merged with the security headers filter when both are present (security
+# headers come first).
+defaultSecurityHeaders:
   set:
     - name: Strict-Transport-Security
       value: "max-age=63072000; includeSubDomains; preload"

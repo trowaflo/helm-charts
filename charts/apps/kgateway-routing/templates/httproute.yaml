@@ -79,7 +79,7 @@ spec:
           namespace: {{ $backend.namespace }}
           {{- end }}
           weight: {{ default 1 $backend.weight }}
-      {{- $shFilter := include "kgateway-routing.securityHeadersFilter" (dict "root" $ "config" $cfg) | trim }}
+      {{- $shFilter := include "kgateway-routing.securityHeadersFilter" (dict "root" $ "config" $cfg "key" $key) | trim }}
       {{- if or $backend.filters $shFilter }}
       filters:
         {{- with $shFilter }}
@@ -180,7 +180,7 @@ spec:
           kind: Backend
           name: {{ $backendName }}
           weight: {{ default 1 $backend.weight }}
-      {{- $shFilter := include "kgateway-routing.securityHeadersFilter" (dict "root" $ "config" $cfg) | trim }}
+      {{- $shFilter := include "kgateway-routing.securityHeadersFilter" (dict "root" $ "config" $cfg "key" $key) | trim }}
       {{- if or $backend.filters $shFilter }}
       filters:
         {{- with $shFilter }}
@@ -290,7 +290,7 @@ spec:
           weight: {{ default 1 .weight }}
         {{- end }}
       {{- end }}
-      {{- $shFilter := include "kgateway-routing.securityHeadersFilter" (dict "root" $ "config" $cfg) | trim }}
+      {{- $shFilter := include "kgateway-routing.securityHeadersFilter" (dict "root" $ "config" $cfg "key" $key) | trim }}
       {{- if or .filters $shFilter }}
       filters:
         {{- with $shFilter }}
