@@ -79,8 +79,12 @@ spec:
           namespace: {{ $backend.namespace }}
           {{- end }}
           weight: {{ default 1 $backend.weight }}
-      {{- if $backend.filters }}
+      {{- $shFilter := include "kgateway-routing.securityHeadersFilter" (dict "root" $ "config" $cfg) | trim }}
+      {{- if or $backend.filters $shFilter }}
       filters:
+        {{- with $shFilter }}
+        {{- . | nindent 8 }}
+        {{- end }}
         {{- range $backend.filters }}
         - type: {{ required "filter type is required" .type }}
           {{- if .requestHeaderModifier }}
@@ -145,7 +149,7 @@ spec:
       {{- end }}
       {{- end }}
     {{- end }}
-    
+
     {{- if $cfg.outCluster }}
       {{- range $idx, $backend := $cfg.outCluster }}
         {{- $backendName := printf "%s-%s-backend" $key $backend.name }}
@@ -176,8 +180,12 @@ spec:
           kind: Backend
           name: {{ $backendName }}
           weight: {{ default 1 $backend.weight }}
-      {{- if $backend.filters }}
+      {{- $shFilter := include "kgateway-routing.securityHeadersFilter" (dict "root" $ "config" $cfg) | trim }}
+      {{- if or $backend.filters $shFilter }}
       filters:
+        {{- with $shFilter }}
+        {{- . | nindent 8 }}
+        {{- end }}
         {{- range $backend.filters }}
         - type: {{ required "filter type is required" .type }}
           {{- if .requestHeaderModifier }}
@@ -282,8 +290,12 @@ spec:
           weight: {{ default 1 .weight }}
         {{- end }}
       {{- end }}
-      {{- if .filters }}
+      {{- $shFilter := include "kgateway-routing.securityHeadersFilter" (dict "root" $ "config" $cfg) | trim }}
+      {{- if or .filters $shFilter }}
       filters:
+        {{- with $shFilter }}
+        {{- . | nindent 8 }}
+        {{- end }}
         {{- range .filters }}
         - type: {{ required "filter type is required" .type }}
           {{- if .requestHeaderModifier }}

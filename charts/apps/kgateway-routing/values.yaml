@@ -175,3 +175,49 @@ defaultForwardAuth: {}
 #
 # @default -- {} (empty, user must configure routes)
 routes: {}
+
+# -- Security headers injected as a `ResponseHeaderModifier` filter on the
+# rules of routes that opt-in with `routes.<name>.securityHeaders: true`.
+#
+# Uses the Gateway API native `ResponseHeaderModifier` (header-only mutation,
+# upgrade-safe). Do NOT replicate this via an Envoy `transformation` filter
+# at Gateway scope — `transformation` buffers responses and breaks WebSocket
+# upgrades by holding the `101 Switching Protocols` reply.
+#
+# Opt-in is **strictly per-route** (boolean flag on the route entry) to avoid
+# a global flag accidentally cascading from `global-values.yaml` to every app:
+#
+# ```yaml
+# routes:
+#   public-app:
+#     securityHeaders: true        # opt-in
+#     inCluster:
+#       - name: foo
+#         port: 80
+#   internal-app:
+#     # no securityHeaders key → no headers injected
+#     inCluster:
+#       - name: bar
+#         port: 80
+# ```
+#
+# The `set` / `remove` lists below are the global header set applied to every
+# opted-in route. Override the whole `securityHeaders` block in your values to
+# customize the list. For per-route extra headers, use the route's `filters:`.
+securityHeaders:
+  set:
+    - name: Strict-Transport-Security
+      value: "max-age=63072000; includeSubDomains; preload"
+    - name: X-Frame-Options
+      value: "DENY"
+    - name: X-Content-Type-Options
+      value: "nosniff"
+    - name: Referrer-Policy
+      value: "strict-origin-when-cross-origin"
+    - name: Permissions-Policy
+      value: "geolocation=(), microphone=(), camera=(), interest-cohort=()"
+    - name: Cross-Origin-Opener-Policy
+      value: "same-origin"
+  remove:
+    - Server
+    - X-Powered-By

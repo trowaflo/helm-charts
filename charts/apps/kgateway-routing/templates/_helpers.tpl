@@ -82,3 +82,35 @@ Generate backend name from key and config
     {{- printf "%s-backend" $key }}
   {{- end }}
 {{- end }}
+
+{{/*
+Render a `ResponseHeaderModifier` filter populated with the global
+`.Values.securityHeaders.set` / `.remove` lists, but only if the route has
+opted in via `securityHeaders: true`.
+
+Returns the filter YAML as a list item starting at column 0 (call with
+`| nindent N` to splice into a `filters:` block at the right column), or
+empty if the route did not opt in.
+
+Usage:
+  {{- $sh := include "kgateway-routing.securityHeadersFilter" (dict "root" $ "config" $cfg) }}
+*/}}
+{{- define "kgateway-routing.securityHeadersFilter" -}}
+{{- $cfg := .config -}}
+{{- if $cfg.securityHeaders -}}
+{{- $sh := .root.Values.securityHeaders | default dict -}}
+- type: ResponseHeaderModifier
+  responseHeaderModifier:
+{{- with $sh.set }}
+    set:
+{{- range . }}
+      - name: {{ required "securityHeaders.set[].name is required" .name }}
+        value: {{ required "securityHeaders.set[].value is required" .value | quote }}
+{{- end }}
+{{- end }}
+{{- with $sh.remove }}
+    remove:
+{{- toYaml . | nindent 6 }}
+{{- end }}
+{{- end -}}
+{{- end -}}
