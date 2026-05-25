@@ -26,7 +26,7 @@ tests:
           value: X-Frame-Options
       - equal:
           path: spec.rules[0].filters[0].responseHeaderModifier.set[1].value
-          value: DENY
+          value: SAMEORIGIN
       - contains:
           path: spec.rules[0].filters[0].responseHeaderModifier.remove
           content: Server

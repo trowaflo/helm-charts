@@ -217,8 +217,13 @@ defaultSecurityHeaders:
   set:
     - name: Strict-Transport-Security
       value: "max-age=63072000; includeSubDomains; preload"
+    # SAMEORIGIN (not DENY) so apps that embed their own sub-dashboards via
+    # iframes from the same origin still work — e.g. Home Assistant Hassio
+    # Ingress (`/api/hassio_ingress/<token>/`), Frigate, NodeRED, ESPHome.
+    # DENY blocks clickjacking from external sites the same way, but also
+    # breaks same-origin admin panels.
     - name: X-Frame-Options
-      value: "DENY"
+      value: "SAMEORIGIN"
     - name: X-Content-Type-Options
       value: "nosniff"
     - name: Referrer-Policy
