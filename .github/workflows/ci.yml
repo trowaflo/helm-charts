@@ -12,6 +12,7 @@ jobs:
     permissions:
       contents: read
       security-events: write   # SARIF uploads (actionlint)
+      pull-requests: write     # shellcheck/shfmt nested jobs request it (v2.1.0)
     with:
       enable_markdown_lint: true
       enable_yamllint: true
