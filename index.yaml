@@ -512,6 +512,37 @@ entries:
     version: 0.0.1
   frigate-exporter:
   - apiVersion: v2
+    created: "2026-07-18T19:24:14.490734736Z"
+    dependencies:
+    - name: common
+      repository: https://trowaflo.github.io/helm-charts
+      version: 3.0.0
+    description: Prometheus exporter for Frigate NVR (Network Video Recorder) system.
+      Exports metrics from Frigate cameras, detections, and recording statistics in
+      Prometheus-compatible format for integration with monitoring stacks.
+    digest: 945aaefc808c7d95d31d4488d25e6a8febfd5404f69a1841976bf180b1ba452f
+    home: https://github.com/bairhys/prometheus-frigate-exporter
+    icon: https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/images/prometheus-logo.svg
+    keywords:
+    - prometheus
+    - exporter
+    - frigate
+    - nvr
+    - video
+    - monitoring
+    - metrics
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: frigate-exporter
+    sources:
+    - https://github.com/bairhys/prometheus-frigate-exporter
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/frigate-exporter-2.0.0/frigate-exporter-2.0.0.tgz
+    version: 2.0.0
+  - apiVersion: v2
     created: "2026-05-08T17:24:09.134446275Z"
     dependencies:
     - name: common
@@ -1164,6 +1195,38 @@ entries:
     - https://github.com/trowaflo/helm-charts/releases/download/grafana-0.1.0/grafana-0.1.0.tgz
     version: 0.1.0
   graphite-exporter:
+  - apiVersion: v2
+    created: "2026-07-18T19:24:14.588045724Z"
+    dependencies:
+    - name: common
+      repository: https://trowaflo.github.io/helm-charts
+      version: 3.0.0
+    description: Prometheus exporter for converting Graphite plaintext protocol metrics
+      to Prometheus format. Enables Prometheus to scrape metrics from legacy Graphite
+      systems and sources (e.g., TrueNAS, custom monitoring systems) that emit Graphite-formatted
+      metrics.
+    digest: 26f88c2b76c54e4b8d042d068ae767e27160fc36aa2af75771425c1ce60f480c
+    home: https://github.com/prometheus/graphite_exporter
+    icon: https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/images/prometheus-logo.svg
+    keywords:
+    - prometheus
+    - exporter
+    - graphite
+    - monitoring
+    - metrics
+    - truenas
+    - plaintext
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: graphite-exporter
+    sources:
+    - https://github.com/prometheus/graphite_exporter
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/graphite-exporter-2.0.0/graphite-exporter-2.0.0.tgz
+    version: 2.0.0
   - apiVersion: v2
     created: "2026-05-08T17:24:09.594987728Z"
     dependencies:
@@ -2629,4 +2692,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2026-07-18T18:11:04.800883907Z"
+generated: "2026-07-18T19:24:14.708642106Z"
