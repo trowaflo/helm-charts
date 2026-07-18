@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   cert-manager-platform:
   - apiVersion: v2
-    created: "2026-07-18T16:45:04.068101548Z"
+    created: "2026-07-18T16:55:10.464663046Z"
     dependencies:
     - alias: cert-manager
       condition: cert-manager.enabled
@@ -41,7 +41,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/cert-manager-platform-3.0.0-pr252.tgz
     version: 3.0.0-pr252
   - apiVersion: v2
-    created: "2026-07-18T16:45:04.060168801Z"
+    created: "2026-07-18T16:55:10.453209331Z"
     dependencies:
     - alias: cert-manager
       condition: cert-manager.enabled
@@ -81,7 +81,33 @@ entries:
     version: 2.0.0-pr252
   kgateway-routing:
   - apiVersion: v2
-    created: "2026-07-18T16:45:04.069012006Z"
+    created: "2026-07-18T16:55:10.467596877Z"
+    description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
+      resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
+      with request/response filters, header modification, and flexible path matching.
+    digest: 09839ee89469347be81d63f5a8919274163b4cc48ba0ac3c09f985b249f9b431
+    keywords:
+    - kubernetes
+    - gateway
+    - kgateway
+    - httproute
+    - backend
+    - routing
+    - networking
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: kgateway-routing
+    sources:
+    - https://github.com/kgateway-dev/kgateway
+    - https://docs.kgateway.dev/
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.5.1-pr253.tgz
+    version: 0.5.1-pr253
+  - apiVersion: v2
+    created: "2026-07-18T16:55:10.466168173Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -106,4 +132,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.5.1-pr252.tgz
     version: 0.5.1-pr252
-generated: "2026-07-18T16:45:04.051222087Z"
+generated: "2026-07-18T16:55:10.444047763Z"
