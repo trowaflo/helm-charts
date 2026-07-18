@@ -20,10 +20,7 @@ tests:
           pattern: "CRDs: true"
       - matchRegex:
           path: raw
-          pattern: "cert-manager-webhook-ovh: true"
-      - matchRegex:
-          path: raw
-          pattern: "configVersion: 0.0.2"
+          pattern: "cert-manager-webhook-ovh: enabled"
 
   # Test with cert-manager disabled
   - it: should render successfully with cert-manager disabled
@@ -46,14 +43,3 @@ tests:
       - matchRegex:
           path: raw
           pattern: "CRDs: false"
-
-  # Test with webhook disabled
-  - it: should render successfully with webhook disabled
-    values:
-      - values/disable-webhook.yaml
-    asserts:
-      - isNotNull:
-          path: raw
-      - matchRegex:
-          path: raw
-          pattern: "cert-manager-webhook-ovh: false"

@@ -4,9 +4,8 @@ version: 2.0.0
 type: application
 description: |-
   Wraps cert-manager and cert-manager-webhook-ovh to provide automated X.509 certificate
-  management for Kubernetes with OVH DNS-01 challenge support. Includes configuration
-  validation for breaking changes, Certificate resource management, and streamlined setup
-  for Let's Encrypt certificates.
+  management for Kubernetes with OVH DNS-01 challenge support. Includes Certificate resource
+  management and streamlined setup for Let's Encrypt certificates.
 keywords:
   - cert-manager
   - certificates
@@ -34,4 +33,3 @@ dependencies:
     version: 0.9.5
     repository: https://aureq.github.io/cert-manager-webhook-ovh/
     alias: cert-manager-webhook-ovh
-    condition: certManagerWebhookOvh.enabled
