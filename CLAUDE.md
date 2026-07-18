@@ -64,5 +64,5 @@ Snapshot tests (`matchSnapshot: {}`) validate full rendering coherence against d
 - **2-space indentation** inside `{{- define ... -}}` template bodies.
 - `helm dependency update` is required before `helm template` or `helm unittest` on any chart with dependencies.
 - **kgateway-routing**: uses inline backend pattern (backends defined inside route config). Legacy separate `backends:` section kept for backwards compatibility only.
-- **cert-manager-platform**: `_helpers.tpl` validates `cert-manager-webhook-ovh.configVersion`. When upgrading `cert-manager-webhook-ovh`, update `$requiredVersion` in `_helpers.tpl` and the corresponding comment in `values.yaml`.
+- **cert-manager-platform**: the `cert-manager-webhook-ovh` subchart is always deployed (no `condition`) because its schema is `additionalProperties: false` and cannot host an `enabled` flag in its values key. Keep the `cert-manager-webhook-ovh:` values clean — only keys the subchart defines are allowed.
 - Conventional commits are mandatory — they drive automated version bumps.

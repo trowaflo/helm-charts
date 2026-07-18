@@ -3,21 +3,10 @@ cert-manager:
   crds:
     enabled: true
 
-# -- Control flags for cert-manager-webhook-ovh subchart.
-# Kept separate from the subchart's own values to avoid schema conflicts
-# (cert-manager-webhook-ovh v0.9.5 has additionalProperties: false).
-#
-# BREAKING CHANGE from v1.3.x: the key was renamed from `cert-manager-webhook-ovh`
-# to `certManagerWebhookOvh`. Update your values files accordingly:
-#   cert-manager-webhook-ovh.enabled  -> certManagerWebhookOvh.enabled
-#   cert-manager-webhook-ovh.configVersion -> certManagerWebhookOvh.configVersion
-certManagerWebhookOvh:
-  enabled: true
-  # configVersion is required when enabled.
-  # Tied to the chart dependency version in Chart.yaml.
-  # Current: cert-manager-webhook-ovh 0.9.5 requires "0.0.2"
-  # Update when upgrading the dependency — check upstream changelog.
-  # configVersion: "0.0.2"
+# The cert-manager-webhook-ovh subchart is always deployed (see Chart.yaml — no
+# condition). Provide its configuration under the `cert-manager-webhook-ovh:` key
+# (groupName, issuers, ...); that key is passed straight to the subchart, whose schema
+# is additionalProperties:false — only keys the subchart defines are allowed.
 
 # -- Certificate resources to manage TLS certificates via cert-manager.
 # Define multiple certificates using map keys (e.g., wildcard-tls, api-tls).
