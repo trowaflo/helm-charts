@@ -4,9 +4,14 @@ should match ServiceMonitor with correct metric relabelings:
     kind: ServiceMonitor
     metadata:
       labels:
+        app.kubernetes.io/component: main
+        app.kubernetes.io/instance: graphite-exporter-testing
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: name-override-test
+        helm.sh/chart: graphite-exporter-2.0.0
         release: prometheus
-      name: graphite-exporter-testing-name-override-test
-      namespace: graphite-exporter-testing-namespace-override-test
+      name: graphite-exporter-testing-name-override-test-main
+      namespace: namespace-override-test
     spec:
       endpoints:
         - metricRelabelings:
@@ -135,5 +140,6 @@ should match ServiceMonitor with correct metric relabelings:
           port: main
       selector:
         matchLabels:
+          app.kubernetes.io/component: main
           app.kubernetes.io/instance: graphite-exporter-testing
           app.kubernetes.io/name: name-override-test

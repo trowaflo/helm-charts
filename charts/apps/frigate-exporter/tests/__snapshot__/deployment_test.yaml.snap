@@ -4,25 +4,27 @@ should have the correct environment variables defined:
     kind: Deployment
     metadata:
       labels:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: frigate-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: frigate-exporter-1.1.1
-      name: frigate-exporter-testing-name-override-test
-      namespace: frigate-exporter-testing-namespace-override-test
+        helm.sh/chart: frigate-exporter-2.0.0
+      name: frigate-exporter-testing-name-override-test-main
+      namespace: namespace-override-test
     spec:
       replicas: 1
       revisionHistoryLimit: 3
       selector:
         matchLabels:
+          app.kubernetes.io/component: main
           app.kubernetes.io/instance: frigate-exporter-testing
           app.kubernetes.io/name: name-override-test
       strategy:
         type: Recreate
       template:
         metadata:
-          annotations: null
           labels:
+            app.kubernetes.io/component: main
             app.kubernetes.io/instance: frigate-exporter-testing
             app.kubernetes.io/name: name-override-test
         spec:
@@ -72,11 +74,8 @@ should have the correct environment variables defined:
                     - ALL
                 readOnlyRootFilesystem: true
                 runAsNonRoot: true
-                runAsUser: 1000
-                seccompProfile:
-                  type: RuntimeDefault
               startupProbe:
-                failureThreshold: 3
+                failureThreshold: 30
                 httpGet:
                   path: /metrics
                   port: main
@@ -85,3 +84,10 @@ should have the correct environment variables defined:
                 periodSeconds: 10
                 successThreshold: 1
                 timeoutSeconds: 5
+          enableServiceLinks: false
+          securityContext:
+            fsGroupChangePolicy: OnRootMismatch
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
