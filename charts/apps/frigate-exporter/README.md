@@ -1,6 +1,6 @@
 # frigate-exporter
 
-![Version: 1.1.1](https://img.shields.io/badge/Version-1.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Prometheus exporter for Frigate NVR (Network Video Recorder) system.
 Exports metrics from Frigate cameras, detections, and recording statistics
@@ -23,35 +23,48 @@ in Prometheus-compatible format for integration with monitoring stacks.
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://trowaflo.github.io/helm-charts | common | 2.1.2 |
+| https://trowaflo.github.io/helm-charts | common | 3.0.0 |
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| containers.main.env | list | `[]` |  |
-| containers.main.image.pullPolicy | string | `"IfNotPresent"` |  |
-| containers.main.image.repository | string | `"rhysbailey/prometheus-frigate-exporter"` |  |
-| containers.main.image.tag | string | `"0.1.1@sha256:6df30ca30c5a69df4f3b21c06a93043a52baf523f808de56f4a40982393b8aff"` |  |
-| containers.main.probes.enabled | bool | `true` |  |
-| containers.main.probes.liveness.httpGet.path | string | `"/metrics"` |  |
-| containers.main.probes.readiness.httpGet.path | string | `"/metrics"` |  |
-| containers.main.probes.startup.httpGet.path | string | `"/metrics"` |  |
-| containers.main.resources.limits.cpu | string | `"100m"` |  |
-| containers.main.resources.limits.memory | string | `"64Mi"` |  |
-| containers.main.resources.requests.cpu | string | `"1m"` |  |
-| containers.main.resources.requests.memory | string | `"32Mi"` |  |
+| deployments.main.enabled | bool | `true` |  |
+| deployments.main.podSpec.containers.main.env | list | `[]` |  |
+| deployments.main.podSpec.containers.main.image.pullPolicy | string | `"IfNotPresent"` |  |
+| deployments.main.podSpec.containers.main.image.repository | string | `"rhysbailey/prometheus-frigate-exporter"` |  |
+| deployments.main.podSpec.containers.main.image.tag | string | `"0.1.1@sha256:6df30ca30c5a69df4f3b21c06a93043a52baf523f808de56f4a40982393b8aff"` |  |
+| deployments.main.podSpec.containers.main.livenessProbe.httpGet.path | string | `"/metrics"` |  |
+| deployments.main.podSpec.containers.main.livenessProbe.httpGet.port | string | `"main"` |  |
+| deployments.main.podSpec.containers.main.livenessProbe.httpGet.scheme | string | `"HTTP"` |  |
+| deployments.main.podSpec.containers.main.livenessProbe.initialDelaySeconds | int | `30` |  |
+| deployments.main.podSpec.containers.main.ports.main.containerPort | int | `9100` |  |
+| deployments.main.podSpec.containers.main.ports.main.protocol | string | `"TCP"` |  |
+| deployments.main.podSpec.containers.main.readinessProbe.httpGet.path | string | `"/metrics"` |  |
+| deployments.main.podSpec.containers.main.readinessProbe.httpGet.port | string | `"main"` |  |
+| deployments.main.podSpec.containers.main.readinessProbe.httpGet.scheme | string | `"HTTP"` |  |
+| deployments.main.podSpec.containers.main.readinessProbe.initialDelaySeconds | int | `30` |  |
+| deployments.main.podSpec.containers.main.resources.limits.cpu | string | `"100m"` |  |
+| deployments.main.podSpec.containers.main.resources.limits.memory | string | `"64Mi"` |  |
+| deployments.main.podSpec.containers.main.resources.requests.cpu | string | `"1m"` |  |
+| deployments.main.podSpec.containers.main.resources.requests.memory | string | `"32Mi"` |  |
+| deployments.main.podSpec.containers.main.startupProbe.httpGet.path | string | `"/metrics"` |  |
+| deployments.main.podSpec.containers.main.startupProbe.httpGet.port | string | `"main"` |  |
+| deployments.main.podSpec.containers.main.startupProbe.httpGet.scheme | string | `"HTTP"` |  |
+| deployments.main.podSpec.containers.main.startupProbe.initialDelaySeconds | int | `60` |  |
+| deployments.main.podSpec.securityContext.runAsUser | int | `1000` |  |
+| deployments.main.podSpec.securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| deployments.main.strategy.type | string | `"Recreate"` |  |
 | frigate.namespace | string | `"frigate"` |  |
 | frigate.port | int | `5000` |  |
 | frigate.serviceName | string | `"frigate"` |  |
-| podSecurityContext.runAsUser | int | `1000` |  |
-| serviceMonitor.enabled | bool | `true` |  |
-| serviceMonitor.endpoints[0].port | string | `"main"` |  |
-| services.main.annotations | object | `{}` |  |
-| services.main.enabled | bool | `true` |  |
-| services.main.labels | object | `{}` |  |
-| services.main.ports.main.port | int | `9100` |  |
-| services.main.ports.main.protocol | string | `"TCP"` |  |
+| k8sServices.main.annotations | object | `{}` |  |
+| k8sServices.main.enabled | bool | `true` |  |
+| k8sServices.main.labels | object | `{}` |  |
+| k8sServices.main.ports.main.port | int | `9100` |  |
+| k8sServices.main.ports.main.protocol | string | `"TCP"` |  |
+| serviceMonitors.main.enabled | bool | `true` |  |
+| serviceMonitors.main.endpoints[0].port | string | `"main"` |  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

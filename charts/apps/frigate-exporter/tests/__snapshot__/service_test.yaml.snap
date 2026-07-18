@@ -4,12 +4,13 @@ should have the correct ports defined:
     kind: Service
     metadata:
       labels:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: frigate-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: frigate-exporter-1.1.1
+        helm.sh/chart: frigate-exporter-2.0.0
       name: frigate-exporter-testing-name-override-test-main
-      namespace: frigate-exporter-testing-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ports:
         - name: main
@@ -17,6 +18,7 @@ should have the correct ports defined:
           protocol: TCP
           targetPort: main
       selector:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: frigate-exporter-testing
         app.kubernetes.io/name: name-override-test
       type: ClusterIP
