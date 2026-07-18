@@ -167,7 +167,8 @@ tests:
               port: 80
     asserts:
       - failedTemplate:
-          errorMessage: "routes.badtype.securityHeaders must be a boolean: set `true` to opt in or `false`/omit to opt out. The header list is configured globally at top-level `defaultSecurityHeaders:` (got string)"
+          errorMessage: "routes.badtype.securityHeaders must be a boolean: set `true` to opt in or `false`/omit to opt out.
+            The header list is configured globally at top-level `defaultSecurityHeaders:` (got string)"
 
   - it: should fail when securityHeaders is a map instead of a bool
     template: templates/httproute.yaml
@@ -187,7 +188,8 @@ tests:
               port: 80
     asserts:
       - failedTemplate:
-          errorMessage: "routes.badtype.securityHeaders must be a boolean: set `true` to opt in or `false`/omit to opt out. The header list is configured globally at top-level `defaultSecurityHeaders:` (got map)"
+          errorMessage: "routes.badtype.securityHeaders must be a boolean: set `true` to opt in or `false`/omit to opt out.
+            The header list is configured globally at top-level `defaultSecurityHeaders:` (got map)"
 
   # Validation: missing name in defaultSecurityHeaders.set → required() fires.
   - it: should fail when defaultSecurityHeaders.set[].name is missing
