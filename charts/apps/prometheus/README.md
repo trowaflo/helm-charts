@@ -1,6 +1,6 @@
 # prometheus
 
-![Version: 4.0.0](https://img.shields.io/badge/Version-4.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 4.1.0](https://img.shields.io/badge/Version-4.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Wraps the official kube-prometheus-stack Helm chart providing production-ready monitoring
 stack including Prometheus, Grafana, Alertmanager, and node exporters.
@@ -23,7 +23,7 @@ stack including Prometheus, Grafana, Alertmanager, and node exporters.
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://prometheus-community.github.io/helm-charts | prometheus | 29.2.0 |
+| https://prometheus-community.github.io/helm-charts | prometheus | 29.12.0 |
 
 ## Values
 
@@ -284,7 +284,7 @@ stack including Prometheus, Grafana, Alertmanager, and node exporters.
 | pveExporter.env.pveUser | string | `"prometheus@pve"` |  |
 | pveExporter.env.pveVerifySsl | bool | `false` |  |
 | pveExporter.image.repository | string | `"prompve/prometheus-pve-exporter"` |  |
-| pveExporter.image.tag | string | `"3.8.2@sha256:e3d501a82df58bc0dd0e3f1fb49f4c10d3069e71ddad68b1fbb773b65da0c177"` |  |
+| pveExporter.image.tag | string | `"3.9.0@sha256:78a58df7a31c9fbee94962cd06422672668529de6421892df9aed4b6cee0757f"` |  |
 | pveExporter.replicaCount | int | `1` |  |
 | pveExporter.resources | object | `{}` |  |
 | pveExporter.revisionHistoryLimit | int | `10` |  |
