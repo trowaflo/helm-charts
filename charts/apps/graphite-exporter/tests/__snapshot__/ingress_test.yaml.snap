@@ -4,13 +4,13 @@ should match Ingress with correct hosts:
     kind: Ingress
     metadata:
       labels:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: graphite-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: graphite-exporter-1.1.1
-        test: true
-      name: graphite-exporter-testing-name-override-test
-      namespace: graphite-exporter-testing-namespace-override-test
+        helm.sh/chart: graphite-exporter-2.0.0
+      name: graphite-exporter-testing-name-override-test-main
+      namespace: namespace-override-test
     spec:
       ingressClassName: traefik
       rules:

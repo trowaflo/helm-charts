@@ -4,12 +4,13 @@ should match snapshot with default values:
     kind: Service
     metadata:
       labels:
+        app.kubernetes.io/component: graphite
         app.kubernetes.io/instance: graphite-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: graphite-exporter-1.1.1
+        helm.sh/chart: graphite-exporter-2.0.0
       name: graphite-exporter-testing-name-override-test-graphite
-      namespace: graphite-exporter-testing-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ports:
         - name: graphite-tcp
@@ -21,6 +22,7 @@ should match snapshot with default values:
           protocol: UDP
           targetPort: graphite-udp
       selector:
+        app.kubernetes.io/component: graphite
         app.kubernetes.io/instance: graphite-exporter-testing
         app.kubernetes.io/name: name-override-test
       type: LoadBalancer
@@ -29,12 +31,13 @@ should match snapshot with default values:
     kind: Service
     metadata:
       labels:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: graphite-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: graphite-exporter-1.1.1
+        helm.sh/chart: graphite-exporter-2.0.0
       name: graphite-exporter-testing-name-override-test-main
-      namespace: graphite-exporter-testing-namespace-override-test
+      namespace: namespace-override-test
     spec:
       ports:
         - name: main
@@ -42,58 +45,36 @@ should match snapshot with default values:
           protocol: TCP
           targetPort: main
       selector:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: graphite-exporter-testing
         app.kubernetes.io/name: name-override-test
       type: ClusterIP
   3: |
-    apiVersion: networking.k8s.io/v1
-    kind: Ingress
-    metadata:
-      labels:
-        app.kubernetes.io/instance: graphite-exporter-testing
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: name-override-test
-        helm.sh/chart: graphite-exporter-1.1.1
-        test: true
-      name: graphite-exporter-testing-name-override-test
-      namespace: graphite-exporter-testing-namespace-override-test
-    spec:
-      ingressClassName: traefik
-      rules:
-        - host: graphite-exporter.fqdn.example.com
-          http:
-            paths:
-              - backend:
-                  service:
-                    name: graphite-exporter-testing-name-override-test-main
-                    port:
-                      name: main
-                path: /
-                pathType: Prefix
-  4: |
     apiVersion: apps/v1
     kind: Deployment
     metadata:
       labels:
+        app.kubernetes.io/component: main
         app.kubernetes.io/instance: graphite-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: graphite-exporter-1.1.1
-      name: graphite-exporter-testing-name-override-test
-      namespace: graphite-exporter-testing-namespace-override-test
+        helm.sh/chart: graphite-exporter-2.0.0
+      name: graphite-exporter-testing-name-override-test-main
+      namespace: namespace-override-test
     spec:
       replicas: 1
       revisionHistoryLimit: 3
       selector:
         matchLabels:
+          app.kubernetes.io/component: main
           app.kubernetes.io/instance: graphite-exporter-testing
           app.kubernetes.io/name: name-override-test
       strategy:
         type: Recreate
       template:
         metadata:
-          annotations: null
           labels:
+            app.kubernetes.io/component: main
             app.kubernetes.io/instance: graphite-exporter-testing
             app.kubernetes.io/name: name-override-test
         spec:
@@ -128,17 +109,51 @@ should match snapshot with default values:
                     - ALL
                 readOnlyRootFilesystem: true
                 runAsNonRoot: true
-                runAsUser: 65534
-                seccompProfile:
-                  type: RuntimeDefault
+          enableServiceLinks: false
+          securityContext:
+            fsGroupChangePolicy: OnRootMismatch
+            runAsNonRoot: true
+            runAsUser: 65534
+            seccompProfile:
+              type: RuntimeDefault
+  4: |
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      labels:
+        app.kubernetes.io/component: main
+        app.kubernetes.io/instance: graphite-exporter-testing
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: name-override-test
+        helm.sh/chart: graphite-exporter-2.0.0
+      name: graphite-exporter-testing-name-override-test-main
+      namespace: namespace-override-test
+    spec:
+      ingressClassName: traefik
+      rules:
+        - host: graphite-exporter.fqdn.example.com
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: graphite-exporter-testing-name-override-test-main
+                    port:
+                      name: main
+                path: /
+                pathType: Prefix
   5: |
     apiVersion: monitoring.coreos.com/v1
     kind: ServiceMonitor
     metadata:
       labels:
+        app.kubernetes.io/component: main
+        app.kubernetes.io/instance: graphite-exporter-testing
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: name-override-test
+        helm.sh/chart: graphite-exporter-2.0.0
         release: prometheus
-      name: graphite-exporter-testing-name-override-test
-      namespace: graphite-exporter-testing-namespace-override-test
+      name: graphite-exporter-testing-name-override-test-main
+      namespace: namespace-override-test
     spec:
       endpoints:
         - metricRelabelings:
@@ -267,5 +282,6 @@ should match snapshot with default values:
           port: main
       selector:
         matchLabels:
+          app.kubernetes.io/component: main
           app.kubernetes.io/instance: graphite-exporter-testing
           app.kubernetes.io/name: name-override-test
