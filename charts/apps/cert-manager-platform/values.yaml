@@ -51,6 +51,8 @@ certificates: {}
 # Only configure this section when using Gateway API (e.g., with kgateway-platform chart).
 # Define multiple grants using map keys (e.g., allow-kgateway-platform, allow-dmz-gateway).
 # Each grant must have 'enabled: true' and 'from'/'to' configuration.
+# Every 'to' entry requires a 'name': without it the grant opens every Secret
+# of the namespace, the DNS provider credentials included.
 #
 # Example:
 #   referenceGrants:
@@ -61,6 +63,7 @@ certificates: {}
 #           namespace: kgateway-platform
 #       to:
 #         - kind: Secret
+#           name: wildcard-tls
 #
 # @default -- {} (empty, configure only when using Gateway API)
 referenceGrants: {}
