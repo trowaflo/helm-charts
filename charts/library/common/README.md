@@ -4,14 +4,15 @@
 
 Common library chart providing reusable Helm templates and default configurations.
 Standardizes Kubernetes resource deployment (Deployments, StatefulSets, DaemonSets, CronJobs, Jobs,
-Services, Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims, CNPG Clusters)
+Services, Ingress, ServiceMonitor, PersistentVolumes, PersistentVolumeClaims, CNPG Clusters,
+CiliumNetworkPolicies)
 across the chart repository with consistent security, observability, and best practices.
 
 Used by all application charts in this repository for consistency.
 
 ---
 
-![Version: 3.1.0](https://img.shields.io/badge/Version-3.1.0-informational?style=flat-square)  ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) 
+![Version: 3.2.0](https://img.shields.io/badge/Version-3.2.0-informational?style=flat-square)  ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) 
 
 ## Requirements
 
@@ -274,6 +275,30 @@ Used by all application charts in this repository for consistency.
 </pre>
 </td>
 			<td>Service configuration. Additional services can be added under the 'k8sServices' key.</td>
+		</tr>
+	</tbody>
+</table>
+<h3>Network policy configuration</h3>
+<table>
+	<thead>
+		<th>Key</th>
+		<th>Type</th>
+		<th>Default</th>
+		<th>Description</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td>networkPolicy</td>
+			<td>object</td>
+			<td><pre lang="json">
+{
+  "egress": [],
+  "enabled": false,
+  "ingress": []
+}
+</pre>
+</td>
+			<td>Cilium network policies of the namespace. When enabled, every pod enters default deny and only the declared flows open, on top of a cluster-wide baseline (DNS, gateway, scrape) that lives outside this library. Every entry needs `why`, rendered as the policy description. `egress[].to`: `kube-apiserver` (6443 by default), `world`, `fqdn` (443 by default, `names`), `cidr` (`cidrs`) or `pods` (`namespace`, `selector`). `ingress[].from`: `pods` or `cidr`. `select` picks the local pods (empty = all), `ports` and `protocol` (TCP, UDP, ANY) apply to the whole entry. A `pods` peer in the same namespace also gets its ingress, so one entry opens both sides. ```yaml networkPolicy:   enabled: true   egress:     - to: pods       select: {app.kubernetes.io/name: server}       selector: {app.kubernetes.io/name: postgresql}       ports: [5432]       why: The server stores its data in PostgreSQL. ```</td>
 		</tr>
 	</tbody>
 </table>

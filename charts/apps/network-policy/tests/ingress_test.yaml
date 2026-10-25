@@ -1,0 +1,61 @@
+suite: test network-policy chart - ingress entries
+release:
+  name: rel
+  namespace: demo
+templates:
+  - templates/common.yaml
+tests:
+  - it: should admit pods of another namespace on the selected local pods
+    set:
+      networkPolicy.ingress:
+        - from: pods
+          namespace: homepage
+          selector:
+            app: homepage
+          select:
+            app: grafana
+          ports: [3000]
+          why: Homepage widget reads Grafana.
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: metadata.name
+          value: rel-network-policy-ingress-0
+      - equal:
+          path: spec.description
+          value: "In: pods app=grafana in demo from pods app=homepage in homepage on 3000. Homepage widget reads Grafana."
+      - equal:
+          path: spec.endpointSelector.matchLabels
+          value:
+            app: grafana
+      - equal:
+          path: spec.ingress[0].fromEndpoints[0].matchLabels
+          value:
+            app: homepage
+            k8s:io.kubernetes.pod.namespace: homepage
+      - equal:
+          path: spec.ingress[0].toPorts[0].ports[0].port
+          value: "3000"
+
+  - it: should admit a CIDR
+    set:
+      networkPolicy.ingress:
+        - from: cidr
+          cidrs: [192.168.2.28/32]
+          ports: [3000]
+          why: Home Assistant VM.
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.ingress[0].fromCIDR
+          value: [192.168.2.28/32]
+
+  - it: should fail when cidr has no cidrs
+    set:
+      networkPolicy.ingress:
+        - from: cidr
+          ports: [3000]
+          why: Missing cidrs.
+    asserts:
+      - failedTemplate:
+          errorMessage: "networkPolicy.ingress[0]: from cidr needs cidrs"

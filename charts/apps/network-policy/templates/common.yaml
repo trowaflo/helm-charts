@@ -1,0 +1,2 @@
+{{/* Render the namespace baseline and the declared flows */}}
+{{- include "common.manifests.networkPolicy" . | nindent 0 -}}

@@ -179,3 +179,28 @@ serviceMonitors:
             regex: "olstring_(.*)"
             replacement: "newstring_$1"
             targetLabel: "__name__"
+
+# -- Cilium network policies of the namespace. When enabled, every pod enters
+# default deny and only the declared flows open, on top of a cluster-wide
+# baseline (DNS, gateway, scrape) that lives outside this library.
+# Every entry needs `why`, rendered as the policy description.
+# `egress[].to`: `kube-apiserver` (6443 by default), `world`, `fqdn` (443 by
+# default, `names`), `cidr` (`cidrs`) or `pods` (`namespace`, `selector`).
+# `ingress[].from`: `pods` or `cidr`. `select` picks the local pods (empty = all),
+# `ports` and `protocol` (TCP, UDP, ANY) apply to the whole entry. A `pods` peer
+# in the same namespace also gets its ingress, so one entry opens both sides.
+# ```yaml
+# networkPolicy:
+#   enabled: true
+#   egress:
+#     - to: pods
+#       select: {app.kubernetes.io/name: server}
+#       selector: {app.kubernetes.io/name: postgresql}
+#       ports: [5432]
+#       why: The server stores its data in PostgreSQL.
+# ```
+# @section -- Network policy configuration
+networkPolicy:
+  enabled: false
+  egress: []
+  ingress: []

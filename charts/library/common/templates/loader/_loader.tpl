@@ -39,4 +39,7 @@
   {{/* Render service-monitor - observability layer */}}
   {{- include "common.manifests.serviceMonitor" . | nindent 0 -}}
 
+  {{/* Render Cilium network policies - network isolation layer */}}
+  {{- include "common.manifests.networkPolicy" . | nindent 0 -}}
+
 {{- end -}}

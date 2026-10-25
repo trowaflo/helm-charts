@@ -1,0 +1,25 @@
+apiVersion: v2
+name: network-policy
+version: 0.6.0
+type: application
+description: |-
+  Helm chart for Cilium network policies of one namespace. Puts every pod of the
+  namespace in default deny, then opens only the flows the app declares: Kubernetes
+  API, Internet, FQDNs, CIDRs and pods, each with the reason it exists. Flows shared
+  by every app (DNS, gateway, scrape) belong to a cluster-wide baseline, not here.
+keywords:
+  - kubernetes
+  - cilium
+  - networkpolicy
+  - security
+maintainers:
+  - name: trowaflo
+    email: trowa.flo@gmail.com
+sources:
+  - https://github.com/trowaflo/helm-charts
+  - https://docs.cilium.io/en/stable/security/policy/
+
+dependencies:
+  - name: common
+    version: 3.2.0
+    repository: file://../../library/common

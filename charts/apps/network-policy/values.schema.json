@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "network-policy values",
+  "description": "The root stays open: consumers share one global values file across several charts. Every object below the root is closed.",
+  "type": "object",
+  "properties": {
+    "nameOverride": { "type": ["string", "null"] },
+    "fullnameOverride": { "type": ["string", "null"] },
+    "networkPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "egress": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["to", "why"],
+            "properties": {
+              "to": { "enum": ["kube-apiserver", "world", "fqdn", "cidr", "pods"] },
+              "select": { "$ref": "#/definitions/labels" },
+              "namespace": { "type": "string", "minLength": 1 },
+              "selector": { "$ref": "#/definitions/labels" },
+              "names": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+              "cidrs": { "$ref": "#/definitions/cidrs" },
+              "ports": { "$ref": "#/definitions/ports" },
+              "protocol": { "$ref": "#/definitions/protocol" },
+              "why": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "ingress": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "ports", "why"],
+            "properties": {
+              "from": { "enum": ["pods", "cidr"] },
+              "select": { "$ref": "#/definitions/labels" },
+              "namespace": { "type": "string", "minLength": 1 },
+              "selector": { "$ref": "#/definitions/labels" },
+              "cidrs": { "$ref": "#/definitions/cidrs" },
+              "ports": { "$ref": "#/definitions/ports" },
+              "protocol": { "$ref": "#/definitions/protocol" },
+              "why": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "labels": {
+      "type": ["object", "null"],
+      "additionalProperties": { "type": "string" }
+    },
+    "cidrs": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[0-9a-fA-F:.]+/[0-9]{1,3}$" }
+    },
+    "ports": {
+      "type": "array",
+      "items": { "type": "integer", "minimum": 1, "maximum": 65535 }
+    },
+    "protocol": { "enum": ["TCP", "UDP", "ANY"] }
+  }
+}

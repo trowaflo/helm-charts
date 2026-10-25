@@ -1,0 +1,175 @@
+suite: test network-policy chart - egress entries
+release:
+  name: rel
+  namespace: demo
+templates:
+  - templates/common.yaml
+tests:
+  - it: should open the Kubernetes API on 6443 for the selected pods only
+    set:
+      networkPolicy.egress:
+        - to: kube-apiserver
+          select:
+            app: worker
+          why: Worker reads the API.
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.description
+          value: "Out: pods app=worker in demo to the Kubernetes API on 6443. Worker reads the API."
+      - equal:
+          path: spec.endpointSelector
+          value:
+            matchLabels:
+              app: worker
+      - equal:
+          path: spec.egress[0].toEntities
+          value: [kube-apiserver]
+      - equal:
+          path: spec.egress[0].toPorts[0].ports
+          value:
+            - port: "6443"
+              protocol: TCP
+
+  - it: should default fqdn to 443 and select every pod without select
+    set:
+      networkPolicy.egress:
+        - to: fqdn
+          names: [grafana.com, grafana.net]
+          why: Update check.
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.endpointSelector
+          value: {}
+      - equal:
+          path: spec.egress[0].toFQDNs
+          value:
+            - matchName: grafana.com
+            - matchName: grafana.net
+      - equal:
+          path: spec.egress[0].toPorts[0].ports[0].port
+          value: "443"
+
+  - it: should route the DNS of fqdn pods through the Cilium DNS proxy
+    set:
+      networkPolicy.egress:
+        - to: fqdn
+          names: [grafana.com]
+          why: Update check.
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.egress[1].toEndpoints[0].matchLabels
+          value:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      - equal:
+          path: spec.egress[1].toPorts[0].rules.dns
+          value:
+            - matchPattern: "*"
+
+  - it: should render world and cidr with their ports and protocol
+    set:
+      networkPolicy.egress:
+        - to: world
+          ports: [80, 443]
+          why: Recipe import.
+        - to: cidr
+          cidrs: [192.168.2.27/32]
+          ports: [1883]
+          protocol: ANY
+          why: MQTT broker.
+    asserts:
+      - equal:
+          path: spec.egress[0].toEntities
+          value: [world]
+        documentIndex: 1
+      - lengthEqual:
+          path: spec.egress[0].toPorts[0].ports
+          count: 2
+        documentIndex: 1
+      - equal:
+          path: spec.egress[0].toCIDR
+          value: [192.168.2.27/32]
+        documentIndex: 2
+      - equal:
+          path: spec.egress[0].toPorts[0].ports[0].protocol
+          value: ANY
+        documentIndex: 2
+
+  - it: should open both sides for a peer in the same namespace
+    set:
+      networkPolicy.egress:
+        - to: pods
+          select:
+            app: server
+          selector:
+            app: db
+          ports: [5432]
+          why: Server stores its data.
+    asserts:
+      - hasDocuments:
+          count: 3
+      - equal:
+          path: spec.egress[0].toEndpoints[0].matchLabels
+          value:
+            app: db
+            k8s:io.kubernetes.pod.namespace: demo
+        documentIndex: 1
+      - equal:
+          path: metadata.name
+          value: rel-network-policy-egress-0-peer
+        documentIndex: 2
+      - equal:
+          path: spec.description
+          value: "In: pods app=db in demo from pods app=server in demo on 5432. Server stores its data."
+        documentIndex: 2
+      - equal:
+          path: spec.endpointSelector.matchLabels
+          value:
+            app: db
+        documentIndex: 2
+      - equal:
+          path: spec.ingress[0].fromEndpoints[0].matchLabels
+          value:
+            app: server
+            k8s:io.kubernetes.pod.namespace: demo
+        documentIndex: 2
+
+  - it: should open only the local side for a peer in another namespace
+    set:
+      networkPolicy.egress:
+        - to: pods
+          namespace: frigate
+          selector:
+            app: frigate
+          ports: [5000]
+          why: Exporter reads Frigate stats.
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: spec.egress[0].toEndpoints[0].matchLabels
+          value:
+            app: frigate
+            k8s:io.kubernetes.pod.namespace: frigate
+        documentIndex: 1
+
+  - it: should fail when world has no ports
+    set:
+      networkPolicy.egress:
+        - to: world
+          why: Missing ports.
+    asserts:
+      - failedTemplate:
+          errorMessage: "networkPolicy.egress[0]: to world needs ports"
+
+  - it: should fail when fqdn has no names
+    set:
+      networkPolicy.egress:
+        - to: fqdn
+          why: Missing names.
+    asserts:
+      - failedTemplate:
+          errorMessage: "networkPolicy.egress[0]: to fqdn needs names"
