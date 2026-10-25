@@ -6,40 +6,47 @@
   "properties": {
     "nameOverride": { "type": ["string", "null"] },
     "fullnameOverride": { "type": ["string", "null"] },
-    "egress": {
-      "type": ["array", "null"],
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["to", "why"],
-        "properties": {
-          "to": { "enum": ["kube-apiserver", "world", "fqdn", "cidr", "pods"] },
-          "select": { "$ref": "#/definitions/labels" },
-          "namespace": { "type": "string", "minLength": 1 },
-          "selector": { "$ref": "#/definitions/labels" },
-          "names": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-          "cidrs": { "$ref": "#/definitions/cidrs" },
-          "ports": { "$ref": "#/definitions/ports" },
-          "protocol": { "$ref": "#/definitions/protocol" },
-          "why": { "type": "string", "minLength": 1 }
-        }
-      }
-    },
-    "ingress": {
-      "type": ["array", "null"],
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["from", "ports", "why"],
-        "properties": {
-          "from": { "enum": ["pods", "cidr"] },
-          "select": { "$ref": "#/definitions/labels" },
-          "namespace": { "type": "string", "minLength": 1 },
-          "selector": { "$ref": "#/definitions/labels" },
-          "cidrs": { "$ref": "#/definitions/cidrs" },
-          "ports": { "$ref": "#/definitions/ports" },
-          "protocol": { "$ref": "#/definitions/protocol" },
-          "why": { "type": "string", "minLength": 1 }
+    "networkPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "egress": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["to", "why"],
+            "properties": {
+              "to": { "enum": ["kube-apiserver", "world", "fqdn", "cidr", "pods"] },
+              "select": { "$ref": "#/definitions/labels" },
+              "namespace": { "type": "string", "minLength": 1 },
+              "selector": { "$ref": "#/definitions/labels" },
+              "names": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+              "cidrs": { "$ref": "#/definitions/cidrs" },
+              "ports": { "$ref": "#/definitions/ports" },
+              "protocol": { "$ref": "#/definitions/protocol" },
+              "why": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "ingress": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "ports", "why"],
+            "properties": {
+              "from": { "enum": ["pods", "cidr"] },
+              "select": { "$ref": "#/definitions/labels" },
+              "namespace": { "type": "string", "minLength": 1 },
+              "selector": { "$ref": "#/definitions/labels" },
+              "cidrs": { "$ref": "#/definitions/cidrs" },
+              "ports": { "$ref": "#/definitions/ports" },
+              "protocol": { "$ref": "#/definitions/protocol" },
+              "why": { "type": "string", "minLength": 1 }
+            }
+          }
         }
       }
     }

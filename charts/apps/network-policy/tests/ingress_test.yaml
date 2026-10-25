@@ -3,11 +3,11 @@ release:
   name: rel
   namespace: demo
 templates:
-  - templates/ciliumnetworkpolicy.yaml
+  - templates/common.yaml
 tests:
   - it: should admit pods of another namespace on the selected local pods
     set:
-      ingress:
+      networkPolicy.ingress:
         - from: pods
           namespace: homepage
           selector:
@@ -36,7 +36,7 @@ tests:
 
   - it: should admit a CIDR
     set:
-      ingress:
+      networkPolicy.ingress:
         - from: cidr
           cidrs: [192.168.2.28/32]
           ports: [3000]
@@ -49,10 +49,10 @@ tests:
 
   - it: should fail when cidr has no cidrs
     set:
-      ingress:
+      networkPolicy.ingress:
         - from: cidr
           ports: [3000]
           why: Missing cidrs.
     asserts:
       - failedTemplate:
-          errorMessage: "ingress[0]: from cidr needs cidrs"
+          errorMessage: "networkPolicy.ingress[0]: from cidr needs cidrs"

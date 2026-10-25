@@ -1,29 +1,29 @@
 suite: test network-policy chart - values schema
 templates:
-  - templates/ciliumnetworkpolicy.yaml
+  - templates/common.yaml
 tests:
   - it: should reject an egress entry without why
     set:
-      egress:
+      networkPolicy.egress:
         - to: world
           ports: [443]
     asserts:
       - failedTemplate:
-          errorPattern: "at '/egress/0': missing property 'why'"
+          errorPattern: "at '/networkPolicy/egress/0': missing property 'why'"
 
   - it: should reject an unknown egress target
     set:
-      egress:
+      networkPolicy.egress:
         - to: internet
           ports: [443]
           why: Typo.
     asserts:
       - failedTemplate:
-          errorPattern: "at '/egress/0/to'"
+          errorPattern: "at '/networkPolicy/egress/0/to'"
 
   - it: should reject an unknown key
     set:
-      egress:
+      networkPolicy.egress:
         - to: world
           port: [443]
           why: Typo.
@@ -33,9 +33,23 @@ tests:
 
   - it: should reject an ingress entry without ports
     set:
-      ingress:
+      networkPolicy.ingress:
         - from: pods
           why: Missing ports.
     asserts:
       - failedTemplate:
-          errorPattern: "at '/ingress/0': missing property 'ports'"
+          errorPattern: "at '/networkPolicy/ingress/0': missing property 'ports'"
+
+  - it: should reject an unknown key under networkPolicy
+    set:
+      networkPolicy.egres: []
+    asserts:
+      - failedTemplate:
+          errorPattern: "additional properties 'egres' not allowed"
+
+  - it: should render nothing when disabled
+    set:
+      networkPolicy.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0

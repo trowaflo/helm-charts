@@ -3,7 +3,7 @@ release:
   name: rel
   namespace: demo
 templates:
-  - templates/ciliumnetworkpolicy.yaml
+  - templates/common.yaml
 tests:
   - it: should render only the baseline with default values
     asserts:
@@ -35,7 +35,7 @@ tests:
     release:
       name: helm-museum-prometheus-pve-exporter
     set:
-      egress:
+      networkPolicy.egress:
         - to: pods
           selector:
             app: db

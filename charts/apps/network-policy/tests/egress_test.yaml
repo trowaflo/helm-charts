@@ -3,11 +3,11 @@ release:
   name: rel
   namespace: demo
 templates:
-  - templates/ciliumnetworkpolicy.yaml
+  - templates/common.yaml
 tests:
   - it: should open the Kubernetes API on 6443 for the selected pods only
     set:
-      egress:
+      networkPolicy.egress:
         - to: kube-apiserver
           select:
             app: worker
@@ -33,7 +33,7 @@ tests:
 
   - it: should default fqdn to 443 and select every pod without select
     set:
-      egress:
+      networkPolicy.egress:
         - to: fqdn
           names: [grafana.com, grafana.net]
           why: Update check.
@@ -53,7 +53,7 @@ tests:
 
   - it: should route the DNS of fqdn pods through the Cilium DNS proxy
     set:
-      egress:
+      networkPolicy.egress:
         - to: fqdn
           names: [grafana.com]
           why: Update check.
@@ -71,7 +71,7 @@ tests:
 
   - it: should render world and cidr with their ports and protocol
     set:
-      egress:
+      networkPolicy.egress:
         - to: world
           ports: [80, 443]
           why: Recipe import.
@@ -100,7 +100,7 @@ tests:
 
   - it: should open both sides for a peer in the same namespace
     set:
-      egress:
+      networkPolicy.egress:
         - to: pods
           select:
             app: server
@@ -135,7 +135,7 @@ tests:
 
   - it: should open only the local side for a peer in another namespace
     set:
-      egress:
+      networkPolicy.egress:
         - to: pods
           namespace: frigate
           selector:
@@ -154,18 +154,18 @@ tests:
 
   - it: should fail when world has no ports
     set:
-      egress:
+      networkPolicy.egress:
         - to: world
           why: Missing ports.
     asserts:
       - failedTemplate:
-          errorMessage: "egress[0]: to world needs ports"
+          errorMessage: "networkPolicy.egress[0]: to world needs ports"
 
   - it: should fail when fqdn has no names
     set:
-      egress:
+      networkPolicy.egress:
         - to: fqdn
           why: Missing names.
     asserts:
       - failedTemplate:
-          errorMessage: "egress[0]: to fqdn needs names"
+          errorMessage: "networkPolicy.egress[0]: to fqdn needs names"
