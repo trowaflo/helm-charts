@@ -37,10 +37,8 @@ kind: Backend
 metadata:
   name: {{ $backendName }}
   namespace: {{ $backendNamespace }}
-  {{- with $cfg.labels }}
   labels:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- include "kgateway-routing.resourceLabels" (dict "root" $ "extra" $cfg.labels) | nindent 4 }}
   {{- with $cfg.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}

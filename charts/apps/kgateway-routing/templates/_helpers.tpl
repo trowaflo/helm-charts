@@ -41,6 +41,16 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
+Chart labels merged with user labels, as a YAML map. A user label wins on a
+shared key so an existing selector on it keeps matching.
+Usage: {{ include "kgateway-routing.resourceLabels" (dict "root" $ "extra" $cfg.labels) | nindent 4 }}
+*/}}
+{{- define "kgateway-routing.resourceLabels" -}}
+  {{- $chart := include "kgateway-routing.labels" .root | fromYaml -}}
+  {{- toYaml (merge (deepCopy (.extra | default dict)) $chart) -}}
+{{- end }}
+
+{{/*
 Selector labels
 */}}
 {{- define "kgateway-routing.selectorLabels" -}}

@@ -16,10 +16,8 @@ kind: HTTPRoute
 metadata:
   name: {{ $name }}
   namespace: {{ $routeNamespace }}
-  {{- with $cfg.labels }}
   labels:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- include "kgateway-routing.resourceLabels" (dict "root" $ "extra" $cfg.labels) | nindent 4 }}
   {{- with $cfg.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}

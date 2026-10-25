@@ -23,10 +23,8 @@ kind: TrafficPolicy
 metadata:
   name: {{ printf "%s-forward-auth" $name | trunc 63 | trimSuffix "-" }}
   namespace: {{ $routeNamespace }}
-  {{- with $cfg.labels }}
   labels:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- include "kgateway-routing.resourceLabels" (dict "root" $ "extra" $cfg.labels) | nindent 4 }}
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
