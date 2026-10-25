@@ -22,6 +22,9 @@ tests:
           path: metadata.name
           value: rel-network-policy-ingress-0
       - equal:
+          path: spec.description
+          value: "In: pods app=grafana in demo from pods app=homepage in homepage on 3000. Homepage widget reads Grafana."
+      - equal:
           path: spec.endpointSelector.matchLabels
           value:
             app: grafana

@@ -40,6 +40,16 @@ spec:
     {{- fail (printf "networkPolicy.egress[%d]: to cidr needs cidrs" $i) }}
   {{- end }}
   {{- $peerNs := $r.namespace | default $ns }}
+  {{- /* Description: direction, local pods, destination, ports, then why. */}}
+  {{- $who := include "common.networkPolicy.who" (dict "labels" $r.select "namespace" $ns) }}
+  {{- $dest := "" }}
+  {{- if eq $r.to "kube-apiserver" }}{{ $dest = "the Kubernetes API" }}
+  {{- else if eq $r.to "world" }}{{ $dest = "the Internet" }}
+  {{- else if eq $r.to "fqdn" }}{{ $dest = join ", " $r.names }}
+  {{- else if eq $r.to "cidr" }}{{ $dest = join ", " $r.cidrs }}
+  {{- else }}{{ $dest = include "common.networkPolicy.who" (dict "labels" $r.selector "namespace" $peerNs) }}
+  {{- end }}
+  {{- /* Egress: one policy per entry, on the selected local pods. */}}
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
@@ -48,7 +58,7 @@ metadata:
   labels:
     {{- include "common.helpers.labels" $ | nindent 4 }}
 spec:
-  description: {{ $r.why | quote }}
+  description: {{ printf "Out: %s to %s on %s. %s" $who $dest (join "," $ports) $r.why | quote }}
   endpointSelector:
     {{- include "common.networkPolicy.selector" $r.select | nindent 4 }}
   egress:
@@ -96,7 +106,7 @@ metadata:
   labels:
     {{- include "common.helpers.labels" $ | nindent 4 }}
 spec:
-  description: {{ $r.why | quote }}
+  description: {{ printf "In: %s from %s on %s. %s" $dest $who (join "," $ports) $r.why | quote }}
   endpointSelector:
     {{- include "common.networkPolicy.selector" $r.selector | nindent 4 }}
   ingress:
@@ -112,6 +122,12 @@ spec:
   {{- if and (eq $r.from "cidr") (not $r.cidrs) }}
     {{- fail (printf "networkPolicy.ingress[%d]: from cidr needs cidrs" $i) }}
   {{- end }}
+  {{- $who := include "common.networkPolicy.who" (dict "labels" $r.select "namespace" $ns) }}
+  {{- $src := "" }}
+  {{- if eq $r.from "cidr" }}{{ $src = join ", " $r.cidrs }}
+  {{- else }}{{ $src = include "common.networkPolicy.who" (dict "labels" $r.selector "namespace" ($r.namespace | default $ns)) }}
+  {{- end }}
+  {{- /* Ingress: one policy per entry, on the selected local pods. */}}
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
@@ -120,7 +136,7 @@ metadata:
   labels:
     {{- include "common.helpers.labels" $ | nindent 4 }}
 spec:
-  description: {{ $r.why | quote }}
+  description: {{ printf "In: %s from %s on %s. %s" $who $src (join "," $r.ports) $r.why | quote }}
   endpointSelector:
     {{- include "common.networkPolicy.selector" $r.select | nindent 4 }}
   ingress:
@@ -140,6 +156,19 @@ spec:
 {{- define "common.networkPolicy.name" -}}
   {{- $prefix := include "common.helpers.fullname" .root | trunc (int (sub 62 (len .suffix))) | trimSuffix "-" }}
   {{- printf "%s-%s" $prefix .suffix }}
+{{- end -}}
+
+{{- /* Human-readable pod set for descriptions: "app=x in ns" or "every pod of ns". */ -}}
+{{- define "common.networkPolicy.who" -}}
+  {{- if .labels -}}
+    {{- $pairs := list -}}
+    {{- range $k := keys .labels | sortAlpha -}}
+      {{- $pairs = append $pairs (printf "%s=%s" $k (index $.labels $k)) -}}
+    {{- end -}}
+    {{- printf "pods %s in %s" (join "," $pairs) .namespace -}}
+  {{- else -}}
+    {{- printf "every pod of %s" .namespace -}}
+  {{- end -}}
 {{- end -}}
 
 {{- /* Endpoint selector from a matchLabels map; an empty map selects every pod. */ -}}
