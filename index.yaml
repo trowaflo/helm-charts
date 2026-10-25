@@ -1,3 +1,121 @@
 apiVersion: v1
-entries: {}
-generated: "2026-08-14T13:25:08.302586629Z"
+entries:
+  cert-manager-platform:
+  - apiVersion: v2
+    created: "2026-10-25T10:06:13.300202916Z"
+    dependencies:
+    - alias: cert-manager
+      condition: cert-manager.enabled
+      name: cert-manager
+      repository: oci://quay.io/jetstack/charts
+      version: v1.20.0
+    - alias: cert-manager-webhook-ovh
+      name: cert-manager-webhook-ovh
+      repository: https://aureq.github.io/cert-manager-webhook-ovh/
+      version: 0.9.5
+    description: Wraps cert-manager and cert-manager-webhook-ovh to provide automated
+      X.509 certificate management for Kubernetes with OVH DNS-01 challenge support.
+      Includes Certificate resource management and streamlined setup for Let's Encrypt
+      certificates.
+    digest: 4a24e15675926908b2633a079446b9b964c39ecffb9d1b9737022e624f4bdca4
+    home: https://cert-manager.io
+    keywords:
+    - cert-manager
+    - certificates
+    - tls
+    - ssl
+    - letsencrypt
+    - ovh
+    - dns
+    - acme
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: cert-manager-platform
+    sources:
+    - https://github.com/cert-manager/cert-manager
+    - https://github.com/aureq/cert-manager-webhook-ovh
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/cert-manager-platform-4.0.0-pr259.tgz
+    version: 4.0.0-pr259
+  common:
+  - apiVersion: v2
+    created: "2026-10-25T10:06:13.301089854Z"
+    description: Common library chart providing reusable Helm templates and default
+      configurations. Standardizes Kubernetes resource deployment (Deployments, StatefulSets,
+      DaemonSets, CronJobs, Jobs, Services, Ingress, ServiceMonitor, PersistentVolumes,
+      PersistentVolumeClaims, CNPG Clusters) across the chart repository with consistent
+      security, observability, and best practices.  Used by all application charts
+      in this repository for consistency.
+    digest: 714cd62a4a08413e1a76548eb74fd8896a2ac123f354d8e5aad4f9d91d17cc5d
+    home: https://github.com/trowaflo/helm-charts
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: common
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    type: library
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-3.1.0-pr259.tgz
+    version: 3.1.0-pr259
+  kgateway-routing:
+  - apiVersion: v2
+    created: "2026-10-25T10:06:13.302076669Z"
+    description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
+      resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
+      with request/response filters, header modification, and flexible path matching.
+    digest: 82eb95cfaeee6d485dbe16382b1810a6983cf494da33203723de98dd784f1494
+    keywords:
+    - kubernetes
+    - gateway
+    - kgateway
+    - httproute
+    - backend
+    - routing
+    - networking
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: kgateway-routing
+    sources:
+    - https://github.com/kgateway-dev/kgateway
+    - https://docs.kgateway.dev/
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.6.0-pr259.tgz
+    version: 0.6.0-pr259
+  persistent-volume:
+  - apiVersion: v2
+    created: "2026-10-25T10:06:13.303234085Z"
+    dependencies:
+    - name: common
+      repository: file://../../library/common
+      version: 3.1.0
+    description: Helm chart for declarative creation and management of Kubernetes
+      PersistentVolumes (PV) and PersistentVolumeClaims (PVC). Supports multiple storage
+      backends including hostPath, NFS, and other volume types with flexible configuration
+      for capacity, access modes, and storage classes.
+    digest: 66cfed551f5a30c701a93cc0b7ca16d7dc81492265edbc2d270de81cfb384d73
+    keywords:
+    - kubernetes
+    - storage
+    - persistentvolume
+    - persistentvolumeclaim
+    - pv
+    - pvc
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: persistent-volume
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    - https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/persistent-volume-0.3.0-pr259.tgz
+    version: 0.3.0-pr259
+generated: "2026-10-25T10:06:13.291514139Z"
