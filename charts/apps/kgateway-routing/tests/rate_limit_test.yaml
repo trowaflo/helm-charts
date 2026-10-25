@@ -84,7 +84,7 @@ tests:
           port: 80
     asserts:
       - failedTemplate:
-          errorMessage: "routes.demo.rateLimit is set but empty; provide maxTokens/tokensPerFill/fillInterval, or remove the key entirely"
+          errorPattern: "at '/routes/demo/rateLimit': got boolean, want null or object"
 
   - it: should fail when maxTokens is missing
     set:

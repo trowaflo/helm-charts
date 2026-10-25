@@ -1,0 +1,51 @@
+suite: test kgateway-routing chart - values schema
+templates:
+  - templates/httproute.yaml
+tests:
+  - it: should reject an unknown key on a route
+    set:
+      routes.demo.enabled: true
+      routes.demo.securityHeader: true
+      routes.demo.inCluster:
+        - name: demo
+          port: 80
+    asserts:
+      - failedTemplate:
+          errorPattern: "at '/routes/demo': additional properties 'securityHeader' not allowed"
+
+  - it: should reject an unknown key on a backend
+    set:
+      routes.demo.enabled: true
+      routes.demo.inCluster:
+        - name: demo
+          port: 80
+          tsl: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "at '/routes/demo/inCluster/0': additional properties 'tsl' not allowed"
+
+  - it: should reject an unknown key in rateLimit
+    set:
+      routes.demo.enabled: true
+      routes.demo.rateLimit:
+        maxTokens: 10
+        tokensPerFill: 5
+        fillInterval: 1s
+        burst: 10
+      routes.demo.inCluster:
+        - name: demo
+          port: 80
+    asserts:
+      - failedTemplate:
+          errorPattern: "at '/routes/demo/rateLimit': additional properties 'burst' not allowed"
+
+  - it: should accept unknown top-level keys shared with other charts
+    set:
+      imagePullPolicy: IfNotPresent
+      routes.demo.enabled: true
+      routes.demo.inCluster:
+        - name: demo
+          port: 80
+    asserts:
+      - hasDocuments:
+          count: 1

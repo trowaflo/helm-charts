@@ -1,0 +1,264 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "kgateway-routing values",
+  "description": "The root stays open: consumers share one global values file across several charts. Every object below the root is closed.",
+  "type": "object",
+  "properties": {
+    "nameOverride": { "type": ["string", "null"] },
+    "fullnameOverride": { "type": ["string", "null"] },
+    "namespaceOverride": { "type": ["string", "null"] },
+    "dnsSuffix": { "type": "string" },
+    "defaultParentRefs": {
+      "type": ["array", "null"],
+      "items": { "$ref": "#/definitions/parentRef" }
+    },
+    "defaultForwardAuth": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "extensionRef": { "$ref": "#/definitions/extensionRef" }
+      }
+    },
+    "defaultSecurityHeaders": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "set": {
+          "type": ["array", "null"],
+          "items": { "$ref": "#/definitions/header" }
+        },
+        "remove": {
+          "type": ["array", "null"],
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "routes": {
+      "type": ["object", "null"],
+      "additionalProperties": { "$ref": "#/definitions/route" }
+    },
+    "backends": {
+      "description": "Legacy section, kept for backwards compatibility only.",
+      "type": ["object", "null"],
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "enabled": { "type": "boolean" },
+          "namespace": { "type": "string" },
+          "type": { "type": "string" },
+          "static": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "hosts": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "host": { "type": "string" },
+                    "port": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          },
+          "labels": { "$ref": "#/definitions/stringMap" },
+          "annotations": { "$ref": "#/definitions/stringMap" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "stringMap": {
+      "type": ["object", "null"],
+      "additionalProperties": { "type": ["string", "null"] }
+    },
+    "header": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "value": { "type": ["string", "number", "boolean"] }
+      }
+    },
+    "headerModifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "set": { "type": "array", "items": { "$ref": "#/definitions/header" } },
+        "add": { "type": "array", "items": { "$ref": "#/definitions/header" } },
+        "remove": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "filter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string" },
+        "requestHeaderModifier": { "$ref": "#/definitions/headerModifier" },
+        "responseHeaderModifier": { "$ref": "#/definitions/headerModifier" },
+        "requestRedirect": { "type": "object" },
+        "requestMirror": { "type": "object" },
+        "urlRewrite": { "type": "object" },
+        "extensionRef": { "type": "object" }
+      }
+    },
+    "filters": {
+      "type": ["array", "null"],
+      "items": { "$ref": "#/definitions/filter" }
+    },
+    "match": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": { "enum": ["Exact", "PathPrefix", "RegularExpression"] },
+            "value": { "type": "string" }
+          }
+        },
+        "headers": { "type": "array" },
+        "queryParams": { "type": "array" },
+        "method": { "type": "string" }
+      }
+    },
+    "matches": {
+      "type": ["array", "null"],
+      "items": { "$ref": "#/definitions/match" }
+    },
+    "parentRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "group": { "type": "string" },
+        "kind": { "type": "string" },
+        "name": { "type": "string" },
+        "namespace": { "type": "string" },
+        "sectionName": { "type": "string" }
+      }
+    },
+    "extensionRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "namespace": { "type": "string" }
+      }
+    },
+    "inClusterBackend": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "port": { "type": "integer" },
+        "namespace": { "type": "string" },
+        "weight": { "type": "integer" },
+        "matches": { "$ref": "#/definitions/matches" },
+        "filters": { "$ref": "#/definitions/filters" },
+        "tls": { "type": "boolean" },
+        "insecure": { "type": "boolean" },
+        "sni": { "type": "string" }
+      }
+    },
+    "outClusterBackend": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "host": { "type": "string" },
+        "port": { "type": "integer" },
+        "namespace": { "type": "string" },
+        "weight": { "type": "integer" },
+        "matches": { "$ref": "#/definitions/matches" },
+        "filters": { "$ref": "#/definitions/filters" },
+        "tls": { "type": "boolean" },
+        "insecure": { "type": "boolean" },
+        "sni": { "type": "string" },
+        "labels": { "$ref": "#/definitions/stringMap" },
+        "annotations": { "$ref": "#/definitions/stringMap" }
+      }
+    },
+    "backendRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "group": { "type": "string" },
+        "kind": { "type": "string" },
+        "name": { "type": "string" },
+        "namespace": { "type": "string" },
+        "port": { "type": "integer" },
+        "weight": { "type": "integer" }
+      }
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "matches": { "$ref": "#/definitions/matches" },
+        "backendRefs": {
+          "type": ["array", "null"],
+          "items": { "$ref": "#/definitions/backendRef" }
+        },
+        "filters": { "$ref": "#/definitions/filters" }
+      }
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "name": { "type": "string" },
+        "namespace": { "type": "string" },
+        "hostnames": {
+          "type": ["array", "null"],
+          "items": { "type": "string" }
+        },
+        "parentRefs": {
+          "type": ["array", "null"],
+          "items": { "$ref": "#/definitions/parentRef" }
+        },
+        "labels": { "$ref": "#/definitions/stringMap" },
+        "annotations": { "$ref": "#/definitions/stringMap" },
+        "allow": {
+          "type": ["array", "null"],
+          "items": { "type": "string" }
+        },
+        "securityHeaders": {
+          "description": "Boolean. Type checked by the template so the error names the route."
+        },
+        "forwardAuth": {
+          "type": ["boolean", "object", "null"],
+          "additionalProperties": false,
+          "properties": {
+            "extensionRef": { "$ref": "#/definitions/extensionRef" }
+          }
+        },
+        "rateLimit": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "properties": {
+            "maxTokens": { "type": "integer" },
+            "tokensPerFill": { "type": "integer" },
+            "fillInterval": { "type": "string" }
+          }
+        },
+        "inCluster": {
+          "type": ["array", "null"],
+          "items": { "$ref": "#/definitions/inClusterBackend" }
+        },
+        "outCluster": {
+          "type": ["array", "null"],
+          "items": { "$ref": "#/definitions/outClusterBackend" }
+        },
+        "rules": {
+          "type": ["array", "null"],
+          "items": { "$ref": "#/definitions/rule" }
+        }
+      }
+    }
+  }
+}
