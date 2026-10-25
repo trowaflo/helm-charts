@@ -51,6 +51,24 @@ tests:
           path: spec.egress[0].toPorts[0].ports[0].port
           value: "443"
 
+  - it: should route the DNS of fqdn pods through the Cilium DNS proxy
+    set:
+      egress:
+        - to: fqdn
+          names: [grafana.com]
+          why: Update check.
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.egress[1].toEndpoints[0].matchLabels
+          value:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      - equal:
+          path: spec.egress[1].toPorts[0].rules.dns
+          value:
+            - matchPattern: "*"
+
   - it: should render world and cidr with their ports and protocol
     set:
       egress:

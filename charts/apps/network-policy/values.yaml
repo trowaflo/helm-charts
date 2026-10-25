@@ -13,7 +13,8 @@ fullnameOverride: ""
 # - `ports`: required for `world`, `cidr` and `pods`; 6443 for `kube-apiserver`,
 #   443 for `fqdn` when omitted.
 # - `protocol`: `TCP` (default), `UDP` or `ANY`, for every port of the entry.
-# - `names`: FQDNs, for `fqdn`.
+# - `names`: FQDNs, for `fqdn`; the DNS of the selected pods then goes through the
+#   Cilium DNS proxy, which learns the IPs behind the names.
 # - `cidrs`: CIDRs, for `cidr`.
 # - `namespace`, `selector`: peer pods, for `pods`; namespace defaults to the release
 #   namespace, an empty selector means every pod of that namespace. A peer in the

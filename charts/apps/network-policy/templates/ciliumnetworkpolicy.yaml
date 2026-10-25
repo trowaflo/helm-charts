@@ -51,7 +51,7 @@ spec:
         - world
   {{- else if eq $r.to "fqdn" }}
     # Matched against the names the pod resolves through the Cilium DNS proxy,
-    # turned on by the cluster-wide baseline.
+    # turned on for these pods only by the DNS rule below.
     - toFQDNs:
     {{- range $r.names }}
         - matchName: {{ . | quote }}
@@ -64,6 +64,19 @@ spec:
         {{- include "network-policy.peer" (dict "selector" $r.selector "namespace" $peerNs) | nindent 8 }}
   {{- end }}
       {{- include "network-policy.ports" (dict "ports" $ports "protocol" $r.protocol) | nindent 6 }}
+  {{- if eq $r.to "fqdn" }}
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+          rules:
+            dns:
+              - matchPattern: "*"
+  {{- end }}
   {{- if and (eq $r.to "pods") (eq $peerNs $ns) }}
 ---
 # Same-namespace peer: the receiving side, so one egress entry opens both.
