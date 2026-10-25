@@ -42,6 +42,45 @@ entries:
     version: 1.0.0
   cert-manager-platform:
   - apiVersion: v2
+    created: "2026-10-25T10:34:17.578843641Z"
+    dependencies:
+    - alias: cert-manager
+      condition: cert-manager.enabled
+      name: cert-manager
+      repository: oci://quay.io/jetstack/charts
+      version: v1.20.0
+    - alias: cert-manager-webhook-ovh
+      name: cert-manager-webhook-ovh
+      repository: https://aureq.github.io/cert-manager-webhook-ovh/
+      version: 0.9.5
+    description: Wraps cert-manager and cert-manager-webhook-ovh to provide automated
+      X.509 certificate management for Kubernetes with OVH DNS-01 challenge support.
+      Includes Certificate resource management and streamlined setup for Let's Encrypt
+      certificates.
+    digest: 14c997b9e076181aadb559c8cb0e932c12add4146ccc289a89067f74a4aaa626
+    home: https://cert-manager.io
+    keywords:
+    - cert-manager
+    - certificates
+    - tls
+    - ssl
+    - letsencrypt
+    - ovh
+    - dns
+    - acme
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: cert-manager-platform
+    sources:
+    - https://github.com/cert-manager/cert-manager
+    - https://github.com/aureq/cert-manager-webhook-ovh
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/cert-manager-platform-4.0.0/cert-manager-platform-4.0.0.tgz
+    version: 4.0.0
+  - apiVersion: v2
     created: "2026-07-18T17:50:03.159939511Z"
     dependencies:
     - alias: cert-manager
@@ -1723,6 +1762,32 @@ entries:
     version: 1.0.0
   kgateway-routing:
   - apiVersion: v2
+    created: "2026-10-25T10:34:17.698027081Z"
+    description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
+      resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
+      with request/response filters, header modification, and flexible path matching.
+    digest: 4dcbed240dde7108b30fc09b9b36434c004b3fbad0a22ff0a490a1e50ffb971d
+    keywords:
+    - kubernetes
+    - gateway
+    - kgateway
+    - httproute
+    - backend
+    - routing
+    - networking
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: kgateway-routing
+    sources:
+    - https://github.com/kgateway-dev/kgateway
+    - https://docs.kgateway.dev/
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/kgateway-routing-0.6.0/kgateway-routing-0.6.0.tgz
+    version: 0.6.0
+  - apiVersion: v2
     created: "2026-05-25T09:24:47.038862926Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
@@ -1931,6 +1996,35 @@ entries:
     - https://github.com/trowaflo/helm-charts/releases/download/kgateway-routing-0.1.0/kgateway-routing-0.1.0.tgz
     version: 0.1.0
   persistent-volume:
+  - apiVersion: v2
+    created: "2026-10-25T10:34:17.814241391Z"
+    dependencies:
+    - name: common
+      repository: file://../../library/common
+      version: 3.1.0
+    description: Helm chart for declarative creation and management of Kubernetes
+      PersistentVolumes (PV) and PersistentVolumeClaims (PVC). Supports multiple storage
+      backends including hostPath, NFS, and other volume types with flexible configuration
+      for capacity, access modes, and storage classes.
+    digest: c54dea7b3e06dc001dc9e1d7dddf0a068362401647f6b24497e9c79c39f06630
+    keywords:
+    - kubernetes
+    - storage
+    - persistentvolume
+    - persistentvolumeclaim
+    - pv
+    - pvc
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: persistent-volume
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    - https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/persistent-volume-0.3.0/persistent-volume-0.3.0.tgz
+    version: 0.3.0
   - apiVersion: v2
     created: "2026-05-09T11:47:44.51757538Z"
     dependencies:
@@ -2712,4 +2806,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/prometheus-1.0.1/prometheus-1.0.1.tgz
     version: 1.0.1
-generated: "2026-10-25T10:34:06.108137019Z"
+generated: "2026-10-25T10:34:17.814484373Z"
