@@ -14,7 +14,7 @@
     {{- $targets = append $targets (dict
         "group" "gateway.kgateway.dev"
         "kind" "Backend"
-        "name" (printf "%s-%s-backend" $routeKey $backend.name)
+        "name" (include "kgateway-routing.backendResourceName" (dict "routeKey" $routeKey "backend" $backend))
         "backend" $backend) }}
   {{- end }}
 {{- end }}

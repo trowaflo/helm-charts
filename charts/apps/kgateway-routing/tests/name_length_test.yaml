@@ -1,0 +1,43 @@
+suite: test kgateway-routing chart - object names fit in 63 characters
+release:
+  name: rel
+set:
+  routes:
+    a-route-key-long-enough-to-push-every-generated-name-past-the-limit:
+      enabled: true
+      outCluster:
+        - name: backend-with-a-long-name
+          host: up.example.com
+          port: 443
+          tls: true
+tests:
+  - it: should truncate the HTTPRoute name
+    template: templates/httproute.yaml
+    asserts:
+      - equal:
+          path: metadata.name
+          value: a-route-key-long-enough-to-push-every-generated-name-past-the-l
+
+  - it: should truncate the Backend name and reference it unchanged from the HTTPRoute
+    templates:
+      - templates/backend.yaml
+      - templates/httproute.yaml
+    asserts:
+      - equal:
+          path: metadata.name
+          value: a-route-key-long-enough-to-push-every-generated-name-past-the-l
+        template: templates/backend.yaml
+      - equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: a-route-key-long-enough-to-push-every-generated-name-past-the-l
+        template: templates/httproute.yaml
+
+  - it: should truncate the BackendConfigPolicy name and target the truncated Backend
+    template: templates/backendconfigpolicy.yaml
+    asserts:
+      - equal:
+          path: metadata.name
+          value: rel-a-route-key-long-enough-to-push-every-generated-name-past-t
+      - equal:
+          path: spec.targetRefs[0].name
+          value: a-route-key-long-enough-to-push-every-generated-name-past-the-l

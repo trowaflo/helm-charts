@@ -17,7 +17,7 @@
 {{- range $routeKey, $routeCfg := .Values.routes }}
   {{- if $routeCfg.enabled }}
     {{- range $backend := $routeCfg.outCluster }}
-      {{- $backendName := printf "%s-%s-backend" $routeKey $backend.name }}
+      {{- $backendName := include "kgateway-routing.backendResourceName" (dict "routeKey" $routeKey "backend" $backend) }}
       {{- $backendNamespace := default $namespace (default $routeCfg.namespace $backend.namespace) }}
       {{- $backendSpec := dict "type" "Static" "namespace" $backendNamespace "static" (dict "hosts" (list (dict "host" $backend.host "port" $backend.port))) }}
       {{- template "kgateway-routing.addBackendMetadata" (list $backendSpec $backend) }}

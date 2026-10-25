@@ -86,7 +86,7 @@ spec:
 
     {{- if $cfg.outCluster }}
       {{- range $idx, $backend := $cfg.outCluster }}
-        {{- $backendName := printf "%s-%s-backend" $key $backend.name }}
+        {{- $backendName := include "kgateway-routing.backendResourceName" (dict "routeKey" $key "backend" $backend) }}
     - matches:
         {{- if hasKey $cfg "allow" }}
           {{- if $cfg.allow }}
