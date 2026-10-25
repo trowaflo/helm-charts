@@ -29,7 +29,7 @@ deployments:
       type: RollingUpdate
     # -- Pod-level spec. Groups all pod-level fields (containers, securityContext, volumes, affinity, etc.)
     # podSpec:
-    #   securityContext: {}   # Defaults: runAsNonRoot=true, fsGroupChangePolicy=OnRootMismatch
+    #   securityContext: {}   # Defaults: runAsNonRoot=true, fsGroupChangePolicy=OnRootMismatch, seccompProfile.type=RuntimeDefault
     #   containers:           # required — at minimum: {main: {imageSelector: image}} or {main: {image: {repository, tag}}}
 
 # -- StatefulSets configuration. Define one or more stateful workloads under the 'statefulsets' key.
@@ -64,7 +64,7 @@ daemonsets:
       type: RollingUpdate
     # -- Pod-level spec. Groups all pod-level fields (containers, securityContext, volumes, etc.)
     # podSpec:
-    #   securityContext: {}   # Defaults: runAsNonRoot=true, fsGroupChangePolicy=OnRootMismatch
+    #   securityContext: {}   # Defaults: runAsNonRoot=true, fsGroupChangePolicy=OnRootMismatch, seccompProfile.type=RuntimeDefault
     #   containers:           # required — at minimum: {main: {image: {repository, tag}}}
 
 # -- CronJobs configuration. Define one or more scheduled jobs under the 'cronjobs' key.

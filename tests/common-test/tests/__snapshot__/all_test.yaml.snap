@@ -67,6 +67,8 @@ should match snapshot with a realistic stack:
           securityContext:
             fsGroupChangePolicy: OnRootMismatch
             runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
   3: |
     apiVersion: monitoring.coreos.com/v1
     kind: ServiceMonitor

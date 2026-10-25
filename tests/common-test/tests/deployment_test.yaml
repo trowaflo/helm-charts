@@ -469,6 +469,41 @@ tests:
             value: "gpu"
             effect: "NoSchedule"
 
+  - it: should default the pod seccompProfile to RuntimeDefault
+    set:
+      deployments:
+        main:
+          enabled: true
+          podSpec:
+            containers:
+              main:
+                image:
+                  repository: nginx
+                  tag: latest
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.seccompProfile.type
+          value: RuntimeDefault
+
+  - it: should let the pod seccompProfile be overridden
+    set:
+      deployments:
+        main:
+          enabled: true
+          podSpec:
+            securityContext:
+              seccompProfile:
+                type: Unconfined
+            containers:
+              main:
+                image:
+                  repository: nginx
+                  tag: latest
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.seccompProfile.type
+          value: Unconfined
+
   # Test security contexts
   - it: should render pod and container security contexts
     set:

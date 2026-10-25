@@ -7,7 +7,7 @@
       {{- $_ := required (printf "deployments.%s.podSpec.containers is required and must define at least one container when enabled" $name) $podSpec.containers }}
       {{- $defaultStrategy := dict "type" "RollingUpdate" -}}
       {{- $strategy := mergeOverwrite (deepCopy $defaultStrategy) ($deployment.strategy | default dict) -}}
-      {{- $defaultPodSecCtx := dict "runAsNonRoot" true "fsGroupChangePolicy" "OnRootMismatch" -}}
+      {{- $defaultPodSecCtx := dict "runAsNonRoot" true "fsGroupChangePolicy" "OnRootMismatch" "seccompProfile" (dict "type" "RuntimeDefault") -}}
       {{- $podSecCtx := mergeOverwrite (deepCopy $defaultPodSecCtx) ($podSpec.securityContext | default dict) }}
 ---
 apiVersion: apps/v1
