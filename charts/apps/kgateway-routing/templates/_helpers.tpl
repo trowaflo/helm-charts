@@ -46,8 +46,12 @@ shared key so an existing selector on it keeps matching.
 Usage: {{ include "kgateway-routing.resourceLabels" (dict "root" $ "extra" $cfg.labels) | nindent 4 }}
 */}}
 {{- define "kgateway-routing.resourceLabels" -}}
-  {{- $chart := include "kgateway-routing.labels" .root | fromYaml -}}
-  {{- toYaml (merge (deepCopy (.extra | default dict)) $chart) -}}
+  {{- $labels := include "kgateway-routing.labels" .root | fromYaml -}}
+  {{- /* Explicit assignment, not merge: merge would refill a user label set to "". */ -}}
+  {{- range $k, $v := .extra | default dict -}}
+    {{- $_ := set $labels $k $v -}}
+  {{- end -}}
+  {{- toYaml $labels -}}
 {{- end }}
 
 {{/*

@@ -58,6 +58,16 @@ tests:
           path: metadata.labels["app.kubernetes.io/instance"]
           value: "123"
 
+  - it: should keep a route label set to an empty string over the chart label
+    template: templates/httproute.yaml
+    set:
+      routes.demo.labels:
+        app.kubernetes.io/name: ""
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: ""
+
   - it: should let a route label override a chart label
     template: templates/httproute.yaml
     set:
