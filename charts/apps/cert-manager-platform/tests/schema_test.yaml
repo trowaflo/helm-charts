@@ -1,0 +1,26 @@
+suite: test cert-manager-platform chart - values schema
+release:
+  name: cert-manager-platform-test
+  namespace: cert-manager-platform
+templates:
+  - templates/certificate.yaml
+tests:
+  - it: should reject an unknown key on a certificate
+    set:
+      certificates.wildcard.enabled: true
+      certificates.wildcard.secretName: wildcard-tls
+      certificates.wildcard.issuerRef.name: le-prod
+      certificates.wildcard.dnsName: example.com
+    asserts:
+      - failedTemplate:
+          errorPattern: "at '/certificates/wildcard': additional properties 'dnsName' not allowed"
+
+  - it: should accept unknown top-level keys shared with other charts
+    set:
+      dnsSuffix: example.com
+      certificates.wildcard.enabled: true
+      certificates.wildcard.secretName: wildcard-tls
+      certificates.wildcard.issuerRef.name: le-prod
+    asserts:
+      - hasDocuments:
+          count: 1

@@ -1,0 +1,79 @@
+suite: test kgateway-routing chart - chart labels on every resource
+release:
+  name: rel
+templates:
+  - templates/httproute.yaml
+  - templates/backend.yaml
+  - templates/backendconfigpolicy.yaml
+  - templates/trafficpolicy.yaml
+  - templates/trafficpolicy-rate-limit.yaml
+set:
+  defaultForwardAuth:
+    extensionRef:
+      name: auth
+      namespace: auth
+  routes:
+    demo:
+      enabled: true
+      forwardAuth: true
+      rateLimit:
+        maxTokens: 10
+        tokensPerFill: 5
+        fillInterval: 1s
+      labels:
+        team: core
+      outCluster:
+        - name: up
+          host: up.lan
+          port: 443
+          tls: true
+tests:
+  - it: should set the chart labels on every resource
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/managed-by"]
+          value: Helm
+      - equal:
+          path: metadata.labels["app.kubernetes.io/instance"]
+          value: rel
+      - exists:
+          path: metadata.labels["helm.sh/chart"]
+
+  - it: should keep the route labels next to the chart labels
+    template: templates/httproute.yaml
+    asserts:
+      - equal:
+          path: metadata.labels.team
+          value: core
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: kgateway-routing
+
+  # A numeric release name must stay a string: label values are strings.
+  - it: should keep a numeric release name a string label
+    release:
+      name: "123"
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/instance"]
+          value: "123"
+
+  - it: should keep a route label set to an empty string over the chart label
+    template: templates/httproute.yaml
+    set:
+      routes.demo.labels:
+        app.kubernetes.io/name: ""
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: ""
+
+  - it: should let a route label override a chart label
+    template: templates/httproute.yaml
+    set:
+      routes.demo.labels:
+        app.kubernetes.io/name: custom
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: custom

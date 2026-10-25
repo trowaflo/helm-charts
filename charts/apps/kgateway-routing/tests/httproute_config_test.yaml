@@ -71,26 +71,34 @@ tests:
   - it: should render request and response header filters correctly
     values:
       - values/default.yaml
+    # filters[0] is the single ResponseHeaderModifier (defaults merged with the
+    # user's), the other user filters follow.
     asserts:
-      - equal:
-          path: spec.rules[0].filters[0].type
-          value: RequestHeaderModifier
-        documentIndex: 1
-      - equal:
-          path: spec.rules[0].filters[0].requestHeaderModifier.set[0].name
-          value: X-Forwarded-Proto
-        documentIndex: 1
-      - equal:
-          path: spec.rules[0].filters[0].requestHeaderModifier.set[0].value
-          value: https
+      - lengthEqual:
+          path: spec.rules[0].filters
+          count: 2
         documentIndex: 1
       - equal:
           path: spec.rules[0].filters[1].type
-          value: ResponseHeaderModifier
+          value: RequestHeaderModifier
         documentIndex: 1
       - equal:
-          path: spec.rules[0].filters[1].responseHeaderModifier.set[0].name
-          value: Content-Security-Policy
+          path: spec.rules[0].filters[1].requestHeaderModifier.set[0].name
+          value: X-Forwarded-Proto
+        documentIndex: 1
+      - equal:
+          path: spec.rules[0].filters[1].requestHeaderModifier.set[0].value
+          value: https
+        documentIndex: 1
+      - equal:
+          path: spec.rules[0].filters[0].type
+          value: ResponseHeaderModifier
+        documentIndex: 1
+      - contains:
+          path: spec.rules[0].filters[0].responseHeaderModifier.set
+          content:
+            name: Content-Security-Policy
+            value: upgrade-insecure-requests
         documentIndex: 1
 
   # Test path matching configuration

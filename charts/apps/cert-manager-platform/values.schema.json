@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "cert-manager-platform values",
+  "description": "The root stays open: consumers share one global values file across several charts. Subchart keys are validated by the subchart schemas. Certificate and ReferenceGrant entries are closed.",
+  "type": "object",
+  "properties": {
+    "cert-manager": { "type": "object" },
+    "cert-manager-webhook-ovh": { "type": "object" },
+    "certificates": {
+      "type": ["object", "null"],
+      "additionalProperties": { "$ref": "#/definitions/certificate" }
+    },
+    "referenceGrants": {
+      "type": ["object", "null"],
+      "additionalProperties": { "$ref": "#/definitions/referenceGrant" }
+    }
+  },
+  "definitions": {
+    "stringMap": {
+      "type": ["object", "null"],
+      "additionalProperties": { "type": ["string", "null"] }
+    },
+    "stringList": {
+      "type": ["array", "null"],
+      "items": { "type": "string" }
+    },
+    "certificate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "labels": { "$ref": "#/definitions/stringMap" },
+        "annotations": { "$ref": "#/definitions/stringMap" },
+        "secretName": { "type": "string" },
+        "issuerRef": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string" },
+            "kind": { "type": "string" },
+            "group": { "type": "string" }
+          }
+        },
+        "dnsNames": { "$ref": "#/definitions/stringList" },
+        "commonName": { "type": "string" },
+        "duration": { "type": "string" },
+        "renewBefore": { "type": "string" },
+        "privateKey": { "type": "object" },
+        "usages": { "$ref": "#/definitions/stringList" },
+        "subject": { "type": "object" },
+        "isCA": { "type": "boolean" },
+        "emailAddresses": { "$ref": "#/definitions/stringList" },
+        "ipAddresses": { "$ref": "#/definitions/stringList" },
+        "uris": { "$ref": "#/definitions/stringList" },
+        "secretTemplate": { "type": "object" }
+      }
+    },
+    "referenceGrant": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "labels": { "$ref": "#/definitions/stringMap" },
+        "annotations": { "$ref": "#/definitions/stringMap" },
+        "from": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "group": { "type": "string" },
+              "kind": { "type": "string" },
+              "namespace": { "type": "string" }
+            }
+          }
+        },
+        "to": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "group": { "type": "string" },
+              "kind": { "type": "string" },
+              "name": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

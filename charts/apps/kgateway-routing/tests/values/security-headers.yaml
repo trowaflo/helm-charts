@@ -1,12 +1,11 @@
-# Test values for securityHeaders per-route opt-in.
+# Test values for securityHeaders, on by default, opt-out per route.
 # Three routes:
-#   - public:   securityHeaders=true   → filter injected
-#   - private:  no securityHeaders     → no filter
+#   - public:   no securityHeaders     → filter injected
+#   - private:  securityHeaders=false  → no filter
 #   - extra:    securityHeaders=true + user filters → filter prepended to user filters
 routes:
   public:
     enabled: true
-    securityHeaders: true
     hostnames:
       - public.example.com
     parentRefs:
@@ -19,6 +18,7 @@ routes:
 
   private:
     enabled: true
+    securityHeaders: false
     hostnames:
       - private.example.com
     parentRefs:

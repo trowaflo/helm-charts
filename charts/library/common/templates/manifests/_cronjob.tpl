@@ -4,7 +4,7 @@
     {{- if $cronjob.enabled }}
       {{- $podSpec := $cronjob.podSpec | default dict -}}
       {{- $_ := required (printf "cronjobs.%s.podSpec.containers is required and must define at least one container when enabled" $name) $podSpec.containers }}
-      {{- $defaultPodSecCtx := dict "runAsNonRoot" true "fsGroupChangePolicy" "OnRootMismatch" -}}
+      {{- $defaultPodSecCtx := dict "runAsNonRoot" true "fsGroupChangePolicy" "OnRootMismatch" "seccompProfile" (dict "type" "RuntimeDefault") -}}
       {{- $podSecCtx := mergeOverwrite (deepCopy $defaultPodSecCtx) ($podSpec.securityContext | default dict) }}
 ---
 apiVersion: batch/v1

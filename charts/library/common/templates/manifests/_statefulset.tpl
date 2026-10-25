@@ -6,7 +6,7 @@
       {{- $_ := required (printf "statefulsets.%s.podSpec.containers is required and must define at least one container when enabled" $name) $podSpec.containers }}
       {{- $defaultUpdateStrategy := dict "type" "RollingUpdate" -}}
       {{- $updateStrategy := mergeOverwrite (deepCopy $defaultUpdateStrategy) ($statefulset.updateStrategy | default dict) -}}
-      {{- $defaultPodSecCtx := dict "runAsNonRoot" true "fsGroupChangePolicy" "OnRootMismatch" -}}
+      {{- $defaultPodSecCtx := dict "runAsNonRoot" true "fsGroupChangePolicy" "OnRootMismatch" "seccompProfile" (dict "type" "RuntimeDefault") -}}
       {{- $podSecCtx := mergeOverwrite (deepCopy $defaultPodSecCtx) ($podSpec.securityContext | default dict) }}
 ---
 apiVersion: apps/v1

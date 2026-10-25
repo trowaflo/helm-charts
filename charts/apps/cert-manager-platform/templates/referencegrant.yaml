@@ -29,9 +29,8 @@ spec:
       group: ""
       {{- end }}
       kind: {{ $to.kind | required "referenceGrants[].to[].kind is required" }}
-      {{- with $to.name }}
-      name: {{ . }}
-      {{- end }}
+      {{- /* Without a name the grant opens every object of that kind in the namespace. */}}
+      name: {{ $to.name | required (printf "referenceGrants.%s.to[].name is required: without it the grant opens every %s of the namespace" $name ($to.kind | default "object")) }}
     {{- end }}
   {{- end }}
 {{- end }}
