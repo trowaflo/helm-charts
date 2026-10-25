@@ -28,6 +28,13 @@ spec:
   egress:
     - {}
 {{- range $i, $r := $np.egress }}
+  {{- /* Same checks as the network-policy schema: a chart on common.loader has none. */}}
+  {{- if not (has $r.to (list "kube-apiserver" "world" "fqdn" "cidr" "pods")) }}
+    {{- fail (printf "networkPolicy.egress[%d]: to must be kube-apiserver, world, fqdn, cidr or pods" $i) }}
+  {{- end }}
+  {{- if not $r.why }}
+    {{- fail (printf "networkPolicy.egress[%d]: why is required" $i) }}
+  {{- end }}
   {{- $ports := $r.ports }}
   {{- if and (not $ports) (eq $r.to "kube-apiserver") }}{{ $ports = list 6443 }}{{ end }}
   {{- if and (not $ports) (eq $r.to "fqdn") }}{{ $ports = list 443 }}{{ end }}
@@ -117,6 +124,12 @@ spec:
   {{- end }}
 {{- end }}
 {{- range $i, $r := $np.ingress }}
+  {{- if not (has $r.from (list "pods" "cidr")) }}
+    {{- fail (printf "networkPolicy.ingress[%d]: from must be pods or cidr" $i) }}
+  {{- end }}
+  {{- if not $r.why }}
+    {{- fail (printf "networkPolicy.ingress[%d]: why is required" $i) }}
+  {{- end }}
   {{- if not $r.ports }}
     {{- fail (printf "networkPolicy.ingress[%d]: from %s needs ports" $i $r.from) }}
   {{- end }}
