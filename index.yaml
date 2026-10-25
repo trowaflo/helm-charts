@@ -1404,7 +1404,65 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/kgateway-routing-0.1.0/kgateway-routing-0.1.0.tgz
     version: 0.1.0
+  network-policy:
+  - apiVersion: v2
+    created: "2026-10-25T21:27:10.217818857Z"
+    dependencies:
+    - name: common
+      repository: file://../../library/common
+      version: 3.2.0
+    description: 'Helm chart for Cilium network policies of one namespace. Puts every
+      pod of the namespace in default deny, then opens only the flows the app declares:
+      Kubernetes API, Internet, FQDNs, CIDRs and pods, each with the reason it exists.
+      Flows shared by every app (DNS, gateway, scrape) belong to a cluster-wide baseline,
+      not here.'
+    digest: 217fa6afa1d916c0bdc9729fa24c72c2fa4e2b3c007053ad9df65ce2f7f8838d
+    keywords:
+    - kubernetes
+    - cilium
+    - networkpolicy
+    - security
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: network-policy
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    - https://docs.cilium.io/en/stable/security/policy/
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/network-policy-0.6.0/network-policy-0.6.0.tgz
+    version: 0.6.0
   persistent-volume:
+  - apiVersion: v2
+    created: "2026-10-25T21:27:10.482751494Z"
+    dependencies:
+    - name: common
+      repository: file://../../library/common
+      version: 3.2.0
+    description: Helm chart for declarative creation and management of Kubernetes
+      PersistentVolumes (PV) and PersistentVolumeClaims (PVC). Supports multiple storage
+      backends including hostPath, NFS, and other volume types with flexible configuration
+      for capacity, access modes, and storage classes.
+    digest: 100054d0d0ae2a46b8d6f1068f276d5fa4349acb22e832a811d83b0d2f3c5bca
+    keywords:
+    - kubernetes
+    - storage
+    - persistentvolume
+    - persistentvolumeclaim
+    - pv
+    - pvc
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: persistent-volume
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    - https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+    type: application
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/persistent-volume-0.4.0/persistent-volume-0.4.0.tgz
+    version: 0.4.0
   - apiVersion: v2
     created: "2026-10-25T10:34:17.814241391Z"
     dependencies:
@@ -1521,4 +1579,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/persistent-volume-0.1.0/persistent-volume-0.1.0.tgz
     version: 0.1.0
-generated: "2026-10-25T21:26:57.398745307Z"
+generated: "2026-10-25T21:27:10.482857472Z"
