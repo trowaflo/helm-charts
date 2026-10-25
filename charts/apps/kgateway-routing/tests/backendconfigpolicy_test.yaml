@@ -335,3 +335,44 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: "routes.dup: two TLS backends produce the BackendConfigPolicy NAMESPACE/RELEASE-NAME-dup-api-policy; give them distinct names"
+
+  # Route `a` + backend `b-c` and route `a-b` + backend `c` both give
+  # <release>-a-b-c-policy: the collision check must span routes.
+  - it: should fail when two routes would share a policy name in one namespace
+    set:
+      routes:
+        a:
+          enabled: true
+          inCluster:
+            - name: b-c
+              port: 443
+              tls: true
+        a-b:
+          enabled: true
+          inCluster:
+            - name: c
+              port: 443
+              tls: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "routes.a-b: two TLS backends produce the BackendConfigPolicy NAMESPACE/RELEASE-NAME-a-b-c-policy; give them distinct names"
+
+  - it: should accept the same policy name in two namespaces
+    set:
+      routes:
+        a:
+          enabled: true
+          inCluster:
+            - name: b-c
+              port: 443
+              tls: true
+        a-b:
+          enabled: true
+          namespace: other
+          inCluster:
+            - name: c
+              port: 443
+              tls: true
+    asserts:
+      - hasDocuments:
+          count: 2

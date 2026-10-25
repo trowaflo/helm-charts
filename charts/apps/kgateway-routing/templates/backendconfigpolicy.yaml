@@ -1,5 +1,7 @@
 {{- $namespace := include "kgateway-routing.namespace" . -}}
 {{- $routeKeys := keys .Values.routes | sortAlpha -}}
+{{- /* Shared by every route: route a + backend b-c and route a-b + backend c give the same name. */ -}}
+{{- $seen := dict -}}
 {{- range $routeKey := $routeKeys }}
 {{- $route := index $.Values.routes $routeKey }}
 {{- if $route.enabled }}
@@ -23,7 +25,6 @@
     {{- $targets = append $targets (dict "group" "" "kind" "Service" "name" $backend.name "backend" $backend) }}
   {{- end }}
 {{- end }}
-{{- $seen := dict }}
 {{- range $target := $targets }}
 {{- $backend := $target.backend }}
 {{- $bcpNs := default $routeNamespace $backend.namespace }}
