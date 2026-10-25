@@ -74,14 +74,22 @@ tests:
       - hasDocuments:
           count: 0
 
-  - it: should fail when forwardAuth is explicitly false
+  - it: should disable ExtAuth on the route when forwardAuth is false
     values:
       - values/forward-auth.yaml
     set:
       routes.frigate.forwardAuth: false
+    documentSelector:
+      path: metadata.name
+      value: frigate-forward-auth
     asserts:
-      - failedTemplate:
-          errorMessage: "routes.frigate.forwardAuth is set but empty/false; set it to true or an object with extensionRef, or remove the key entirely"
+      - equal:
+          path: spec.targetRefs[0].name
+          value: frigate
+      - equal:
+          path: spec.extAuth
+          value:
+            disable: {}
 
   - it: should fail when forwardAuth is explicitly empty map
     values:
@@ -90,7 +98,9 @@ tests:
       routes.frigate.forwardAuth: {}
     asserts:
       - failedTemplate:
-          errorMessage: "routes.frigate.forwardAuth is set but empty/false; set it to true or an object with extensionRef, or remove the key entirely"
+          errorMessage: >-
+            routes.frigate.forwardAuth is set but empty; set it to true, false
+            or an object with extensionRef, or remove the key entirely
 
   - it: should truncate TrafficPolicy name to 63 chars
     set:

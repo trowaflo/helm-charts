@@ -128,6 +128,8 @@ defaultForwardAuth: {}
 # When `forwardAuth: true`, a `TrafficPolicy` is generated that attaches an ExtAuth
 # policy to the route, referencing the GatewayExtension declared in `defaultForwardAuth`.
 # Per-route override is also supported.
+# `forwardAuth: false` generates a TrafficPolicy with `extAuth.disable: {}`, the
+# opt-out for an app with its own login when ExtAuth is attached to the Gateway.
 # ```yaml
 # defaultForwardAuth:
 #   extensionRef:

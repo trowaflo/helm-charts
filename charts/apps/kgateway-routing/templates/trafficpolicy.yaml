@@ -3,13 +3,15 @@
 {{- range $key := $keys }}
   {{- $cfg := index $.Values.routes $key }}
   {{- if and $cfg.enabled (hasKey $cfg "forwardAuth") }}
-    {{- if not $cfg.forwardAuth }}
-      {{- fail (printf "routes.%s.forwardAuth is set but empty/false; set it to true or an object with extensionRef, or remove the key entirely" $key) }}
+    {{- $disabled := and (kindIs "bool" $cfg.forwardAuth) (not $cfg.forwardAuth) }}
+    {{- if and (not $disabled) (not $cfg.forwardAuth) }}
+      {{- fail (printf "routes.%s.forwardAuth is set but empty; set it to true, false or an object with extensionRef, or remove the key entirely" $key) }}
     {{- end }}
     {{- $name := include "kgateway-routing.routeName" (dict "root" $ "key" $key "config" $cfg) }}
     {{- $routeNamespace := default $namespace $cfg.namespace }}
     {{- $extRef := dict }}
-    {{- if kindIs "bool" $cfg.forwardAuth }}
+    {{- if $disabled }}
+    {{- else if kindIs "bool" $cfg.forwardAuth }}
       {{- if not $.Values.defaultForwardAuth.extensionRef }}
         {{- fail (printf "routes.%s.forwardAuth: true requires .Values.defaultForwardAuth.extensionRef to be set" $key) }}
       {{- end }}
@@ -31,10 +33,15 @@ spec:
       kind: HTTPRoute
       name: {{ $name }}
   extAuth:
+    {{- if $disabled }}
+    # Overrides an ExtAuth policy attached to the parent Gateway.
+    disable: {}
+    {{- else }}
     extensionRef:
       name: {{ required (printf "routes.%s.forwardAuth.extensionRef.name (or defaultForwardAuth.extensionRef.name) is required" $key) $extRef.name }}
       {{- if $extRef.namespace }}
       namespace: {{ $extRef.namespace }}
       {{- end }}
+    {{- end }}
   {{- end }}
 {{- end }}
