@@ -49,6 +49,15 @@ tests:
           path: metadata.labels["app.kubernetes.io/name"]
           value: kgateway-routing
 
+  # A numeric release name must stay a string: label values are strings.
+  - it: should keep a numeric release name a string label
+    release:
+      name: "123"
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/instance"]
+          value: "123"
+
   - it: should let a route label override a chart label
     template: templates/httproute.yaml
     set:

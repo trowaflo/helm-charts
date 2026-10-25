@@ -32,12 +32,12 @@ Create chart name and version as used by the chart label.
 Common labels
 */}}
 {{- define "kgateway-routing.labels" -}}
-helm.sh/chart: {{ include "kgateway-routing.chart" . }}
+helm.sh/chart: {{ include "kgateway-routing.chart" . | quote }}
 {{ include "kgateway-routing.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
 {{- end }}
 
 {{/*
@@ -54,8 +54,9 @@ Usage: {{ include "kgateway-routing.resourceLabels" (dict "root" $ "extra" $cfg.
 Selector labels
 */}}
 {{- define "kgateway-routing.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "kgateway-routing.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+{{- /* Quoted: a release name such as 123 would otherwise parse as a number. */ -}}
+app.kubernetes.io/name: {{ include "kgateway-routing.name" . | quote }}
+app.kubernetes.io/instance: {{ .Release.Name | quote }}
 {{- end }}
 
 {{/*
