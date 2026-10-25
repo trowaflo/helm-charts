@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   common:
   - apiVersion: v2
-    created: "2026-10-25T21:12:55.363759648Z"
+    created: "2026-10-25T21:26:49.499243176Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, StatefulSets,
       DaemonSets, CronJobs, Jobs, Services, Ingress, ServiceMonitor, PersistentVolumes,
@@ -23,7 +23,7 @@ entries:
     version: 3.2.0-pr263
   kgateway-routing:
   - apiVersion: v2
-    created: "2026-10-25T21:12:55.364489549Z"
+    created: "2026-10-25T21:26:49.500063022Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -50,7 +50,35 @@ entries:
     version: 0.7.0-pr262
   network-policy:
   - apiVersion: v2
-    created: "2026-10-25T21:12:55.368373942Z"
+    created: "2026-10-25T21:26:49.504129446Z"
+    dependencies:
+    - name: common
+      repository: file://../../library/common
+      version: 3.2.0
+    description: 'Helm chart for Cilium network policies of one namespace. Puts every
+      pod of the namespace in default deny, then opens only the flows the app declares:
+      Kubernetes API, Internet, FQDNs, CIDRs and pods, each with the reason it exists.
+      Flows shared by every app (DNS, gateway, scrape) belong to a cluster-wide baseline,
+      not here.'
+    digest: d3c62efa1c494240fb859ed02f6c19a597c1f9bd97718184252f0bd6e5a5c4c9
+    keywords:
+    - kubernetes
+    - cilium
+    - networkpolicy
+    - security
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: network-policy
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    - https://docs.cilium.io/en/stable/security/policy/
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/network-policy-0.5.0-pr263.tgz
+    version: 0.5.0-pr263
+  - apiVersion: v2
+    created: "2026-10-25T21:26:49.503003638Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -78,7 +106,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/network-policy-0.4.0-pr263.tgz
     version: 0.4.0-pr263
   - apiVersion: v2
-    created: "2026-10-25T21:12:55.36661877Z"
+    created: "2026-10-25T21:26:49.502136246Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -106,7 +134,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/network-policy-0.3.0-pr263.tgz
     version: 0.3.0-pr263
   - apiVersion: v2
-    created: "2026-10-25T21:12:55.365792223Z"
+    created: "2026-10-25T21:26:49.501245221Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -134,7 +162,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/network-policy-0.2.0-pr263.tgz
     version: 0.2.0-pr263
   - apiVersion: v2
-    created: "2026-10-25T21:12:55.364853438Z"
+    created: "2026-10-25T21:26:49.500313817Z"
     description: 'Helm chart for Cilium network policies of one namespace. Puts every
       pod of the namespace in default deny, then opens only the flows the app declares:
       Kubernetes API, Internet, FQDNs, CIDRs and pods, each with the reason it exists.
@@ -159,7 +187,7 @@ entries:
     version: 0.1.0-pr263
   persistent-volume:
   - apiVersion: v2
-    created: "2026-10-25T21:12:55.370100606Z"
+    created: "2026-10-25T21:26:49.506445918Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -188,7 +216,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/persistent-volume-0.4.0-pr263.tgz
     version: 0.4.0-pr263
   - apiVersion: v2
-    created: "2026-10-25T21:12:55.369257585Z"
+    created: "2026-10-25T21:26:49.50553835Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -216,4 +244,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/persistent-volume-0.3.0-pr263.tgz
     version: 0.3.0-pr263
-generated: "2026-10-25T21:12:55.362881073Z"
+generated: "2026-10-25T21:26:49.498058925Z"
