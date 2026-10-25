@@ -9,6 +9,7 @@ baseline outside this chart.
 {{- if $np.enabled }}
 {{- $ns := .Release.Namespace }}
 ---
+# Namespace baseline: every pod of the namespace in default deny, in and out.
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
@@ -49,8 +50,8 @@ spec:
   {{- else if eq $r.to "cidr" }}{{ $dest = join ", " $r.cidrs }}
   {{- else }}{{ $dest = include "common.networkPolicy.who" (dict "labels" $r.selector "namespace" $peerNs) }}
   {{- end }}
-  {{- /* Egress: one policy per entry, on the selected local pods. */}}
 ---
+# Egress entry: the outbound flow of the selected local pods.
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
@@ -127,8 +128,8 @@ spec:
   {{- if eq $r.from "cidr" }}{{ $src = join ", " $r.cidrs }}
   {{- else }}{{ $src = include "common.networkPolicy.who" (dict "labels" $r.selector "namespace" ($r.namespace | default $ns)) }}
   {{- end }}
-  {{- /* Ingress: one policy per entry, on the selected local pods. */}}
 ---
+# Ingress entry: the inbound flow to the selected local pods.
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
