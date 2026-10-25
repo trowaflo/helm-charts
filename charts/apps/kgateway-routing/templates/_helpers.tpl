@@ -77,11 +77,16 @@ Generate route name from key and config
   {{- $key := .key -}}
   {{- $config := .config -}}
   {{- $root := .root -}}
-  {{- if $config.name }}
-    {{- $config.name }}
-  {{- else }}
-    {{- $key }}
-  {{- end }}
+  {{- default $key $config.name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Name of the Backend generated for an outCluster entry. Shared by the Backend,
+the HTTPRoute backendRef and the BackendConfigPolicy targetRef so all three agree.
+Usage: {{ include "kgateway-routing.backendResourceName" (dict "routeKey" $key "backend" $backend) }}
+*/}}
+{{- define "kgateway-routing.backendResourceName" -}}
+  {{- printf "%s-%s-backend" .routeKey .backend.name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*

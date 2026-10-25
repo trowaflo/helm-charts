@@ -242,7 +242,7 @@ tests:
           value: app-ns
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-api-policy-app-ns
+          value: RELEASE-NAME-api-api-service-policy
       - equal:
           path: spec.targetRefs[0].kind
           value: Service
@@ -250,7 +250,7 @@ tests:
           path: spec.targetRefs[0].name
           value: api-service
 
-  - it: should emit one BCP per target namespace when mixing cross-namespace inCluster TLS
+  - it: should emit one BCP per target, each in its target namespace
     template: templates/backendconfigpolicy.yaml
     set:
       routes:
@@ -274,17 +274,17 @@ tests:
           count: 2
       - equal:
           path: metadata.namespace
-          value: other-ns
-        documentIndex: 0
-      - equal:
-          path: spec.targetRefs[0].name
-          value: remote-svc
-        documentIndex: 0
-      - equal:
-          path: metadata.namespace
           value: routing-ns
-        documentIndex: 1
+        documentIndex: 0
       - equal:
           path: spec.targetRefs[0].name
           value: local-svc
+        documentIndex: 0
+      - equal:
+          path: metadata.namespace
+          value: other-ns
+        documentIndex: 1
+      - equal:
+          path: spec.targetRefs[0].name
+          value: remote-svc
         documentIndex: 1
