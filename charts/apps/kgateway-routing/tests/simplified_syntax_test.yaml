@@ -61,14 +61,15 @@ tests:
     asserts:
       - isNotEmpty:
           path: spec.rules[0].filters
-      - equal:
-          path: spec.rules[0].filters[0].type
-          value: RequestHeaderModifier
-      - equal:
-          path: spec.rules[0].filters[0].requestHeaderModifier.set[0].name
-          value: X-Forwarded-Proto
+      # filters[0] is the default security headers filter, user filters follow.
       - equal:
           path: spec.rules[0].filters[1].type
+          value: RequestHeaderModifier
+      - equal:
+          path: spec.rules[0].filters[1].requestHeaderModifier.set[0].name
+          value: X-Forwarded-Proto
+      - equal:
+          path: spec.rules[0].filters[2].type
           value: ResponseHeaderModifier
 
   - it: should render Backend for outCluster

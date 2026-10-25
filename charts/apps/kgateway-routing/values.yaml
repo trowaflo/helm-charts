@@ -177,10 +177,11 @@ defaultForwardAuth: {}
 routes: {}
 
 # -- Default security headers injected as a `ResponseHeaderModifier` filter on
-# the rules of routes that opt in with `routes.<name>.securityHeaders: true`.
+# the rules of every route, unless the route opts out with
+# `routes.<name>.securityHeaders: false`.
 #
 # Mirrors the chart convention used by `defaultParentRefs` / `defaultForwardAuth`
-# (a global default, opt-in per-route). Using a distinct name from the per-route
+# (a global default, overridable per-route). Using a distinct name from the per-route
 # boolean flag `securityHeaders:` avoids overloading the same key with two
 # different types at two scopes (map at chart level, bool per-route).
 #
@@ -189,25 +190,25 @@ routes: {}
 # at Gateway scope — `transformation` buffers responses and breaks WebSocket
 # upgrades by holding the `101 Switching Protocols` reply.
 #
-# Opt-in is **strictly per-route** (boolean flag on the route entry) to avoid
-# a global flag accidentally cascading from `global-values.yaml` to every app:
+# On by default so a new route is never exposed without them; opt-out is
+# **strictly per-route** (boolean flag on the route entry):
 #
 # ```yaml
 # routes:
 #   public-app:
-#     securityHeaders: true        # opt in for this route only
+#     # no securityHeaders key → headers injected
 #     inCluster:
 #       - name: foo
 #         port: 80
-#   internal-app:
-#     # no securityHeaders key → no headers injected
+#   legacy-app:
+#     securityHeaders: false       # opt out for this route only
 #     inCluster:
 #       - name: bar
 #         port: 80
 # ```
 #
 # The `set` / `remove` lists below are the global header set applied to every
-# opted-in route. Override the whole `defaultSecurityHeaders` block in your
+# route that did not opt out. Override the whole `defaultSecurityHeaders` block in your
 # values to customize the list. For per-route extra response/request headers,
 # use the `filters:` field on each backend (`inCluster[].filters`,
 # `outCluster[].filters`) or on each rule (`rules[].filters`) — these are

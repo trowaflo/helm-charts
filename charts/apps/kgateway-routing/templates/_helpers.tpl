@@ -85,12 +85,12 @@ Generate backend name from key and config
 
 {{/*
 Render a `ResponseHeaderModifier` filter populated with the global
-`.Values.defaultSecurityHeaders.set` / `.remove` lists, but only if the route
-has opted in via `securityHeaders: true`.
+`.Values.defaultSecurityHeaders.set` / `.remove` lists, unless the route
+opted out via `securityHeaders: false`.
 
 Returns the filter YAML as a list item starting at column 0 (call with
 `| nindent N` to splice into a `filters:` block at the right column), or
-empty if the route did not opt in.
+empty if the route opted out.
 
 Fails explicitly if the per-route `securityHeaders` field is present but not
 a boolean, so typos like `securityHeaders: "true"` (string) or attempts to
@@ -102,11 +102,14 @@ Usage:
 {{- define "kgateway-routing.securityHeadersFilter" -}}
   {{- $cfg := .config -}}
   {{- $key := .key | default "<route>" -}}
-  {{- $optIn := $cfg.securityHeaders -}}
-  {{- if and (hasKey $cfg "securityHeaders") (not (kindIs "bool" $optIn)) -}}
-    {{- fail (printf "routes.%s.securityHeaders must be a boolean: set `true` to opt in or `false`/omit to opt out. The header list is configured globally at top-level `defaultSecurityHeaders:` (got %s)" $key (kindOf $optIn)) -}}
+  {{- $enabled := true -}}
+  {{- if hasKey $cfg "securityHeaders" -}}
+    {{- $enabled = $cfg.securityHeaders -}}
+    {{- if not (kindIs "bool" $enabled) -}}
+      {{- fail (printf "routes.%s.securityHeaders must be a boolean: omit or set `true` to keep them, `false` to opt out. The header list is configured globally at top-level `defaultSecurityHeaders:` (got %s)" $key (kindOf $enabled)) -}}
+    {{- end -}}
   {{- end -}}
-  {{- if eq (default false $optIn) true -}}
+  {{- if $enabled -}}
     {{- $defaults := .root.Values.defaultSecurityHeaders | default dict -}}
 - type: ResponseHeaderModifier
   responseHeaderModifier:

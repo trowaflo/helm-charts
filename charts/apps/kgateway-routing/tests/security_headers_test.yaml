@@ -1,11 +1,11 @@
-suite: test kgateway-routing chart - per-route securityHeaders opt-in
+suite: test kgateway-routing chart - securityHeaders on by default, opt-out per route
 release:
   name: kgateway-routing-test
   namespace: kgateway-test
 templates:
   - templates/httproute.yaml
 tests:
-  - it: should inject ResponseHeaderModifier filter when route opts in (outCluster)
+  - it: should inject ResponseHeaderModifier filter by default (outCluster)
     template: templates/httproute.yaml
     values:
       - values/security-headers.yaml
@@ -31,7 +31,7 @@ tests:
           path: spec.rules[0].filters[0].responseHeaderModifier.remove
           content: Server
 
-  - it: should NOT inject any filter when route does not opt in
+  - it: should NOT inject any filter when route opts out
     template: templates/httproute.yaml
     values:
       - values/security-headers.yaml
@@ -167,7 +167,7 @@ tests:
               port: 80
     asserts:
       - failedTemplate:
-          errorMessage: "routes.badtype.securityHeaders must be a boolean: set `true` to opt in or `false`/omit to opt out.
+          errorMessage: "routes.badtype.securityHeaders must be a boolean: omit or set `true` to keep them, `false` to opt out.
             The header list is configured globally at top-level `defaultSecurityHeaders:` (got string)"
 
   - it: should fail when securityHeaders is a map instead of a bool
@@ -188,7 +188,7 @@ tests:
               port: 80
     asserts:
       - failedTemplate:
-          errorMessage: "routes.badtype.securityHeaders must be a boolean: set `true` to opt in or `false`/omit to opt out.
+          errorMessage: "routes.badtype.securityHeaders must be a boolean: omit or set `true` to keep them, `false` to opt out.
             The header list is configured globally at top-level `defaultSecurityHeaders:` (got map)"
 
   # Validation: missing name in defaultSecurityHeaders.set → required() fires.

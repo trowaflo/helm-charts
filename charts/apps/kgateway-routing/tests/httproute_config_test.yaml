@@ -71,25 +71,26 @@ tests:
   - it: should render request and response header filters correctly
     values:
       - values/default.yaml
+    # filters[0] is the default security headers filter, user filters follow.
     asserts:
       - equal:
-          path: spec.rules[0].filters[0].type
+          path: spec.rules[0].filters[1].type
           value: RequestHeaderModifier
         documentIndex: 1
       - equal:
-          path: spec.rules[0].filters[0].requestHeaderModifier.set[0].name
+          path: spec.rules[0].filters[1].requestHeaderModifier.set[0].name
           value: X-Forwarded-Proto
         documentIndex: 1
       - equal:
-          path: spec.rules[0].filters[0].requestHeaderModifier.set[0].value
+          path: spec.rules[0].filters[1].requestHeaderModifier.set[0].value
           value: https
         documentIndex: 1
       - equal:
-          path: spec.rules[0].filters[1].type
+          path: spec.rules[0].filters[2].type
           value: ResponseHeaderModifier
         documentIndex: 1
       - equal:
-          path: spec.rules[0].filters[1].responseHeaderModifier.set[0].name
+          path: spec.rules[0].filters[2].responseHeaderModifier.set[0].name
           value: Content-Security-Policy
         documentIndex: 1
 
