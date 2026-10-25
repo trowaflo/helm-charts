@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   cert-manager-platform:
   - apiVersion: v2
-    created: "2026-10-25T10:06:13.300202916Z"
+    created: "2026-10-25T10:27:09.342961075Z"
     dependencies:
     - alias: cert-manager
       condition: cert-manager.enabled
@@ -17,7 +17,7 @@ entries:
       X.509 certificate management for Kubernetes with OVH DNS-01 challenge support.
       Includes Certificate resource management and streamlined setup for Let's Encrypt
       certificates.
-    digest: 4a24e15675926908b2633a079446b9b964c39ecffb9d1b9737022e624f4bdca4
+    digest: d0a721eb63e6eb40f743867cfb13233ec709f3810b2ed0d5a99921aa98b239f4
     home: https://cert-manager.io
     keywords:
     - cert-manager
@@ -42,14 +42,14 @@ entries:
     version: 4.0.0-pr259
   common:
   - apiVersion: v2
-    created: "2026-10-25T10:06:13.301089854Z"
+    created: "2026-10-25T10:27:09.34388463Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, StatefulSets,
       DaemonSets, CronJobs, Jobs, Services, Ingress, ServiceMonitor, PersistentVolumes,
       PersistentVolumeClaims, CNPG Clusters) across the chart repository with consistent
       security, observability, and best practices.  Used by all application charts
       in this repository for consistency.
-    digest: 714cd62a4a08413e1a76548eb74fd8896a2ac123f354d8e5aad4f9d91d17cc5d
+    digest: bea5c93bf94dc7663d61a2d272d73af0bebe1045627559356521bdecdc3090ce
     home: https://github.com/trowaflo/helm-charts
     maintainers:
     - email: trowa.flo@gmail.com
@@ -63,11 +63,11 @@ entries:
     version: 3.1.0-pr259
   kgateway-routing:
   - apiVersion: v2
-    created: "2026-10-25T10:06:13.302076669Z"
+    created: "2026-10-25T10:27:09.344842388Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
-    digest: 82eb95cfaeee6d485dbe16382b1810a6983cf494da33203723de98dd784f1494
+    digest: 3e20cd4bdb5e1518ecb822be83dc10df2d4232fb2076d22b538734728701a4b6
     keywords:
     - kubernetes
     - gateway
@@ -90,7 +90,7 @@ entries:
     version: 0.6.0-pr259
   persistent-volume:
   - apiVersion: v2
-    created: "2026-10-25T10:06:13.303234085Z"
+    created: "2026-10-25T10:27:09.34603882Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -99,7 +99,7 @@ entries:
       PersistentVolumes (PV) and PersistentVolumeClaims (PVC). Supports multiple storage
       backends including hostPath, NFS, and other volume types with flexible configuration
       for capacity, access modes, and storage classes.
-    digest: 66cfed551f5a30c701a93cc0b7ca16d7dc81492265edbc2d270de81cfb384d73
+    digest: deb7b0655d19b25b521eaa029b12c0feb41e6bc2c4bc57132094a8bde138e7e3
     keywords:
     - kubernetes
     - storage
@@ -118,4 +118,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/persistent-volume-0.3.0-pr259.tgz
     version: 0.3.0-pr259
-generated: "2026-10-25T10:06:13.291514139Z"
+generated: "2026-10-25T10:27:09.33447942Z"
