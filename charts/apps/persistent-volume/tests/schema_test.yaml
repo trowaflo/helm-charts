@@ -1,0 +1,34 @@
+suite: test persistent-volume chart - values schema
+templates:
+  - templates/common.yaml
+tests:
+  - it: should reject an unknown key on a PersistentVolume
+    set:
+      persistentVolumes.data.enabled: true
+      persistentVolumes.data.capacity: 1Gi
+      persistentVolumes.data.accessModes: [ReadWriteOnce]
+      persistentVolumes.data.reclaimPolicy: Retain
+      persistentVolumes.data.hostPath.path: /mnt/data
+    asserts:
+      - failedTemplate:
+          errorPattern: "at '/persistentVolumes/data': additional properties 'reclaimPolicy' not allowed"
+
+  - it: should reject an unknown key on a PersistentVolumeClaim
+    set:
+      persistentVolumeClaims.data.enabled: true
+      persistentVolumeClaims.data.accessModes: [ReadWriteOnce]
+      persistentVolumeClaims.data.storageClass: fast
+      persistentVolumeClaims.data.resources.requests.storage: 1Gi
+    asserts:
+      - failedTemplate:
+          errorPattern: "at '/persistentVolumeClaims/data': additional properties 'storageClass' not allowed"
+
+  - it: should accept unknown top-level keys shared with other charts
+    set:
+      dnsSuffix: example.com
+      persistentVolumeClaims.data.enabled: true
+      persistentVolumeClaims.data.accessModes: [ReadWriteOnce]
+      persistentVolumeClaims.data.resources.requests.storage: 1Gi
+    asserts:
+      - hasDocuments:
+          count: 1
