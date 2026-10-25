@@ -216,8 +216,10 @@ routes: {}
 # headers come first).
 defaultSecurityHeaders:
   set:
+    # No `preload`: submitted to the browser list, it pins HTTPS on the whole
+    # domain for months and cannot be undone from the chart.
     - name: Strict-Transport-Security
-      value: "max-age=63072000; includeSubDomains; preload"
+      value: "max-age=63072000; includeSubDomains"
     # SAMEORIGIN (not DENY) so apps that embed their own sub-dashboards via
     # iframes from the same origin still work — e.g. Home Assistant Hassio
     # Ingress (`/api/hassio_ingress/<token>/`), Frigate, NodeRED, ESPHome.

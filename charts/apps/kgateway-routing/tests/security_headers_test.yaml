@@ -22,6 +22,9 @@ tests:
           path: spec.rules[0].filters[0].responseHeaderModifier.set[0].name
           value: Strict-Transport-Security
       - equal:
+          path: spec.rules[0].filters[0].responseHeaderModifier.set[0].value
+          value: "max-age=63072000; includeSubDomains"
+      - equal:
           path: spec.rules[0].filters[0].responseHeaderModifier.set[1].name
           value: X-Frame-Options
       - equal:
