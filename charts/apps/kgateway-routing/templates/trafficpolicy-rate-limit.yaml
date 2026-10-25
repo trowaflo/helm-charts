@@ -5,9 +5,10 @@ Génère une TrafficPolicy `<route>-rate-limit` pour chaque route qui définit
 un champ `rateLimit:`. Cible la HTTPRoute correspondante (même nom que la clé
 de route).
 
-Le rate limit est LOCAL (token bucket par worker Envoy, pas de Redis/global
-service) — adapté pour homelab single-cluster. Pour un rate limit global
-partagé entre N replicas, utiliser un GatewayExtension type RateLimit + RLS.
+Le rate limit est LOCAL : un token bucket par pod de gateway, partagé par ses
+workers Envoy (mesuré : 573 requêtes passées sur 1500 pour 575 attendues avec
+un bucket unique). Pour un rate limit global partagé entre N replicas, utiliser
+un GatewayExtension type RateLimit + RLS.
 
 Validation : si `rateLimit:` est présent mais incomplet, on fail explicite
 (meilleur que générer une policy invalide que kgateway rejettera silencieusement).

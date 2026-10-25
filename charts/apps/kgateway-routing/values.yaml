@@ -156,8 +156,11 @@ defaultForwardAuth: {}
 # **Local rate limit via kgateway TrafficPolicy:**
 # When a route defines `rateLimit:`, a `TrafficPolicy <route>-rate-limit` is
 # generated that attaches a token bucket local rate limit to the HTTPRoute.
-# Local = per Envoy worker (no Redis/global RLS); calibrate for the worker
-# count of your gateway.
+# Local = one bucket per gateway pod, shared by its Envoy workers (no
+# Redis/global RLS): N gateway replicas let N times the bucket through.
+# Measured on one replica (maxTokens 300, 50/s, 1500 requests in 5.5 s):
+# 573 passed, 300 + 50 x 5.5 = 575 expected. Calibrate below what the
+# backend sustains: the limit does not protect a backend that fails first.
 # ```yaml
 # routes:
 #   mealie:
