@@ -1,0 +1,48 @@
+suite: test network-policy chart - namespace baseline
+release:
+  name: rel
+  namespace: demo
+templates:
+  - templates/ciliumnetworkpolicy.yaml
+tests:
+  - it: should render only the baseline with default values
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: rel-network-policy-baseline
+
+  - it: should put every pod of the namespace in default deny both ways
+    asserts:
+      - equal:
+          path: spec.endpointSelector
+          value: {}
+      - equal:
+          path: spec.enableDefaultDeny
+          value:
+            ingress: true
+            egress: true
+      - equal:
+          path: spec.ingress
+          value: [{}]
+      - equal:
+          path: spec.egress
+          value: [{}]
+
+  # ArgoCD names the release after the Application: helm-museum-<app>.
+  - it: should keep the suffix whole when the release name is long
+    release:
+      name: helm-museum-prometheus-pve-exporter
+    set:
+      egress:
+        - to: pods
+          selector:
+            app: db
+          ports: [5432]
+          why: Test.
+    asserts:
+      - matchRegex:
+          path: metadata.name
+          pattern: ^[a-z0-9-]{1,49}-egress-0-peer$
+        documentIndex: 2
