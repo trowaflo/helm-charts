@@ -71,8 +71,13 @@ tests:
   - it: should render request and response header filters correctly
     values:
       - values/default.yaml
-    # filters[0] is the default security headers filter, user filters follow.
+    # filters[0] is the single ResponseHeaderModifier (defaults merged with the
+    # user's), the other user filters follow.
     asserts:
+      - lengthEqual:
+          path: spec.rules[0].filters
+          count: 2
+        documentIndex: 1
       - equal:
           path: spec.rules[0].filters[1].type
           value: RequestHeaderModifier
@@ -86,12 +91,14 @@ tests:
           value: https
         documentIndex: 1
       - equal:
-          path: spec.rules[0].filters[2].type
+          path: spec.rules[0].filters[0].type
           value: ResponseHeaderModifier
         documentIndex: 1
-      - equal:
-          path: spec.rules[0].filters[2].responseHeaderModifier.set[0].name
-          value: Content-Security-Policy
+      - contains:
+          path: spec.rules[0].filters[0].responseHeaderModifier.set
+          content:
+            name: Content-Security-Policy
+            value: upgrade-insecure-requests
         documentIndex: 1
 
   # Test path matching configuration

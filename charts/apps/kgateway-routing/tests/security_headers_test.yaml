@@ -238,3 +238,169 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: "defaultSecurityHeaders.set[].value is required"
+
+  # Gateway API rejects a rule that repeats a ResponseHeaderModifier: the
+  # default headers and the user's own response headers share one filter, and
+  # a user `set` wins over a default header of the same name.
+  - it: should merge user response headers into the default filter (inCluster)
+    template: templates/httproute.yaml
+    set:
+      routes:
+        app:
+          enabled: true
+          inCluster:
+            - name: svc
+              port: 80
+              filters:
+                - type: RequestHeaderModifier
+                  requestHeaderModifier:
+                    set:
+                      - name: X-Forwarded-Proto
+                        value: https
+                - type: ResponseHeaderModifier
+                  responseHeaderModifier:
+                    set:
+                      - name: x-frame-options
+                        value: DENY
+                      - name: Content-Security-Policy
+                        value: upgrade-insecure-requests
+                    add:
+                      - name: X-Extra
+                        value: "1"
+                    remove:
+                      - Via
+    asserts: &mergedAsserts
+      - lengthEqual:
+          path: spec.rules[0].filters
+          count: 2
+      - equal:
+          path: spec.rules[0].filters[0].type
+          value: ResponseHeaderModifier
+      - equal:
+          path: spec.rules[0].filters[1].type
+          value: RequestHeaderModifier
+      - contains:
+          path: spec.rules[0].filters[0].responseHeaderModifier.set
+          content:
+            name: x-frame-options
+            value: DENY
+      - notContains:
+          path: spec.rules[0].filters[0].responseHeaderModifier.set
+          content:
+            name: X-Frame-Options
+            value: SAMEORIGIN
+      - contains:
+          path: spec.rules[0].filters[0].responseHeaderModifier.set
+          content:
+            name: Content-Security-Policy
+            value: upgrade-insecure-requests
+      - contains:
+          path: spec.rules[0].filters[0].responseHeaderModifier.set
+          content:
+            name: Strict-Transport-Security
+            value: "max-age=63072000; includeSubDomains"
+      - lengthEqual:
+          path: spec.rules[0].filters[0].responseHeaderModifier.set
+          count: 7
+      - equal:
+          path: spec.rules[0].filters[0].responseHeaderModifier.add
+          value:
+            - name: X-Extra
+              value: "1"
+      - equal:
+          path: spec.rules[0].filters[0].responseHeaderModifier.remove
+          value: [Server, X-Powered-By, Via]
+
+  - it: should merge user response headers into the default filter (outCluster)
+    template: templates/httproute.yaml
+    set:
+      routes:
+        app:
+          enabled: true
+          outCluster:
+            - name: up
+              host: up.lan
+              port: 80
+              filters:
+                - type: RequestHeaderModifier
+                  requestHeaderModifier:
+                    set:
+                      - name: X-Forwarded-Proto
+                        value: https
+                - type: ResponseHeaderModifier
+                  responseHeaderModifier:
+                    set:
+                      - name: x-frame-options
+                        value: DENY
+                      - name: Content-Security-Policy
+                        value: upgrade-insecure-requests
+                    add:
+                      - name: X-Extra
+                        value: "1"
+                    remove:
+                      - Via
+    asserts: *mergedAsserts
+
+  - it: should merge user response headers into the default filter (rules)
+    template: templates/httproute.yaml
+    set:
+      routes:
+        app:
+          enabled: true
+          rules:
+            - backendRefs:
+                - name: svc
+                  port: 80
+              filters:
+                - type: RequestHeaderModifier
+                  requestHeaderModifier:
+                    set:
+                      - name: X-Forwarded-Proto
+                        value: https
+                - type: ResponseHeaderModifier
+                  responseHeaderModifier:
+                    set:
+                      - name: x-frame-options
+                        value: DENY
+                      - name: Content-Security-Policy
+                        value: upgrade-insecure-requests
+                    add:
+                      - name: X-Extra
+                        value: "1"
+                    remove:
+                      - Via
+    asserts: *mergedAsserts
+
+  - it: should keep the user filter order when the route opts out
+    template: templates/httproute.yaml
+    set:
+      routes:
+        app:
+          enabled: true
+          securityHeaders: false
+          inCluster:
+            - name: svc
+              port: 80
+              filters:
+                - type: RequestHeaderModifier
+                  requestHeaderModifier:
+                    set:
+                      - name: X-Forwarded-Proto
+                        value: https
+                - type: ResponseHeaderModifier
+                  responseHeaderModifier:
+                    set:
+                      - name: Content-Security-Policy
+                        value: upgrade-insecure-requests
+    asserts:
+      - lengthEqual:
+          path: spec.rules[0].filters
+          count: 2
+      - equal:
+          path: spec.rules[0].filters[0].type
+          value: RequestHeaderModifier
+      - equal:
+          path: spec.rules[0].filters[1].responseHeaderModifier.set
+          value:
+            - name: Content-Security-Policy
+              value: upgrade-insecure-requests

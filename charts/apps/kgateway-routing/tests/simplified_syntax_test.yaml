@@ -61,7 +61,11 @@ tests:
     asserts:
       - isNotEmpty:
           path: spec.rules[0].filters
-      # filters[0] is the default security headers filter, user filters follow.
+      # filters[0] is the single ResponseHeaderModifier (defaults merged with
+      # the user's), the other user filters follow.
+      - lengthEqual:
+          path: spec.rules[0].filters
+          count: 2
       - equal:
           path: spec.rules[0].filters[1].type
           value: RequestHeaderModifier
@@ -69,8 +73,13 @@ tests:
           path: spec.rules[0].filters[1].requestHeaderModifier.set[0].name
           value: X-Forwarded-Proto
       - equal:
-          path: spec.rules[0].filters[2].type
+          path: spec.rules[0].filters[0].type
           value: ResponseHeaderModifier
+      - contains:
+          path: spec.rules[0].filters[0].responseHeaderModifier.set
+          content:
+            name: Content-Security-Policy
+            value: upgrade-insecure-requests
 
   - it: should render Backend for outCluster
     template: backend.yaml
