@@ -55,7 +55,7 @@ tests:
           of: BackendConfigPolicy
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-pmxx-policy
+          value: RELEASE-NAME-pmxx-pmxx-policy
       - equal:
           path: metadata.namespace
           value: NAMESPACE
@@ -169,7 +169,7 @@ tests:
           of: BackendConfigPolicy
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-api-policy
+          value: RELEASE-NAME-api-api-service-policy
       - equal:
           path: spec.targetRefs[0].group
           value: ""
@@ -230,25 +230,108 @@ tests:
               tls: true
     asserts:
       - hasDocuments:
-          count: 1
-      - equal:
-          path: spec.targetRefs[0].group
-          value: gateway.kgateway.dev
+          count: 2
       - equal:
           path: spec.targetRefs[0].kind
           value: Backend
+        documentIndex: 0
       - equal:
           path: spec.targetRefs[0].name
           value: mixed-external-api-backend
-      - equal:
-          path: spec.targetRefs[1].group
-          value: ""
-      - equal:
-          path: spec.targetRefs[1].kind
-          value: Service
-      - equal:
-          path: spec.targetRefs[1].name
-          value: internal-api
+        documentIndex: 0
       - equal:
           path: spec.tls.sni
           value: external.example.com
+        documentIndex: 0
+      - isNull:
+          path: spec.tls.insecureSkipVerify
+        documentIndex: 0
+      - equal:
+          path: spec.targetRefs[0].kind
+          value: Service
+        documentIndex: 1
+      - equal:
+          path: spec.targetRefs[0].name
+          value: internal-api
+        documentIndex: 1
+      - equal:
+          path: spec.tls.sni
+          value: internal-api
+        documentIndex: 1
+      - equal:
+          path: spec.tls.insecureSkipVerify
+          value: true
+        documentIndex: 1
+
+  # Regression: the shared policy used to give the first backend's sni and
+  # insecure flag to every target of the route.
+  - it: should give each outCluster TLS target its own sni and insecure flag
+    set:
+      routes:
+        multi:
+          enabled: true
+          outCluster:
+            - name: one
+              host: one.example.com
+              port: 443
+              tls: true
+              insecure: true
+            - name: two
+              host: two.example.com
+              port: 443
+              tls: true
+    asserts:
+      - hasDocuments:
+          count: 2
+      - lengthEqual:
+          path: spec.targetRefs
+          count: 1
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-multi-one-policy
+        documentIndex: 0
+      - equal:
+          path: spec.targetRefs[0].name
+          value: multi-one-backend
+        documentIndex: 0
+      - equal:
+          path: spec.tls.sni
+          value: one.example.com
+        documentIndex: 0
+      - equal:
+          path: spec.tls.insecureSkipVerify
+          value: true
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-multi-two-policy
+        documentIndex: 1
+      - equal:
+          path: spec.targetRefs[0].name
+          value: multi-two-backend
+        documentIndex: 1
+      - equal:
+          path: spec.tls.sni
+          value: two.example.com
+        documentIndex: 1
+      - isNull:
+          path: spec.tls.insecureSkipVerify
+        documentIndex: 1
+
+  - it: should fail when two TLS backends would share a policy name
+    set:
+      routes:
+        dup:
+          enabled: true
+          inCluster:
+            - name: api
+              port: 443
+              tls: true
+          outCluster:
+            - name: api
+              host: api.example.com
+              port: 443
+              tls: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "routes.dup: two TLS backends produce the BackendConfigPolicy NAMESPACE/RELEASE-NAME-dup-api-policy; give them distinct names"
