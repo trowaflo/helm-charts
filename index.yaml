@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   kgateway-routing:
   - apiVersion: v2
-    created: "2026-10-25T17:22:07.37102812Z"
+    created: "2026-10-25T20:03:48.048724926Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -27,4 +27,29 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.7.0-pr262.tgz
     version: 0.7.0-pr262
-generated: "2026-10-25T17:22:07.369854295Z"
+  network-policy:
+  - apiVersion: v2
+    created: "2026-10-25T20:03:48.049196297Z"
+    description: 'Helm chart for Cilium network policies of one namespace. Puts every
+      pod of the namespace in default deny, then opens only the flows the app declares:
+      Kubernetes API, Internet, FQDNs, CIDRs and pods, each with the reason it exists.
+      Flows shared by every app (DNS, gateway, scrape) belong to a cluster-wide baseline,
+      not here.'
+    digest: a11ab77b763eb92a1105441e74975b3e43bbb5867947c0c0a38d8c1cc3ad6e5c
+    keywords:
+    - kubernetes
+    - cilium
+    - networkpolicy
+    - security
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: network-policy
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    - https://docs.cilium.io/en/stable/security/policy/
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/network-policy-0.1.0-pr263.tgz
+    version: 0.1.0-pr263
+generated: "2026-10-25T20:03:48.04723955Z"
