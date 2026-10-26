@@ -5,6 +5,23 @@ release:
 templates:
   - templates/common.yaml
 tests:
+  - it: should admit CIDR groups by name
+    set:
+      networkPolicy.ingress:
+        - from: cidrGroup
+          groups: [group-b]
+          ports: [8443]
+          why: Example flow.
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.description
+          value: "In: every pod of demo from CIDR groups group-b on 8443. Example flow."
+      - equal:
+          path: spec.ingress[0].fromCIDRSet
+          value:
+            - cidrGroupRef: group-b
+
   - it: should admit pods of another namespace on the selected local pods
     set:
       networkPolicy.ingress:

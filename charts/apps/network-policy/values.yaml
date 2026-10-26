@@ -10,17 +10,19 @@ networkPolicy:
 
   # -- Outbound flows of this namespace, one entry per need, beyond the cluster-wide
   # baseline (DNS, gateway hairpin). Every entry carries `why`, rendered as the
-  # policy `description`. Templates live in the common library (3.2.0).
+  # policy `description`. Templates live in the common library (3.3.0).
   # @default -- [] (only the baseline applies)
   # Entry keys:
-  # - `to`: `kube-apiserver`, `world`, `fqdn`, `cidr` or `pods`.
+  # - `to`: `kube-apiserver`, `world`, `fqdn`, `cidr`, `cidrGroup` or `pods`.
   # - `select`: matchLabels of the local pods the rule applies to; empty = every pod.
-  # - `ports`: required for `world`, `cidr` and `pods`; 6443 for `kube-apiserver`,
-  #   443 for `fqdn` when omitted.
+  # - `ports`: required for `world`, `cidr`, `cidrGroup` and `pods`; 6443 for
+  #   `kube-apiserver`, 443 for `fqdn` when omitted.
   # - `protocol`: `TCP` (default), `UDP` or `ANY`, for every port of the entry.
   # - `names`: FQDNs, for `fqdn`; the DNS of the selected pods then goes through the
   #   Cilium DNS proxy, which learns the IPs behind the names.
   # - `cidrs`: CIDRs, for `cidr`.
+  # - `groups`: names of CiliumCIDRGroup objects, for `cidrGroup`; the addresses live
+  #   once in those cluster-scoped objects, shared by every namespace.
   # - `namespace`, `selector`: peer pods, for `pods`; namespace defaults to the release
   #   namespace, an empty selector means every pod of that namespace. A peer in the
   #   same namespace also gets the matching ingress, so one entry opens both sides.
@@ -45,11 +47,11 @@ networkPolicy:
   # namespace is opened by its `egress` entry.
   # @default -- [] (only the baseline applies)
   # Entry keys:
-  # - `from`: `pods` or `cidr`.
+  # - `from`: `pods`, `cidr` or `cidrGroup`.
   # - `select`: matchLabels of the local pods that receive the flow; empty = every pod.
   # - `namespace`, `selector`: peer pods, for `pods`; namespace defaults to the release
   #   namespace.
-  # - `cidrs`: CIDRs, for `cidr`.
+  # - `cidrs`: CIDRs, for `cidr`; `groups`: CiliumCIDRGroup names, for `cidrGroup`.
   # - `ports`, `protocol`, `why`: as for `egress`; `ports` is required.
   # ```yaml
   # networkPolicy:

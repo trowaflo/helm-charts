@@ -31,6 +31,59 @@ tests:
             - port: "6443"
               protocol: TCP
 
+  - it: should reference CIDR groups by name
+    set:
+      networkPolicy.egress:
+        - to: cidrGroup
+          groups: [group-a]
+          ports: [8080]
+          why: Example flow.
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.description
+          value: "Out: every pod of demo to CIDR groups group-a on 8080. Example flow."
+      - equal:
+          path: spec.egress[0].toCIDRSet
+          value:
+            - cidrGroupRef: group-a
+      - equal:
+          path: spec.egress[0].toPorts[0].ports[0].port
+          value: "8080"
+
+  - it: should fail a cidrGroup egress with an invalid group name
+    set:
+      networkPolicy.egress:
+        - to: cidrGroup
+          groups: [Group_A]
+          ports: [8080]
+          why: Example flow.
+    asserts:
+      - failedTemplate: {}
+
+  - it: should fail a cidrGroup egress with a group name over 253 characters
+    set:
+      networkPolicy.egress:
+        - to: cidrGroup
+          # 254 characters: a trailing backslash joins the lines without a space.
+          groups:
+            - "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\
+              aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\
+              aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          ports: [8080]
+          why: Example flow.
+    asserts:
+      - failedTemplate: {}
+
+  - it: should fail a cidrGroup egress without groups
+    set:
+      networkPolicy.egress:
+        - to: cidrGroup
+          ports: [8080]
+          why: Example flow.
+    asserts:
+      - failedTemplate: {}
+
   - it: should default fqdn to 443 and select every pod without select
     set:
       networkPolicy.egress:
