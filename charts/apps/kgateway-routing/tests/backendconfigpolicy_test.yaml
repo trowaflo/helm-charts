@@ -74,6 +74,29 @@ tests:
       - equal:
           path: spec.tls.insecureSkipVerify
           value: true
+      - notExists:
+          path: spec.tls.wellKnownCACertificates
+
+  - it: should verify against the system CA pool when not insecure
+    set:
+      routes:
+        pmxx:
+          enabled: true
+          hostnames: ["pmxx.example.com"]
+          parentRefs:
+            - name: gateway
+              namespace: kgateway-system
+          outCluster:
+            - name: pmxx
+              host: proxmox1.example.com
+              port: 8006
+              tls: true
+    asserts:
+      - equal:
+          path: spec.tls.wellKnownCACertificates
+          value: System
+      - notExists:
+          path: spec.tls.insecureSkipVerify
 
   - it: should auto-derive SNI from host
     set:

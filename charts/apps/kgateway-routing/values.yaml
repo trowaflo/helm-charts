@@ -61,7 +61,7 @@ defaultForwardAuth: {}
 #                   value: https
 # ```
 #
-# **Backend with TLS policy (for HTTPS backends with self-signed certs):**
+# **Backend with TLS policy (for HTTPS backends):**
 # ```yaml
 # routes:
 #   pmxx:
@@ -76,10 +76,10 @@ defaultForwardAuth: {}
 #         host: proxmox1.example.com
 #         port: 8006
 #         tls: true
-#         insecure: true
 # ```
-# Note: `tls: true` enables TLS with SNI auto-derived from host.
-#       `insecure: true` allows self-signed certificates.
+# Note: `tls: true` enables TLS with SNI auto-derived from host, and verifies the
+#       backend certificate against the system CA pool (`wellKnownCACertificates: System`).
+#       `insecure: true` skips verification instead, for self-signed certificates.
 #
 # **In-cluster Service with TLS (for HTTPS services with self-signed certs):**
 # ```yaml
