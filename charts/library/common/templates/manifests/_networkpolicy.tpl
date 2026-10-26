@@ -29,8 +29,8 @@ spec:
     - {}
 {{- range $i, $r := $np.egress }}
   {{- /* Same checks as the network-policy schema: a chart on common.loader has none. */}}
-  {{- if not (has $r.to (list "kube-apiserver" "world" "fqdn" "cidr" "pods")) }}
-    {{- fail (printf "networkPolicy.egress[%d]: to must be kube-apiserver, world, fqdn, cidr or pods" $i) }}
+  {{- if not (has $r.to (list "kube-apiserver" "world" "fqdn" "cidr" "cidrGroup" "pods")) }}
+    {{- fail (printf "networkPolicy.egress[%d]: to must be kube-apiserver, world, fqdn, cidr, cidrGroup or pods" $i) }}
   {{- end }}
   {{- if not $r.why }}
     {{- fail (printf "networkPolicy.egress[%d]: why is required" $i) }}
@@ -38,7 +38,7 @@ spec:
   {{- $ports := $r.ports }}
   {{- if and (not $ports) (eq $r.to "kube-apiserver") }}{{ $ports = list 6443 }}{{ end }}
   {{- if and (not $ports) (eq $r.to "fqdn") }}{{ $ports = list 443 }}{{ end }}
-  {{- if and (not $ports) (has $r.to (list "world" "cidr" "pods")) }}
+  {{- if and (not $ports) (has $r.to (list "world" "cidr" "cidrGroup" "pods")) }}
     {{- fail (printf "networkPolicy.egress[%d]: to %s needs ports" $i $r.to) }}
   {{- end }}
   {{- if and (eq $r.to "fqdn") (not $r.names) }}
@@ -46,6 +46,9 @@ spec:
   {{- end }}
   {{- if and (eq $r.to "cidr") (not $r.cidrs) }}
     {{- fail (printf "networkPolicy.egress[%d]: to cidr needs cidrs" $i) }}
+  {{- end }}
+  {{- if and (eq $r.to "cidrGroup") (not $r.groups) }}
+    {{- fail (printf "networkPolicy.egress[%d]: to cidrGroup needs groups" $i) }}
   {{- end }}
   {{- $peerNs := $r.namespace | default $ns }}
   {{- /* Description: direction, local pods, destination, ports, then why. */}}
@@ -55,6 +58,7 @@ spec:
   {{- else if eq $r.to "world" }}{{ $dest = "the Internet" }}
   {{- else if eq $r.to "fqdn" }}{{ $dest = join ", " $r.names }}
   {{- else if eq $r.to "cidr" }}{{ $dest = join ", " $r.cidrs }}
+  {{- else if eq $r.to "cidrGroup" }}{{ $dest = printf "CIDR groups %s" (join ", " $r.groups) }}
   {{- else }}{{ $dest = include "common.networkPolicy.who" (dict "labels" $r.selector "namespace" $peerNs) }}
   {{- end }}
 ---
@@ -86,6 +90,12 @@ spec:
   {{- else if eq $r.to "cidr" }}
     - toCIDR:
         {{- toYaml $r.cidrs | nindent 8 }}
+  {{- else if eq $r.to "cidrGroup" }}
+    # CiliumCIDRGroup objects, cluster-scoped: one place holds the addresses.
+    - toCIDRSet:
+    {{- range $r.groups }}
+        - cidrGroupRef: {{ . | quote }}
+    {{- end }}
   {{- else if eq $r.to "pods" }}
     - toEndpoints:
         {{- include "common.networkPolicy.peer" (dict "selector" $r.selector "namespace" $peerNs) | nindent 8 }}
@@ -124,8 +134,8 @@ spec:
   {{- end }}
 {{- end }}
 {{- range $i, $r := $np.ingress }}
-  {{- if not (has $r.from (list "pods" "cidr")) }}
-    {{- fail (printf "networkPolicy.ingress[%d]: from must be pods or cidr" $i) }}
+  {{- if not (has $r.from (list "pods" "cidr" "cidrGroup")) }}
+    {{- fail (printf "networkPolicy.ingress[%d]: from must be pods, cidr or cidrGroup" $i) }}
   {{- end }}
   {{- if not $r.why }}
     {{- fail (printf "networkPolicy.ingress[%d]: why is required" $i) }}
@@ -136,9 +146,13 @@ spec:
   {{- if and (eq $r.from "cidr") (not $r.cidrs) }}
     {{- fail (printf "networkPolicy.ingress[%d]: from cidr needs cidrs" $i) }}
   {{- end }}
+  {{- if and (eq $r.from "cidrGroup") (not $r.groups) }}
+    {{- fail (printf "networkPolicy.ingress[%d]: from cidrGroup needs groups" $i) }}
+  {{- end }}
   {{- $who := include "common.networkPolicy.who" (dict "labels" $r.select "namespace" $ns) }}
   {{- $src := "" }}
   {{- if eq $r.from "cidr" }}{{ $src = join ", " $r.cidrs }}
+  {{- else if eq $r.from "cidrGroup" }}{{ $src = printf "CIDR groups %s" (join ", " $r.groups) }}
   {{- else }}{{ $src = include "common.networkPolicy.who" (dict "labels" $r.selector "namespace" ($r.namespace | default $ns)) }}
   {{- end }}
 ---
@@ -160,6 +174,11 @@ spec:
   {{- else if eq $r.from "cidr" }}
     - fromCIDR:
         {{- toYaml $r.cidrs | nindent 8 }}
+  {{- else if eq $r.from "cidrGroup" }}
+    - fromCIDRSet:
+    {{- range $r.groups }}
+        - cidrGroupRef: {{ . | quote }}
+    {{- end }}
   {{- end }}
       {{- include "common.networkPolicy.ports" (dict "ports" $r.ports "protocol" $r.protocol) | nindent 6 }}
 {{- end }}

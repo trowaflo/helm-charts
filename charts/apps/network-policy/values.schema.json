@@ -18,12 +18,13 @@
             "additionalProperties": false,
             "required": ["to", "why"],
             "properties": {
-              "to": { "enum": ["kube-apiserver", "world", "fqdn", "cidr", "pods"] },
+              "to": { "enum": ["kube-apiserver", "world", "fqdn", "cidr", "cidrGroup", "pods"] },
               "select": { "$ref": "#/definitions/labels" },
               "namespace": { "type": "string", "minLength": 1 },
               "selector": { "$ref": "#/definitions/labels" },
               "names": { "type": "array", "items": { "type": "string", "minLength": 1 } },
               "cidrs": { "$ref": "#/definitions/cidrs" },
+              "groups": { "$ref": "#/definitions/groups" },
               "ports": { "$ref": "#/definitions/ports" },
               "protocol": { "$ref": "#/definitions/protocol" },
               "why": { "type": "string", "minLength": 1 }
@@ -37,11 +38,12 @@
             "additionalProperties": false,
             "required": ["from", "ports", "why"],
             "properties": {
-              "from": { "enum": ["pods", "cidr"] },
+              "from": { "enum": ["pods", "cidr", "cidrGroup"] },
               "select": { "$ref": "#/definitions/labels" },
               "namespace": { "type": "string", "minLength": 1 },
               "selector": { "$ref": "#/definitions/labels" },
               "cidrs": { "$ref": "#/definitions/cidrs" },
+              "groups": { "$ref": "#/definitions/groups" },
               "ports": { "$ref": "#/definitions/ports" },
               "protocol": { "$ref": "#/definitions/protocol" },
               "why": { "type": "string", "minLength": 1 }
@@ -59,6 +61,10 @@
     "cidrs": {
       "type": "array",
       "items": { "type": "string", "pattern": "^[0-9a-fA-F:.]+/[0-9]{1,3}$" }
+    },
+    "groups": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$" }
     },
     "ports": {
       "type": "array",

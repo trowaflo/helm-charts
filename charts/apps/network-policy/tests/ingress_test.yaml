@@ -5,6 +5,23 @@ release:
 templates:
   - templates/common.yaml
 tests:
+  - it: should admit CIDR groups by name
+    set:
+      networkPolicy.ingress:
+        - from: cidrGroup
+          groups: [lan-clients]
+          ports: [443]
+          why: LAN clients.
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.description
+          value: "In: every pod of demo from CIDR groups lan-clients on 443. LAN clients."
+      - equal:
+          path: spec.ingress[0].fromCIDRSet
+          value:
+            - cidrGroupRef: lan-clients
+
   - it: should admit pods of another namespace on the selected local pods
     set:
       networkPolicy.ingress:

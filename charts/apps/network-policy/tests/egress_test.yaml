@@ -31,6 +31,35 @@ tests:
             - port: "6443"
               protocol: TCP
 
+  - it: should reference CIDR groups by name
+    set:
+      networkPolicy.egress:
+        - to: cidrGroup
+          groups: [lan-cameras]
+          ports: [80]
+          why: Camera streams.
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.description
+          value: "Out: every pod of demo to CIDR groups lan-cameras on 80. Camera streams."
+      - equal:
+          path: spec.egress[0].toCIDRSet
+          value:
+            - cidrGroupRef: lan-cameras
+      - equal:
+          path: spec.egress[0].toPorts[0].ports[0].port
+          value: "80"
+
+  - it: should fail a cidrGroup egress without groups
+    set:
+      networkPolicy.egress:
+        - to: cidrGroup
+          ports: [80]
+          why: Camera streams.
+    asserts:
+      - failedTemplate: {}
+
   - it: should default fqdn to 443 and select every pod without select
     set:
       networkPolicy.egress:
