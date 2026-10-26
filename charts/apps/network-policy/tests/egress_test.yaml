@@ -35,28 +35,28 @@ tests:
     set:
       networkPolicy.egress:
         - to: cidrGroup
-          groups: [lan-cameras]
-          ports: [80]
-          why: Camera streams.
+          groups: [group-a]
+          ports: [8080]
+          why: Example flow.
     documentIndex: 1
     asserts:
       - equal:
           path: spec.description
-          value: "Out: every pod of demo to CIDR groups lan-cameras on 80. Camera streams."
+          value: "Out: every pod of demo to CIDR groups group-a on 8080. Example flow."
       - equal:
           path: spec.egress[0].toCIDRSet
           value:
-            - cidrGroupRef: lan-cameras
+            - cidrGroupRef: group-a
       - equal:
           path: spec.egress[0].toPorts[0].ports[0].port
-          value: "80"
+          value: "8080"
 
   - it: should fail a cidrGroup egress without groups
     set:
       networkPolicy.egress:
         - to: cidrGroup
-          ports: [80]
-          why: Camera streams.
+          ports: [8080]
+          why: Example flow.
     asserts:
       - failedTemplate: {}
 
