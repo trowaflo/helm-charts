@@ -55,8 +55,11 @@ spec:
     {{- else }}
     sni: {{ $backend.name }}
     {{- end }}
+    {{- /* Without a CA source Envoy accepts any certificate: verify against the system pool unless insecure. */ -}}
     {{- if $backend.insecure }}
     insecureSkipVerify: true
+    {{- else }}
+    wellKnownCACertificates: System
     {{- end }}
 {{- end }}
 {{- end }}
