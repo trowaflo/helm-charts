@@ -2,14 +2,14 @@ apiVersion: v1
 entries:
   common:
   - apiVersion: v2
-    created: "2026-10-26T07:40:01.037636012Z"
+    created: "2026-10-26T07:45:36.532758742Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, StatefulSets,
       DaemonSets, CronJobs, Jobs, Services, Ingress, ServiceMonitor, PersistentVolumes,
       PersistentVolumeClaims, CNPG Clusters, CiliumNetworkPolicies) across the chart
       repository with consistent security, observability, and best practices.  Used
       by all application charts in this repository for consistency.
-    digest: 3ccd24706ea417d7381bd31a1e5a1d0d2775447ffaec0b0023cd0a888051c778
+    digest: 8d5347ff8723a55fdd1f579fabe3e79b1deb9dba7361497e594931d10e3d50e0
     home: https://github.com/trowaflo/helm-charts
     maintainers:
     - email: trowa.flo@gmail.com
@@ -22,7 +22,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-3.3.0-pr267.tgz
     version: 3.3.0-pr267
   - apiVersion: v2
-    created: "2026-10-26T07:40:01.036690515Z"
+    created: "2026-10-26T07:45:36.531764813Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, StatefulSets,
       DaemonSets, CronJobs, Jobs, Services, Ingress, ServiceMonitor, PersistentVolumes,
@@ -43,7 +43,7 @@ entries:
     version: 3.2.0-pr263
   kgateway-routing:
   - apiVersion: v2
-    created: "2026-10-26T07:40:01.039640353Z"
+    created: "2026-10-26T07:45:36.534739877Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -69,7 +69,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/kgateway-routing-0.7.0-pr266.tgz
     version: 0.7.0-pr266
   - apiVersion: v2
-    created: "2026-10-26T07:40:01.038666885Z"
+    created: "2026-10-26T07:45:36.533756198Z"
     description: Helm chart for managing Kubernetes Gateway API HTTPRoute and Backend
       resources. Supports both in-cluster (Service) and out-of-cluster (Backend) routing
       with request/response filters, header modification, and flexible path matching.
@@ -96,7 +96,7 @@ entries:
     version: 0.7.0-pr262
   network-policy:
   - apiVersion: v2
-    created: "2026-10-26T07:40:01.04742665Z"
+    created: "2026-10-26T07:45:36.543060301Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -106,7 +106,7 @@ entries:
       Kubernetes API, Internet, FQDNs, CIDRs and pods, each with the reason it exists.
       Flows shared by every app (DNS, gateway, scrape) belong to a cluster-wide baseline,
       not here.'
-    digest: c6ab251716892e3ec1cf7b2dc4cffef56c23b9f6e3992477a16367e6f6f6af61
+    digest: 90dd09d9267b86252cfe5c0ba8ccbac785462934c0bbca54442f1ca8379a317d
     keywords:
     - kubernetes
     - cilium
@@ -124,7 +124,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/network-policy-0.7.0-pr267.tgz
     version: 0.7.0-pr267
   - apiVersion: v2
-    created: "2026-10-26T07:40:01.046219185Z"
+    created: "2026-10-26T07:45:36.541833965Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -152,7 +152,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/network-policy-0.5.0-pr263.tgz
     version: 0.5.0-pr263
   - apiVersion: v2
-    created: "2026-10-26T07:40:01.044937625Z"
+    created: "2026-10-26T07:45:36.540551293Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -180,7 +180,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/network-policy-0.4.0-pr263.tgz
     version: 0.4.0-pr263
   - apiVersion: v2
-    created: "2026-10-26T07:40:01.042699306Z"
+    created: "2026-10-26T07:45:36.537869693Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -208,7 +208,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/network-policy-0.3.0-pr263.tgz
     version: 0.3.0-pr263
   - apiVersion: v2
-    created: "2026-10-26T07:40:01.041250261Z"
+    created: "2026-10-26T07:45:36.536479729Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -236,7 +236,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/network-policy-0.2.0-pr263.tgz
     version: 0.2.0-pr263
   - apiVersion: v2
-    created: "2026-10-26T07:40:01.04001339Z"
+    created: "2026-10-26T07:45:36.535155609Z"
     description: 'Helm chart for Cilium network policies of one namespace. Puts every
       pod of the namespace in default deny, then opens only the flows the app declares:
       Kubernetes API, Internet, FQDNs, CIDRs and pods, each with the reason it exists.
@@ -261,7 +261,36 @@ entries:
     version: 0.1.0-pr263
   persistent-volume:
   - apiVersion: v2
-    created: "2026-10-26T07:40:01.053296436Z"
+    created: "2026-10-26T07:45:36.549476446Z"
+    dependencies:
+    - name: common
+      repository: file://../../library/common
+      version: 3.3.0
+    description: Helm chart for declarative creation and management of Kubernetes
+      PersistentVolumes (PV) and PersistentVolumeClaims (PVC). Supports multiple storage
+      backends including hostPath, NFS, and other volume types with flexible configuration
+      for capacity, access modes, and storage classes.
+    digest: 7005889cb643c6edb0d7cc8c9c28f248d648d2c4192ce73b90eadc09a12a98d1
+    keywords:
+    - kubernetes
+    - storage
+    - persistentvolume
+    - persistentvolumeclaim
+    - pv
+    - pvc
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: persistent-volume
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    - https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/persistent-volume-0.5.0-pr267.tgz
+    version: 0.5.0-pr267
+  - apiVersion: v2
+    created: "2026-10-26T07:45:36.547545722Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -290,7 +319,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/persistent-volume-0.4.0-pr267.tgz
     version: 0.4.0-pr267
   - apiVersion: v2
-    created: "2026-10-26T07:40:01.050701727Z"
+    created: "2026-10-26T07:45:36.545650832Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -319,7 +348,7 @@ entries:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/persistent-volume-0.4.0-pr263.tgz
     version: 0.4.0-pr263
   - apiVersion: v2
-    created: "2026-10-26T07:40:01.048918107Z"
+    created: "2026-10-26T07:45:36.544311895Z"
     dependencies:
     - name: common
       repository: file://../../library/common
@@ -347,4 +376,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/persistent-volume-0.3.0-pr263.tgz
     version: 0.3.0-pr263
-generated: "2026-10-26T07:40:01.035464711Z"
+generated: "2026-10-26T07:45:36.530467754Z"
