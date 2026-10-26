@@ -64,7 +64,11 @@
     },
     "groups": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$" }
+      "items": {
+        "type": "string",
+        "maxLength": 253,
+        "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
+      }
     },
     "ports": {
       "type": "array",

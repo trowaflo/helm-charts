@@ -50,6 +50,7 @@ spec:
   {{- if and (eq $r.to "cidrGroup") (not $r.groups) }}
     {{- fail (printf "networkPolicy.egress[%d]: to cidrGroup needs groups" $i) }}
   {{- end }}
+  {{- include "common.networkPolicy.groups" (dict "groups" $r.groups "where" (printf "networkPolicy.egress[%d]" $i)) }}
   {{- $peerNs := $r.namespace | default $ns }}
   {{- /* Description: direction, local pods, destination, ports, then why. */}}
   {{- $who := include "common.networkPolicy.who" (dict "labels" $r.select "namespace" $ns) }}
@@ -149,6 +150,7 @@ spec:
   {{- if and (eq $r.from "cidrGroup") (not $r.groups) }}
     {{- fail (printf "networkPolicy.ingress[%d]: from cidrGroup needs groups" $i) }}
   {{- end }}
+  {{- include "common.networkPolicy.groups" (dict "groups" $r.groups "where" (printf "networkPolicy.ingress[%d]" $i)) }}
   {{- $who := include "common.networkPolicy.who" (dict "labels" $r.select "namespace" $ns) }}
   {{- $src := "" }}
   {{- if eq $r.from "cidr" }}{{ $src = join ", " $r.cidrs }}
@@ -183,6 +185,16 @@ spec:
       {{- include "common.networkPolicy.ports" (dict "ports" $r.ports "protocol" $r.protocol) | nindent 6 }}
 {{- end }}
 {{- end }}
+{{- end -}}
+
+{{- /* CIDR group names must be valid object names, or the reference matches nothing;
+the network-policy schema checks the same, a chart on common.loader has no schema. */ -}}
+{{- define "common.networkPolicy.groups" -}}
+  {{- range $j, $g := .groups -}}
+    {{- if not (and (kindIs "string" $g) (le (len $g) 253) (regexMatch "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$" $g)) -}}
+      {{- fail (printf "%s.groups[%d]: %v is not a valid CiliumCIDRGroup name (DNS-1123 subdomain, 253 characters at most)" $.where $j $g) -}}
+    {{- end -}}
+  {{- end -}}
 {{- end -}}
 
 {{- /* Policy name: fullname plus suffix, the suffix kept whole when the prefix is cut. */ -}}
