@@ -303,6 +303,16 @@ tests:
       - failedTemplate:
           errorMessage: "networkPolicy.egress[0]: allPorts is for cidr and cidrGroup only"
 
+  - it: should fail a quoted allPorts
+    set:
+      networkPolicy.egress:
+        - to: cidrGroup
+          groups: [group-a]
+          allPorts: "false"
+          why: Example flow.
+    asserts:
+      - failedTemplate: {}
+
   - it: should fail allPorts with ports
     set:
       networkPolicy.egress:

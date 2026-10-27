@@ -35,6 +35,10 @@ spec:
   {{- if not $r.why }}
     {{- fail (printf "networkPolicy.egress[%d]: why is required" $i) }}
   {{- end }}
+  {{- /* A quoted "false" is truthy: without the schema, only a real boolean may open every port. */}}
+  {{- if and (hasKey $r "allPorts") (not (kindIs "bool" $r.allPorts)) }}
+    {{- fail (printf "networkPolicy.egress[%d]: allPorts must be a boolean" $i) }}
+  {{- end }}
   {{- if and $r.allPorts (not (has $r.to (list "cidr" "cidrGroup"))) }}
     {{- fail (printf "networkPolicy.egress[%d]: allPorts is for cidr and cidrGroup only" $i) }}
   {{- end }}
