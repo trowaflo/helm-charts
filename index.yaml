@@ -1,3 +1,53 @@
 apiVersion: v1
-entries: {}
-generated: "2026-10-26T07:51:53.28667693Z"
+entries:
+  common:
+  - apiVersion: v2
+    created: "2026-10-27T21:00:05.476505739Z"
+    description: Common library chart providing reusable Helm templates and default
+      configurations. Standardizes Kubernetes resource deployment (Deployments, StatefulSets,
+      DaemonSets, CronJobs, Jobs, Services, Ingress, ServiceMonitor, PersistentVolumes,
+      PersistentVolumeClaims, CNPG Clusters, CiliumNetworkPolicies) across the chart
+      repository with consistent security, observability, and best practices.  Used
+      by all application charts in this repository for consistency.
+    digest: 316371fad19b0a5832b3c5f515fb4aa7e3394bfafd7d9ddac499085ed282fdd1
+    home: https://github.com/trowaflo/helm-charts
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: common
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    type: library
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/common-3.3.0-pr268.tgz
+    version: 3.3.0-pr268
+  network-policy:
+  - apiVersion: v2
+    created: "2026-10-27T21:00:05.477405934Z"
+    dependencies:
+    - name: common
+      repository: file://../../library/common
+      version: 3.3.0
+    description: 'Helm chart for Cilium network policies of one namespace. Puts every
+      pod of the namespace in default deny, then opens only the flows the app declares:
+      Kubernetes API, Internet, FQDNs, CIDRs and pods, each with the reason it exists.
+      Flows shared by every app (DNS, gateway, scrape) belong to a cluster-wide baseline,
+      not here.'
+    digest: dee1b781e527388bb5db233b4b22f143efaf72765bbbaacbab2c5032d0b8fea3
+    keywords:
+    - kubernetes
+    - cilium
+    - networkpolicy
+    - security
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: network-policy
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    - https://docs.cilium.io/en/stable/security/policy/
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/network-policy-0.7.0-pr268.tgz
+    version: 0.7.0-pr268
+generated: "2026-10-27T21:00:05.475712155Z"
