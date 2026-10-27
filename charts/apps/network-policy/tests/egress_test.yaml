@@ -226,3 +226,91 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: "networkPolicy.egress[0]: to fqdn needs names"
+
+  - it: should open the Internet on every port with the private ranges excepted
+    set:
+      networkPolicy.egress:
+        - to: internet
+          why: Example flow.
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.description
+          value: "Out: every pod of demo to the Internet except private ranges on every port. Example flow."
+      - equal:
+          path: spec.egress[0].toCIDRSet
+          value:
+            - cidr: 0.0.0.0/0
+              except:
+                - 10.0.0.0/8
+                - 172.16.0.0/12
+                - 192.168.0.0/16
+      - notExists:
+          path: spec.egress[0].toPorts
+
+  - it: should keep the ports of an internet entry when set
+    set:
+      networkPolicy.egress:
+        - to: internet
+          ports: [443]
+          why: Example flow.
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.egress[0].toPorts[0].ports
+          value:
+            - port: "443"
+              protocol: TCP
+
+  - it: should open every port of one protocol with allPorts
+    set:
+      networkPolicy.egress:
+        - to: cidrGroup
+          groups: [group-a]
+          allPorts: true
+          protocol: UDP
+          why: Example flow.
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.description
+          value: "Out: every pod of demo to CIDR groups group-a on every UDP port. Example flow."
+      - equal:
+          path: spec.egress[0].toPorts[0].ports
+          value:
+            - port: "0"
+              protocol: UDP
+
+  - it: should open every port and protocol with allPorts and no protocol
+    set:
+      networkPolicy.egress:
+        - to: cidr
+          cidrs: [203.0.113.0/24]
+          allPorts: true
+          why: Example flow.
+    documentIndex: 1
+    asserts:
+      - notExists:
+          path: spec.egress[0].toPorts
+
+  - it: should fail allPorts outside cidr and cidrGroup
+    set:
+      networkPolicy.egress:
+        - to: world
+          allPorts: true
+          why: Example flow.
+    asserts:
+      - failedTemplate:
+          errorMessage: "networkPolicy.egress[0]: allPorts is for cidr and cidrGroup only"
+
+  - it: should fail allPorts with ports
+    set:
+      networkPolicy.egress:
+        - to: cidrGroup
+          groups: [group-a]
+          allPorts: true
+          ports: [80]
+          why: Example flow.
+    asserts:
+      - failedTemplate:
+          errorMessage: "networkPolicy.egress[0]: allPorts and ports exclude each other"

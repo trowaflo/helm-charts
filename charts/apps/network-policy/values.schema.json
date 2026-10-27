@@ -18,7 +18,7 @@
             "additionalProperties": false,
             "required": ["to", "why"],
             "properties": {
-              "to": { "enum": ["kube-apiserver", "world", "fqdn", "cidr", "cidrGroup", "pods"] },
+              "to": { "enum": ["kube-apiserver", "world", "internet", "fqdn", "cidr", "cidrGroup", "pods"] },
               "select": { "$ref": "#/definitions/labels" },
               "namespace": { "type": "string", "minLength": 1 },
               "selector": { "$ref": "#/definitions/labels" },
@@ -26,6 +26,7 @@
               "cidrs": { "$ref": "#/definitions/cidrs" },
               "groups": { "$ref": "#/definitions/groups" },
               "ports": { "$ref": "#/definitions/ports" },
+              "allPorts": { "type": "boolean" },
               "protocol": { "$ref": "#/definitions/protocol" },
               "why": { "type": "string", "minLength": 1 }
             }
