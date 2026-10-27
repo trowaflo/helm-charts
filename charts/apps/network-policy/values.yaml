@@ -10,14 +10,21 @@ networkPolicy:
 
   # -- Outbound flows of this namespace, one entry per need, beyond the cluster-wide
   # baseline (DNS, gateway hairpin). Every entry carries `why`, rendered as the
-  # policy `description`. Templates live in the common library (3.3.0).
+  # policy `description`. Templates live in the common library (3.4.0).
   # @default -- [] (only the baseline applies)
   # Entry keys:
-  # - `to`: `kube-apiserver`, `world`, `fqdn`, `cidr`, `cidrGroup` or `pods`.
+  # - `to`: `kube-apiserver`, `world`, `internet`, `fqdn`, `cidr`, `cidrGroup` or `pods`.
+  #   `world` is every address outside the cluster, LAN included; `internet` is
+  #   0.0.0.0/0 except 10.0.0.0/8, 172.16.0.0/12 and 192.168.0.0/16, for an app whose
+  #   Internet peers cannot be listed (WebRTC, LLM providers).
   # - `select`: matchLabels of the local pods the rule applies to; empty = every pod.
   # - `ports`: required for `world`, `cidr`, `cidrGroup` and `pods`; 6443 for
-  #   `kube-apiserver`, 443 for `fqdn` when omitted.
-  # - `protocol`: `TCP` (default), `UDP` or `ANY`, for every port of the entry.
+  #   `kube-apiserver`, 443 for `fqdn` when omitted; every port for `internet` when
+  #   omitted.
+  # - `allPorts`: `true` opens every port of a `cidr` or `cidrGroup` entry instead of
+  #   `ports`; explicit, so a forgotten `ports` still fails.
+  # - `protocol`: `TCP` (default), `UDP` or `ANY`, for every port of the entry; on an
+  #   entry without ports, it limits the entry to that protocol.
   # - `names`: FQDNs, for `fqdn`; the DNS of the selected pods then goes through the
   #   Cilium DNS proxy, which learns the IPs behind the names.
   # - `cidrs`: CIDRs, for `cidr`.

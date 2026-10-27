@@ -14,7 +14,7 @@ tests:
   - it: should reject an unknown egress target
     set:
       networkPolicy.egress:
-        - to: internet
+        - to: intranet
           ports: [443]
           why: Typo.
     asserts:

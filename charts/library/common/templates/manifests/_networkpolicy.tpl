@@ -29,18 +29,31 @@ spec:
     - {}
 {{- range $i, $r := $np.egress }}
   {{- /* Same checks as the network-policy schema: a chart on common.loader has none. */}}
-  {{- if not (has $r.to (list "kube-apiserver" "world" "fqdn" "cidr" "cidrGroup" "pods")) }}
-    {{- fail (printf "networkPolicy.egress[%d]: to must be kube-apiserver, world, fqdn, cidr, cidrGroup or pods" $i) }}
+  {{- if not (has $r.to (list "kube-apiserver" "world" "internet" "fqdn" "cidr" "cidrGroup" "pods")) }}
+    {{- fail (printf "networkPolicy.egress[%d]: to must be kube-apiserver, world, internet, fqdn, cidr, cidrGroup or pods" $i) }}
   {{- end }}
   {{- if not $r.why }}
     {{- fail (printf "networkPolicy.egress[%d]: why is required" $i) }}
   {{- end }}
+  {{- /* A quoted "false" is truthy: without the schema, only a real boolean may open every port. */}}
+  {{- if and (hasKey $r "allPorts") (not (kindIs "bool" $r.allPorts)) }}
+    {{- fail (printf "networkPolicy.egress[%d]: allPorts must be a boolean" $i) }}
+  {{- end }}
+  {{- if and $r.allPorts (not (has $r.to (list "cidr" "cidrGroup"))) }}
+    {{- fail (printf "networkPolicy.egress[%d]: allPorts is for cidr and cidrGroup only" $i) }}
+  {{- end }}
+  {{- if and $r.allPorts $r.ports }}
+    {{- fail (printf "networkPolicy.egress[%d]: allPorts and ports exclude each other" $i) }}
+  {{- end }}
   {{- $ports := $r.ports }}
   {{- if and (not $ports) (eq $r.to "kube-apiserver") }}{{ $ports = list 6443 }}{{ end }}
   {{- if and (not $ports) (eq $r.to "fqdn") }}{{ $ports = list 443 }}{{ end }}
-  {{- if and (not $ports) (has $r.to (list "world" "cidr" "cidrGroup" "pods")) }}
+  {{- /* allPorts must be explicit: a forgotten ports list fails instead of opening every port. */}}
+  {{- if and (not $ports) (not $r.allPorts) (has $r.to (list "world" "cidr" "cidrGroup" "pods")) }}
     {{- fail (printf "networkPolicy.egress[%d]: to %s needs ports" $i $r.to) }}
   {{- end }}
+  {{- $portsText := join "," $ports }}
+  {{- if not $ports }}{{ $portsText = ternary (printf "every %s port" $r.protocol) "every port" (not (empty $r.protocol)) }}{{ end }}
   {{- if and (eq $r.to "fqdn") (not $r.names) }}
     {{- fail (printf "networkPolicy.egress[%d]: to fqdn needs names" $i) }}
   {{- end }}
@@ -57,6 +70,7 @@ spec:
   {{- $dest := "" }}
   {{- if eq $r.to "kube-apiserver" }}{{ $dest = "the Kubernetes API" }}
   {{- else if eq $r.to "world" }}{{ $dest = "the Internet" }}
+  {{- else if eq $r.to "internet" }}{{ $dest = "the Internet except private ranges" }}
   {{- else if eq $r.to "fqdn" }}{{ $dest = join ", " $r.names }}
   {{- else if eq $r.to "cidr" }}{{ $dest = join ", " $r.cidrs }}
   {{- else if eq $r.to "cidrGroup" }}{{ $dest = printf "CIDR groups %s" (join ", " $r.groups) }}
@@ -71,7 +85,7 @@ metadata:
   labels:
     {{- include "common.helpers.labels" $ | nindent 4 }}
 spec:
-  description: {{ printf "Out: %s to %s on %s. %s" $who $dest (join "," $ports) $r.why | quote }}
+  description: {{ printf "Out: %s to %s on %s. %s" $who $dest $portsText $r.why | quote }}
   endpointSelector:
     {{- include "common.networkPolicy.selector" $r.select | nindent 4 }}
   egress:
@@ -81,6 +95,15 @@ spec:
   {{- else if eq $r.to "world" }}
     - toEntities:
         - world
+  {{- else if eq $r.to "internet" }}
+    # The world entity also holds the LAN: the private ranges stay closed, a LAN
+    # target needs its own cidr or cidrGroup entry.
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
   {{- else if eq $r.to "fqdn" }}
     # Matched against the names the pod resolves through the Cilium DNS proxy,
     # turned on for these pods only by the DNS rule below.
@@ -101,7 +124,10 @@ spec:
     - toEndpoints:
         {{- include "common.networkPolicy.peer" (dict "selector" $r.selector "namespace" $peerNs) | nindent 8 }}
   {{- end }}
-      {{- include "common.networkPolicy.ports" (dict "ports" $ports "protocol" $r.protocol) | nindent 6 }}
+  {{- $rulePorts := $ports | default (ternary (list 0) list (not (empty $r.protocol))) }}
+  {{- if $rulePorts }}
+      {{- include "common.networkPolicy.ports" (dict "ports" $rulePorts "protocol" $r.protocol) | nindent 6 }}
+  {{- end }}
   {{- if eq $r.to "fqdn" }}
     - toEndpoints:
         - matchLabels:
@@ -125,7 +151,7 @@ metadata:
   labels:
     {{- include "common.helpers.labels" $ | nindent 4 }}
 spec:
-  description: {{ printf "In: %s from %s on %s. %s" $dest $who (join "," $ports) $r.why | quote }}
+  description: {{ printf "In: %s from %s on %s. %s" $dest $who $portsText $r.why | quote }}
   endpointSelector:
     {{- include "common.networkPolicy.selector" $r.selector | nindent 4 }}
   ingress:
@@ -235,7 +261,8 @@ without it as the policy namespace. */ -}}
     {{- toYaml $labels | nindent 4 }}
 {{- end -}}
 
-{{- /* toPorts block, nothing when the list is empty. */ -}}
+{{- /* toPorts block, nothing when the list is empty; port 0 matches every port
+of the protocol. */ -}}
 {{- define "common.networkPolicy.ports" -}}
   {{- if .ports -}}
 toPorts:
