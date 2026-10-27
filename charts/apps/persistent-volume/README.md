@@ -22,7 +22,7 @@ storage classes.
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../../library/common | common | 3.3.0 |
+| file://../../library/common | common | 3.4.0 |
 
 ## Values
 
