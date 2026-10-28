@@ -30,6 +30,48 @@ tests:
           path: spec.egress
           value: [{}]
 
+  - it: should apply the baseline in a later ArgoCD sync wave
+    asserts:
+      - equal:
+          path: metadata.annotations["argocd.argoproj.io/sync-wave"]
+          value: "1"
+
+  - it: should keep every flow policy out of default deny
+    set:
+      networkPolicy.egress:
+        - to: pods
+          selector:
+            app: db
+          ports: [5432]
+          why: Example flow.
+      networkPolicy.ingress:
+        - from: cidrGroup
+          groups: [group-a]
+          ports: [8080]
+          why: Example flow.
+    asserts:
+      - equal:
+          path: spec.enableDefaultDeny
+          value:
+            ingress: false
+            egress: false
+        documentIndex: 1
+      - equal:
+          path: spec.enableDefaultDeny
+          value:
+            ingress: false
+            egress: false
+        documentIndex: 2
+      - equal:
+          path: spec.enableDefaultDeny
+          value:
+            ingress: false
+            egress: false
+        documentIndex: 3
+      - notExists:
+          path: metadata.annotations
+        documentIndex: 1
+
   # ArgoCD names the release after the Application: helm-museum-<app>.
   - it: should keep the suffix whole when the release name is long
     release:

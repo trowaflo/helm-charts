@@ -22,7 +22,7 @@ by every app (DNS, gateway, scrape) belong to a cluster-wide baseline, not here.
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../../library/common | common | 3.4.0 |
+| file://../../library/common | common | 3.5.0 |
 
 ## Values
 
