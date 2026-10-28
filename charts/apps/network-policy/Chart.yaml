@@ -1,6 +1,6 @@
 apiVersion: v2
 name: network-policy
-version: 0.9.0
+version: 0.10.0
 type: application
 description: |-
   Helm chart for Cilium network policies of one namespace. Puts every pod of the
