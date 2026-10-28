@@ -3,6 +3,10 @@ Cilium network policies of one namespace: a baseline that puts every pod in
 default deny, then one policy per declared flow, its `why` as description.
 Flows shared by every app (DNS, gateway, scrape) belong to a cluster-wide
 baseline outside this chart.
+Only the baseline denies: a flow policy keeps enableDefaultDeny false, since
+Cilium otherwise denies everything else for its pods as soon as it exists. The
+baseline goes in a later ArgoCD sync wave, so a sync applied halfway leaves the
+namespace open instead of cutting flows whose policy is not there yet.
 */ -}}
 {{- define "common.manifests.networkPolicy" -}}
 {{- $np := .Values.networkPolicy | default dict }}
@@ -16,6 +20,8 @@ metadata:
   name: {{ include "common.networkPolicy.name" (dict "root" $ "suffix" "baseline") }}
   labels:
     {{- include "common.helpers.labels" $ | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   description: Default deny for every pod of the namespace, present or future; the other policies of this release and the cluster-wide baseline open the declared flows.
   endpointSelector: {}
@@ -88,6 +94,9 @@ spec:
   description: {{ printf "Out: %s to %s on %s. %s" $who $dest $portsText $r.why | quote }}
   endpointSelector:
     {{- include "common.networkPolicy.selector" $r.select | nindent 4 }}
+  enableDefaultDeny:
+    ingress: false
+    egress: false
   egress:
   {{- if eq $r.to "kube-apiserver" }}
     - toEntities:
@@ -154,6 +163,9 @@ spec:
   description: {{ printf "In: %s from %s on %s. %s" $dest $who $portsText $r.why | quote }}
   endpointSelector:
     {{- include "common.networkPolicy.selector" $r.selector | nindent 4 }}
+  enableDefaultDeny:
+    ingress: false
+    egress: false
   ingress:
     - fromEndpoints:
         {{- include "common.networkPolicy.peer" (dict "selector" $r.select "namespace" $ns) | nindent 8 }}
@@ -195,6 +207,9 @@ spec:
   description: {{ printf "In: %s from %s on %s. %s" $who $src (join "," $r.ports) $r.why | quote }}
   endpointSelector:
     {{- include "common.networkPolicy.selector" $r.select | nindent 4 }}
+  enableDefaultDeny:
+    ingress: false
+    egress: false
   ingress:
   {{- if eq $r.from "pods" }}
     - fromEndpoints:

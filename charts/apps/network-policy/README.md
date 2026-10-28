@@ -1,6 +1,6 @@
 # network-policy
 
-![Version: 0.8.1](https://img.shields.io/badge/Version-0.8.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.9.0](https://img.shields.io/badge/Version-0.9.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Helm chart for Cilium network policies of one namespace. Puts every pod of the
 namespace in default deny, then opens only the flows the app declares: Kubernetes
@@ -22,7 +22,7 @@ by every app (DNS, gateway, scrape) belong to a cluster-wide baseline, not here.
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../../library/common | common | 3.4.0 |
+| file://../../library/common | common | 3.5.0 |
 
 ## Values
 
