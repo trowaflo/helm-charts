@@ -321,6 +321,26 @@ entries:
     version: 1.0.0
   common:
   - apiVersion: v2
+    created: "2026-10-28T16:18:10.589902196Z"
+    description: Common library chart providing reusable Helm templates and default
+      configurations. Standardizes Kubernetes resource deployment (Deployments, StatefulSets,
+      DaemonSets, CronJobs, Jobs, Services, Ingress, ServiceMonitor, PersistentVolumes,
+      PersistentVolumeClaims, CNPG Clusters, CiliumNetworkPolicies) across the chart
+      repository with consistent security, observability, and best practices.  Used
+      by all application charts in this repository for consistency.
+    digest: 4157906e47ee54ee58be1dc772b8c5700a0000172d95877a33a1ae749c0d3142
+    home: https://github.com/trowaflo/helm-charts
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: common
+    sources:
+    - https://github.com/trowaflo/helm-charts
+    type: library
+    urls:
+    - https://github.com/trowaflo/helm-charts/releases/download/common-3.6.0/common-3.6.0.tgz
+    version: 3.6.0
+  - apiVersion: v2
     created: "2026-10-28T08:27:36.638174692Z"
     description: Common library chart providing reusable Helm templates and default
       configurations. Standardizes Kubernetes resource deployment (Deployments, StatefulSets,
@@ -1836,4 +1856,4 @@ entries:
     urls:
     - https://github.com/trowaflo/helm-charts/releases/download/persistent-volume-0.1.0/persistent-volume-0.1.0.tgz
     version: 0.1.0
-generated: "2026-10-28T08:27:50.522318174Z"
+generated: "2026-10-28T16:18:10.590095538Z"
