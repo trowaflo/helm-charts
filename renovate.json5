@@ -2,6 +2,6 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     // Pinned: a preset change reaches this repo only through a reviewed PR.
-    "github>trowaflo/renovate-config#v1.0.0"
+    "github>trowaflo/renovate-config#v1.0.1"
   ]
 }
