@@ -4,9 +4,10 @@ default deny, then one policy per declared flow, its `why` as description.
 Flows shared by every app (DNS, gateway, scrape) belong to a cluster-wide
 baseline outside this chart.
 Only the baseline denies: a flow policy keeps enableDefaultDeny false, since
-Cilium otherwise denies everything else for its pods as soon as it exists. The
-baseline goes in a later ArgoCD sync wave, so a sync applied halfway leaves the
-namespace open instead of cutting flows whose policy is not there yet.
+Cilium otherwise denies everything else for its pods as soon as it exists.
+baselineAnnotations lets a deploy tool apply the baseline last (an ArgoCD sync
+wave, a Helm hook), so a rollout applied halfway leaves the namespace open
+instead of cutting flows whose policy is not there yet.
 */ -}}
 {{- define "common.manifests.networkPolicy" -}}
 {{- $np := .Values.networkPolicy | default dict }}
@@ -20,8 +21,10 @@ metadata:
   name: {{ include "common.networkPolicy.name" (dict "root" $ "suffix" "baseline") }}
   labels:
     {{- include "common.helpers.labels" $ | nindent 4 }}
+  {{- with $np.baselineAnnotations }}
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   description: Default deny for every pod of the namespace, present or future; the other policies of this release and the cluster-wide baseline open the declared flows.
   endpointSelector: {}

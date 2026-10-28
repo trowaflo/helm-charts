@@ -8,6 +8,12 @@ networkPolicy:
   # where the default is false.
   enabled: true
 
+  # -- Annotations of the baseline, the only policy that puts the namespace in
+  # default deny. Lets the deploy tool apply it after the flow policies, e.g.
+  # `argocd.argoproj.io/sync-wave: "1"`, so a rollout applied halfway leaves the
+  # namespace open instead of cutting flows whose policy is not there yet.
+  baselineAnnotations: {}
+
   # -- Outbound flows of this namespace, one entry per need, beyond the cluster-wide
   # baseline (DNS, gateway hairpin). Every entry carries `why`, rendered as the
   # policy `description`. Templates live in the common library (3.4.0).

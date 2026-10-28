@@ -30,11 +30,27 @@ tests:
           path: spec.egress
           value: [{}]
 
-  - it: should apply the baseline in a later ArgoCD sync wave
+  - it: should render the baseline without annotations by default
+    asserts:
+      - notExists:
+          path: metadata.annotations
+
+  - it: should put the declared annotations on the baseline only
+    set:
+      networkPolicy.baselineAnnotations:
+        example.com/order: "1"
+      networkPolicy.egress:
+        - to: kube-apiserver
+          why: Example flow.
     asserts:
       - equal:
-          path: metadata.annotations["argocd.argoproj.io/sync-wave"]
-          value: "1"
+          path: metadata.annotations
+          value:
+            example.com/order: "1"
+        documentIndex: 0
+      - notExists:
+          path: metadata.annotations
+        documentIndex: 1
 
   - it: should keep every flow policy out of default deny
     set:

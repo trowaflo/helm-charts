@@ -11,6 +11,10 @@
       "additionalProperties": false,
       "properties": {
         "enabled": { "type": "boolean" },
+        "baselineAnnotations": {
+          "type": ["object", "null"],
+          "additionalProperties": { "type": "string" }
+        },
         "egress": {
           "type": ["array", "null"],
           "items": {
