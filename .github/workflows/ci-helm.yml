@@ -273,6 +273,8 @@ jobs:
       cancel-in-progress: false
     permissions:
       contents: write
+    outputs:
+      sha: ${{ steps.head.outputs.sha }}
     env:
       # Built-in endpoints — see first job above
       _HARDEN_DEFAULTS: >-
@@ -373,6 +375,11 @@ jobs:
           find "$CHARTS_DIR" -name Chart.yaml -exec git add {} +
           git commit -m "ci: bump chart versions [skip ci]"
           git push
+      # Le commit de bump porte `[skip ci]` : aucun run ne repart de lui, et l'event garde
+      # le SHA d'avant. Les jobs aval qui empaquettent lisent celui-ci.
+      - name: Expose head SHA
+        id: head
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
   # ─── Documentation ───────────────────────────────────────────────────────────
 
@@ -550,7 +557,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
+          # helm-bump sauté (Renovate) : pas de sortie, l'event fait foi.
+          ref: ${{ needs.helm-bump.outputs.sha || github.event.pull_request.head.sha }}
       - uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
       - name: Configure Git
         run: |
