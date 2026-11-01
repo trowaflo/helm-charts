@@ -54,12 +54,20 @@ jobs:
         release-assets.githubusercontent.com:443
         tuf-repo-cdn.sigstore.dev:443
         uploads.github.com:443
+      # Dépendances des charts : `helm repo add` des dépôts HTTP (aureq, ce dépôt via
+      # trowaflo.github.io) et `helm dependency build` des registres OCI (quay.io, kgateway).
+      _HARDEN_DEPS: >-
+        aureq.github.io:443
+        trowaflo.github.io:443
+        quay.io:443
+        cdn01.quay.io:443
+        cr.kgateway.dev:443
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
         with:
           egress-policy: block
-          allowed-endpoints: ${{ env._HARDEN_DEFAULTS }}
+          allowed-endpoints: ${{ env._HARDEN_DEFAULTS }} ${{ env._HARDEN_DEPS }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
