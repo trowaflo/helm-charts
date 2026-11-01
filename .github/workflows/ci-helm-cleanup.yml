@@ -18,8 +18,9 @@ jobs:
     # Job-level, not workflow-level: in a called workflow, workflow-level concurrency
     # applies to the caller's run. Never cancelled: the job pushes to pr-charts and
     # deletes GHCR versions, and a run cut in the middle leaves them half-reconciled.
+    # Même groupe que helm-pr-charts (ci-helm.yml) : un seul écrivain de pr-charts à la fois.
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-ci-helm-cleanup
+      group: pr-charts-branch
       cancel-in-progress: false
     permissions:
       contents: write

@@ -526,8 +526,10 @@ jobs:
     name: PR Chart Packages
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Groupe partagé par tous les écrivains de la branche pr-charts, toutes PR et
+    # ci-helm-cleanup.yml compris : deux pushes partis du même tip, l'un est rejeté.
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-ci-helm-pr-charts
+      group: pr-charts-branch
       cancel-in-progress: false
     permissions:
       contents: write
