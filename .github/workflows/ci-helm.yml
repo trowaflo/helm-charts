@@ -258,13 +258,14 @@ jobs:
 
   helm-bump:
     needs: [helm-lint, helm-unittest-matrix, helm-unittest]
+    # Sans fonction de statut, le `success()` implicite saute un job dès qu'un parent est
+    # sauté. `failure()` ignore un parent annulé (timeout) : d'où le contrôle explicite des
+    # résultats, et chaque job aval liste tous ses ancêtres dans `needs`.
     if: >-
-      ${{ !failure() && !cancelled() &&
+      ${{ !cancelled() &&
+          !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') &&
           github.event_name == 'pull_request' &&
-          !contains(',renovate[bot],', format(',{0},', github.actor)) &&
-          (needs.helm-lint.result == 'success' || needs.helm-lint.result == 'skipped') &&
-          (needs.helm-unittest-matrix.result == 'success' || needs.helm-unittest-matrix.result == 'skipped') &&
-          (needs.helm-unittest.result == 'success' || needs.helm-unittest.result == 'skipped') }}
+          !contains(',renovate[bot],', format(',{0},', github.actor)) }}
     name: Helm Version Bump
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -384,12 +385,11 @@ jobs:
   # ─── Documentation ───────────────────────────────────────────────────────────
 
   helm-docs:
-    needs: [helm-bump]
-    # Sans fonction de statut, le `success()` implicite saute ce job dès que helm-bump
-    # est sauté (Renovate, workflow_dispatch), et la tolérance `skipped` ne sert jamais.
+    needs: [helm-lint, helm-unittest-matrix, helm-unittest, helm-bump]
+    # Garde : voir helm-bump.
     if: >-
-      ${{ !failure() && !cancelled() &&
-          (needs.helm-bump.result == 'success' || needs.helm-bump.result == 'skipped') }}
+      ${{ !cancelled() &&
+          !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}
     name: Helm Docs
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -452,10 +452,11 @@ jobs:
           fi
 
   helm-docs-check:
-    needs: [helm-docs]
+    needs: [helm-lint, helm-unittest-matrix, helm-unittest, helm-bump, helm-docs]
+    # Garde : voir helm-bump.
     if: >-
-      ${{ !failure() && !cancelled() &&
-          (needs.helm-docs.result == 'success' || needs.helm-docs.result == 'skipped') }}
+      ${{ !cancelled() &&
+          !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}
     name: Helm Docs Check
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -518,11 +519,12 @@ jobs:
   # ─── PR Charts ───────────────────────────────────────────────────────────────
 
   helm-pr-charts:
-    needs: [helm-bump]
+    needs: [helm-lint, helm-unittest-matrix, helm-unittest, helm-bump]
+    # Garde : voir helm-bump.
     if: >-
-      ${{ !failure() && !cancelled() &&
-          github.event_name == 'pull_request' &&
-          (needs.helm-bump.result == 'success' || needs.helm-bump.result == 'skipped') }}
+      ${{ !cancelled() &&
+          !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') &&
+          github.event_name == 'pull_request' }}
     name: PR Chart Packages
     runs-on: ubuntu-latest
     timeout-minutes: 15
