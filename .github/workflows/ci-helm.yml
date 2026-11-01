@@ -224,11 +224,33 @@ jobs:
             "$CHART"
       - name: Publish test results
         if: always()
-        uses: EnricoMi/publish-unit-test-result-action@c950f6fb443cb5af20a377fd0dfaa78838901040 # v2.23.0
+        # Image par digest : l'action déclare son image par tag (v2.23.0), que `uses:` d'une
+        # action ne fige pas. Les défauts de son action.yml sont recopiés, `docker://` n'en applique aucun.
+        uses: docker://ghcr.io/enricomi/publish-unit-test-result-action:v2.23.0@sha256:9c5a81dbdc3bdc370fdb9c4e35a8ceb63cce8c880354d3db0d6e66f4197db55a
         with:
+          github_token: ${{ github.token }}
+          github_retries: "10"
+          ssl_verify: "true"
           files: test-results-*.xml
           check_name: "Test Results - ${{ matrix.chart }}"
           comment_mode: "off"
+          fail_on: "test failures"
+          action_fail: "false"
+          action_fail_on_inconclusive: "false"
+          time_unit: "seconds"
+          report_suite_logs: "none"
+          ignore_runs: "false"
+          check_run: "true"
+          job_summary: "true"
+          compare_to_earlier_commit: "true"
+          pull_request_build: "merge"
+          check_run_annotations: "all tests, skipped tests"
+          seconds_between_github_reads: "0.25"
+          seconds_between_github_writes: "2.0"
+          json_thousands_separator: " "
+          json_suite_details: "false"
+          json_test_case_results: "false"
+          search_pull_requests: "false"
 
   # ─── Version Bump ────────────────────────────────────────────────────────────
 
