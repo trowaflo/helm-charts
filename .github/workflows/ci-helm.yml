@@ -1,3 +1,4 @@
+# yamllint disable rule:line-length
 name: Helm CI
 
 # Job order: lint + unittest -> bump -> docs -> docs-check
@@ -20,6 +21,8 @@ env:
     cdn01.quay.io:443
     aureq.github.io:443
     trowaflo.github.io:443
+    quay.io:443
+    cr.kgateway.dev:443
 
 permissions: {}
 
