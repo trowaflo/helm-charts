@@ -259,7 +259,8 @@ jobs:
   helm-bump:
     needs: [helm-lint, helm-unittest-matrix, helm-unittest]
     if: >-
-      ${{ github.event_name == 'pull_request' &&
+      ${{ !failure() && !cancelled() &&
+          github.event_name == 'pull_request' &&
           !contains(',renovate[bot],', format(',{0},', github.actor)) &&
           (needs.helm-lint.result == 'success' || needs.helm-lint.result == 'skipped') &&
           (needs.helm-unittest-matrix.result == 'success' || needs.helm-unittest-matrix.result == 'skipped') &&
@@ -377,8 +378,11 @@ jobs:
 
   helm-docs:
     needs: [helm-bump]
+    # Sans fonction de statut, le `success()` implicite saute ce job dès que helm-bump
+    # est sauté (Renovate, workflow_dispatch), et la tolérance `skipped` ne sert jamais.
     if: >-
-      ${{ (needs.helm-bump.result == 'success' || needs.helm-bump.result == 'skipped') }}
+      ${{ !failure() && !cancelled() &&
+          (needs.helm-bump.result == 'success' || needs.helm-bump.result == 'skipped') }}
     name: Helm Docs
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -443,7 +447,8 @@ jobs:
   helm-docs-check:
     needs: [helm-docs]
     if: >-
-      ${{ (needs.helm-docs.result == 'success' || needs.helm-docs.result == 'skipped') }}
+      ${{ !failure() && !cancelled() &&
+          (needs.helm-docs.result == 'success' || needs.helm-docs.result == 'skipped') }}
     name: Helm Docs Check
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -508,7 +513,8 @@ jobs:
   helm-pr-charts:
     needs: [helm-bump]
     if: >-
-      ${{ github.event_name == 'pull_request' &&
+      ${{ !failure() && !cancelled() &&
+          github.event_name == 'pull_request' &&
           (needs.helm-bump.result == 'success' || needs.helm-bump.result == 'skipped') }}
     name: PR Chart Packages
     runs-on: ubuntu-latest
