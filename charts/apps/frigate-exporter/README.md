@@ -1,6 +1,6 @@
 # frigate-exporter
 
-![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.1.0](https://img.shields.io/badge/Version-2.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Prometheus exporter for Frigate NVR (Network Video Recorder) system.
 Exports metrics from Frigate cameras, detections, and recording statistics
@@ -23,7 +23,7 @@ in Prometheus-compatible format for integration with monitoring stacks.
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://trowaflo.github.io/helm-charts | common | 3.0.0 |
+| https://trowaflo.github.io/helm-charts | common | 3.6.0 |
 
 ## Values
 
