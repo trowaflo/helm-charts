@@ -1,6 +1,6 @@
 # graphite-exporter
 
-![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.1.0](https://img.shields.io/badge/Version-2.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Prometheus exporter for converting Graphite plaintext protocol metrics to Prometheus format.
 Enables Prometheus to scrape metrics from legacy Graphite systems and sources
@@ -23,7 +23,7 @@ Enables Prometheus to scrape metrics from legacy Graphite systems and sources
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://trowaflo.github.io/helm-charts | common | 3.0.0 |
+| https://trowaflo.github.io/helm-charts | common | 3.6.0 |
 
 ## Values
 
@@ -33,7 +33,7 @@ Enables Prometheus to scrape metrics from legacy Graphite systems and sources
 | deployments.main.podSpec.containers.main.args[0] | string | `"--graphite.listen-address=:9109"` |  |
 | deployments.main.podSpec.containers.main.image.pullPolicy | string | `"IfNotPresent"` |  |
 | deployments.main.podSpec.containers.main.image.repository | string | `"prom/graphite-exporter"` |  |
-| deployments.main.podSpec.containers.main.image.tag | string | `"v0.16.0@sha256:e54bca6645ea8a9e8c52312a8540de98ad08819d38476c021d77a0eae75bc797"` |  |
+| deployments.main.podSpec.containers.main.image.tag | string | `"v0.17.0@sha256:c1a266f63a84fd11048ab6ad1552a4c497b14522d02823925247698e41eeac2b"` |  |
 | deployments.main.podSpec.containers.main.ports.graphite-tcp.containerPort | int | `9109` |  |
 | deployments.main.podSpec.containers.main.ports.graphite-tcp.protocol | string | `"TCP"` |  |
 | deployments.main.podSpec.containers.main.ports.graphite-udp.containerPort | int | `9109` |  |
