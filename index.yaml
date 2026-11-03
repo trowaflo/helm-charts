@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   cert-manager-platform:
   - apiVersion: v2
-    created: "2026-11-02T21:09:58.259305311Z"
+    created: "2026-11-03T22:02:37.846786237Z"
     dependencies:
     - alias: cert-manager
       condition: cert-manager.enabled
@@ -40,4 +40,36 @@ entries:
     urls:
     - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/cert-manager-platform-4.1.0-pr265.tgz
     version: 4.1.0-pr265
-generated: "2026-11-02T21:09:58.251174688Z"
+  frigate-exporter:
+  - apiVersion: v2
+    created: "2026-11-03T22:02:37.848215834Z"
+    dependencies:
+    - name: common
+      repository: https://trowaflo.github.io/helm-charts
+      version: 3.6.0
+    description: Prometheus exporter for Frigate NVR (Network Video Recorder) system.
+      Exports metrics from Frigate cameras, detections, and recording statistics in
+      Prometheus-compatible format for integration with monitoring stacks.
+    digest: fd672d5daa7bb229d7add922b4d7f540574faa4e2ff3b03d2932ae6b341588b2
+    home: https://github.com/bairhys/prometheus-frigate-exporter
+    icon: https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/images/prometheus-logo.svg
+    keywords:
+    - prometheus
+    - exporter
+    - frigate
+    - nvr
+    - video
+    - monitoring
+    - metrics
+    maintainers:
+    - email: trowa.flo@gmail.com
+      name: trowaflo
+    name: frigate-exporter
+    sources:
+    - https://github.com/bairhys/prometheus-frigate-exporter
+    - https://github.com/trowaflo/helm-charts
+    type: application
+    urls:
+    - https://raw.githubusercontent.com/trowaflo/helm-charts/pr-charts/frigate-exporter-2.1.0-pr274.tgz
+    version: 2.1.0-pr274
+generated: "2026-11-03T22:02:37.836118458Z"
