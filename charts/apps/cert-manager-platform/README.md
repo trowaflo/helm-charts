@@ -1,6 +1,6 @@
 # cert-manager-platform
 
-![Version: 4.0.0](https://img.shields.io/badge/Version-4.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 4.1.0](https://img.shields.io/badge/Version-4.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Wraps cert-manager and cert-manager-webhook-ovh to provide automated X.509 certificate
 management for Kubernetes with OVH DNS-01 challenge support. Includes Certificate resource
@@ -25,7 +25,7 @@ management and streamlined setup for Let's Encrypt certificates.
 | Repository | Name | Version |
 |------------|------|---------|
 | https://aureq.github.io/cert-manager-webhook-ovh/ | cert-manager-webhook-ovh(cert-manager-webhook-ovh) | 0.9.5 |
-| oci://quay.io/jetstack/charts | cert-manager(cert-manager) | v1.20.0 |
+| oci://quay.io/jetstack/charts | cert-manager(cert-manager) | v1.21.3 |
 
 ## Values
 
