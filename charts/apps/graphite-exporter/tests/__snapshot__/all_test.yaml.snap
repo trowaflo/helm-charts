@@ -8,7 +8,7 @@ should match snapshot with default values:
         app.kubernetes.io/instance: graphite-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: graphite-exporter-2.0.0
+        helm.sh/chart: graphite-exporter-2.1.0
       name: graphite-exporter-testing-name-override-test-graphite
       namespace: namespace-override-test
     spec:
@@ -35,7 +35,7 @@ should match snapshot with default values:
         app.kubernetes.io/instance: graphite-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: graphite-exporter-2.0.0
+        helm.sh/chart: graphite-exporter-2.1.0
       name: graphite-exporter-testing-name-override-test-main
       namespace: namespace-override-test
     spec:
@@ -58,7 +58,7 @@ should match snapshot with default values:
         app.kubernetes.io/instance: graphite-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: graphite-exporter-2.0.0
+        helm.sh/chart: graphite-exporter-2.1.0
       name: graphite-exporter-testing-name-override-test-main
       namespace: namespace-override-test
     spec:
@@ -82,7 +82,7 @@ should match snapshot with default values:
           containers:
             - args:
                 - --graphite.listen-address=:9109
-              image: prom/graphite-exporter:v0.16.0@sha256:e54bca6645ea8a9e8c52312a8540de98ad08819d38476c021d77a0eae75bc797
+              image: prom/graphite-exporter:v0.17.0@sha256:c1a266f63a84fd11048ab6ad1552a4c497b14522d02823925247698e41eeac2b
               imagePullPolicy: IfNotPresent
               name: main
               ports:
@@ -125,7 +125,7 @@ should match snapshot with default values:
         app.kubernetes.io/instance: graphite-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: graphite-exporter-2.0.0
+        helm.sh/chart: graphite-exporter-2.1.0
       name: graphite-exporter-testing-name-override-test-main
       namespace: namespace-override-test
     spec:
@@ -150,7 +150,7 @@ should match snapshot with default values:
         app.kubernetes.io/instance: graphite-exporter-testing
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: name-override-test
-        helm.sh/chart: graphite-exporter-2.0.0
+        helm.sh/chart: graphite-exporter-2.1.0
         release: prometheus
       name: graphite-exporter-testing-name-override-test-main
       namespace: namespace-override-test
