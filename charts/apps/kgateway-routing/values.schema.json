@@ -194,6 +194,18 @@
         "weight": { "type": "integer" }
       }
     },
+    "timeouts": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "request": { "$ref": "#/definitions/duration" },
+        "backendRequest": { "$ref": "#/definitions/duration" }
+      }
+    },
+    "duration": {
+      "type": "string",
+      "pattern": "^([0-9]{1,5}(h|m|s|ms)){1,4}$"
+    },
     "rule": {
       "type": "object",
       "additionalProperties": false,
@@ -203,7 +215,8 @@
           "type": ["array", "null"],
           "items": { "$ref": "#/definitions/backendRef" }
         },
-        "filters": { "$ref": "#/definitions/filters" }
+        "filters": { "$ref": "#/definitions/filters" },
+        "timeouts": { "$ref": "#/definitions/timeouts" }
       }
     },
     "route": {
@@ -246,6 +259,7 @@
             "fillInterval": { "type": "string" }
           }
         },
+        "timeouts": { "$ref": "#/definitions/timeouts" },
         "inCluster": {
           "type": ["array", "null"],
           "items": { "$ref": "#/definitions/inClusterBackend" }

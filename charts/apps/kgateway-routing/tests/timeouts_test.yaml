@@ -1,0 +1,87 @@
+suite: test kgateway-routing chart - HTTPRoute timeouts
+release:
+  name: kgateway-routing-test
+  namespace: kgateway-test
+templates:
+  - templates/httproute.yaml
+tests:
+  - it: should copy route timeouts to an inCluster rule
+    values:
+      - values/timeouts.yaml
+    documentSelector:
+      path: metadata.name
+      value: stream
+    asserts:
+      - equal:
+          path: spec.rules[0].timeouts
+          value:
+            request: 0s
+
+  - it: should copy route timeouts to an outCluster rule
+    values:
+      - values/timeouts.yaml
+    documentSelector:
+      path: metadata.name
+      value: external
+    asserts:
+      - equal:
+          path: spec.rules[0].timeouts
+          value:
+            request: 1h
+            backendRequest: 30m
+
+  - it: should let a rule-level timeouts replace the route-level one
+    values:
+      - values/timeouts.yaml
+    documentSelector:
+      path: metadata.name
+      value: ruled
+    asserts:
+      - equal:
+          path: spec.rules[0].timeouts
+          value:
+            request: 30s
+      - equal:
+          path: spec.rules[1].timeouts
+          value:
+            request: 0s
+
+  - it: should render no timeouts when the route sets none
+    values:
+      - values/timeouts.yaml
+    documentSelector:
+      path: metadata.name
+      value: plain
+    asserts:
+      - notExists:
+          path: spec.rules[0].timeouts
+
+  - it: should reject a duration outside the Gateway API format
+    set:
+      routes:
+        bad:
+          enabled: true
+          hostnames:
+            - bad.example.com
+          timeouts:
+            request: 15
+          inCluster:
+            - name: bad
+              port: 80
+    asserts:
+      - failedTemplate: {}
+
+  - it: should reject an unknown timeouts key
+    set:
+      routes:
+        bad:
+          enabled: true
+          hostnames:
+            - bad.example.com
+          timeouts:
+            idle: 1m
+          inCluster:
+            - name: bad
+              port: 80
+    asserts:
+      - failedTemplate: {}
