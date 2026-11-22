@@ -56,12 +56,14 @@ jobs:
         uploads.github.com:443
       # Dépendances des charts : `helm repo add` des dépôts HTTP (aureq, ce dépôt via
       # trowaflo.github.io) et `helm dependency build` des registres OCI (quay.io, kgateway).
+      # cr.kgateway.dev redirige ses blobs vers le stockage de GHCR (pkg-containers).
       _HARDEN_DEPS: >-
         aureq.github.io:443
         trowaflo.github.io:443
         quay.io:443
         cdn01.quay.io:443
         cr.kgateway.dev:443
+        pkg-containers.githubusercontent.com:443
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
