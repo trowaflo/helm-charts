@@ -1,0 +1,53 @@
+defaultParentRefs:
+  - name: kgateway-private
+    namespace: kgateway
+
+routes:
+  stream:
+    enabled: true
+    hostnames:
+      - stream.example.com
+    timeouts:
+      request: 0s
+    inCluster:
+      - name: stream
+        port: 80
+
+  external:
+    enabled: true
+    hostnames:
+      - external.example.com
+    timeouts:
+      request: 1h
+      backendRequest: 30m
+    outCluster:
+      - host: external.example.org
+        port: 443
+        tls: true
+
+  ruled:
+    enabled: true
+    hostnames:
+      - ruled.example.com
+    timeouts:
+      request: 0s
+    rules:
+      - matches:
+          - path:
+              value: /api
+        backendRefs:
+          - name: api
+            port: 80
+        timeouts:
+          request: 30s
+      - backendRefs:
+          - name: web
+            port: 80
+
+  plain:
+    enabled: true
+    hostnames:
+      - plain.example.com
+    inCluster:
+      - name: plain
+        port: 80
